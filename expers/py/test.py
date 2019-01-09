@@ -1,7 +1,28 @@
 #!/usr/bin/env python3
 #coding: utf-8
 
-import ralgo
+import pyralgo
+import pyralgo.libralgo
 
-reg = ralgo.libralgo.pi_regulator_const_delta(5, 0.1)
-print(reg)
+kp 			= 0.5
+ki_discr 	= pyralgo.libralgo.ki_discr(kp=kp, kip=0.5, delta=0.01)
+reg 		= pyralgo.libralgo.pi_regulator_const_delta(kp, ki_discr)
+
+r=0
+r = reg(r, 1); print(r)
+r = reg(r, 1); print(r)
+r = reg(r, 1); print(r)
+r = reg(r, 1); print(r)
+r = reg(r, 1); print(r)
+r = reg(r, 1); print(r)
+r = reg(r, 1); print(r)
+r = reg(r, 1); print(r)
+r = reg(r, 1); print(r)
+r = reg(r, 1); print(r)
+r = reg(r, 1); print(r)
+r = reg(r, 1); print(r)
+r = reg(r, 1); print(r)
+r = reg(r, 1); print(r)
+r = reg(r, 1); print(r)
+r = reg(r, 1); print(r)
+r = reg(r, 1); print(r)

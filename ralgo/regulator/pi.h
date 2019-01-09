@@ -9,19 +9,26 @@ namespace ralgo
 	struct regulator_const_delta
 	{
 		virtual T operator()(T error) = 0;
+		
+		T operator()(T current, T target)
+		{
+			return operator()(+ target - current);
+		}
 	};
 
 	template <class T, class Koeff = float>
 	struct pi_regulator_const_delta : public regulator_const_delta<T>
 	{
+		using parent = regulator_const_delta<T>;
 		Koeff kp;
 		Koeff ki_discr;
 
-		T u;
-		T e;
+		T u = 0;
+		T e = 0;
 
-		pi_regulator_const_delta(Koeff _kp, Koeff _kip) : kp(_kp), ki_discr(_kip) {}
+		pi_regulator_const_delta(Koeff _kp, Koeff _ki_discr) : kp(_kp), ki_discr(_ki_discr) {}
 
+		using parent::operator();
 		T operator()(T error) override
 		{
 			u = u + kp * (error - e) + ki_discr * error;
@@ -49,14 +56,15 @@ namespace ralgo
 		}
 	};
 
-	template <class T, class Time, class Koeff> T ki_discr(Koeff ki, Time delta)
-	{
-		return ki / delta;
-	}
+	//template <class Time, class Koeff=float> Koeff ki_discr(Koeff ki, Time delta)
+	//{
+	//	return ki * delta;
+	//}
 
-	template <class T, class Time, class Koeff> T ki_discr(Koeff kp, Koeff kip, Time delta)
+	template <class Time, class Koeff=float> 
+	Koeff ki_discr(Koeff kp, Koeff kip, Time delta)
 	{
-		return kp * kip / delta;
+		return kp * kip * delta;
 	}
 
 	template <class T, class Koeff> void step_responce(const regulator_const_delta<T>& regul, T* responce, size_t n, T input = 1) 

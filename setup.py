@@ -34,7 +34,7 @@ class bdist_wheel(bdist_wheel_):
 		self.plat_name_supplied = True
 		self.plat_name = platform_name
 
-ralgo_lib = Extension("libralgo",
+ralgo_lib = Extension("pyralgo.libralgo",
 	sources = ["ralgo/pywrap.cpp"] + ralgoopts["sources"],
 	extra_compile_args=['-fPIC', '-std=c++14'],
 	extra_link_args=['-Wl,-rpath,$ORIGIN/libs'],
@@ -43,11 +43,11 @@ ralgo_lib = Extension("libralgo",
 )
 
 setup(
-	name = 'ralgo',
-	packages = ['ralgo'],
+	name = 'pyralgo',
+	packages = ['pyralgo'],
 	version = '0.0.1',
 	license='MIT',
-	description = 'Messaging system',
+	description = '???????????',
 	author = 'Sorokin Nikolay',
 	author_email = 'mirmikns@yandex.ru',
 	url = 'https://mirmik.github.io/ralgo/',
