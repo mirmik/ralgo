@@ -1,5 +1,5 @@
 import licant
 
-licant.module("cynematic",
+licant.module("autocontrol",
 	include_paths=["."]
 )
