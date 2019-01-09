@@ -8,7 +8,7 @@ namespace ralgo
 	template <class T>
 	struct regulator_const_delta
 	{
-		virtual T operator()(T error) const = 0;
+		virtual T operator()(T error) = 0;
 	};
 
 	template <class T, class Koeff = float>
@@ -22,7 +22,7 @@ namespace ralgo
 
 		pi_regulator_const_delta(Koeff _kp, Koeff _kip) : kp(_kp), ki_discr(_kip) {}
 
-		T operator()(T error) const override
+		T operator()(T error) override
 		{
 			u = u + kp * (error - e) + ki_discr * error;
 			e = error;
@@ -41,7 +41,7 @@ namespace ralgo
 
 		pi_regulator(Koeff _kp, Koeff _ki) : kp(_kp), ki_discr_delta(_kp * _ki) {}
 
-		T operator()(T error, Time delta) const override
+		T operator()(T error, Time delta) override
 		{
 			u = u + kp * (error - e) + ki_discr_delta * delta * error;
 			e = error;

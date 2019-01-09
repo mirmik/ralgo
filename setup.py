@@ -34,9 +34,7 @@ class bdist_wheel(bdist_wheel_):
 		self.plat_name_supplied = True
 		self.plat_name = platform_name
 
-print([os.path.relpath(p) for p in ralgoopts["sources"]])
-
-ralgo_lib = Extension("libralgo.so",
+ralgo_lib = Extension("libralgo",
 	sources = ["ralgo/pywrap.cpp"] + ralgoopts["sources"],
 	extra_compile_args=['-fPIC', '-std=c++14'],
 	extra_link_args=['-Wl,-rpath,$ORIGIN/libs'],
