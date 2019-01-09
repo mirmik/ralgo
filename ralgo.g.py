@@ -1,5 +1,5 @@
 import licant
 
-licant.module("autocontrol",
+licant.module("ralgo",
 	include_paths=["."]
 )
