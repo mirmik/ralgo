@@ -2,6 +2,7 @@
 #define AUTOCONTROL_PI_H
 
 #include <cstdlib>
+#include <nos/print.h>
 
 namespace ralgo
 {
@@ -12,7 +13,7 @@ namespace ralgo
 		
 		T operator()(T current, T target)
 		{
-			return operator()(+ target - current);
+			return operator()(target - current);
 		}
 	};
 
@@ -23,17 +24,20 @@ namespace ralgo
 		Koeff kp;
 		Koeff ki_discr;
 
-		T u = 0;
-		T e = 0;
+		//T u = 0;
+		//T e = 0;
+		T integral = 0;
 
 		pi_regulator_const_delta(Koeff _kp, Koeff _ki_discr) : kp(_kp), ki_discr(_ki_discr) {}
 
 		using parent::operator();
 		T operator()(T error) override
 		{
-			u = u + kp * (error - e) + ki_discr * error;
-			e = error;
-			return u;
+			integral += error;
+			return kp * error + ki_discr * integral;
+			//u = u + kp * (error - e) + ki_discr * error;
+			//e = error;
+			//return u;
 		}
 	};
 

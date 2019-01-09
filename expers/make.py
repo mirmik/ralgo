@@ -4,11 +4,11 @@
 import licant
 
 licant.include("nos")
-licant.include("autocontrol")
+licant.include("ralgo")
 
 licant.cxx_application("target",
 	sources=["main.cpp"],
-	mdepends=["autocontrol", "nos"]
+	mdepends=["ralgo", "nos"]
 )
 
 licant.ex("target")
