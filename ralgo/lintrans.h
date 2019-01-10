@@ -40,21 +40,12 @@ namespace ralgo
 				K T_ksi_t_2 = 2 * T * ksi * t; 
 				K T_T__T_ksi_t_2 = T_T + T_ksi_t_2; 
 				
-				PRINT(T_T);
-				PRINT(T_T_t);
-
 				K znam = T_T__T_ksi_t_2 + t_t;
-				PRINT(znam);
 				a = T_T__T_ksi_t_2 / znam;
 				b = T_T_t / znam;
 				c = t_t / znam;
 				d = T_T / znam;
 				e = t / znam;
-				PRINT(a);
-				PRINT(b);
-				PRINT(c);
-				PRINT(d);
-				PRINT(e);
 			}
 
 			V operator()(V g) override 
@@ -63,6 +54,27 @@ namespace ralgo
 				return x = a*x + b*v + c*g;
 			}	
 		};
+
+		template <class V, class K=float> struct zv1 : public inout<V>
+		{
+			K pp, pg;
+			V p;
+			zv1(K a, K t) { K q=a+t; pp=a/q; pg=t/q; }
+			V operator()(V g) override { return p = pp*p + pg*g; }	
+		};
+
+		template <class V, class K=float> struct zv2 : public inout<V>
+		{
+			K pp, pr, pg, rp, rr, rg;
+			V p, r;
+			zv2(K a, K b, K t) { 
+				K q=a+b*t+t*t; 
+				pp=(a+b*t)/q; pr=(a*t)/q; pg=t*t;
+				rp=(-t)/q; rr=(a)/q; rg=(t)/q;
+			}
+
+			V operator()(V g) override { r = rp*p + rr*r + rg*g; return p = pp*p + pr*r + pg*g; }
+		};		
 	}
 }
 
