@@ -44,7 +44,7 @@ def plot_bode(w, start=-5, stop=5, num=100):
 	ax = fig.add_subplot(2, 1, 2)
 	line, = ax.plot(pnts, np.array(phs) * 180 / math.pi)
 	ax.set_xscale('log')
-	ax.set_ylim((-180 - 0.1, 180 + 0.1))
+	ax.set_ylim((-180 - 5, 180 + 5))
 
 def plot_step_responce(model, time, step):
 	space = np.r_[0:time:step]
