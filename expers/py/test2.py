@@ -9,12 +9,7 @@ import cmath
 import sympy
 import sys
 
-import evalcache
-import evalcache.dircache_v2
-
 import scipy
-
-lazy = evalcache.Lazy(evalcache.dircache_v2.DirCache_v2(".eval"))
 
 #pid = ralgo.pd.by_attrs(K=0.01,T=10)
 regulator = ralgo.pd.by_attrs(K=0.01, T=10)
