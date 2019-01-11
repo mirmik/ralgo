@@ -9,33 +9,27 @@ import cmath
 import sympy
 import sys
 
-tau = 0.01
-Tcor = 10
-Kcor = 0.1
-time = 200
-N = int(time / tau)
+import evalcache
+import evalcache.dircache_v2
 
-regulator = ralgo.pi(Kcor/Tcor, 1/Tcor, tau)
-#regulator2 = ralgo.pi(Kcor/Tcor, 1/Tcor, tau)
-model = ralgo.oscilator(T=0.1, ksi=0.5, delta=tau)
+import scipy
 
-values = []
-sigs = []
-for i in range(0,N):
-	target = 20
-	sig = regulator(target - model.output())
-	values.append(model(sig))
-	sigs.append(sig)
-	
-plt.subplot(2, 1, 1)
-plt.plot(np.arange(0,N) * tau, values)
+lazy = evalcache.Lazy(evalcache.dircache_v2.DirCache_v2(".eval"))
 
-plt.subplot(2, 1, 2)
-plt.plot(np.arange(0,N) * tau, sigs)
+#pid = ralgo.pd.by_attrs(K=0.01,T=10)
+regulator = ralgo.pd.by_attrs(K=0.01, T=10)
+model = ralgo.oscilator.by_attrs(T=0.1, ksi=0, delta=0.01)
+#tf = model.to_tf()
+#st = scipy.signal.step(tf)
 
+w = model.trfunc() * regulator.trfunc()
 
-pyralgo.plot_bode(regulator.trfunc() * model.trfunc())
-print((regulator.trfunc() * model.trfunc()).factor())
+#ralgo.plot_bode(w)
+#ralgo.plot_bode(model.trfunc())
+#ralgo.plot_bode(regulator.trfunc())
+print(ralgo.zfunc(w, -1))
+print(ralgo.zroots(w))
 
+ralgo.plot_step_responce_tf(model.trfunc(), 2, points = 100)
 
 plt.show()

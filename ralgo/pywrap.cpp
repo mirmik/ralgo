@@ -36,7 +36,7 @@ PYBIND11_MODULE(libralgo, m)
 		.def("print_internal", &lintrans::aperiodic<double,double>::print_internal)
 	;	
 	py::class_<lintrans::oscilator<double,double>>(m, "oscilator", inout_state)
-		.def(py::init<double,double,double>(), py::arg("T"), py::arg("ksi"), py::arg("delta"))
+		.def(py::init<double,double,double>(), py::arg("a"), py::arg("b"), py::arg("delta"))
 		.def("__call__", &lintrans::oscilator<double,double>::operator())
 		.def("output", &lintrans::oscilator<double,double>::output)
 		.def("a", &lintrans::oscilator<double,double>::a)
