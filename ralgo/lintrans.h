@@ -2,6 +2,9 @@
 #define RALGO_LINFILTERS_H
 
 #include <linalg.h>
+#include <linalg-add.h>
+
+using namespace linalg::ostream_overloads;
 
 namespace ralgo 
 {
@@ -69,49 +72,24 @@ namespace ralgo
 
 		template <class V, class K=float> struct zv2 : public inout<V>
 		{
-			//linalg::mat<V,2> m;
-			//linalg::vec<V,2> v;
+			linalg::mat<V,2,2> A;
+			linalg::vec<V,2> B;
+			linalg::vec<V,2> x;
 			
-			K pp, pr, pg, rp, rr, rg;
-			V p, r;
-			zv2(K a, K b, K t, V pi=V(), V ri=V()) : p(pi), r(ri) { 
-			//	K q=a+b*t+t*t; 
-			//	pp=(a+b*t)/q; pr=(a*t)/q; pg=(t*t)/q;
-			//	rp=(-t)/q; rr=(a)/q; rg=(t)/q;
-
-				auto D = sqrt(4*a+b*b)/2;
-				auto D1 = D+b/2;
-				auto D2 = -D+b/2;
-				auto DD = -1/D2+1/D1;
-				auto DDD = D1*D2*DD;
-				auto DD1 = D1*DD;
-				auto DD2 = D2*DD;
-
-				auto ED1 = exp(D1*t);
-				auto ED2 = exp(D2*t);
-
-				//m = linalg::mat<V,2> {
-				pp = -ED2/DD2+ED1/DD1;
-				pr = -ED1/DDD+ED2/DDD;
-				rp = ED1/DD-ED2/DD;
-				rr = -ED1/DD2+ED2/DD1;
-				//};
-
-				rg = 0.9;
-				pg = 0;
-
-				PRINT(pp);
-				PRINT(rp);
-				PRINT(pp);
-				PRINT(rr);
+			zv2(K a, K b, K t) : x{0,0}, B{0,1}, A{{0,-a},{1,-b}}
+			{ 
+				auto exp_A = linalg::exponent(linalg::mat<V,2,2>{{2,0},{0,1}});
+				auto inv_A = linalg::inverse(A);
+				nos::println(A);
+				nos::println(exp_A);
 			}
 
 			V operator()(V g) override 
 			{ 
-				V _r = 	rp*p + rr*r + rg*g; 
-				p = 	pp*p + pr*r + pg*g; 
-				r = _r;
-				return p;
+		//		V _r = 	rp*p + rr*r + rg*g; 
+		//		p = 	pp*p + pr*r + pg*g; 
+		//		r = _r;
+		//		return p;
 			}
 		};		
 	}
