@@ -12,6 +12,7 @@ namespace ralgo
 	{
 		template <class V> struct inout { 
 			virtual V operator()(V in) = 0;
+			virtual void print_internal() { nos::println("TODO"); };
 		};
 		
 		template <class V> struct inout_state : public inout<V> { 
@@ -74,21 +75,33 @@ namespace ralgo
 			V output() { return integral; }
 		};
 	
-		template <class V, class K=float> struct zv1 : public inout<V>
+		template <class V, class K=float> struct zv1 : public inout_state<V>
 		{
+			V _a;
 			K pp, pg;
 			V p;
-			zv1(K a, K t, V pi=V()) : p(pi) { K q=a+t; pp=a/q; pg=t/q; }
+			V a() { return _a; }
+			zv1(K a, K t, V pi=V()) : p(pi), _a(a) { K q=a+t; pp=a/q; pg=t/q; }
 			V operator()(V g) override { return p = pp*p + pg*g; }	
+			V output() { return p; }
+
+			void print_internal()  override
+			{
+				PRINT(_a);
+			}
 		};
 
-		template <class V, class K=float> struct zv2 : public inout<V>
+		template <class V, class K=float> struct zv2 : public inout_state<V>
 		{
+			V _a, _b;
 			linalg::mat<V,2,2> A;
 			linalg::vec<V,2> B;
 			linalg::vec<V,2> x;
 			
-			zv2(K a, K b, K t) : x{0,0}, B{0,1}, A{{0,-a},{1,-b}}
+			V a() { return _a; }
+			V b() { return _b; }
+
+			zv2(K a, K b, K t) : x{0,0}, B{0,1}, A{{0,-a},{1,-b}}, _a(a), _b(b)
 			{ 
 				auto _A = exponent(A * t);
 				auto I = linalg::mat<V,2,2>{linalg::identity};
@@ -101,23 +114,49 @@ namespace ralgo
 				x = A*x + B*g;
 				return x[0];
 			}
+
+			V output() { return x[0]; }
+
+			void print_internal()  override
+			{
+				PRINT(_a);
+				PRINT(_b);
+				PRINT(A);
+				PRINT(B);
+			}
 		};		
 
 
 		template <class T, class K=float>
 		struct pi : public inout<T>
 		{
-			K kp;
+			K _kp;
 			K ki_discr;
+			K delta;
 	
 			T integral = 0;
+
+			T kp() const { return _kp; }
+			T ki() const { return ki_discr / delta; }
+			T kip() const { return kip() / _kp; }
 	
-			pi(K kp, K kip, K delta) : kp(kp), ki_discr(kp * kip * delta) {}
+			pi(K kp, K kip, K delta) : _kp(kp), ki_discr(kp * kip * delta), delta(delta)
+			{
+				//nos::println("pi");	
+			}
 	
 			T operator()(T error) override
 			{
+				//nos::println("here");
 				integral += error;
-				return kp * error + ki_discr * integral;
+				return _kp * error + ki_discr * integral;
+			}
+
+			void print_internal() override
+			{
+				PRINT(_kp);
+				PRINT(ki_discr);
+				PRINT(delta);
 			}
 		};
 	}
