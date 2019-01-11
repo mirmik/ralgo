@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import pyralgo as ralgo
 import numpy as np
 import cmath
+import sympy
 import sys
 
 Tcor = 0.5
@@ -14,10 +15,12 @@ Kcor = 0.005
 tau = 0.001
 time = 100
 N = int(time / tau)
-model = ralgo.zv2(0.1, 0.5, tau)
+model = ralgo.oscilator(T=0.1, ksi=0.5, delta=tau)
 regulator = ralgo.pi(Kcor/Tcor, 1/Tcor, tau)
 
-print((model.trfunc() * regulator.trfunc()).factor())
+w = (model.trfunc() * regulator.trfunc())
+print(w.factor())
+print(sympy.fraction(w.factor()))
 
 #ralgo.plot_bode(regulator.trfunc(), -5, 5, 200)
 #plt.show()

@@ -11,11 +11,11 @@ class pi(lib.pi):
 	def trfunc(self):
 		return self.kp() + self.ki() * 1/s 
 
-class zv1(lib.zv1):
+class aperiodic(lib.aperiodic):
 	def trfunc(self):
 		return 1/(self.a()*s+1) 
 
-class zv2(lib.zv2):
+class oscilator(lib.oscilator):
 	def trfunc(self):
 		return 1/(self.a()*s*s+self.b()*s+1) 
 

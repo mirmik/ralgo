@@ -28,7 +28,7 @@ namespace ralgo
 		};
 
 		//W(s)=1/(T+s); a=t/(T+t); t=delta;
-		template <class V, class K=float> struct aperiodic : public inout<V>
+		/*template <class V, class K=float> struct aperiodic : public inout<V>
 		{
 			K a;
 			V x;
@@ -65,7 +65,7 @@ namespace ralgo
 				v = (g-x)*e + d*v;
 				return x = a*x + b*v + c*g;
 			}	
-		};
+		};*/
 
 		template <class V, class K=float> struct integrator : public inout_state<V>
 		{
@@ -75,13 +75,13 @@ namespace ralgo
 			V output() { return integral; }
 		};
 	
-		template <class V, class K=float> struct zv1 : public inout_state<V>
+		template <class V, class K=float> struct aperiodic : public inout_state<V>
 		{
 			V _a;
 			K pp, pg;
 			V p;
 			V a() { return _a; }
-			zv1(K a, K t, V pi=V()) : p(pi), _a(a) { K q=a+t; pp=a/q; pg=t/q; }
+			aperiodic(K a, K t, V pi=V()) : p(pi), _a(a) { K q=a+t; pp=a/q; pg=t/q; }
 			V operator()(V g) override { return p = pp*p + pg*g; }	
 			V output() { return p; }
 
@@ -91,7 +91,7 @@ namespace ralgo
 			}
 		};
 
-		template <class V, class K=float> struct zv2 : public inout_state<V>
+		template <class V, class K=float> struct oscilator : public inout_state<V>
 		{
 			V _a, _b;
 			linalg::mat<V,2,2> A;
@@ -101,7 +101,7 @@ namespace ralgo
 			V a() { return _a; }
 			V b() { return _b; }
 
-			zv2(K a, K b, K t) : x{0,0}, B{0,1}, A{{0,-a},{1,-b}}, _a(a), _b(b)
+			oscilator(K a, K b, K t) : x{0,0}, B{0,1}, A{{0,-a},{1,-b}}, _a(a), _b(b)
 			{ 
 				auto _A = exponent(A * t);
 				auto I = linalg::mat<V,2,2>{linalg::identity};
