@@ -11,7 +11,11 @@ namespace ralgo
 	namespace lintrans 
 	{
 		template <class V> struct inout { 
-			virtual V operator()(V in) = 0; 
+			virtual V operator()(V in) = 0;
+		};
+		
+		template <class V> struct inout_state : public inout<V> { 
+			virtual V output() = 0; 
 		};
 		
 		//W(s)=k
@@ -62,6 +66,14 @@ namespace ralgo
 			}	
 		};
 
+		template <class V, class K=float> struct integrator : public inout_state<V>
+		{
+			V integral;
+			integrator(V init=V()) : integral(init) { }
+			V operator()(V g) override { return integral+=g; }	
+			V output() { return integral; }
+		};
+	
 		template <class V, class K=float> struct zv1 : public inout<V>
 		{
 			K pp, pg;
@@ -78,20 +90,36 @@ namespace ralgo
 			
 			zv2(K a, K b, K t) : x{0,0}, B{0,1}, A{{0,-a},{1,-b}}
 			{ 
-				auto exp_A = linalg::exponent(linalg::mat<V,2,2>{{2,0},{0,1}});
-				auto inv_A = linalg::inverse(A);
-				nos::println(A);
-				nos::println(exp_A);
+				auto _A = exponent(A * t);
+				auto I = linalg::mat<V,2,2>{linalg::identity};
+				auto _B = inverse(A) * ((_A - I) * B);
+				A = _A; B = _B;
 			}
 
 			V operator()(V g) override 
 			{ 
-		//		V _r = 	rp*p + rr*r + rg*g; 
-		//		p = 	pp*p + pr*r + pg*g; 
-		//		r = _r;
-		//		return p;
+				x = A*x + B*g;
+				return x[0];
 			}
 		};		
+
+
+		template <class T, class K=float>
+		struct pi : public inout<T>
+		{
+			K kp;
+			K ki_discr;
+	
+			T integral = 0;
+	
+			pi(K kp, K kip, K delta) : kp(kp), ki_discr(kp * kip * delta) {}
+	
+			T operator()(T error) override
+			{
+				integral += error;
+				return kp * error + ki_discr * integral;
+			}
+		};
 	}
 }
 

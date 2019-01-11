@@ -8,11 +8,18 @@ import os
 
 import licant
 
+#licant.include("nos", "submodules/nos/nos.g.py")
+#licant.include("linalg-v3", "submodules/linalg/linalg.g.py")
+
+licant.include("nos", local_tunel="build/nos")
+licant.include("linalg-v3", local_tunel="build/linalg")
 licant.include("ralgo", "ralgo.g.py")
 
 licant.cxx_objects("ralgo-objects", 
 	mdepends = [
 		"ralgo",
+		"nos",
+		"linalg-v3"
 	] 
 )
 ralgoopts = licant.core.core.get("ralgo-objects").finalopts

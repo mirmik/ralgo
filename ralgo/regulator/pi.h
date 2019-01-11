@@ -4,6 +4,8 @@
 #include <cstdlib>
 #include <nos/print.h>
 
+#include <ralgo/lintrans.h>
+
 namespace ralgo
 {
 	template <class T>
