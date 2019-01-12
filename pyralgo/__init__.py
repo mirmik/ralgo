@@ -13,9 +13,11 @@ s, t = sympy.symbols("s t")
 class pi(lib.pi):
 	def trfunc(self):
 		return self.kp() + self.ki() * 1/s 
+	@staticmethod
+	def by_attrs(K, T, delta): return pi(K/T, 1/T, delta)
 
 class pid(lib.pi):
-	def __init__(self, kp, ki, kd): self._kp = kp; self._ki = ki; self._kd = kd;  
+	def __init__(self, kp, ki, kd, delta): self._kp = kp; self._ki = ki; self._kd = kd;  
 	def trfunc(self):
 		return self.kp() + self.ki() * 1/s + self.kd() * s
 	def kp(self): return self._kp
@@ -23,18 +25,26 @@ class pid(lib.pi):
 	def kd(self): return self._kd
 	def to_tf(self):
 		return scipy.signal.TransferFunction([self.kd(), self.kp(), self.ki()], [1,0])
+	@staticmethod
+	def by_attrs(K, T1, T2, delta): return pid(K*T1, K, K*T1*T2, delta)
 
 
 class pd(lib.pi):
-	def __init__(self, kp, kd): self._kp = kp; self._kd = kd;  
+	def __init__(self, kp, kd, delta): self._kp = kp; self._kd = kd;  
 	def trfunc(self):
 		return self.kp() + self.kd() * s
 	def kp(self): return self._kp
 	def kd(self): return self._kd
 	@staticmethod
-	def by_attrs(K, T): return pd(K, T*K)
+	def by_attrs(K, T, delta): return pd(K, T*K, delta)
 
-class regulator_d(lib.pi):
+class regulator_p:
+	def __init__(self, kp): self._kp = kp;  
+	def trfunc(self):
+		return self.kp()
+	def kp(self): return self._kp
+
+class regulator_d:
 	def __init__(self, kd): self._kd = kd;  
 	def trfunc(self):
 		return self.kd() * s
