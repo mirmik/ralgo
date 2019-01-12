@@ -26,7 +26,7 @@ regulator = ralgo.pid.by_attrs(K=1, T1=100, T2=1, delta=0.01)
 #ralgo.plot_bode(model.trfunc())
 #ralgo.plot_bode(regulator.trfunc())
 #print(ralgo.zfunc(w, -1))
-#print(ralgo.zroots(w))
+print(ralgo.zroots(regulator.trfunc()))
 
 #ralgo.plot_step_responce_tf(ralgo.zfunc(w, -1), 20, points = 100)
 ralgo.plot_bode(regulator.trfunc())
