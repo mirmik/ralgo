@@ -140,7 +140,7 @@ namespace ralgo
 			T ki() const { return ki_discr / delta; }
 			T kip() const { return kip() / _kp; }
 	
-			pi(K kp, K kip, K delta) : _kp(kp), ki_discr(kp * kip * delta), delta(delta)
+			pi(K kp, K ki, K delta) : _kp(kp), ki_discr(ki * delta), delta(delta)
 			{
 				//nos::println("pi");	
 			}
