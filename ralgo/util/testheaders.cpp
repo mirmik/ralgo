@@ -6,3 +6,5 @@
 #include <ralgo/servo/impulse_position_driver.h>
 
 #include <ralgo/servo/impulse_writer.h>
+
+#include <ralgo/kinematics/link.h>
