@@ -3,7 +3,8 @@
 #include <pybind11/stl.h>
 #include <pybind11/functional.h>
 
-#include <ralgo/regulator/pi.h>
+//#include <ralgo/regulator/pi.h>
+#include <ralgo/lintrans.h>
 
 using namespace ralgo;
 namespace py = pybind11;
