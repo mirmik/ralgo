@@ -20,25 +20,30 @@ namespace ralgo
 		P current;
 		P target;
 		bool worker_runned;
+		bool endpoint;
 		V speed;
 
-		void write(P _target, V _speed) 
+		P maxerror;
+		V minspeed;
+		V maxspeed;		
+		V alpha; //коэффициент компенсации ошибки по позиции
+
+		void write(P _target, V _speed, bool endpoint) 
 		{
 			lock.lock();
 
 			speed = _speed;
 			target = _target;
 
-			auto dst = target - current;
-			auto dstsign = sign(dst);
-			auto spdsign = sign(speed);
-			if (dstsign != spdsign) 
-			{
-				speed = -speed;
-				ralgo::warning("reversed speed in impulse_writer");
+			P dist = target - current;
+			if (ralgo::abs(dist) > maxerror) {
+				ralgo::fault("deviation error");
 			}
 
-			set_speed(_speed);
+			V eval_speed = speed + () * alpha;
+			eval_speed = ralgo::clamp(eval_speed, -maxspeed, maxspeed);
+			eval_speed = ralgo::rlamp(eval_speed, -minspeed, minspeed);
+			set_speed(eval_speed);
 
 			if (!worker_runned)
 				start_worker();
