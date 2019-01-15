@@ -3,6 +3,7 @@
 
 //#include <ralgo/servo/impulse_position_driver.h>
 #include <ralgo/info.h>
+#include <ralgo/util/math.h>
 
 namespace ralgo 
 {
@@ -36,13 +37,13 @@ namespace ralgo
 			target = _target;
 
 			P dist = target - current;
-			if (ralgo::abs(dist) > maxerror) {
-				ralgo::fault("deviation error");
+			if (abs(dist) > maxerror) {
+				ralgo::fault("control deviation error");
 			}
 
-			V eval_speed = speed + () * alpha;
+			V eval_speed = speed + dist * alpha;
 			eval_speed = ralgo::clamp(eval_speed, -maxspeed, maxspeed);
-			eval_speed = ralgo::rlamp(eval_speed, -minspeed, minspeed);
+			eval_speed = ralgo::rlamp(eval_speed, minspeed);
 			set_speed(eval_speed);
 
 			if (!worker_runned)

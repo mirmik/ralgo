@@ -4,6 +4,7 @@
 namespace ralgo 
 {
 	void warning(const char*);
+	void fault(const char*);
 }
 
 #endif
