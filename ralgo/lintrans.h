@@ -3,6 +3,7 @@
 
 #include <linalg.h>
 #include <linalg-add.h>
+#include <nos/print.h>
 
 using namespace linalg::ostream_overloads;
 
