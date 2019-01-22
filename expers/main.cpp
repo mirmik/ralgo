@@ -38,7 +38,7 @@ int main()
 	PRINT(ralgo::timepredict_trapecidal<double>(100, 10, 14, 20));
 
 	PRINT(ralgo::integrate_parabolic<double>([](double x){ return x*x*x; }, 0, 1, 10));
-	PRINT(ralgo::integrate_trapecidal<double>([](double x){ return x*x*x; }, 0, 1, 10));
-	PRINT(ralgo::integrate_rectangle<double>([](double x){ return x*x*x; }, 0, 1, 10));
+	PRINT(ralgo::integrate_trapecidal<double>([](double x){ return x*x*x; }, 0, 1, 100));
+	PRINT(ralgo::integrate_rectangle<double>([](double x){ return x*x*x; }, 0, 1, 1000));
 
 }
