@@ -3,6 +3,7 @@
 
 #include <ralgo/planning/phase.h>
 #include <gxx/datastruct/dlist.h>
+#include <utility>
 
 namespace ralgo
 {
@@ -22,7 +23,14 @@ namespace ralgo
 
 		///Возвращает -1 при выходе за целевой интервал времени.
 		///Иначе ноль. Фаза возваращается через указатель.
-		virtual int inloctime(T time, phase<P, V, A>* phs) = 0;
+		virtual int inloctime_placed(T time, phase<P, V, A>* phs) = 0;
+
+		std::pair<phase<P, V, A>, int> inloctime(T time) 
+		{
+			phase<P, V, A> phs;
+			auto ret = inloctime_placed(time, &phs);	
+			return std::make_pair(phs, ret);
+		}
 
 	public:
 		dlist_head lnk; // Для подключения в стэк траекторий.
@@ -39,7 +47,7 @@ namespace ralgo
 
 		keep_trajectory(P pos) : x(pos) {};
 
-		int inloctime(T t, phase<P, V, A>* phs) override
+		int inloctime_placed(T t, phase<P, V, A>* phs) override
 		{
 			phs->d0 = x;
 			phs->d1 = 0;
@@ -58,7 +66,7 @@ namespace ralgo
 
 		jog_trajectory(P startpos, V speed) : x0(startpos), v(speed) {};
 
-		int inloctime(T t, phase<P, V, A>* phs) override
+		int inloctime_placed(T t, phase<P, V, A>* phs) override
 		{
 			phs->d0 = x0 + v * t;
 			phs->d1 = v;
@@ -84,7 +92,7 @@ namespace ralgo
 			v = (V)x01 / (V)t01;
 		}
 
-		int inloctime(T t, phase<P, V, A>* phs) override
+		int inloctime_placed(T t, phase<P, V, A>* phs) override
 		{
 			if (t > t01) {
 				phs->d0 = x1;
@@ -112,7 +120,7 @@ namespace ralgo
 		T t01;
 
 		P xacc;
-		P xlin;
+//		P xlin;
 
 		A acc;
 		A dcc;
@@ -127,13 +135,13 @@ namespace ralgo
 			x01 = x1 - x0;
 			v = 2 * (V)x01 / (V)(t_acc + 2*t_lin + t_dcc);
 			xacc = t_acc * v / 2;
-			xlin = xacc + t_lin * v;
+//			xlin = xacc + t_lin * v;
 
-			A acc = v / t_acc;
-			A dcc = - v / t_dcc;
+			acc = v / t_acc;
+			dcc = - v / t_dcc;
 		}
 
-		int inloctime(T t, phase<P, V, A>* phs) override
+		int inloctime_placed(T t, phase<P, V, A>* phs) override
 		{
 			if (t > t01) {
 				phs->d0 = x1;
@@ -152,13 +160,13 @@ namespace ralgo
 			{
 				phs->d2 = 0;	
 				phs->d1 = v;
-				phs->d0 = xacc + v * t;
+				phs->d0 = xacc + v * (t - t_acc);
 			}
 			else 
 			{
 				phs->d2 = dcc;	
-				phs->d1 = v + dcc * (t - t_acc - t_lin);
-				phs->d0 = xlin + phs->d1 * (t - t_acc - t_lin) / 2;
+				phs->d1 = - dcc * (t01 - t);
+				phs->d0 = x1 - phs->d1 * (t01 - t) / 2;
 			} 
 
 			return 0;
