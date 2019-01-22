@@ -5,8 +5,11 @@ import numpy as np
 import cmath
 import math
 
-import scipy
-import scipy.signal
+#import scipy
+#import scipy.signal
+
+from pyralgo.libralgo import keep_trajectory
+from pyralgo.libralgo import accdcc_by_time_trajectory
 
 s, t = sympy.symbols("s t")
 
