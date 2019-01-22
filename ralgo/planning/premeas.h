@@ -15,7 +15,7 @@ namespace ralgo
 		
 		if (dist_accdcc < dist) 
 		{
-			//Изделие полностью выполнонит разгонные участки.
+			//Изделие полностью выполнит разгонные участки.
 			//Эпюра имеет форму трапеции.
 			T dist_line = dist - dist_accdcc;
 			T time_line = dist_line / spd;

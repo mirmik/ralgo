@@ -1,6 +1,7 @@
 #include <nos/print.h>
 #include <ralgo/lintrans.h>
 #include <ralgo/planning/premeas.h>
+#include <ralgo/integrate/integrate.h>
 
 using namespace ralgo;
 
@@ -35,5 +36,9 @@ int main()
 	PRINT(ralgo::timepredict_trapecidal<double>(100, 10, 13, 13));
 	PRINT(ralgo::timepredict_trapecidal<double>(100, 10, 14, 14));
 	PRINT(ralgo::timepredict_trapecidal<double>(100, 10, 14, 20));
+
+	PRINT(ralgo::integrate_parabolic<double>([](double x){ return x*x*x; }, 0, 1, 10));
+	PRINT(ralgo::integrate_trapecidal<double>([](double x){ return x*x*x; }, 0, 1, 10));
+	PRINT(ralgo::integrate_rectangle<double>([](double x){ return x*x*x; }, 0, 1, 10));
 
 }
