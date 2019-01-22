@@ -31,6 +31,7 @@ namespace ralgo
 		T _start;
 	};
 
+	/// Траектория удержания текущей позиции. Бесконечное время действия.
 	template <typename P = int64_t, typename V = float, typename A = float, typename T = time_t>
 	struct keep_trajectory : public trajectory<P, V, A, T>
 	{
@@ -48,7 +49,7 @@ namespace ralgo
 		}
 	};
 
-
+	///Траектория движения с постоянной скоростью. Бесконечное время действия.
 	template <typename P = int64_t, typename V = float, typename A = float, typename T = time_t>
 	struct jog_trajectory : public trajectory<P, V, A, T>
 	{
@@ -85,8 +86,12 @@ namespace ralgo
 
 		int inloctime(T t, phase<P, V, A>* phs) override
 		{
-			if (t > t01)
+			if (t > t01) {
+				phs->d0 = x1;
+				phs->d1 = 0;
+				phs->d2 = 0;
 				return -1;
+			}
 
 			phs->d0 = x0 + ((float)t / (float)t01) * x01;
 			phs->d1 = v;
