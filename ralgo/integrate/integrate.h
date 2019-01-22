@@ -61,6 +61,38 @@ namespace ralgo
 	}
 
 	template <class T, class F>
+	T integrate_rectangle_left(F f, T begin, T end, int points)
+	{
+		T step = (end - begin) / (points - 1);
+		T cur = begin;
+		
+		T integ = 0;
+		for (int i = 1; i < points; ++i)
+		{
+			integ += f(cur) * step;
+			cur += step;
+		}
+
+		return integ;
+	}
+
+	template <class T, class F>
+	T integrate_rectangle_right(F f, T begin, T end, int points)
+	{
+		T step = (end - begin) / (points - 1);
+		T cur = begin + step;
+		
+		T integ = 0;
+		for (int i = 1; i < points; ++i)
+		{
+			integ += f(cur) * step;
+			cur += step;
+		}
+
+		return integ;
+	}
+
+	template <class T, class F>
 	T integrate_parabolic(F f, T begin, T end, int points)
 	{
 		T cur0 = begin;
