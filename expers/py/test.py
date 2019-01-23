@@ -2,46 +2,17 @@
 #coding: utf-8
 
 import pyralgo
-import matplotlib.pyplot as plt  
-import pyralgo as ralgo
 import numpy as np
-import cmath
-import sympy
-import sys
+import matplotlib.pyplot as plt
 
-Tcor = 0.5
-Kcor = 0.005
+traj = pyralgo.accdcc_by_time_trajectory(x0=0,x1=100,tacc=10,tlin=20,tdcc=10)
 
-tau = 0.001
-time = 100
-N = int(time / tau)
-model = ralgo.oscilator(T=0.1, ksi=0.5, delta=tau)
-regulator = ralgo.pi(Kcor/Tcor, 1/Tcor, tau)
+print(traj)
 
-w = (model.trfunc() * regulator.trfunc())
-print(w.factor())
-print(sympy.fraction(w.factor()))
+ls = np.linspace(0, 40, 100)
+arr = []
+for i in ls:
+	arr.append(traj.inloctime(i)[0].d0)
 
-#ralgo.plot_bode(regulator.trfunc(), -5, 5, 200)
-#plt.show()
-#sys.exit()
-
-values = []
-sigs = []
-for i in range(0,N):
-	target = 20
-	sig = regulator(target - model.output())
-	values.append(model(sig))
-	sigs.append(sig)
-	
-plt.subplot(2, 1, 1)
-plt.plot(np.arange(0,N) * tau, values)
-
-plt.subplot(2, 1, 2)
-plt.plot(np.arange(0,N) * tau, sigs)
-
-w = model.trfunc() * regulator.trfunc()
-ralgo.plot_bode(w, -5, 5, 200)
-
-
+plt.plot(ls,arr)
 plt.show()

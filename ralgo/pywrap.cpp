@@ -3,10 +3,14 @@
 #include <pybind11/stl.h>
 #include <pybind11/functional.h>
 
-#include <ralgo/regulator/pi.h>
+//#include <ralgo/regulator/pi.h>
+#include <ralgo/lintrans.h>
+#include <ralgo/planning/traj.h>
 
 using namespace ralgo;
 namespace py = pybind11;
+
+#define DOUBLE4 double,double,double,double
 
 PYBIND11_MODULE(libralgo, m)
 {
@@ -49,5 +53,23 @@ PYBIND11_MODULE(libralgo, m)
 		.def("kp", &lintrans::pi<double,double>::kp)
 		.def("ki", &lintrans::pi<double,double>::ki)
 		.def("print_internal", &lintrans::pi<double,double>::print_internal)
+	;
+
+	py::class_<phase<double,double,double>>(m, "phase")
+		.def_readwrite("d0", &phase<double,double,double>::d0)
+		.def_readwrite("d1", &phase<double,double,double>::d1)
+		.def_readwrite("d2", &phase<double,double,double>::d2)
+	;
+
+	auto traj = py::class_<trajectory<DOUBLE4>>(m, "trajectory")
+		.def("inloctime", &trajectory<DOUBLE4>::inloctime)
+	;
+	py::class_<keep_trajectory<DOUBLE4>>(m, "keep_trajectory", traj)
+		.def(py::init<double>())
+		.def("inloctime_placed", &keep_trajectory<DOUBLE4>::inloctime_placed)
+	;
+	py::class_<accdcc_by_time_trajectory<DOUBLE4>>(m, "accdcc_by_time_trajectory", traj)
+		.def(py::init<double,double,double,double,double>(), py::arg("x0"), py::arg("x1"), py::arg("tacc"), py::arg("tlin"), py::arg("tdcc"))
+		.def("inloctime_placed", &accdcc_by_time_trajectory<DOUBLE4>::inloctime_placed)
 	;
 }
