@@ -179,8 +179,8 @@ def plot_step_responce_tf(w, time, points):
 
 	D = np.zeros((1, 1))
 
-	#print(w)
-	#print(numer, denum)
+	print(w)
+	print(numer, denum)
 	#print(A)
 	#print(B)
 	#print(C)

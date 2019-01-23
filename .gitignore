@@ -140,3 +140,7 @@ pyservoce/libs
 build
 cxxbuild 
 dist
+
+.eval
+.evalcache
+.evalfile
