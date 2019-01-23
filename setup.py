@@ -11,6 +11,7 @@ import licant
 #licant.include("nos", "submodules/nos/nos.g.py")
 #licant.include("linalg-v3", "submodules/linalg/linalg.g.py")
 
+licant.include("gxx", local_tunel="build/gxx")
 licant.include("nos", local_tunel="build/nos")
 licant.include("linalg-v3", local_tunel="build/linalg")
 licant.include("ralgo", "ralgo.g.py")
@@ -18,6 +19,7 @@ licant.include("ralgo", "ralgo.g.py")
 licant.cxx_objects("ralgo-objects", 
 	mdepends = [
 		"ralgo",
+		"gxx",
 		"nos",
 		"linalg-v3"
 	] 

@@ -3,6 +3,7 @@
 
 #include <linalg.h>
 #include <linalg-add.h>
+#include <nos/print.h>
 
 using namespace linalg::ostream_overloads;
 
@@ -123,6 +124,7 @@ namespace ralgo
 				PRINT(_b);
 				PRINT(A);
 				PRINT(B);
+				
 			}
 		};		
 
@@ -157,6 +159,44 @@ namespace ralgo
 				PRINT(_kp);
 				PRINT(ki_discr);
 				PRINT(delta);
+			}
+		};
+
+		template <class T, class K=float>
+		struct pid : public inout<T>
+		{
+			K kp_discr;
+			K ki_discr;
+			K kd_discr;
+			
+			T last;
+			T integral = 0;
+
+			//T kp() const { return kp_discr; }
+			//T ki() const { return ki_discr / delta; }
+			//T kd() const { return kd_discr * delta; }
+			//T kip() const { return ki() / _kp; }
+			//T kdp() const { return kd() * _kp; }
+	
+			pid(K _kp_discr, K _ki_discr, K _kd_discr) 
+				: kp_discr(kp_discr), ki_discr(_ki_discr), kd_discr(_kd_discr)
+			{
+				//nos::println("pi");	
+			}
+	
+			T operator()(T error) override
+			{
+				integral += error;
+				auto ret = kp_discr * error + ki_discr * integral + kd_discr * (error - last);
+				last = error;
+				return ret;
+			}
+
+			void print_internal() override
+			{
+				PRINT(kp_discr);
+				PRINT(ki_discr);
+				PRINT(kd_discr);
 			}
 		};
 	}
