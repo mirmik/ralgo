@@ -5,8 +5,8 @@
 #include <linalg-ext.h>
 #include <linalg-add.h>
 
-#include <nos/trace.h>
-#include <gxx/panic.h>
+//#include <nos/trace.h>
+//#include <gxx/panic.h>
 
 #include <initializer_list>
 #include <algorithm>
@@ -18,7 +18,7 @@
 
 #include <numeric>
 
-#include <nos/input.h>
+//#include <nos/input.h>
 
 #include <malgo/vector.h>
 #include <malgo/matrix.h>
