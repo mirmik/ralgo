@@ -2,7 +2,7 @@
 #define RALGO_TRAJ_H
 
 #include <ralgo/planning/phase.h>
-#include <gxx/datastruct/dlist.h>
+#include <igris/datastruct/dlist.h>
 #include <utility>
 
 namespace ralgo

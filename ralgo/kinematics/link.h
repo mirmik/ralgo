@@ -34,7 +34,7 @@ namespace cynematic
 	using namespace linalg::ostream_overloads;
 
 	template<typename T, int M>
-	malgo::vector<T> backpack(vec<T, M> need, std::vector<vec<T, M>> sens) 
+	malgo::vector<T> backpack(vec<T, M> need, std::vector<vec<T, M>> sens)
 	{
 		malgo::matrix<T> m(sens);
 		m = transpose(m);
@@ -47,85 +47,88 @@ namespace cynematic
 		//PRINT(svd.v);
 		//PRINT(svd.w);
 
-		try {
-		svd.solve(b, x);
+		try
+		{
+			svd.solve(b, x);
 		}
-		catch (const char * c) {
-		//	PRINT(b.size());
-		//	PRINT(x.size());
-		//	PRINT(m.size1());
-		//	PRINT(m.size2());
-		//	PRINT(c);
-		//	exit(0);
+		catch (const char * c)
+		{
+			//	PRINT(b.size());
+			//	PRINT(x.size());
+			//	PRINT(m.size1());
+			//	PRINT(m.size2());
+			//	PRINT(c);
+			//	exit(0);
 		}
+
 		//PRINT(b);
 		//PRINT(x);
 
 		return x;
 	}
-	
+
 
 	///Функция выбирает коэфициенты линейной комбинации sens таким образом, чтобы образовать вектор need.
-/*	template<typename T, int M>
-	malgo::vector<T> backpack(vec<T, M> need, std::vector<vec<T, M>> sens)
-	{
-		T last_errlen;
-		vec<T, M> curvec;
-		malgo::vector<T> koeffs(sens.size());
-		malgo::vector<T> sens_length2(sens.size());
-
-		for (int i = 0; i < sens.size(); ++i) 
+	/*	template<typename T, int M>
+		malgo::vector<T> backpack(vec<T, M> need, std::vector<vec<T, M>> sens)
 		{
-			sens_length2[i] = length2(sens[i]);
-		}
+			T last_errlen;
+			vec<T, M> curvec;
+			malgo::vector<T> koeffs(sens.size());
+			malgo::vector<T> sens_length2(sens.size());
 
-		auto error = need - curvec;
-		auto errlen = pseudolen1(error);
-
-		do {
-			//В цикле покоординатно корректируем вектор. 
 			for (int i = 0; i < sens.size(); ++i)
 			{
-				//Запоминаем то, что получили на последней итерации.
-				last_errlen = errlen;
-
-				//Проецируем sens на недостающий кусок вектора. Делим на квадрат sens.
-				//Первое деление даёт норму.
-				//Таким образом мы получаем длину проекции на sens.
-				//Второе деление учитывает масштаб. В конечном итоге получается минимизация расстояния need - curvec. 
-				auto koeffadd = linalg::dot(error, sens[i]) / sens_length2[i];
-				koeffs[i] += koeffadd;
-
-				//Вычисляем новый curvec
-				curvec += sens[i] * koeffadd;
-				//curvec = vec<T, M> {};
-				//for (int j = 0; j < sens.size(); ++j)
-				//{
-				//	curvec += sens[j] * koeffs[j];
-				//}
-
-				error = need - curvec;
-				errlen = pseudolen1(error);
-
-				/*nos::println();
-				PRINT(i);
-				PRINT(koeffadd);
-				PRINT(koeffs);
-				PRINT(need);
-				PRINT(sens);
-				PRINT(curvec);
-				PRINT(error);
-				PRINT(errlen);*/
-
-				//Условие выхода - минимизация длины ошибки.
-/*				if (errlen == 0) break;
+				sens_length2[i] = length2(sens[i]);
 			}
-		} 
-		//Если результат не может быть достигнут, покидаем алгоритм по этому условию.
-		while (abs(errlen - last_errlen) > 0.0000000001);
 
-		return koeffs;
-	}*/
+			auto error = need - curvec;
+			auto errlen = pseudolen1(error);
+
+			do {
+				//В цикле покоординатно корректируем вектор.
+				for (int i = 0; i < sens.size(); ++i)
+				{
+					//Запоминаем то, что получили на последней итерации.
+					last_errlen = errlen;
+
+					//Проецируем sens на недостающий кусок вектора. Делим на квадрат sens.
+					//Первое деление даёт норму.
+					//Таким образом мы получаем длину проекции на sens.
+					//Второе деление учитывает масштаб. В конечном итоге получается минимизация расстояния need - curvec.
+					auto koeffadd = linalg::dot(error, sens[i]) / sens_length2[i];
+					koeffs[i] += koeffadd;
+
+					//Вычисляем новый curvec
+					curvec += sens[i] * koeffadd;
+					//curvec = vec<T, M> {};
+					//for (int j = 0; j < sens.size(); ++j)
+					//{
+					//	curvec += sens[j] * koeffs[j];
+					//}
+
+					error = need - curvec;
+					errlen = pseudolen1(error);
+
+					/*nos::println();
+					PRINT(i);
+					PRINT(koeffadd);
+					PRINT(koeffs);
+					PRINT(need);
+					PRINT(sens);
+					PRINT(curvec);
+					PRINT(error);
+					PRINT(errlen);*/
+
+	//Условие выхода - минимизация длины ошибки.
+	/*				if (errlen == 0) break;
+				}
+			}
+			//Если результат не может быть достигнут, покидаем алгоритм по этому условию.
+			while (abs(errlen - last_errlen) > 0.0000000001);
+
+			return koeffs;
+		}*/
 
 	template <typename T>
 	struct abstract_link
@@ -343,8 +346,8 @@ namespace cynematic
 		}
 
 
-		malgo::vector<T> solve_inverse_cynematic(const mtrans<T>& target, const malgo::vector<T>& _reference, 
-			T maxstep = 1)
+		malgo::vector<T> solve_inverse_cynematic(const mtrans<T>& target, const malgo::vector<T>& _reference,
+		        T maxstep = 1)
 		{
 			assert(_reference.size() == coords_total);
 			malgo::vector<T> reference = _reference;
@@ -358,10 +361,12 @@ namespace cynematic
 				auto rrr = get_speed_transes(reference);
 				auto iv6 = curtrans.vector6_to(target);
 
-				if (pseudolen1(iv6) < 0.0000001) { 
+				if (pseudolen1(iv6) < 0.0000001)
+				{
 					nos::println("RESULT:", reference);
-					break; 
+					break;
 				}
+
 				auto koeffs = backpack(iv6, rrr);
 
 

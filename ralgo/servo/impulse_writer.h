@@ -17,44 +17,54 @@ namespace ralgo
 	template <class Lock, class P = int64_t, class V = float>
 	struct impulse_writer
 	{
-		Lock lock;
-		P current;
-		P target;
-		bool worker_runned;
-		bool endpoint;
-		V speed;
+	public:
+		int write(P _target, V _speed) 
+		{		
+			lock.lock();	
+			P position_error = target_position - current_position;
+			lock.unlock();
 
-		P maxerror;
-		V minspeed;
-		V maxspeed;		
-		V alpha; //коэффициент компенсации ошибки по позиции
-
-		void write(P _target, V _speed, bool endpoint) 
-		{
-			lock.lock();
-
-			speed = _speed;
-			target = _target;
-
-			P dist = target - current;
-			if (abs(dist) > maxerror) {
-				ralgo::fault("control deviation error");
+			P abserror = abs(position_error);
+			if (deviation_error_enabled & abserror > maxerror) {
+				dprln("control deviation error");
+				return -1;
 			}
 
-			V eval_speed = speed + dist * alpha;
-			eval_speed = ralgo::clamp(eval_speed, -maxspeed, maxspeed);
-			eval_speed = ralgo::rlamp(eval_speed, minspeed);
-			set_speed(eval_speed);
-
-			if (!worker_runned)
-				start_worker();
+			V eval_speed = _speed + position_error * alpha;
 			
+			if (speed_limits_enabled) 
+			{
+				eval_speed = ralgo::clamp(eval_speed, -maxspeed, maxspeed);
+				eval_speed = ralgo::rlamp(eval_speed, minspeed);
+			}
+
+			lock.lock();
+			target_position = _target;
+			evaluated_speed = eval_speed;
+			target_speed = _speed;
+			update_worker();
 			lock.unlock();
 		}
 
-		virtual void start_worker() = 0;
-		virtual void stop_worker() = 0;
-		virtual void set_speed(V spd) = 0;
+	private:
+		virtual void update_worker() = 0;
+		
+		bool deviation_error_enabled = false;
+		P maxerror = 0;
+		
+		bool speed_limits_enabled = false;
+		V minspeed = 0;
+		V maxspeed = 0;		
+		
+	protected:
+		Lock lock;
+
+		P current_position = 0;
+		P target_position = 0;
+		
+		V evaluated_speed;
+		V target_speed = 0.0;
+		V alpha = 0.005; //коэффициент компенсации ошибки по позиции
 	};
 }
 
