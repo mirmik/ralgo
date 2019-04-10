@@ -18,7 +18,7 @@ namespace ralgo
 
 		int inabstime(T time, phase<P, V, A>* phs)
 		{
-			return inloctime(time - _start, phs);
+			return inloctime_placed(time - _start, phs);
 		}
 
 		///Возвращает -1 при выходе за целевой интервал времени.
@@ -45,6 +45,8 @@ namespace ralgo
 	{
 		P x;
 
+		keep_trajectory() : x(0) {}
+		 
 		keep_trajectory(P pos) : x(pos) {};
 
 		int inloctime_placed(T t, phase<P, V, A>* phs) override
@@ -114,10 +116,10 @@ namespace ralgo
 	{
 		P x0;
 		P x1;
-		T t_acc;
-		T t_lin;
-		T t_dcc;
-		T t01;
+		T t_acc; ///< Acceleration time
+		T t_lin; ///< Carrier time
+		T t_dcc; ///< Decceleration time
+		T t01; ///< Full time
 
 		P xacc;
 //		P xlin;
@@ -128,15 +130,27 @@ namespace ralgo
 		P x01;
 		V v;
 
+		accdcc_by_time_trajectory() = default; 
+
 		accdcc_by_time_trajectory(P spos, P fpos, T t_acc, T t_lin, T t_dcc) 
-			: x0(spos), x1(fpos), t_acc(t_acc), t_dcc(t_dcc), t_lin(t_lin)
 		{
+			init(spos, fpos, t_acc, t_lin, t_dcc);
+		}
+
+		void init(P spos, P fpos, T t_acc, T t_lin, T t_dcc) 
+		{
+			x0 = spos;
+			x1 = fpos;
+			this->t_acc = t_acc;
+			this->t_dcc = t_dcc;
+			this->t_lin = t_lin;
+			
 			t01 = t_acc + t_lin + t_dcc;
 			x01 = x1 - x0;
+			
 			v = 2 * (V)x01 / (V)(t_acc + 2*t_lin + t_dcc);
 			xacc = t_acc * v / 2;
-//			xlin = xacc + t_lin * v;
-
+			
 			acc = v / t_acc;
 			dcc = - v / t_dcc;
 		}
