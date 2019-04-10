@@ -13,6 +13,9 @@ namespace ralgo
 		P d0;
 		V d1;
 		A d2;
+
+		phase() = default;
+		phase(P p,V v,A a) : d0(p), d1(v), d2(a) {}
 	};
 
 	template<class PHASE> using pos_t = typename PHASE::pos_t;

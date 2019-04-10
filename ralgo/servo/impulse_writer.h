@@ -64,7 +64,7 @@ namespace ralgo
 		
 		V evaluated_speed;
 		V target_speed = 0.0;
-		V alpha = 0.005; //коэффициент компенсации ошибки по позиции
+		V alpha = 0.01; //коэффициент компенсации ошибки по позиции
 	};
 }
 
