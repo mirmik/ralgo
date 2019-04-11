@@ -1,11 +1,9 @@
 #ifndef RALGO_PHASE_H
 #define RALGO_PHASE_H
 
-namespace ralgo 
-{
+namespace ralgo {
 	template <typename P = int64_t, typename V = float, typename A = float>
-	struct phase
-	{
+	struct phase {
 		using pos_t = P;
 		using spd_t = V;
 		using acc_t = A;
@@ -15,12 +13,12 @@ namespace ralgo
 		A d2;
 
 		phase() = default;
-		phase(P p,V v,A a) : d0(p), d1(v), d2(a) {}
+		phase(P p, V v, A a) : d0(p), d1(v), d2(a) {}
 	};
 
-	template<class PHASE> using pos_t = typename PHASE::pos_t;
-	template<class PHASE> using spd_t = typename PHASE::spd_t;
-	template<class PHASE> using acc_t = typename PHASE::acc_t;
-}
+	template <class PHASE> using pos_t = typename PHASE::pos_t;
+	template <class PHASE> using spd_t = typename PHASE::spd_t;
+	template <class PHASE> using acc_t = typename PHASE::acc_t;
+} // namespace ralgo
 
 #endif
