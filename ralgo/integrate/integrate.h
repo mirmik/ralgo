@@ -1,21 +1,14 @@
 #ifndef RALGO_INTEGRATE_H
 #define RALGO_INTEGRATE_H
 
-namespace ralgo
-{
-	template <class T>
-	struct linspace
-	{
+namespace ralgo {
+	template <class T> struct linspace {
 		T a, b;
 		int points;
 
-		T step()
-		{
-			return (b - a) / (points - 1);
-		}
+		T step() { return (b - a) / (points - 1); }
 
-		T operator[](int p)
-		{
+		T operator[](int p) {
 			assert(p < points);
 			T koeff = (T)p / (T)(points - 1);
 			return a * (1 - koeff) + b * koeff;
@@ -36,19 +29,16 @@ namespace ralgo
 
 	template <class T, class F>
 	T integrate_parabolic(F f, T begin, T end, int points);
-}
-
+} // namespace ralgo
 
 template <class T, class F>
-T ralgo::integrate_trapecidal(F f, T begin, T end, int points)
-{
+T ralgo::integrate_trapecidal(F f, T begin, T end, int points) {
 	T cur0 = begin;
 	T fcur0 = f(cur0);
 	T step = (end - begin) / (points - 1);
 
 	T integ = 0;
-	for (int i = 1; i < points; ++i)
-	{
+	for (int i = 1; i < points; ++i) {
 		T next = cur0 + step;
 		T fnext = f(next);
 
@@ -62,14 +52,12 @@ T ralgo::integrate_trapecidal(F f, T begin, T end, int points)
 }
 
 template <class T, class F>
-T ralgo::integrate_rectangle(F f, T begin, T end, int points)
-{
+T ralgo::integrate_rectangle(F f, T begin, T end, int points) {
 	T step = (end - begin) / (points - 1);
 	T cur = begin + step / 2;
 
 	T integ = 0;
-	for (int i = 1; i < points; ++i)
-	{
+	for (int i = 1; i < points; ++i) {
 		integ += f(cur) * step;
 		cur += step;
 	}
@@ -78,14 +66,12 @@ T ralgo::integrate_rectangle(F f, T begin, T end, int points)
 }
 
 template <class T, class F>
-T ralgo::integrate_rectangle_left(F f, T begin, T end, int points)
-{
+T ralgo::integrate_rectangle_left(F f, T begin, T end, int points) {
 	T step = (end - begin) / (points - 1);
 	T cur = begin;
 
 	T integ = 0;
-	for (int i = 1; i < points; ++i)
-	{
+	for (int i = 1; i < points; ++i) {
 		integ += f(cur) * step;
 		cur += step;
 	}
@@ -94,14 +80,12 @@ T ralgo::integrate_rectangle_left(F f, T begin, T end, int points)
 }
 
 template <class T, class F>
-T ralgo::integrate_rectangle_right(F f, T begin, T end, int points)
-{
+T ralgo::integrate_rectangle_right(F f, T begin, T end, int points) {
 	T step = (end - begin) / (points - 1);
 	T cur = begin + step;
 
 	T integ = 0;
-	for (int i = 1; i < points; ++i)
-	{
+	for (int i = 1; i < points; ++i) {
 		integ += f(cur) * step;
 		cur += step;
 	}
@@ -110,16 +94,14 @@ T ralgo::integrate_rectangle_right(F f, T begin, T end, int points)
 }
 
 template <class T, class F>
-T ralgo::integrate_parabolic(F f, T begin, T end, int points)
-{
+T ralgo::integrate_parabolic(F f, T begin, T end, int points) {
 	T cur0 = begin;
 	T fcur0 = f(cur0);
 	T step = (end - begin) / (points - 1);
 	T halfstep = step / 2;
 
 	T integ = 0;
-	for (int i = 1; i < points; ++i)
-	{
+	for (int i = 1; i < points; ++i) {
 		T next = cur0 + step;
 		T fnext = f(next);
 		T half = cur0 + halfstep;
