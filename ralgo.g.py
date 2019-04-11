@@ -1,9 +1,5 @@
 import licant
 
-licant.include("linalg-v3")
-licant.include("malgo")
-licant.include("nos")
-
 licant.module("ralgo",
 	sources=[
 	#	"ralgo/util/testheaders.cpp"
