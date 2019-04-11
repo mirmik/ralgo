@@ -5,14 +5,19 @@
 #include <ralgo/planning/phase.h>
 #include <utility>
 
-namespace ralgo {
-
+namespace ralgo
+{
 	template <class P = int64_t, class V = float, class A = float,
 			  class T = time_t>
-	struct trajectory {
-		void set_start_time(T time) { _start = time; }
+	struct trajectory
+	{
+		void set_start_time(T time)
+		{
+			_start = time;
+		}
 
-		int inabstime(T time, phase<P, V, A> *phs) {
+		int inabstime(T time, phase<P, V, A> *phs)
+		{
 			return inloctime_placed(time - _start, phs);
 		}
 
@@ -20,7 +25,8 @@ namespace ralgo {
 		///Иначе ноль. Фаза возваращается через указатель.
 		virtual int inloctime_placed(T time, phase<P, V, A> *phs) = 0;
 
-		std::pair<phase<P, V, A>, int> inloctime(T time) {
+		std::pair<phase<P, V, A>, int> inloctime(T time)
+		{
 			phase<P, V, A> phs;
 			auto ret = inloctime_placed(time, &phs);
 			return std::make_pair(phs, ret);
@@ -36,14 +42,18 @@ namespace ralgo {
 	/// Траектория удержания текущей позиции. Бесконечное время действия.
 	template <class P = int64_t, class V = float, class A = float,
 			  class T = time_t>
-	struct keep_trajectory : public trajectory<P, V, A, T> {
+	struct keep_trajectory : public trajectory<P, V, A, T>
+	{
 		P x;
 
-		keep_trajectory() : x(0) {}
+		keep_trajectory() : x(0)
+		{
+		}
 
 		keep_trajectory(P pos) : x(pos){};
 
-		int inloctime_placed(T t, phase<P, V, A> *phs) override {
+		int inloctime_placed(T t, phase<P, V, A> *phs) override
+		{
 			phs->d0 = x;
 			phs->d1 = 0;
 			phs->d2 = 0;
@@ -55,13 +65,15 @@ namespace ralgo {
 	///Траектория движения с постоянной скоростью. Бесконечное время действия.
 	template <class P = int64_t, class V = float, class A = float,
 			  class T = time_t>
-	struct jog_trajectory : public trajectory<P, V, A, T> {
+	struct jog_trajectory : public trajectory<P, V, A, T>
+	{
 		P x0;
 		V v;
 
 		jog_trajectory(P startpos, V speed) : x0(startpos), v(speed){};
 
-		int inloctime_placed(T t, phase<P, V, A> *phs) override {
+		int inloctime_placed(T t, phase<P, V, A> *phs) override
+		{
 			phs->d0 = x0 + v * t;
 			phs->d1 = v;
 			phs->d2 = 0;
@@ -72,7 +84,8 @@ namespace ralgo {
 
 	template <class P = int64_t, class V = float, class A = float,
 			  class T = time_t>
-	struct line_by_time_trajectory : public trajectory<P, V, A, T> {
+	struct line_by_time_trajectory : public trajectory<P, V, A, T>
+	{
 		P x0;
 		P x1;
 		T t01;
@@ -81,13 +94,16 @@ namespace ralgo {
 		V v;
 
 		line_by_time_trajectory(P spos, P fpos, T interval)
-			: x0(spos), x1(fpos), t01(interval) {
+			: x0(spos), x1(fpos), t01(interval)
+		{
 			x01 = x1 - x0;
 			v = (V)x01 / (V)t01;
 		}
 
-		int inloctime_placed(T t, phase<P, V, A> *phs) override {
-			if (t > t01) {
+		int inloctime_placed(T t, phase<P, V, A> *phs) override
+		{
+			if (t > t01)
+			{
 				phs->d0 = x1;
 				phs->d1 = 0;
 				phs->d2 = 0;
@@ -104,7 +120,8 @@ namespace ralgo {
 
 	template <class P = int64_t, class V = float, class A = float,
 			  class T = time_t>
-	struct accdcc_by_time_trajectory : public trajectory<P, V, A, T> {
+	struct accdcc_by_time_trajectory : public trajectory<P, V, A, T>
+	{
 		P x0;
 		P x1;
 		T t_acc; ///< Acceleration time
@@ -122,11 +139,13 @@ namespace ralgo {
 
 		accdcc_by_time_trajectory() = default;
 
-		accdcc_by_time_trajectory(P spos, P fpos, T t_acc, T t_lin, T t_dcc) {
+		accdcc_by_time_trajectory(P spos, P fpos, T t_acc, T t_lin, T t_dcc)
+		{
 			init(spos, fpos, t_acc, t_lin, t_dcc);
 		}
 
-		void init(P spos, P fpos, T t_acc, T t_lin, T t_dcc) {
+		void init(P spos, P fpos, T t_acc, T t_lin, T t_dcc)
+		{
 			x0 = spos;
 			x1 = fpos;
 			this->t_acc = t_acc;
@@ -143,23 +162,30 @@ namespace ralgo {
 			dcc = -v / t_dcc;
 		}
 
-		int inloctime_placed(T t, phase<P, V, A> *phs) override {
-			if (t > t01) {
+		int inloctime_placed(T t, phase<P, V, A> *phs) override
+		{
+			if (t > t01)
+			{
 				phs->d0 = x1;
 				phs->d1 = 0;
 				phs->d2 = 0;
 				return -1;
 			}
 
-			if (t < t_acc) {
+			if (t < t_acc)
+			{
 				phs->d2 = acc;
 				phs->d1 = acc * t;
 				phs->d0 = x0 + phs->d1 * t / 2;
-			} else if (t < t_acc + t_lin) {
+			}
+			else if (t < t_acc + t_lin)
+			{
 				phs->d2 = 0;
 				phs->d1 = v;
 				phs->d0 = xacc + v * (t - t_acc);
-			} else {
+			}
+			else
+			{
 				phs->d2 = dcc;
 				phs->d1 = -dcc * (t01 - t);
 				phs->d0 = x1 - phs->d1 * (t01 - t) / 2;

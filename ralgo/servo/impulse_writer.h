@@ -5,7 +5,8 @@
 #include <ralgo/info.h>
 #include <ralgo/util/math.h>
 
-namespace ralgo {
+namespace ralgo
+{
 	/** Абстрактный контроллер импульсов. Задача контроллера импульсовать
 	 *	выдавать надлежащее количество импульсов с надлежащей частотой
 	 *	с каждым отданным импульсом контроллер изменяет значение current.
@@ -14,22 +15,26 @@ namespace ralgo {
 	 *переменной target и операции установки скорости.
 	 */
 	template <class Lock, class P = int64_t, class V = float>
-	struct impulse_writer {
+	struct impulse_writer
+	{
 	  public:
-		int write(P _target, V _speed) {
+		int write(P _target, V _speed)
+		{
 			lock.lock();
 			P position_error = target_position - current_position;
 			lock.unlock();
 
 			P abserror = abs(position_error);
-			if (deviation_error_enabled & abserror > maxerror) {
+			if (deviation_error_enabled & abserror > maxerror)
+			{
 				dprln("control deviation error");
 				return -1;
 			}
 
 			V eval_speed = _speed + position_error * alpha;
 
-			if (speed_limits_enabled) {
+			if (speed_limits_enabled)
+			{
 				eval_speed = ralgo::clamp(eval_speed, -maxspeed, maxspeed);
 				eval_speed = ralgo::rlamp(eval_speed, minspeed);
 			}

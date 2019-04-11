@@ -12,7 +12,8 @@ namespace py = pybind11;
 
 #define DOUBLE4 double, double, double, double
 
-PYBIND11_MODULE(libralgo, m) {
+PYBIND11_MODULE(libralgo, m)
+{
 	/*auto regcdelta = py::class_<regulator_const_delta<double>>(m,
 	"regulator_const_delta"); py::class_<pi_regulator_const_delta<double>>(m,
 	"pi_regulator_const_delta", regcdelta) .def(py::init<double, double>())

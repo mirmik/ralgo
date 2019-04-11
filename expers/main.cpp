@@ -6,7 +6,8 @@
 
 using namespace ralgo;
 
-int main() {
+int main()
+{
 	/*	auto T = 1;
 		auto ksi = 0;
 

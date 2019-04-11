@@ -6,7 +6,8 @@
 
 #include <emergency_stop.h>
 
-namespace ralgo {
+namespace ralgo
+{
 	template <class Lock = igris::syslock, class P = int64_t, class V = float,
 			  class A = float, class T = time_t>
 	class servo // : public position_driver<P,V,A>
@@ -25,14 +26,20 @@ namespace ralgo {
 		V move_mode_speed = 0;
 		A move_mode_acctime = 0;
 
-		servo() : curtraj(&keeptraj), phs(0, 0, 0) {}
+		servo() : curtraj(&keeptraj), phs(0, 0, 0)
+		{
+		}
 
-		int relative_move(P dist) {
+		int relative_move(P dist)
+		{
 			T lintime = (ralgo::abs(dist) / move_mode_speed);
 
-			if (lintime > 2 * move_mode_acctime) {
+			if (lintime > 2 * move_mode_acctime)
+			{
 				lintime -= 2 * move_mode_acctime;
-			} else {
+			}
+			else
+			{
 				lintime = 0;
 			}
 
@@ -45,7 +52,8 @@ namespace ralgo {
 			lock->unlock();
 		}
 
-		void serve(T time) {
+		void serve(T time)
+		{
 			int sts;
 
 			assert(writer);
@@ -57,7 +65,8 @@ namespace ralgo {
 			writer->write(phs.d0, phs.d1);
 			// dprln(phs.d0, phs.d1);
 
-			if (sts == -1) {
+			if (sts == -1)
+			{
 				dprln("finish operation");
 				// Вышли за текущее время траектории.
 				// Операция завершена, устанавливаем траекторию сохранения в
