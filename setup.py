@@ -16,10 +16,7 @@ licant.include("ralgo", "ralgo.g.py")
 
 licant.cxx_objects("ralgo-objects", 
 	mdepends = [
-		"ralgo",
-		"nos",
-		"igris.dprint",
-		"linalg-v3"
+		"ralgo"
 	] 
 )
 ralgoopts = licant.core.core.get("ralgo-objects").finalopts

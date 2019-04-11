@@ -7,8 +7,8 @@ licant.module("ralgo",
 	include_paths=["."],
 	mdepends=[
 		"linalg-v3", 
-		#"nos", 
-		#"gxx", 
+		"nos", 
+		"igris", 
 		"malgo", 
 		#("gxx.dprint", "__none__")
 	],
