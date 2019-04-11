@@ -27,13 +27,15 @@
 #define EPSILON 0.000001
 #define EPSILON2 0.0000001
 
-namespace cynematic {
+namespace cynematic
+{
 	using namespace linalg;
 	using namespace linalg::aliases;
 	using namespace linalg::ostream_overloads;
 
 	template <typename T, int M>
-	malgo::vector<T> backpack(vec<T, M> need, std::vector<vec<T, M>> sens) {
+	malgo::vector<T> backpack(vec<T, M> need, std::vector<vec<T, M>> sens)
+	{
 		malgo::matrix<T> m(sens);
 		m = transpose(m);
 		malgo::vecview<T> b(&need[0], 6);
@@ -45,9 +47,12 @@ namespace cynematic {
 		// PRINT(svd.v);
 		// PRINT(svd.w);
 
-		try {
+		try
+		{
 			svd.solve(b, x);
-		} catch (const char *c) {
+		}
+		catch (const char *c)
+		{
 			//	PRINT(b.size());
 			//	PRINT(x.size());
 			//	PRINT(m.size1());
@@ -126,7 +131,8 @@ namespace cynematic {
 			return koeffs;
 		}*/
 
-	template <typename T> struct abstract_link {
+	template <typename T> struct abstract_link
+	{
 		using ax_t = linalg::vec<T, 3>;
 
 		virtual mtrans<T> get(const malgo::vector<T> &coords, uint8_t pos) = 0;
@@ -134,78 +140,116 @@ namespace cynematic {
 		virtual uint8_t count_of_coords() = 0;
 	};
 
-	template <typename T> struct onedof_link : public abstract_link<T> {
+	template <typename T> struct onedof_link : public abstract_link<T>
+	{
 		virtual mtrans<T> get(T coord) = 0;
 
-		mtrans<T> get(const malgo::vector<T> &coords, uint8_t pos) override {
+		mtrans<T> get(const malgo::vector<T> &coords, uint8_t pos) override
+		{
 			return get(coords[pos]);
 		}
 
 		virtual bivec<T, 3> d1_bivec() = 0;
 	};
 
-	template <typename T> struct constant_link : public abstract_link<T> {
+	template <typename T> struct constant_link : public abstract_link<T>
+	{
 		mtrans<T> mat;
 
-		mtrans<T> get() { return mat; }
-
-		mtrans<T> get(const malgo::vector<T> &coords, uint8_t pos) override {
+		mtrans<T> get()
+		{
 			return mat;
 		}
 
-		uint8_t count_of_coords() override { return 0; }
+		mtrans<T> get(const malgo::vector<T> &coords, uint8_t pos) override
+		{
+			return mat;
+		}
+
+		uint8_t count_of_coords() override
+		{
+			return 0;
+		}
 
 		constant_link(mtrans<T> _mat) : mat(_mat){};
 	};
 
-	template <typename T> struct rotation_link : public onedof_link<T> {
+	template <typename T> struct rotation_link : public onedof_link<T>
+	{
 		using ax_t = linalg::vec<T, 3>;
 		ax_t axvec;
 
-		rotation_link(ax_t _axvec) : axvec(_axvec) {}
+		rotation_link(ax_t _axvec) : axvec(_axvec)
+		{
+		}
 
-		mtrans<T> get(T coord) override {
+		mtrans<T> get(T coord) override
+		{
 			return mtrans<T>::rotation(axvec, coord);
 		}
 
-		uint8_t count_of_coords() override { return 1; }
+		uint8_t count_of_coords() override
+		{
+			return 1;
+		}
 
-		bivec<T, 3> d1_bivec() override { return {axvec, ax_t()}; }
+		bivec<T, 3> d1_bivec() override
+		{
+			return {axvec, ax_t()};
+		}
 	};
 
-	template <typename T> struct translation_link : public onedof_link<T> {
+	template <typename T> struct translation_link : public onedof_link<T>
+	{
 		using ax_t = linalg::vec<T, 3>;
 		ax_t axvec;
 
-		translation_link(ax_t _axvec) : axvec(_axvec) {}
+		translation_link(ax_t _axvec) : axvec(_axvec)
+		{
+		}
 
-		mtrans<T> get(T coord) override {
+		mtrans<T> get(T coord) override
+		{
 			return mtrans<T>::translation(axvec * coord);
 		}
 
-		uint8_t count_of_coords() override { return 1; }
+		uint8_t count_of_coords() override
+		{
+			return 1;
+		}
 
-		bivec<T, 3> d1_bivec() override { return {ax_t(), axvec}; }
+		bivec<T, 3> d1_bivec() override
+		{
+			return {ax_t(), axvec};
+		}
 	};
 
-	template <typename T> struct chain {
-		chain() {}
-		chain(std::initializer_list<abstract_link<T> *> lst) : links(lst) {
-			for (auto *r : links) {
+	template <typename T> struct chain
+	{
+		chain()
+		{
+		}
+		chain(std::initializer_list<abstract_link<T> *> lst) : links(lst)
+		{
+			for (auto *r : links)
+			{
 				coords_total += r->count_of_coords();
 			}
 		}
 
-		void add_link(abstract_link<T> *lnk) {
+		void add_link(abstract_link<T> *lnk)
+		{
 			links.push_back(lnk);
 			coords_total += lnk->count_of_coords();
 		}
 
-		mtrans<T> get(const malgo::vector<T> &coords) {
+		mtrans<T> get(const malgo::vector<T> &coords)
+		{
 			mtrans<T> result{};
 			int8_t coord_pos = coords.size() - 1;
 
-			for (int i = links.size() - 1; i >= 0; --i) {
+			for (int i = links.size() - 1; i >= 0; --i)
+			{
 				uint8_t count_of_coords = links[i]->count_of_coords();
 
 				if (coord_pos - count_of_coords + 1 < 0)
@@ -219,28 +263,33 @@ namespace cynematic {
 			return result;
 		}
 
-		std::vector<vec<T, 6>>
-		get_speed_transes(const malgo::vector<T> &coords) {
+		std::vector<vec<T, 6>> get_speed_transes(const malgo::vector<T> &coords)
+		{
 			std::vector<vec<T, 6>> result;
 
 			mtrans<T> curtrans{};
 			int8_t coord_pos = coords.size() - 1;
 
-			for (int i = links.size() - 1; i >= 0; --i) {
+			for (int i = links.size() - 1; i >= 0; --i)
+			{
 				uint8_t count_of_coords = links[i]->count_of_coords();
 
 				//Проверка корректности вектора координат.
 				if (coord_pos - count_of_coords + 1 < 0)
 					return std::vector<vec<T, 6>>();
 
-				if (count_of_coords > 0) {
-					if (count_of_coords == 1) {
+				if (count_of_coords > 0)
+				{
+					if (count_of_coords == 1)
+					{
 						result.emplace_back(
 							speed_trans(
 								((onedof_link<T> *)links[i])->d1_bivec(),
 								curtrans)
 								.concat());
-					} else {
+					}
+					else
+					{
 						PANIC_TRACED();
 					}
 				}
@@ -256,13 +305,15 @@ namespace cynematic {
 			return result;
 		}
 
-		bivec<T, 3> get_sens(int idx, const malgo::vector<T> &coords) {
+		bivec<T, 3> get_sens(int idx, const malgo::vector<T> &coords)
+		{
 			uint8_t coordpos = coords_total - 1;
 			mtrans<T> curtrans{};
 
 			int linkidx = links.size() - 1;
 
-			while (coordpos != idx) {
+			while (coordpos != idx)
+			{
 				uint8_t count_of_coords = links[linkidx]->count_of_coords();
 				auto nmat = links[linkidx]->get(coords, coordpos);
 
@@ -275,13 +326,15 @@ namespace cynematic {
 							   curtrans);
 		}
 
-		bivec<T, 3> get_sens_base(int idx, const malgo::vector<T> &coords) {
+		bivec<T, 3> get_sens_base(int idx, const malgo::vector<T> &coords)
+		{
 			uint8_t coordpos = coords_total - 1;
 			mtrans<T> curtrans{};
 
 			int linkidx = links.size() - 1;
 
-			while (coordpos != idx) {
+			while (coordpos != idx)
+			{
 				uint8_t count_of_coords = links[linkidx]->count_of_coords();
 				auto nmat = links[linkidx]->get(coords, coordpos);
 				curtrans = nmat * curtrans;
@@ -295,7 +348,8 @@ namespace cynematic {
 
 			mtrans<T> basetrans{};
 
-			while (linkidx >= 0) {
+			while (linkidx >= 0)
+			{
 				uint8_t count_of_coords = links[linkidx]->count_of_coords();
 				auto nmat = links[linkidx]->get(coords, coordpos);
 				basetrans = nmat * basetrans;
@@ -309,19 +363,22 @@ namespace cynematic {
 		malgo::vector<T>
 		solve_inverse_cynematic(const mtrans<T> &target,
 								const malgo::vector<T> &_reference,
-								T maxstep = 1) {
+								T maxstep = 1)
+		{
 			assert(_reference.size() == coords_total);
 			malgo::vector<T> reference = _reference;
 
 			mtrans<T> itr;
 			T lastlen = std::numeric_limits<T>::max();
 
-			while (1) {
+			while (1)
+			{
 				auto curtrans = get(reference);
 				auto rrr = get_speed_transes(reference);
 				auto iv6 = curtrans.vector6_to(target);
 
-				if (pseudolen1(iv6) < 0.0000001) {
+				if (pseudolen1(iv6) < 0.0000001)
+				{
 					nos::println("RESULT:", reference);
 					break;
 				}
@@ -346,7 +403,8 @@ namespace cynematic {
 
 				nos::readline();*/
 
-				for (int i = 0; i < coords_total; ++i) {
+				for (int i = 0; i < coords_total; ++i)
+				{
 					reference[i] += koeffs[i] * (koeffs_length > maxstep
 													 ? (maxstep / koeffs_length)
 													 : 1);
