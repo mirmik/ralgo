@@ -122,7 +122,6 @@ namespace ralgo
 		T t01; ///< Full time
 
 		P xacc;
-//		P xlin;
 
 		A acc;
 		A dcc;

@@ -8,7 +8,7 @@ licant.module("ralgo",
 	mdepends=[
 		"linalg-v3", 
 		"nos", 
-		"igris", 
+		"igris.dprint", 
 		"malgo", 
 		#("gxx.dprint", "__none__")
 	],
