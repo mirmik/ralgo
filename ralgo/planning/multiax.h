@@ -26,6 +26,11 @@ namespace ralgo
 			return traj -> inloctime_placed(time, phs, idx);
 		}
 	};
+
+	struct circle_traj 
+	{
+
+	};
 } // namespace ralgo
 
 #endif
