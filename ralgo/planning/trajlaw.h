@@ -29,7 +29,7 @@ namespace ralgo
 		float pdcc;
 		float spd_acceleration_factor;
 
-		acc_dcc_paramlaw(float acc, float lin, float dcc)
+		accdcclaw(float acc, float lin, float dcc)
 			: acc(acc), lin(lin), dcc(dcc), full(acc + lin + dcc)
 		{
 			spd_acceleration_factor = full / ((acc + dcc) / 2 + lin);
