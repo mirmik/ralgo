@@ -3,6 +3,9 @@ import licant
 licant.module("ralgo",
 	sources=[
 	#	"ralgo/util/testheaders.cpp"
+
+		"ralgo/madgwick.cpp"
+
 	],
 	include_paths=["."],
 	mdepends=[
