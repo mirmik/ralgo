@@ -5,6 +5,8 @@
 #include <ralgo/info.h>
 #include <ralgo/util/math.h>
 
+#include <igris/dprint.h>
+
 namespace ralgo
 {
 	/** Абстрактный контроллер импульсов. Задача контроллера импульсовать
