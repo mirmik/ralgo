@@ -10,9 +10,9 @@ licant.module("ralgo",
 	include_paths=["."],
 	mdepends=[
 		"linalg-v3", 
-		"nos", 
+		#"nos", 
 		"igris.dprint", 
-		"malgo", 
+		#"malgo", 
 		#("gxx.dprint", "__none__")
 	],
 )

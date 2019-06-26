@@ -16,7 +16,7 @@ namespace ralgo
 			virtual V operator()(V in) = 0;
 			virtual void print_internal()
 			{
-				nos::println("TODO");
+				//nos::println("TODO");
 			};
 		};
 
@@ -121,9 +121,7 @@ namespace ralgo
 			}
 
 			void print_internal() override
-			{
-				PRINT(_a);
-			}
+			{}
 		};
 
 		template <class V, class K = float>
