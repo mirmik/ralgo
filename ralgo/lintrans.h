@@ -95,6 +95,9 @@ namespace ralgo
 			}
 		};
 
+
+		// a - Постоянная времени процесса в секундах.
+		// delta - Интервал времени между проходами алгоритма. 
 		template <class V, class K = float>
 		struct aperiodic : public inout_state<V>
 		{
@@ -105,20 +108,25 @@ namespace ralgo
 			{
 				return _a;
 			}
-			aperiodic(K a, K t, V pi = V()) : p(pi), _a(a)
+			
+			aperiodic(K a, K delta, V pi = V()) : p(pi), _a(a)
 			{
-				K q = a + t;
+				K q = a + delta;
 				pp = a / q;
-				pg = t / q;
+				pg = delta / q;
 			}
+
 			V operator()(V g) override
 			{
 				return p = pp * p + pg * g;
 			}
+			
 			V output()
 			{
 				return p;
 			}
+
+			void set_value(V value) { p = value; }
 
 			void print_internal() override
 			{}
