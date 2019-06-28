@@ -4,7 +4,8 @@ licant.module("ralgo",
 	sources=[
 	#	"ralgo/util/testheaders.cpp"
 
-		"ralgo/madgwick.cpp"
+		"ralgo/madgwick.cpp",
+		"ralgo/signal/spectre.cpp"
 
 	],
 	include_paths=["."],
