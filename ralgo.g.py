@@ -5,14 +5,14 @@ licant.module("ralgo",
 	#	"ralgo/util/testheaders.cpp"
 
 		"ralgo/madgwick.cpp",
-		"ralgo/signal/spectre.cpp"
+		"ralgo/signal/fft.cpp"
 
 	],
 	include_paths=["."],
 	mdepends=[
 		"linalg-v3", 
 		#"nos", 
-		"igris.dprint", 
+		#"igris.dprint", 
 		#"malgo", 
 		#("gxx.dprint", "__none__")
 	],
