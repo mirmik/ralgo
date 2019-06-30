@@ -1,6 +1,7 @@
 #ifndef RALGO_VECTOR_OPERATIONS_H
 #define RALGO_VECTOR_OPERATIONS_H
 
+#include <assert.h>
 #include <algorithm>
 #include <ralgo/util/helpers.h>
 #include <igris/dprint.h>
@@ -50,36 +51,48 @@ namespace ralgo
 		}
 
 		// Применить функцию f ко всем элементам массива v. Допускается передача дополнительных аргументов.
-		template < template<class> class V, template<class> class R = V, class F, class T, class ... Args >
-		auto elementwise(const V<T> & vec, const F& f, Args && ... args)
-		-> R<decltype(std::declval<F>()(std::declval<value_t<V<T>>>(), std::declval<Args>() ...))>
+		template <class R, class F, class A, class ... Args>
+		R elementwise(const F& f, const A & a, Args&& ... args)
 		{
-			R < decltype(
-			    std::declval<F>()(
-			        std::declval<value_t<V<T>>>(),
-			        std::declval<Args>() ...))
-			> ret(std::size(vec));
+			R ret(a.size());
 
-			auto vit = vec.begin(), eit = vec.end();
+			auto ait = a.begin(), aend = a.end();
 			auto cit = ret.begin();
 
-			for (; vit != eit; ++vit, ++cit)
-				*cit = f(*vit, std::forward<Args>(args) ...);
+			for (; ait != aend; ++ait, ++cit)
+				*cit = f(*ait, std::forward<Args>(args) ...);
 
 			return ret;
+		}
+
+		// Применить функцию f ко всем элементам массива v. Допускается передача дополнительных аргументов.
+		template <class R, class F, class A, class B, class ... Args>
+		R elementwise2(const F& f, const A& a, const B& b, Args&& ... args) 
+		{
+			assert(a.size() == b.size());
+			R c(a.size());
+
+			auto ait = a.begin(), aend = a.end();
+			auto bit = b.begin();
+			auto cit = c.begin();
+
+			for (; ait != aend; ++ait, ++bit, ++cit)
+				*cit = f(*ait, *bit, std::forward<Args>(args) ...); 
+
+			return c;
 		}
 
 		// Создаёт векторизованный вриант функции.
 		template<class V, class R = V, typename F, class ... Args>
 		constexpr auto vectorize(const F& f, Args && ... args)
 		{
-			auto lamda = [=](const V & vec){ return elementwise(vec, f, args...); };
+			auto lamda = [=](const V & vec){ return elementwise<R>(f, vec, args...); };
 			return lamda;
 		}
 
-		template <template<class C> class V, class T> auto abs(const V<T>& obj) { return elementwise(obj, std::abs<scalar_t<T>>); }
-		template <template<class C> class V, class T> auto real(const V<T>& obj) { return elementwise(obj, [](const auto & c) {return c.real();}); }
-		template <template<class C> class V, class T> auto imag(const V<T>& obj) { return elementwise(obj, [](const auto & c) {return c.imag();}); }
+		template <template<class C> class V, class T> auto abs(const V<T>& obj) { return elementwise<V<T>>(std::abs<scalar_t<T>>, obj); }
+		template <template<class C> class V, class T> auto real(const V<T>& obj) { return elementwise<V<T>>([](const auto & c) {return c.real();}, obj); }
+		template <template<class C> class V, class T> auto imag(const V<T>& obj) { return elementwise<V<T>>([](const auto & c) {return c.imag();}, obj); }
 
 		template <typename T>
 		T reverse(const T& src)
@@ -120,12 +133,15 @@ namespace ralgo
 			return sqrt(res);
 		}
 
-		template <class V, class S> void add(const V& v, S s) { V r(std::size(v)); for (int i = 0; i < std::size(v); ++i) r[i] = v[i] + s; return r; }
-		template <class V, class S> void sub(const V& v, S s) { V r(std::size(v)); for (int i = 0; i < std::size(v); ++i) r[i] = v[i] - s; return r; }
-		template <class V, class S> void mul(const V& v, S s) { V r(std::size(v)); for (int i = 0; i < std::size(v); ++i) r[i] = v[i] * s; return r; }
-		template <class V, class S> void div(const V& v, S s) { V r(std::size(v)); for (int i = 0; i < std::size(v); ++i) r[i] = v[i] / s; return r; }
+		template <class A, class B, class R=rettype_t<A>> void add_vs(const A& a, B b) { return elementwise<R>(ralgo::op::add(), a, b); }
+		template <class A, class B, class R=rettype_t<A>> void sub_vs(const A& a, B b) { return elementwise<R>(ralgo::op::add(), a, b); }
+		template <class A, class B, class R=rettype_t<A>> void mul_vs(const A& a, B b) { return elementwise<R>(ralgo::op::add(), a, b); }
+		template <class A, class B, class R=rettype_t<A>> void div_vs(const A& a, B b) { return elementwise<R>(ralgo::op::add(), a, b); }
 
-
+		template <class A, class B, class R=rettype_t<A,B>> R add_vv(const A& a, const B& b) { return elementwise2<R>(ralgo::op::add(), a, b); }
+		template <class A, class B, class R=rettype_t<A,B>> R sub_vv(const A& a, const B& b) { return elementwise2<R>(ralgo::op::sub(), a, b); }
+		template <class A, class B, class R=rettype_t<A,B>> R mul_vv(const A& a, const B& b) { return elementwise2<R>(ralgo::op::mul(), a, b); }
+		template <class A, class B, class R=rettype_t<A,B>> R div_vv(const A& a, const B& b) { return elementwise2<R>(ralgo::op::div(), a, b); }
 
 		namespace inplace
 		{
@@ -148,7 +164,7 @@ namespace ralgo
 		}
 
 		template <class VI, class WI, class RI>
-		void stamp_union(VI vit, const VI vend, WI wit, const WI wend, RI rit) 
+		void merge_sorted(VI vit, const VI vend, WI wit, const WI wend, RI rit) 
 		{
 			while(vit != vend && wit != wend) 
 			{
@@ -163,14 +179,22 @@ namespace ralgo
 		}
 
 		template <class V, class W, class R>
-		void stamp_union_window(const V& v, const W& w, R writer) 
+		void merge_sorted(const V& v, const W& w, R writer, double start, double stop) 
 		{
-			auto vit = std::lower_bound(v.begin(), v.end(), w[0]);
-			auto wit = w.begin();
-			auto vend = std::upper_bound(v.begin(), v.end(), w[w.size()-1]);
-			auto wend = w.end();
+			auto vit = std::lower_bound(v.begin(), v.end(), start);
+			auto wit = std::lower_bound(w.begin(), w.end(), start);
+			auto vend = std::upper_bound(v.begin(), v.end(), stop);
+			auto wend = std::upper_bound(w.begin(), w.end(), stop);
 
-			return stamp_union(vit, vend, wit, wend, writer);			
+			return merge_sorted(vit, vend, wit, wend, writer);			
+		}
+
+		template <class V, class W>
+		auto merge_sorted(const V& v, const W& w, double start, double stop) 
+		{
+			std::vector<value_t<V>> r;
+			merge_sorted(v,w,std::back_inserter(r),start,stop);	
+			return r;	
 		}
 	}
 

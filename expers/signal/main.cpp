@@ -6,6 +6,7 @@
 
 #include <ralgo/vecops.h>
 #include <ralgo/signal/convolution.h>
+#include <ralgo/signal/signal.h>
 
 int main() 
 {	
@@ -75,8 +76,19 @@ int main()
 
 	ralgo::signal::triangle_window w(15, 25);
 
+	std::vector<double> wkeys;
 	std::vector<double> keys;
+	std::vector<double> vals;
+	std::vector<double> wvals;
+	std::vector<double> muls;
 
-	nos::println("keypoints:", keys = w.keypoints_map(freqs));
-	nos::println("keypoints:", keys = ralgo::signal::lerp_keypoints(freqs, keys));
+	nos::println("freqs:", freqs);
+	nos::println("wkeys:", wkeys = w.keypoints());
+	nos::println("keys:", keys = ralgo::vecops::merge_sorted(freqs, wkeys, w.strt, w.fini));
+	nos::println("values:", vals = ralgo::signal::lerp_values(std::vector<double>{1,2,2,1}, freqs, keys));
+	nos::println("wvalues:", wvals = w.lerp_values(keys));
+	nos::println("muls", muls = ralgo::vecops::mul_vv(vals, wvals));
+	nos::println("traps", ralgo::trapz(keys, muls));
+
+	//nos::println("convolution:", ralgo::signal::convolution(std::vector<double>{0,1}, std::vector<double>{0,1}, std::vector<double>{1,0}));
 }
