@@ -5,6 +5,8 @@
 
 namespace ralgo 
 {
+	constexpr const double epsilon = 0.000000001;
+
 	// Достать тип значения из контейнера.
 	template <typename V> struct value { using type = typename V::value_type; };
 	template <typename T> using value_t = typename value<T>::type;
@@ -30,6 +32,8 @@ namespace ralgo
 		struct sub { template<class A, class B> auto operator()(const A& a, const B& b) const { return a - b; } };
 		struct mul { template<class A, class B> auto operator()(const A& a, const B& b) const { return a * b; } };
 		struct div { template<class A, class B> auto operator()(const A& a, const B& b) const { return a / b; } };
+	
+		struct abs { template<class A> auto operator()(const A& a) const { return std::abs(a); } };
 	}
 
 	template <typename ... T> struct rettype {};

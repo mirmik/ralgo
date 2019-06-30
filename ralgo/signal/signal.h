@@ -14,20 +14,20 @@ namespace ralgo
 		*/
 
 		template<class VI, class SI, class KI, class RI>
-		void lerp_values(
+		static void lerp_values(
 		    VI vit, const VI vend,
 		    SI sit, const SI send,
 		    KI kit, const KI kend,
 		    RI rit)
 		{
 			SI sitnext = std::next(sit);
-			SI vitnext = std::next(vit);
+			VI vitnext = std::next(vit);
 
 			for (; kit != kend; kit++, rit++)
 			{
 				auto key = *kit;
 
-				while(key > *sitnext) { 
+				while(key - *sitnext >= ralgo::epsilon) { 
 					sit++; sitnext++; 
 					vit++; vitnext++;
 				
@@ -55,10 +55,10 @@ namespace ralgo
 			}
 		}
 
-		template<class V, class S, class K>
-		std::vector<value_t<V>> lerp_values(const V& vals, const S& stamp, const K& keys)
+		template<class R, class V, class S, class K>
+		static R lerp_values(const V& vals, const S& stamp, const K& keys)
 		{
-			std::vector<value_t<V>> r(keys.size());
+			R r(keys.size());
 
 			/*PRINT(vals);
 			PRINT(stamp);
