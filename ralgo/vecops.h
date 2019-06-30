@@ -50,6 +50,21 @@ namespace ralgo
 			return r;
 		}
 
+		template<class R>
+		auto linspace(double s, double f, int n)
+		{
+			R r(n);
+			double k;
+
+			for (int i = 0; i < n; ++i) 
+			{
+				k = (double)i / ((double)n - 1);
+				r[i] = s * (1-k) + f * k;
+			}
+
+			return r;
+		}
+
 		// Применить функцию f ко всем элементам массива v. Допускается передача дополнительных аргументов.
 		template <class R, class F, class A, class ... Args>
 		R elementwise(const F& f, const A & a, Args&& ... args)
@@ -90,7 +105,7 @@ namespace ralgo
 			return lamda;
 		}
 
-		template <template<class C> class V, class T> auto abs(const V<T>& obj) { return elementwise<V<T>>(std::abs<scalar_t<T>>, obj); }
+		template <class R, class A> auto abs(const A& obj) { return elementwise<R>(ralgo::op::abs(), obj); }
 		template <template<class C> class V, class T> auto real(const V<T>& obj) { return elementwise<V<T>>([](const auto & c) {return c.real();}, obj); }
 		template <template<class C> class V, class T> auto imag(const V<T>& obj) { return elementwise<V<T>>([](const auto & c) {return c.imag();}, obj); }
 
@@ -108,7 +123,7 @@ namespace ralgo
 		}
 
 		template <typename T>
-		T slice(const T& src, size_t start, size_t size, size_t stride)
+		T slice(const T& src, size_t start, size_t size, size_t stride = 1)
 		{
 			T dst(size);
 
@@ -161,6 +176,12 @@ namespace ralgo
 			template <class V> V& conj(V& vec) { for (auto& val : vec) val = std::conj(val); return vec; }
 
 			template <class V> V& sin(V& vec) { return elementwise(vec, ralgo::sin<value_t<V>>); }
+
+			template <class V> V& normalize(V& vec) 
+			{
+				double norm = ralgo::vecops::norm(vec);
+				ralgo::vecops::inplace::div(vec, norm);
+			}
 		}
 
 		template <class VI, class WI, class RI>
@@ -199,12 +220,20 @@ namespace ralgo
 	}
 
 	using vecops::elementwise;
+	using vecops::elementwise2;
 	using vecops::vectorize;
+
+	using vecops::arange;
+	using vecops::linspace;
+
+	using vecops::merge_sorted;
 
 	namespace inplace 
 	{
 		using vecops::inplace::elementwise;
 		//using vecops::inplace::vectorize;
+
+		using vecops::inplace::normalize;
 	}
 }
 

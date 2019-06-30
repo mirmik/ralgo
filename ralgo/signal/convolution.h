@@ -47,7 +47,7 @@ namespace ralgo
 			{
 				std::vector<double> vals = values();
 				std::vector<double> keys = keypoints();
-				return ralgo::signal::lerp_values(vals, keys, wided_keys);
+				return ralgo::signal::lerp_values<std::vector<double>>(vals, keys, wided_keys);
 			}
 		};
 
