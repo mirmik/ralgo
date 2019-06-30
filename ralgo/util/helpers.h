@@ -18,6 +18,24 @@ namespace ralgo
 	template <class T> constexpr T sin(T x) { return std::sin(x); }
 	template <class T> constexpr T cos(T x) { return std::cos(x); }
 	template <class T> constexpr T tan(T x) { return std::tan(x); }
+
+	namespace op 
+	{
+		//template <class A, class B> constexpr auto add(const A& a, const B& b) { return a + b; }
+		//template <class A, class B> constexpr auto sub(const A& a, const B& b) { return a - b; }
+		//template <class A, class B> constexpr auto mul(const A& a, const B& b) { return a * b; }
+		//template <class A, class B> constexpr auto div(const A& a, const B& b) { return a / b; }
+
+		struct add { template<class A, class B> auto operator()(const A& a, const B& b) const { return a + b; } };
+		struct sub { template<class A, class B> auto operator()(const A& a, const B& b) const { return a - b; } };
+		struct mul { template<class A, class B> auto operator()(const A& a, const B& b) const { return a * b; } };
+		struct div { template<class A, class B> auto operator()(const A& a, const B& b) const { return a / b; } };
+	}
+
+	template <typename ... T> struct rettype {};
+	template <class A, class B> struct rettype<A,B> { using type = A; };
+///	template <template<class> V, class T> struct rettype { using type = V<T>; };
+	template <typename ... T> using rettype_t = typename rettype<T ...>::type;
 }
 
 #endif
