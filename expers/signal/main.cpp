@@ -75,5 +75,8 @@ int main()
 
 	ralgo::signal::triangle_window w(15, 25);
 
-	nos::println("keypoints:", w.keypoints_map(freqs));
+	std::vector<double> keys;
+
+	nos::println("keypoints:", keys = w.keypoints_map(freqs));
+	nos::println("keypoints:", keys = ralgo::signal::lerp_keypoints(freqs, keys));
 }
