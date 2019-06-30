@@ -5,6 +5,7 @@
 #include <math.h>
 
 #include <ralgo/vecops.h>
+#include <ralgo/signal/convolution.h>
 
 int main() 
 {	
@@ -65,6 +66,14 @@ int main()
 	nos::println("MELS");
 	auto freqs = ralgo::signal::rfftfreq(arr.size(), .1/8);
 	nos::println("\t", freqs);
-	nos::println("\t", freqs = ralgo::vectorize(freqs, ralgo::hz2mel));
-	nos::println("\t", freqs = ralgo::vectorize(freqs, ralgo::mel2hz));
+
+	constexpr auto hz2mel = ralgo::vectorize<std::vector<double>>(&ralgo::hz2mel);
+	constexpr auto mel2hz = ralgo::vectorize<std::vector<double>>(&ralgo::mel2hz);
+
+	nos::println("\t", ralgo::hz2mel_vi(freqs));
+	nos::println("\t", ralgo::mel2hz_vi(freqs));
+
+	ralgo::signal::triangle_window w(15, 25);
+
+	nos::println("keypoints:", w.keypoints_map(freqs));
 }
