@@ -1,4 +1,5 @@
 #include <ralgo/signal/fft.h>
+#include <ralgo/signal/voice.h>
 #include <nos/print.h>
 
 #include <math.h>
@@ -20,6 +21,9 @@ int main()
 	{
 		arr[i] = arr0[i];
 	}
+
+	arr0 = ralgo::vecops::arange<std::vector<double>>(8);
+	ralgo::vecops::inplace::sin(arr0);
 
 	//nos::println(ralgo::vecops::norm(arr0));
 	//nos::println(1./ralgo::vecops::norm(arr0));
@@ -57,4 +61,10 @@ int main()
 	nos::println(ralgo::signal::fftfreq(arr.size(), .1/8));
 	nos::print("\t");
 	nos::println(ralgo::signal::rfftfreq(arr.size(), .1/8));
+
+	nos::println("MELS");
+	auto freqs = ralgo::signal::rfftfreq(arr.size(), .1/8);
+	nos::println("\t", freqs);
+	nos::println("\t", freqs = ralgo::vectorize(freqs, ralgo::hz2mel));
+	nos::println("\t", freqs = ralgo::vectorize(freqs, ralgo::mel2hz));
 }
