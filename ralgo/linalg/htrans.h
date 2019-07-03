@@ -60,7 +60,7 @@ namespace ralgo
 
 		auto vector6_to(const htrans& target) const
 		{
-			return (target * inverse()).vector6();
+			return (inverse() * target).vector6();
 		}
 
 		htrans inverse() const
