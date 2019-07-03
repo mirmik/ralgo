@@ -17,18 +17,21 @@ def timing(f):
         return result
     return wrap
 
-a=ralgo.htrans(ralgo.rotation_quat((0,0,1),ralgo.deg(1)),(0,0,0))
+q=ralgo.htrans(ralgo.quat(0,0,0,1),(8,0,0))
+a=ralgo.htrans(ralgo.rotation_quat((0,0,1),ralgo.deg(20)),(0,0,0))
 b=ralgo.htrans(ralgo.rotation_quat((1,0,0),ralgo.deg(1)),(0,0,0))
 #c=ralgo.htrans(ralgo.rotation_quat((0,1,0),ralgo.deg(33)),(0,0,0))
 
-m = a*b#*c
+m = q*a*b
 
+qlink = ralgo.cynematic.translation_link((1,0,0))
 alink = ralgo.cynematic.rotation_link((0,0,1))
 blink = ralgo.cynematic.rotation_link((1,0,0))
 #clink = ralgo.cynematic.rotation_link((0,1,0))
 
 chain = ralgo.cynematic.chain(
 	[
+		qlink,
 		alink, 
 		blink, 
 		#clink
@@ -42,9 +45,11 @@ def do():
 	global ret
 
 	for i in range(100):
-		ret = chain.solve_inverse_cynematic(m, [0,0], 1)
+		ret = chain.solve_inverse_cynematic(m, [0,0,0], 1)
 
 do()
+
+print(chain.get(ret[0]))
 
 print(m)
 print(ret)

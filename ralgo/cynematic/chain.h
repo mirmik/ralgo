@@ -55,9 +55,31 @@ namespace ralgo
 				coords_total += lnk->count_of_coords();
 			}
 
+			htrans<T> get(const std::vector<T> &coords)
+			{
+				htrans<T> result{};
+				malgo::vector<T> cccc(coords.data(), coords.size());
+				int8_t coord_pos = coords.size() - 1;
+
+				for (int i = links.size() - 1; i >= 0; --i)
+				{
+					uint8_t count_of_coords = links[i]->count_of_coords();
+
+					if (coord_pos - count_of_coords + 1 < 0)
+						return htrans<T>();
+
+					htrans<T> nmat = links[i]->get(cccc, coord_pos);
+					result = nmat * result;
+					coord_pos -= count_of_coords;
+				}
+
+				return result;
+			}
+
 			htrans<T> get(const malgo::vector<T> &coords)
 			{
 				htrans<T> result{};
+				//malgo::vector<T> cccc(coords.data(), coords.size());
 				int8_t coord_pos = coords.size() - 1;
 
 				for (int i = links.size() - 1; i >= 0; --i)
@@ -175,7 +197,7 @@ namespace ralgo
 			std::pair<std::vector<T>, int>
 			solve_inverse_cynematic(const htrans<T> &target,
 			                        const std::vector<T> &_reference,
-			                        T maxstep = 1)
+			                        T maxstep = 5)
 			{
 				assert(_reference.size() == coords_total);
 				malgo::vector<T> reference(_reference.data(), _reference.size());
@@ -184,13 +206,13 @@ namespace ralgo
 				//T lastlen = std::numeric_limits<T>::max();
 
 				int iteration;
-				for (iteration = 0; iteration < 100; ++iteration)
+				for (iteration = 0; iteration < 1000; ++iteration)
 				{
 					auto curtrans = get(reference);
 					auto rrr = get_speed_transes(reference);
 					auto iv6 = curtrans.vector6_to(target);
 
-					if (pseudolen1(iv6) < 0.0000001)
+					if (pseudolen1(iv6) < 0.000001)
 					{
 						nos::println("RESULT:", reference);
 						break;

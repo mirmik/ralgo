@@ -126,7 +126,8 @@ PYBIND11_MODULE(libralgo, m)
 	py::class_<cynematic::chain<double>>(m, "chain")
 		//.def(py::init<std::initializer_list<cynematic::abstract_link<double>*>>());
 		.def(py::init<std::vector<cynematic::abstract_link<double>*>>())
-		.def("solve_inverse_cynematic", &cynematic::chain<double>::solve_inverse_cynematic);
+		.def("solve_inverse_cynematic", &cynematic::chain<double>::solve_inverse_cynematic)
+		.def("get", (htrans<double>(cynematic::chain<double>::*)(const std::vector<double> &coords))&cynematic::chain<double>::get);
 
 
 	// IGRIS
