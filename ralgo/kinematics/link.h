@@ -11,14 +11,15 @@
 #include <algorithm>
 #include <initializer_list>
 
-#include <gxx/util/iteration_counter.h>
+//#include <gxx/util/iteration_counter.h>
 
 #include <chrono>
 #include <thread>
 
 #include <numeric>
 
-//#include <nos/input.h>
+#include <igris/util/bug.h>
+#include <nos/input.h>
 
 #include <malgo/matrix.h>
 #include <malgo/nrecipes/svd.h>
@@ -290,7 +291,7 @@ namespace cynematic
 					}
 					else
 					{
-						PANIC_TRACED();
+						BUG();//PANIC_TRACED();
 					}
 				}
 
@@ -391,7 +392,7 @@ namespace cynematic
 				// for (auto f : koeffs) koeffs_length += abs(f);
 				// koeffs_length /= koeffs.size();
 
-				/*nos::println();
+				nos::println();
 				PRINT(target);
 				PRINT(curtrans);
 				PRINT(curtrans.inverse() * target);
@@ -401,7 +402,7 @@ namespace cynematic
 				PRINT(koeffs_length);
 				PRINT(reference);
 
-				nos::readline();*/
+	//			nos::readline();
 
 				for (int i = 0; i < coords_total; ++i)
 				{
