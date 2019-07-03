@@ -1,9 +1,9 @@
 #ifndef RALGO_LINFILTERS_H
 #define RALGO_LINFILTERS_H
 
-#include <linalg-add.h>
+#include <ralgo/linalg/extension.h>
 #include <linalg.h>
-//#include <nos/print.h>
+#include <nos/print.h>
 
 using namespace linalg::ostream_overloads;
 
@@ -101,9 +101,9 @@ namespace ralgo
 		template <class V, class K = float>
 		struct aperiodic : public inout_state<V>
 		{
+			V p;
 			V _a;
 			K pp, pg;
-			V p;
 			V a()
 			{
 				return _a;
@@ -135,10 +135,10 @@ namespace ralgo
 		template <class V, class K = float>
 		struct oscilator : public inout_state<V>
 		{
-			V _a, _b;
 			linalg::mat<V, 2, 2> A;
 			linalg::vec<V, 2> B;
 			linalg::vec<V, 2> x;
+			V _a, _b;
 
 			V a()
 			{
@@ -150,9 +150,9 @@ namespace ralgo
 			}
 
 			oscilator(K a, K b, K t)
-				: x{0, 0}, B{0, 1}, A{{0, -a}, {1, -b}}, _a(a), _b(b)
+				:  A{{0, -a},{1, -b}}, B{0, 1}, x{0, 0}, _a(a), _b(b)
 			{
-				auto _A = exponent(A * t);
+				auto _A = linalg::exponent(A * t);
 				auto I = linalg::mat<V, 2, 2>{linalg::identity};
 				auto _B = inverse(A) * ((_A - I) * B);
 				A = _A;

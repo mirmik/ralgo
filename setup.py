@@ -8,15 +8,18 @@ import os
 
 import licant
 
-licant.include("igris", local_tunel="build/igris")
-licant.include("nos", local_tunel="build/nos")
-licant.include("linalg-v3", local_tunel="build/linalg")
-licant.include("malgo", local_tunel="build/malgo")
+licant.include("nos", local_tunel=("build/nos", "nos.g.py"))
+licant.include("igris", local_tunel=("build/igris", "igris.g.py"))
+licant.include("linalg-v3", local_tunel=("build/linalg-v3", "linalg.g.py"))
+licant.include("malgo", local_tunel=("build/malgo", "malgo.g.py"))
 licant.include("ralgo", "ralgo.g.py")
 
 licant.cxx_objects("ralgo-objects", 
 	mdepends = [
-		"ralgo"
+		"ralgo",
+		"nos",
+		"igris",
+		"nos.current_ostream"
 	] 
 )
 ralgoopts = licant.core.core.get("ralgo-objects").finalopts
@@ -38,7 +41,7 @@ class bdist_wheel(bdist_wheel_):
 		self.plat_name_supplied = True
 		self.plat_name = platform_name
 
-ralgo_lib = Extension("pyralgo.libralgo",
+ralgo_lib = Extension("ralgo.libralgo",
 	sources = ["ralgo/pywrap.cpp"] + ralgoopts["sources"],
 	extra_compile_args=['-fPIC', '-std=c++14'],
 	extra_link_args=['-Wl,-rpath,$ORIGIN/libs'],
@@ -47,8 +50,9 @@ ralgo_lib = Extension("pyralgo.libralgo",
 )
 
 setup(
-	name = 'pyralgo',
-	packages = ['pyralgo'],
+	name = 'ralgo',
+	packages = ['ralgo'],
+	package_dir = {'ralgo': 'pyralgo'},
 	version = '0.0.1',
 	license='MIT',
 	description = '???????????',
