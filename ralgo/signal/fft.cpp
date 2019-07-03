@@ -115,11 +115,13 @@ std::vector<double> ralgo::signal::spectre(double *src, size_t srclen, size_t ds
 
 void ralgo::signal::fftfreq(double* dst, size_t n, double delta) 
 {
-	for (int i = 0; i <= (n/2)-1; ++ i) 
+	int _n = n;
+
+	for (int i = 0; i <= (_n/2)-1; ++ i) 
 	{
 		dst[i] = i / (delta * n);
 	}
-	for (int i = -(n/2); i <= -1; ++ i) 
+	for (int i = -(_n/2); i <= -1; ++ i) 
 	{
 		dst[n+i] = i / (delta * n);
 	}
@@ -127,7 +129,7 @@ void ralgo::signal::fftfreq(double* dst, size_t n, double delta)
 
 void ralgo::signal::rfftfreq(double* dst, size_t n, double delta) 
 {
-	for (int i = 0; i <= n/2; ++ i) 
+	for (unsigned int i = 0; i <= n/2; ++ i) 
 	{
 		dst[i] = i / (delta * n);
 	}

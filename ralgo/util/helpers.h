@@ -21,6 +21,11 @@ namespace ralgo
 	template <class T> constexpr T cos(T x) { return std::cos(x); }
 	template <class T> constexpr T tan(T x) { return std::tan(x); }
 
+	template <class T> constexpr T exp(T x) { return std::exp(x); }
+	template <class T> constexpr T log(T x) { return std::log(x); }
+	template <class T> constexpr T log2(T x) { return std::log2(x); }
+	template <class T> constexpr T log10(T x) { return std::log10(x); }
+
 	namespace op 
 	{
 		//template <class A, class B> constexpr auto add(const A& a, const B& b) { return a + b; }

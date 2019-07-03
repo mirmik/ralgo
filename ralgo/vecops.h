@@ -176,6 +176,12 @@ namespace ralgo
 			template <class V> V& conj(V& vec) { for (auto& val : vec) val = std::conj(val); return vec; }
 
 			template <class V> V& sin(V& vec) { return elementwise(vec, ralgo::sin<value_t<V>>); }
+			template <class V> V& cos(V& vec) { return elementwise(vec, ralgo::cos<value_t<V>>); }
+			template <class V> V& tan(V& vec) { return elementwise(vec, ralgo::tan<value_t<V>>); }
+			template <class V> V& exp(V& vec) { return elementwise(vec, ralgo::exp<value_t<V>>); }
+			template <class V> V& log(V& vec) { return elementwise(vec, ralgo::log<value_t<V>>); }
+			template <class V> V& log2(V& vec) { return elementwise(vec, ralgo::log2<value_t<V>>); }
+			template <class V> V& log10(V& vec) { return elementwise(vec, ralgo::log10<value_t<V>>); }
 
 			template <class V> V& normalize(V& vec) 
 			{
@@ -234,6 +240,15 @@ namespace ralgo
 		//using vecops::inplace::vectorize;
 
 		using vecops::inplace::normalize;
+
+		using vecops::inplace::sin;
+		using vecops::inplace::cos;
+		using vecops::inplace::tan;
+		
+		using vecops::inplace::exp;
+		using vecops::inplace::log;
+		using vecops::inplace::log2;
+		using vecops::inplace::log10;
 	}
 }
 

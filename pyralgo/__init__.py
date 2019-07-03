@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt   
-import pyralgo.libralgo as lib
+import ralgo.libralgo as lib
 import sympy
 import numpy as np
 import cmath
@@ -8,8 +8,8 @@ import math
 #import scipy
 #import scipy.signal
 
-from pyralgo.libralgo import keep_trajectory
-from pyralgo.libralgo import accdcc_by_time_trajectory
+from ralgo.libralgo import keep_trajectory
+from ralgo.libralgo import accdcc_by_time_trajectory
 
 s, t = sympy.symbols("s t")
 
@@ -207,5 +207,26 @@ def plot_step_responce_tf(w, time, points):
 	plt.plot(np.r_[0:time:N*1j], arr)
 
 
+import ralgo.libralgo
+from ralgo.libralgo import htrans, vec3, mat33, quat
+from ralgo.libralgo import rotation_quat
+from ralgo.libralgo import deg
 
-	
+def to_quat(a):
+	if isinstance(a, tuple):
+		return quat(*a)
+	else: 
+		return quat(a)
+
+def to_vec3(a):
+	if isinstance(a, tuple):
+		return vec3(*a)
+	else: 
+		return vec3(a)
+
+class htrans(ralgo.libralgo.htrans):
+	def __init__(self,rot, mov):
+		super().__init__(to_quat(rot), to_vec3(mov))
+
+def rotation_quat(ax, angle):
+	return ralgo.libralgo.rotation_quat(to_vec3(ax), angle)
