@@ -209,9 +209,12 @@ namespace ralgo
 				for (iteration = 0; iteration < 1000; ++iteration)
 				{
 					auto curtrans = get(reference);
+					PRINT(curtrans);
+
 					auto rrr = get_speed_transes(reference);
 					auto iv6 = curtrans.vector6_to(target);
 
+					//std::cout<<iv6 <<" "<<pseudolen1(iv6)<<std::endl;
 					if (pseudolen1(iv6) < 0.000001)
 					{
 						nos::println("RESULT:", reference);
@@ -219,6 +222,9 @@ namespace ralgo
 					}
 
 					auto koeffs = vecops::backpack(iv6, rrr);
+
+					for (auto& k: koeffs)
+						k = k * 1.05;
 
 					if (koeffs.size() == 0)
 						return {};
@@ -229,17 +235,17 @@ namespace ralgo
 					// for (auto f : koeffs) koeffs_length += abs(f);
 					// koeffs_length /= koeffs.size();
 
-					/*nos::println();
-					PRINT(target);
-					PRINT(curtrans);
-					PRINT(curtrans.inverse() * target);
+					nos::println();
+					//PRINT(target);
+					//PRINT(curtrans);
+					//PRINT(curtrans.inverse() * target);
 					PRINT(iv6);
-					PRINT(rrr);
-					PRINT(koeffs);
-					PRINT(koeffs_length);
-					PRINT(reference);
+					//PRINT(rrr);
+					//PRINT(koeffs);
+					//PRINT(koeffs_length);
+					//PRINT(reference);
 
-					nos::readline();*/
+					//nos::readline();*/
 
 					for (unsigned int i = 0; i < coords_total; ++i)
 					{
