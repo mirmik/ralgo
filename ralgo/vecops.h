@@ -66,10 +66,10 @@ namespace ralgo
 		}
 
 		// Применить функцию f ко всем элементам массива v. Допускается передача дополнительных аргументов.
-		template <class R, class F, class A, class ... Args>
-		R elementwise(const F& f, const A & a, Args&& ... args)
+		template <class R=void, class F, class A, class ... Args>
+		defsame_t<R,A> elementwise(const F& f, const A & a, Args&& ... args)
 		{
-			R ret(a.size());
+			defsame_t<R,A> ret(a.size());
 
 			auto ait = a.begin(), aend = a.end();
 			auto cit = ret.begin();
@@ -105,7 +105,7 @@ namespace ralgo
 			return lamda;
 		}
 
-		template <class R, class A> auto abs(const A& obj) { return elementwise<R>(ralgo::op::abs(), obj); }
+		template <class R=void, class A> defsame_t<R,A> abs(const A& obj) { return elementwise<R>(ralgo::op::abs(), obj); }
 		template <template<class C> class V, class T> auto real(const V<T>& obj) { return elementwise<V<T>>([](const auto & c) {return c.real();}, obj); }
 		template <template<class C> class V, class T> auto imag(const V<T>& obj) { return elementwise<V<T>>([](const auto & c) {return c.imag();}, obj); }
 
