@@ -47,13 +47,14 @@ namespace ralgo
 ///	template <template<class> V, class T> struct rettype { using type = V<T>; };
 	template <typename ... T> using rettype_t = typename rettype<T ...>::type;
 
-	template<class R, class V> struct defvec 
-	{ using type = R; };
-
-	template<class V> struct defvec<void, V> 
-	{ using type = std::vector<value_t<V>>; };
-
+	template<class R, class V> struct defvec { using type = R; };
+	template<class V> struct defvec<void, V> { using type = std::vector<value_t<V>>; };
 	template<class R, class V> using defvec_t = typename defvec<R,V>::type; 
+
+	template<class R, class V> struct defsame { using type = R; };
+	template<class V> struct defsame<void, V> { using type = V; };
+	template<class R, class V> using defsame_t = typename defsame<R,V>::type; 
+
 }
 
 #endif
