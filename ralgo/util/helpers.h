@@ -2,10 +2,11 @@
 #define RALGO_UTIL_FUNC_HELPERS_H
 
 #include <cmath>
+#include <numeric>
 
 namespace ralgo 
 {
-	constexpr const double epsilon = 0.000000001;
+	constexpr const double epsilon = std::numeric_limits<double>::epsilon();
 
 	// Достать тип значения из контейнера.
 	template <typename V> struct value { using type = typename V::value_type; };
@@ -45,6 +46,14 @@ namespace ralgo
 	template <class A, class B> struct rettype<A,B> { using type = A; };
 ///	template <template<class> V, class T> struct rettype { using type = V<T>; };
 	template <typename ... T> using rettype_t = typename rettype<T ...>::type;
+
+	template<class R, class V> struct defvec 
+	{ using type = R; };
+
+	template<class V> struct defvec<void, V> 
+	{ using type = std::vector<value_t<V>>; };
+
+	template<class R, class V> using defvec_t = typename defvec<R,V>::type; 
 }
 
 #endif

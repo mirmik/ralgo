@@ -4,6 +4,8 @@
 #include <igris/util/bug.h>
 #include <nos/print.h>
 
+#include <ralgo/util/helpers.h>
+
 namespace ralgo
 {
 	namespace signal
@@ -55,10 +57,10 @@ namespace ralgo
 			}
 		}
 
-		template<class R, class V, class S, class K>
-		static R lerp_values(const V& vals, const S& stamp, const K& keys)
+		template<class R=void, class V, class S, class K>
+		static defvec_t<R,V> lerp_values(const V& vals, const S& stamp, const K& keys)
 		{
-			R r(keys.size());
+			defvec_t<R,V> r(keys.size());
 
 			/*PRINT(vals);
 			PRINT(stamp);
