@@ -50,7 +50,7 @@ int main()
 	nos::print("\t");
 	nos::println(ralgo::vecops::imag(arr));
 	nos::print("\t");
-	nos::println(ralgo::vecops::abs(arr));
+	nos::println(ralgo::vecops::abs<std::vector<double>>(arr));
 
 	nos::print("Reverse FFT:\n\t");
 	ralgo::signal::ifft(arr);
