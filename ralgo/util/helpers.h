@@ -55,6 +55,9 @@ namespace ralgo
 	template<class V> struct defsame<void, V> { using type = V; };
 	template<class R, class V> using defsame_t = typename defsame<R,V>::type; 
 
+	template<class R, class F> struct fretvec { using type = R; };
+	template<class F> struct fretvec<void, F> { using type = std::vector<std::result_of<F>>; };
+	template<class R, class F> using fretvec_t = typename fretvec<R,F>::type; 
 }
 
 #endif
