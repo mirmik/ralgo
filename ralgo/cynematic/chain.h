@@ -215,7 +215,7 @@ namespace ralgo
 					auto iv6 = curtrans.vector6_to(target);
 
 					//std::cout<<iv6 <<" "<<pseudolen1(iv6)<<std::endl;
-					if (pseudolen1(iv6) < 0.000001)
+					if (linalg::pseudolen1(iv6) < 0.000001)
 					{
 						nos::println("RESULT:", reference);
 						break;

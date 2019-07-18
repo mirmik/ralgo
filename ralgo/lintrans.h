@@ -2,8 +2,6 @@
 #define RALGO_LINFILTERS_H
 
 #include <ralgo/linalg/extension.h>
-#include <linalg.h>
-#include <nos/print.h>
 
 using namespace linalg::ostream_overloads;
 
