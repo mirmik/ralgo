@@ -3,6 +3,7 @@
 
 #include <assert.h>
 #include <algorithm>
+#include <iterator>
 #include <ralgo/util/helpers.h>
 #include <igris/dprint.h>
 

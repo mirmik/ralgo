@@ -5,7 +5,7 @@
 #include <complex>
 #include <stdlib.h>
 
-#include <nos/print.h>
+//#include <nos/print.h>
 #include <ralgo/vecops.h>
 
 namespace ralgo

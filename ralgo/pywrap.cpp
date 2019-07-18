@@ -89,17 +89,25 @@ PYBIND11_MODULE(libralgo, m)
 	        .def("inloctime_placed",
 	             &accdcc_by_time_trajectory<DOUBLE4>::inloctime_placed);
 
-
+	// LINALG
 	py::class_<linalg::vec<double,3>>(m, "vec3")
 		.def(py::init<DOUBLE3>())
-		.def(py::init<const vec<double,3>&>());
+		.def(py::init<const vec<double,3>&>())
+		.def("__str__", [](const linalg::vec<double,3>& self){ return nos::format("{}", self); });
 
 	py::class_<linalg::mat<double,3,3>>(m, "mat33")
-		.def(py::init<const mat<double,3,3>&>());
+		.def(py::init<const mat<double,3,3>&>())
+		.def("__str__", [](const linalg::mat<double,3,3>& self){ return nos::format("{}", self); });
 
 	py::class_<linalg::quat<double>>(m, "quat")
 		.def(py::init<DOUBLE4>())
-		.def(py::init<const quat<double>&>());
+		.def(py::init<const vec<double,3>&,double>())
+		.def(py::init<const vec<double,4>&>())
+		.def(py::init<const quat<double>&>())
+		.def("__str__", [](const linalg::quat<double>& self){ return nos::format("{}", self); })
+		.def("__mul__", [](const linalg::quat<double>& a, const linalg::quat<double>& b){ return a * b; });
+
+	m.def("rotation_quat", (quat<double>(*)(const vec<double,3> &, double))&rotation_quat<double> );
 
 	// RALGO::LINALG
 	py::class_<htrans<double>>(m, "htrans")
@@ -110,9 +118,6 @@ PYBIND11_MODULE(libralgo, m)
 		.def("transform_vector", &htrans<double>::transform_vector)
 		.def("transform_point", &htrans<double>::transform_point)
 		.def("__str__", [](const htrans<double>& self){ return nos::format("{}", self); });
-
-	// LINALG
-	m.def("rotation_quat", (quat<double>(*)(const vec<double,3> &, double))&rotation_quat<double> );
 
 	// CYNEMATIC
 	auto alink = py::class_<cynematic::abstract_link<double>>(m, "abstract_link");

@@ -69,7 +69,7 @@ namespace ralgo
 		}
 	};
 
-
+	template <typename T> mtrans<T> identity_lerp(const mtrans<T>& tr, T mul) { return { rotation_quat(qaxis(tr.orient), mul * qangle(tr.orient)), mul * tr.center }; }
 
 	namespace ostream_overloads
 	{

@@ -17,6 +17,7 @@ licant.include("ralgo", "ralgo.g.py")
 licant.cxx_objects("ralgo-objects", 
 	mdepends = [
 		"ralgo",
+		"malgo",
 		"nos",
 		"igris",
 		"nos.current_ostream"
