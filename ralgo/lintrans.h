@@ -2,6 +2,7 @@
 #define RALGO_LINFILTERS_H
 
 #include <ralgo/linalg/extension.h>
+#include <ralgo/inout/inout.h>
 
 using namespace linalg::ostream_overloads;
 
@@ -9,14 +10,8 @@ namespace ralgo
 {
 	namespace lintrans
 	{
-		template <class V> struct inout
-		{
-			virtual V operator()(V in) = 0;
-			virtual void print_internal()
-			{
-				//nos::println("TODO");
-			};
-		};
+
+		using ralgo::inout;		
 
 		template <class V> struct inout_state : public inout<V>
 		{
