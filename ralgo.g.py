@@ -1,5 +1,9 @@
 import licant
 
+licant.module("ralgo.include",
+	include_paths=["."])
+
+
 licant.module("ralgo",
 	sources=[
 	#	"ralgo/util/testheaders.cpp"
