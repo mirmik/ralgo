@@ -105,7 +105,7 @@ namespace ralgo
 
 			for (unsigned int a = 0; a < N; a++)
 			{
-				unsigned int b = a;
+				uint32_t b = a;
 				// Reverse bits
 				b = (((b & 0xaaaaaaaa) >> 1) | ((b & 0x55555555) << 1));
 				b = (((b & 0xcccccccc) >> 2) | ((b & 0x33333333) << 2));
