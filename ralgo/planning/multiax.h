@@ -76,6 +76,25 @@ namespace ralgo
 		rabbit::trimmed_curve2 * crv;
 		ralgo::speed_deformer * spddeform;
 		float timemul;		
+
+		geom2d_trajectory(
+			rabbit::bounded_curve2* crv, 
+			ralgo::speed_deformer* def,
+			float fulltime
+			);
+
+		int inloctime_placed(T time, phase<P, V, A> *phs) 
+		{
+			T tkoeff = (fintime - time) / fintime;
+
+			T time_to_traj_param_koeff = interval.length() / fintime;
+
+			auto traj_param = spddeform.posmod(t) * finangle;
+			auto speed_modifier = spddeform.spdmod(t) * time_to_traj_param_koeff;
+
+			auto pos = circ.d0(traj_param);
+			auto spd = circ.d1(traj_param) * speed_modifier;
+		}
 	};
 
 
