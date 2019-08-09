@@ -1,9 +1,20 @@
 #ifndef RALGO_SPEED_DEFORMATION_H
 #define RALGO_SPEED_DEFORMATION_H
 
+/**
+	Деформаторы скорости для траекторных проходов.
+
+	Деформаторы скорости нужны для того, чтобы наложить скоростной паттерн на 
+	траекторию описываемую уравнением s(t). 
+
+	Деформатор скорости D следует применять как:
+	s = s(D_pos(t / tfull) * t)
+	x = D_spd(t / tfull) \dot{s}(D_pos(t / tfull) * t)
+*/
+
 namespace ralgo 
 {
-	struct speed_deformation 
+	struct speed_deformer
 	{
 		virtual float spdmod(float param) = 0;
 		virtual float posmod(float param) = 0;
@@ -13,7 +24,7 @@ namespace ralgo
 	struct acc_speed_deformation
 	{
 		float start_speed;
-		//float tasked_linear_speed;
+		float finacc_position;
 		float evaluated_linear_speed;
 
 		float lin;
@@ -38,7 +49,8 @@ namespace ralgo
 		{
 			if (param < acc) 
 			{
-				return std::lerp(start_speed, evaluated_linear_speed, param / acc);
+				float k = param / acc;
+				return start_speed * (1-k) + evaluated_linear_speed * k;
 			}
 
 			else 

@@ -1,7 +1,7 @@
 #ifndef MADGWICK_AHRS_H_
 #define MADGWICK_AHRS_H_
 
-#include <linalg.h>
+#include <linalg-v3/linalg.h>
 #include <math.h>
 
 #include <igris/math/fast_invsqrt.h>
