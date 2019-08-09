@@ -42,7 +42,8 @@ int main()
 	dprln((float)ellipse.d0(M_PI).x, (float)ellipse.d0(M_PI).y);
 	//dprln(ellipse.d0(0).y);
 
-	ralgo::geom2d_trajectory<> traj(&curve, 10);
+	ralgo::acc_speed_deformer<> spddeform(0.1);
+	ralgo::geom2d_trajectory<> traj(&curve, &spddeform, 10);
 	
 	while(1) 
 		__schedule__();
