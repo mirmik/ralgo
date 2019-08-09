@@ -14,23 +14,28 @@
 
 namespace ralgo 
 {
+	template < class P=int64_t, class V=float, class A=float >
 	struct speed_deformer
 	{
 		virtual float spdmod(float param) = 0;
 		virtual float posmod(float param) = 0;
 	};
 
-	template < class P, class V, class A >
-	struct acc_speed_deformation
+	template < class P=int64_t, class V=float, class A=float >
+	struct acc_speed_deformer : public speed_deformer<P,V,A>
 	{
 		float start_speed;
 		float finacc_position;
 		float evaluated_linear_speed;
 
-		float lin;
+		//float lin;
 		float acc;
 
-		P posmod(float param) 
+		acc_speed_deformer(float acc, float sspd = 0) 
+			: acc(acc), start_speed(sspd)
+		{}
+
+		V posmod(float param) 
 		{
 			if (param < acc) 
 			{
