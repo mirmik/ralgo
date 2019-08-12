@@ -149,15 +149,15 @@ namespace ralgo
 			return sqrt(res);
 		}
 
-		template <class A, class B, class R=rettype_t<A>> void add_vs(const A& a, B b) { return elementwise<R>(ralgo::op::add(), a, b); }
-		template <class A, class B, class R=rettype_t<A>> void sub_vs(const A& a, B b) { return elementwise<R>(ralgo::op::add(), a, b); }
-		template <class A, class B, class R=rettype_t<A>> void mul_vs(const A& a, B b) { return elementwise<R>(ralgo::op::add(), a, b); }
-		template <class A, class B, class R=rettype_t<A>> void div_vs(const A& a, B b) { return elementwise<R>(ralgo::op::add(), a, b); }
+		template <class R=void, class A, class B> defsame_t<R,A> add_vs(const A& a, B b) { return elementwise<R>(ralgo::op::add(), a, b); }
+		template <class R=void, class A, class B> defsame_t<R,A> sub_vs(const A& a, B b) { return elementwise<R>(ralgo::op::sub(), a, b); }
+		template <class R=void, class A, class B> defsame_t<R,A> mul_vs(const A& a, B b) { return elementwise<R>(ralgo::op::mul(), a, b); }
+		template <class R=void, class A, class B> defsame_t<R,A> div_vs(const A& a, B b) { return elementwise<R>(ralgo::op::div(), a, b); }
 
-		template <class A, class B, class R=rettype_t<A,B>> R add_vv(const A& a, const B& b) { return elementwise2<R>(ralgo::op::add(), a, b); }
-		template <class A, class B, class R=rettype_t<A,B>> R sub_vv(const A& a, const B& b) { return elementwise2<R>(ralgo::op::sub(), a, b); }
-		template <class A, class B, class R=rettype_t<A,B>> R mul_vv(const A& a, const B& b) { return elementwise2<R>(ralgo::op::mul(), a, b); }
-		template <class A, class B, class R=rettype_t<A,B>> R div_vv(const A& a, const B& b) { return elementwise2<R>(ralgo::op::div(), a, b); }
+		template <class R=void, class A, class B> defsame_t<R,A> add_vv(const A& a, const B& b) { return elementwise2<R>(ralgo::op::add(), a, b); }
+		template <class R=void, class A, class B> defsame_t<R,A> sub_vv(const A& a, const B& b) { return elementwise2<R>(ralgo::op::sub(), a, b); }
+		template <class R=void, class A, class B> defsame_t<R,A> mul_vv(const A& a, const B& b) { return elementwise2<R>(ralgo::op::mul(), a, b); }
+		template <class R=void, class A, class B> defsame_t<R,A> div_vv(const A& a, const B& b) { return elementwise2<R>(ralgo::op::div(), a, b); }
 
 		namespace inplace
 		{

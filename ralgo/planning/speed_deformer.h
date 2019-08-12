@@ -33,19 +33,28 @@ namespace ralgo
 
 		acc_speed_deformer(float acc, float sspd = 0) 
 			: acc(acc), start_speed(sspd)
-		{}
+		{
+			evaluated_linear_speed = 
+				(1 - start_speed * acc / 2) / 
+				(acc/2 + 1 - acc);
+
+			finacc_position = (start_speed + evaluated_linear_speed) * acc / 2; 
+			PRINT(evaluated_linear_speed);
+		}
 
 		V posmod(float param) 
 		{
 			if (param < acc) 
 			{
+				PRINT(param * start_speed + 
+					param * (evaluated_linear_speed - start_speed) / 2);
 				return 
-					param * start_speed + 
-					param * (evaluated_linear_speed - start_speed) / 2;
+					param * (evaluated_linear_speed + start_speed) / 2;
 			}
 
 			else 
 			{
+				PRINT(finacc_position + evaluated_linear_speed * (param - acc));
 				return finacc_position + evaluated_linear_speed * (param - acc);
 			}
 		}

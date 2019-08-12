@@ -3,6 +3,8 @@
 
 #include <cmath>
 #include <numeric>
+#include <complex>
+#include <vector>
 
 namespace ralgo 
 {
@@ -47,14 +49,17 @@ namespace ralgo
 ///	template <template<class> V, class T> struct rettype { using type = V<T>; };
 	template <typename ... T> using rettype_t = typename rettype<T ...>::type;
 
+	// Определяет тип по умолчанию. Если тип равен void, то используется std::vector<>.
 	template<class R, class V> struct defvec { using type = R; };
 	template<class V> struct defvec<void, V> { using type = std::vector<value_t<V>>; };
 	template<class R, class V> using defvec_t = typename defvec<R,V>::type; 
 
+	// Определяет тип по умолчанию. Если тип равен void, то используется тип по умолчанию.
 	template<class R, class V> struct defsame { using type = R; };
 	template<class V> struct defsame<void, V> { using type = V; };
 	template<class R, class V> using defsame_t = typename defsame<R,V>::type; 
 
+	// Определяет тип по умолчанию. Если тип равен void, то используется тип результат функтора.
 	template<class R, class F> struct fretvec { using type = R; };
 	template<class F> struct fretvec<void, F> { using type = std::vector<std::result_of<F>>; };
 	template<class R, class F> using fretvec_t = typename fretvec<R,F>::type; 
