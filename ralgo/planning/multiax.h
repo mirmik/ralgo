@@ -65,13 +65,30 @@ namespace ralgo
 		{
 			T tkoeff = (fulltime - time) / fulltime;
 
+//			PRINT(tkoeff);
+
 			T time_to_traj_param_koeff = crv->tlength() / fulltime;
 
-			auto traj_param = spddeform->posmod(time) * crv->tfinish();
-			auto speed_modifier = spddeform->spdmod(time) * time_to_traj_param_koeff;
+//			PRINT(time_to_traj_param_koeff);
 
+			auto time_unit = (float)time / fulltime;
+			auto traj_param = spddeform->posmod(time_unit) * crv->tfinish();
+
+//			PRINT(traj_param);
+
+			auto speed_modifier = spddeform->spdmod(time_unit) * time_to_traj_param_koeff;
+
+			PRINT(traj_param);
 			auto pos = crv->d0(traj_param);
+			PRINT(pos);
+
 			auto spd = crv->d1(traj_param) * speed_modifier;
+
+			phs[0].d0 = pos[0];
+			phs[1].d0 = pos[1];
+
+			phs[0].d1 = spd[0];
+			phs[1].d1 = spd[1];
 		}
 	};
 }
