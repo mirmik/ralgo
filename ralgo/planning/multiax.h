@@ -5,10 +5,12 @@
 #include <ralgo/planning/speed_deformer.h>
 #include <rabbit/geom/curve2.h>
 
+#include <ralgo/defs.h>
+
 namespace ralgo
 {
-	template <class P = int64_t, class V = float, class A = float,
-	          class T = time_t>
+	template <class P = pos_t, class V = spd_t, class A = acc_t,
+	          class T = tim_t>
 	class multiax_traj
 	{
 	private:
@@ -34,8 +36,8 @@ namespace ralgo
 		}
 	};
 	
-	template <class P = int64_t, class V = float, class A = float,
-	          class T = time_t>
+	template <class P = pos_t, class V = spd_t, class A = acc_t,
+	          class T = tim_t>
 	struct geom2d_trajectory
 	{
 		rabbit::bounded_curve2<V> * crv;
@@ -78,9 +80,9 @@ namespace ralgo
 
 			auto speed_modifier = spddeform->spdmod(time_unit) * time_to_traj_param_koeff;
 
-			PRINT(traj_param);
+			//PRINT(traj_param);
 			auto pos = crv->d0(traj_param);
-			PRINT(pos);
+			//PRINT(pos);
 
 			auto spd = crv->d1(traj_param) * speed_modifier;
 

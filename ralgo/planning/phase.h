@@ -1,9 +1,12 @@
 #ifndef RALGO_PHASE_H
 #define RALGO_PHASE_H
 
+#include <nos/fprint.h>
+#include <ralgo/defs.h>
+
 namespace ralgo
 {
-	template <typename P = int64_t, typename V = float, typename A = float>
+	template <typename P = pos_t, typename V = spd_t, typename A = acc_t>
 	struct phase
 	{
 		using pos_t = P;
@@ -18,11 +21,12 @@ namespace ralgo
 		phase(P p, V v, A a) : d0(p), d1(v), d2(a)
 		{
 		}
-	};
 
-	template <class PHASE> using pos_t = typename PHASE::pos_t;
-	template <class PHASE> using spd_t = typename PHASE::spd_t;
-	template <class PHASE> using acc_t = typename PHASE::acc_t;
+		ssize_t print_to(nos::ostream& os) const
+		{
+			return nos::fprint_to(os, "phase({},{},{})", d0, d1, d2);
+		}
+	};
 } // namespace ralgo
 
 #endif

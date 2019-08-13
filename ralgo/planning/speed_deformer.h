@@ -21,7 +21,7 @@ namespace ralgo
 		virtual float posmod(float param) = 0;
 	};
 
-	template < class P=int64_t, class V=float, class A=float >
+	template < class P=pos_t, class V=spd_t, class A=acc_t >
 	struct acc_speed_deformer : public speed_deformer<P,V,A>
 	{
 		float start_speed;
@@ -39,22 +39,22 @@ namespace ralgo
 				(acc/2 + 1 - acc);
 
 			finacc_position = (start_speed + evaluated_linear_speed) * acc / 2; 
-			PRINT(evaluated_linear_speed);
+			//PRINT(evaluated_linear_speed);
 		}
 
 		V posmod(float param) 
 		{
 			if (param < acc) 
 			{
-				PRINT(param * start_speed + 
-					param * (evaluated_linear_speed - start_speed) / 2);
+				//PRINT(param * start_speed + 
+				//	param * (evaluated_linear_speed - start_speed) / 2);
 				return 
 					param * (evaluated_linear_speed + start_speed) / 2;
 			}
 
 			else 
 			{
-				PRINT(finacc_position + evaluated_linear_speed * (param - acc));
+				//PRINT(finacc_position + evaluated_linear_speed * (param - acc));
 				return finacc_position + evaluated_linear_speed * (param - acc);
 			}
 		}
