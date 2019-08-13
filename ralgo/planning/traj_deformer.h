@@ -41,17 +41,50 @@ namespace ralgo
 			{
 				return
 				    t * strt_spd
-				    + t * t * (real_spd - strt_spd) / acc / 2;
+				    + t * t * (1 - strt_spd) / acc / 2;
 			}
 
 			else if (t < fin - dcc)
 			{
-				t = t -  
+				t = t - acc;  
 				return 
 					fini_acc_pos + 
 					t;// * 1;
 			}
+
+			else 
+			{
+				t = t - (fin - dcc);
+				return 
+					strt_dcc_pos 
+					+ t
+					+ t * t * (fini_spd - 1) / dcc / 2; 
+			}
 		}
+
+		float spdmod() 
+		{
+
+			if (t < acc)
+			{
+				return
+				    strt_spd
+				    + t * (1 - strt_spd) / acc;
+			}
+
+			else if (t < fin - dcc)
+			{
+				return 1;
+			}
+
+			else 
+			{
+				t = t - (fin - dcc);
+				return 
+					1 + 
+					t * (fini_spd - 1) / dcc; 
+			}
+		};
 	};
 }
 
