@@ -41,14 +41,14 @@ namespace ralgo
 	struct geom2d_trajectory
 	{
 		rabbit::bounded_curve2<V> * crv;
-		ralgo::speed_deformer<P,V,A> * spddeform;
+		ralgo::speed_deformer* spddeform;
 		float timemul;
 
 		T fulltime;
 
 		geom2d_trajectory(
 		    rabbit::bounded_curve2<V>* crv,
-		    ralgo::speed_deformer<P,V,A>* def,
+		    ralgo::speed_deformer* def,
 		    float fulltime
 		) 
 			: crv(crv), spddeform(def), fulltime(fulltime)

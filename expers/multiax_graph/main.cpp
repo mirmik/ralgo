@@ -13,7 +13,8 @@ int main()
 
 	rabbit::ellipse_curve2<float> basecrv(cp,xp,yp);
 	rabbit::trimmed_curve2<float> crv{ &basecrv, 0, M_PI * 2 };
-	ralgo::acc_speed_deformer deformer {0.1};
+	ralgo::accdcc_speed_deformer deformer {0.1,0.1, 0.5,0.5};
+//	ralgo::acc_speed_deformer deformer {0.1};
 
 	ralgo::geom2d_trajectory<> traj(&crv, &deformer, 1);
 
@@ -33,9 +34,6 @@ int main()
 		y[i] = phs[1].d0;
 		x1[i] = phs[0].d1;
 		y1[i] = phs[1].d1;
-
-		PRINT(phs[0]);
-		PRINT(phs[1]);
 	}
 
 	ralgraph::init_qt_application();
@@ -47,7 +45,8 @@ int main()
 			return sqrt(x * x + y * y);
 		}, x1, y1);
 
-	chart.set_data(t,m);
+	//chart.set_data(t,m);
+	chart.set_data(x,y);
 	chart.autoscale();
 
 	ralgraph::show(chart);
