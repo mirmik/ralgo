@@ -41,7 +41,7 @@ int main()
 	auto chart = ralgraph::chart();
 
 	auto m = ralgo::vecops::elementwise2<std::vector<float>>(
-		[](float x, float y){
+		[](float x, float y) ->float {
 			return sqrt(x * x + y * y);
 		}, x1, y1);
 
