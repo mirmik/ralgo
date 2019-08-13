@@ -20,39 +20,42 @@ namespace ralgo
 		virtual float posmod(float param) = 0;
 	};
 
-	struct acc_speed_deformer : public speed_deformer
+	class acc_speed_deformer : public speed_deformer
 	{
-		float start_speed;
-		float finacc_position;
-		float evaluated_linear_speed;
+		float strt_spd;
+		
+		float fini_acc_pos;
+		float real_spd;
 
-		//float lin;
 		float acc;
-
+		
+	public:
 		acc_speed_deformer(float acc, float sspd = 0)
-			: acc(acc), start_speed(sspd)
+			: acc(acc), strt_spd(sspd)
 		{
-			evaluated_linear_speed =
-			    (1 - start_speed * acc / 2) /
+			real_spd =
+			    (1 - strt_spd * acc / 2) /
 			    (1 - acc / 2);
 
-			finacc_position = (start_speed + evaluated_linear_speed) * acc / 2;
+			fini_acc_pos = (strt_spd + real_spd) * acc / 2;
 		}
 
 		float posmod(float param) override
 		{
 			if (param < acc)
 			{
-				//PRINT(param * start_speed +
-				//	param * (evaluated_linear_speed - start_speed) / 2);
-				return
-				    param * (evaluated_linear_speed + start_speed) / 2;
+				//return
+				//    param * (real_spd + strt_spd) / 2;
+				return 
+					param * strt_spd 
+					+ param * (param / acc * (real_spd - strt_spd) / 2);
 			}
 
 			else
 			{
-				//PRINT(finacc_position + evaluated_linear_speed * (param - acc));
-				return finacc_position + evaluated_linear_speed * (param - acc);
+				return
+				    fini_acc_pos 
+				    + real_spd * (param - acc);
 			}
 		}
 
@@ -61,14 +64,15 @@ namespace ralgo
 			if (param < acc)
 			{
 				float k = param / acc;
-				return start_speed * (1 - k) + evaluated_linear_speed * k;
+				return strt_spd * (1 - k) + real_spd * k;
 			}
 
 			else
 			{
-				return evaluated_linear_speed;
+				return real_spd;
 			}
 		}
+
 	};
 
 	class accdcc_speed_deformer : public speed_deformer
@@ -130,7 +134,7 @@ namespace ralgo
 				return strt_spd * (1 - k) + real_spd * k;
 			}
 
-			if (param < 1 - dcc)
+			else if (param < 1 - dcc)
 			{
 				return real_spd;
 			}

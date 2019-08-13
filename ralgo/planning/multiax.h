@@ -65,7 +65,7 @@ namespace ralgo
 
 		int inloctime_placed(T time, phase<P, V, A> *phs)
 		{
-			T tkoeff = (fulltime - time) / fulltime;
+			//T tkoeff = (fulltime - time) / fulltime;
 
 //			PRINT(tkoeff);
 
