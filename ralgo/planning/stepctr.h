@@ -3,82 +3,132 @@
 
 #include <limits>
 
-namespace ralgo 
+#include <ralgo/planning/speed_driver.h>
+
+namespace ralgo
 {
 	class stepctr_server;
 
-	class stepctr
-	{ 
+	class stepctr : public ralgo::speed_driver
+	{
 	public:
-		int64_t impcurrent;
-		int64_t imptarget;
+		int32_t accum = 0; // Текущее значение аккумулятора.
+		volatile int32_t step = 0; // Величина инкремента.
 
-		int32_t stepwidth;
-		int32_t stepaccum;
+		int32_t width = 10*1000*1000;
 
-		stepctr_server * parent;
+		float tick_per_timeunit = 1;
+		float timeunit_per_tick = 1;		
+
+		//stepctr_server * parent;
 
 	public:
-		stepctr() 
-			: 
-			impcurrent(0),
-			imptarget(0),
-			stepwidth(std::numeric_limits<int32_t>::maximum()),
-			stepaccum(0)
+		stepctr()
 		{}
 
 		// Установить ширину импульса в единицах инкремента.
-		void set_stepwidth(int stepwidth) 
+		void set_step(int _step) 
 		{
-			//if (parent->tdelta > stepwidth)
-			//	BUG();
+			system_lock();
+			step = _step;
+			system_unlock();
+		}
 
-			this->stepwidth = stepwidth;
+		void set_declared_serve_freq(float arg) 
+		{
+			tick_per_timeunit = arg;
+			timeunit_per_tick = 1/arg;
+		}
+
+		void set_speed(float posunit_per_timeunit) 
+		{
+			dprln();
+			set_step(width * timeunit_per_tick * posunit_per_timeunit);
 		}
 
 		virtual void inc() = 0;
 		virtual void dec() = 0;
-	};
 
-	class stepctr_server
+		void serve() 
+		{
+			accum += step;
+
+			bool negative = accum < 0;
+
+			if (negative) 
+			{
+				if (accum < -width) 
+				{
+					dec();
+					accum += width;
+					--target_impulse_position;
+				}
+			}
+
+			else 
+			{
+				if (accum > width) 
+				{
+					inc();
+					accum -= width; 
+					++target_impulse_position;
+				}
+			}
+		}
+	};
+}
+/*	class stepctr_server
 	{
 	public:
-		int32_t tdelta; // < время между итерациями алгоритма (период прерывания)
 
 		stepctr ** axes;
 		int axtotal;
 
 	public:
-		stepctr_server(stepctr ** ptr, int total) 
+		stepctr_server(stepctr ** ptr, int total)
 		{
 			axes = ptr;
 			axtotal = total;
+
+			stepctr * ax;
+
+			for (int i = 0; i < axtotal; ++i)
+			{
+				ax = axes[i];
+				ax->parent = this;
+			}
 		}
-	
-		void serve() 
+
+		// Установить стоимость шага обслуживания.
+		void set_tdelta(int32_t delta)
+		{
+			tdelta = delta;
+		}
+
+		void serve()
 		{
 			int diff;
 			stepctr * ax;
 
-			for (int i = 0; i < axtotal; ++i) 
+			for (int i = 0; i < axtotal; ++i)
 			{
 				ax = axes[i];
 
-				if ((diff = ax->imptarget - ax->impcurrent) != 0) 
+				if ((diff = ax->imptarget - ax->impcurrent) != 0)
 				{
 					ax->stepaccum += tdelta;
-					if (ax->stepaccum > ax->stepwidth) 
+					if (ax->stepaccum > ax->stepwidth)
 					{
 						ax->stepaccum -= ax->stepwidth;
-						if (diff > 0) 
+						if (diff > 0)
 						{
 							ax->inc();
 							++ax->impcurrent;
 						}
-						else 
+						else
 						{
 							ax->dec();
-							--ax->impcurrent;	
+							--ax->impcurrent;
 						}
 
 						if (ax->impcurrent == ax->imptarget)
@@ -89,5 +139,20 @@ namespace ralgo
 		}
 	};
 }
+
+
+void ralgo::stepctr::set_stepwidth(int stepwidth)
+{
+	assert(stepwidth >= parent->tdelta);
+	//if (parent->tdelta > stepwidth)
+	//	BUG();
+
+	this->stepwidth = stepwidth;
+}
+
+void ralgo::stepctr::serve() 
+{
+
+}*/
 
 #endif
