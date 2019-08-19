@@ -93,6 +93,28 @@ namespace ralgo
 			phs[1].d1 = spd[1];
 		}
 	};
+
+	class line_1d_traj 
+	{
+		ralgo::speed_deformer* spddeform;
+		int64_t ftime;
+		int64_t length;
+
+		float setted_speed = length / ftime;
+
+		void inloctime(T time, phase<P, V, A> *phs) 
+		{
+			float time_unit = (float)time / ftime;
+			float traj_param = spddeform->posmod(time_unit) * length;
+			float speed_modifier = spddeform->spdmod(time_unit) * time_to_traj_param_koeff;
+
+			auto pos = traj_param;
+			auto spd = setted_speed * speed_modifier;
+
+			phs[0].d0 = pos[0];
+			phs[0].d1 = spd[0];
+		}
+	};
 }
 
 #endif
