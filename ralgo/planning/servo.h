@@ -1,35 +1,105 @@
-#ifndef RALGO_PLANNING_SERVO_H
-#define RALGO_PLANNING_SERVO_H
+#ifndef RALGO_SERVO_H
+#define RALGO_SERVO_H
 
-//#include <ralgo/planning/stepctr.h>
-
-#include <igris/sync/syslock.h>
-#include <ralgo/planning/speed_driver.h>
-
-namespace ralgo
+#include <ralgo/planning/multiax.h>
+#include <ralgo/planning/limit_switch.h>
+namespace ralgo 
 {
-	// Интерфейсный класс для реализации контроллера управления одной оси по критериям положения и скорости.
-	class phase_driver
+	class external_servo_controller 
 	{
-		//int64_t target;
-		float poskoeff = 10; // T = 1 / k
+		virtual void stop(uint8_t stopcode) = 0; 
+	};
 
-		ralgo::speed_driver * speed_driver;
+	struct servo_options 
+	{
+		bool forward_limit_switch = true;
+		bool backward_limit_switch = true;
+	};
+
+	class servo 
+	{
+		int64_t acctime = 0;
+		int64_t dcctime = 0;
+
+		ralgo::traj1d_line line_traj;
+
+		ralgo::external_servo_controller * extcontroller; 		
+		
+		ralgo::traj1d * current_trajectory;
+		ralgo::speed_deformator spddeform;
+
+		bool external_control = false;
+
+		ralgo::phase_driver * drv;
+		ralgo::limit_switch * flimit;
+		ralgo::limit_switch * blimit;
+
+		servo_options options;
+
 	public:
-		phase_driver(ralgo::speed_driver * speed_driver)
-			: speed_driver(speed_driver) {}
-
-		void set_phase(int64_t target_posunit, float posunit_per_timeunit)
+		void incremental_move(int64_t imps, float spd) 
 		{
-			system_lock();
-			int64_t current = speed_driver->target_impulse_position;
-			system_unlock();
+			time_t settime = imps / spd;
+			line_traj.reset(imps, settime);
+			spddeform.set_accdcc(options.acc, options.dcc, settime);
 
-			auto diff = target_posunit - current;
+			current_trajectory = &line_traj;
+			current_trajectory.set_deform(&spddeform);
+		}
 
-			float evalspeed = posunit_per_timeunit + poskoeff * diff;
+		void serve(int64_t time) 
+		{
+			if (external_control)
+				return;
 
-			speed_driver->set_speed(evalspeed);
+			else 
+			{
+				ralgo::phase<> phase;
+				int ret = current_trajectory->inloctime_deformed(time, &phs);
+
+				if (ret == RALGO_TRAJECTORY_FINISHED) 
+				{
+					dprln("finished TODO.");
+				}
+
+				drv->set_phase(phs);
+			}
+		}
+
+		void power(bool en) 
+		{
+			drv->power(en);
+		}
+
+		void stop(uint8_t stopcode) 
+		{
+			if (external_control) 
+			{
+				extcontroller->stop(stopcode);
+				return;
+			}
+
+			switch (stopcode) 
+			{
+				case RALGO_STOP_IMMEDIATE:
+					BUG();
+
+				case RALGO_STOP_SMOOTH:
+					BUG();
+
+				default:
+					BUG();
+			}
+		}
+
+		void flimit_event_handler() 
+		{
+			stop(RALGO_STOP_IMMEDIATE);
+		}
+
+		void blimit_event_handler() 
+		{
+			stop(RALGO_STOP_IMMEDIATE);
 		}
 	};
 }
