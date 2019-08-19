@@ -5,6 +5,13 @@
 #include <ralgo/planning/limit_switch.h>
 namespace ralgo 
 {
+	enum class ServoOperationStatus : uint8_t 
+	{
+		stoped,
+		moved,
+		external
+	};
+
 	class external_servo_controller 
 	{
 		virtual void stop(uint8_t stopcode) = 0; 
@@ -34,7 +41,11 @@ namespace ralgo
 		ralgo::limit_switch * flimit;
 		ralgo::limit_switch * blimit;
 
+		ServoOperationStatus opstat;
+
 		servo_options options;
+
+		bool is_powered = false;
 
 	public:
 		void incremental_move(int64_t imps, float spd) 
@@ -68,6 +79,7 @@ namespace ralgo
 
 		void power(bool en) 
 		{
+			is_powered = en;
 			drv->power(en);
 		}
 
