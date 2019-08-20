@@ -4,16 +4,20 @@
 #include <ralgo/planning/multiax.h>
 #include <ralgo/planning/limit_switch.h>
 
-#define RALGO_STOP_IMMEDIATE 1
-#define RALGO_STOP_SMOOTH 2
-
 namespace ralgo 
 {
 	enum class ServoOperationStatus : uint8_t 
 	{
-		stoped,
-		moved,
-		external
+		stoped = 0,
+		moved = 1,
+		external = 2,
+		alarm = 3
+	};
+
+	enum class ServoStopCommand 
+	{
+		immediate = 0,
+		smooth = 1
 	};
 
 	class external_servo_controller 
@@ -29,27 +33,37 @@ namespace ralgo
 
 	class servo 
 	{
+		int alarm_status = 0;
+		//ServoOperationStatus opstat;
+
 		int64_t acctime = 0;
 		int64_t dcctime = 0;
 
-		ralgo::traj1d_line line_traj;
-
-		ralgo::external_servo_controller * extcontroller; 		
-		
-		ralgo::traj1d * current_trajectory;
 		ralgo::speed_deformator spddeform;
+		ralgo::traj1d_line line_traj;
+		ralgo::traj1d * current_trajectory;
+		
+		ralgo::external_servo_controller * extcontroller; 		
 
 		bool external_control = false;
+		ServoOperationStatus current_status;
 
 		ralgo::phase_driver * drv;
 		ralgo::limit_switch * flimit;
 		ralgo::limit_switch * blimit;
-
-		ServoOperationStatus opstat;
-
+		
 		servo_options options;
 
 		bool is_powered = false;
+
+	private:
+		void set_status(ServoOperationStatus status) 
+		{
+			if (ServoOperationStatus::alarm == current_status)
+				return;
+
+			current_status = status; 
+		}
 
 	public:
 		void incremental_move(int64_t imps, float spd) 
@@ -79,6 +93,11 @@ namespace ralgo
 
 				drv->set_phase(phs);
 			}
+		}
+
+		ServoOperationStatus status() 
+		{
+			return current_status;
 		}
 
 		void power(bool en) 
@@ -116,6 +135,11 @@ namespace ralgo
 		void blimit_event_handler() 
 		{
 			stop(RALGO_STOP_IMMEDIATE);
+		}
+
+		void alarm_event_handler(uint8_t errcode) 
+		{
+
 		}
 	};
 }
