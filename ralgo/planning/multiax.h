@@ -3,6 +3,7 @@
 
 #include <ralgo/planning/traj.h>
 #include <ralgo/planning/speed_deformer.h>
+
 #include <rabbit/geom/curve2.h>
 
 #include <ralgo/defs.h>
@@ -74,7 +75,9 @@ namespace ralgo
 //			PRINT(time_to_traj_param_koeff);
 
 			auto time_unit = (float)time / fulltime;
-			auto traj_param = spddeform->posmod(time_unit) * crv->tfinish();
+			auto posmod = spddeform->posmod(time_unit);
+
+			auto traj_param = posmod * crv->tfinish();
 
 //			PRINT(traj_param);
 
@@ -91,28 +94,72 @@ namespace ralgo
 
 			phs[0].d1 = spd[0];
 			phs[1].d1 = spd[1];
+
+			return posmod >= 1;
 		}
 	};
 
-	class line_1d_traj 
+	#define RALGO_TRAJECTORY_FINISHED 1
+
+	class traj1d 
 	{
-		ralgo::speed_deformer* spddeform;
+	public:
+		virtual int inloctime(int64_t time, phase<int64_t, float> *phs) = 0;
+	};
+
+	class traj1d_line : public traj1d
+	{
 		int64_t ftime;
 		int64_t length;
 
-		float setted_speed = length / ftime;
+		float setted_speed;
 
-		void inloctime(T time, phase<P, V, A> *phs) 
+	public:
+		ralgo::speed_deformer spddeform;
+
+		traj1d_line() {}
+		
+		traj1d_line(int64_t incpos, int64_t time) 
+		{
+			reset(incpos, time);
+		}
+
+		void reset(int64_t incpos, int64_t time) 
+		{
+			length = incpos;
+			ftime = time;
+
+			DPRINT(length);
+			DPRINT(ftime);
+
+			//while(1);
+
+			setted_speed = incpos / time;
+
+		}
+
+		int inloctime(int64_t time, phase<int64_t, float> *phs) 
 		{
 			float time_unit = (float)time / ftime;
-			float traj_param = spddeform->posmod(time_unit) * length;
-			float speed_modifier = spddeform->spdmod(time_unit) * time_to_traj_param_koeff;
+
+			auto posmod = spddeform.posmod(time_unit);
+			auto spdmod = spddeform.spdmod(time_unit);
+
+			float traj_param = posmod * length;
+			float speed_modifier = spdmod;
+
+			//DPRINT(time_unit);
+			DPRINT(traj_param);
+			DPRINT(speed_modifier);
 
 			auto pos = traj_param;
 			auto spd = setted_speed * speed_modifier;
 
-			phs[0].d0 = pos[0];
-			phs[0].d1 = spd[0];
+			phs[0].d0 = pos;
+			phs[0].d1 = spd;
+
+			if (posmod >= 1) return 1;
+			else return 0;
 		}
 	};
 }
