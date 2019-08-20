@@ -1,6 +1,9 @@
 #ifndef RALGO_SERVO_H
 #define RALGO_SERVO_H
 
+#include <ralgo/planning/speed_deformer.h>
+#include <ralgo/planning/phase_driver.h>
+
 #include <ralgo/planning/multiax.h>
 #include <ralgo/planning/limit_switch.h>
 
@@ -22,11 +25,15 @@ namespace ralgo
 
 	class external_servo_controller 
 	{
-		virtual void stop(uint8_t stopcode) = 0; 
+	public:
+		virtual void stop(ServoStopCommand stopcode) = 0; 
 	};
 
 	struct servo_options 
 	{
+		int32_t acctime = 0;
+		int32_t dcctime = 0;
+
 		bool forward_limit_switch = true;
 		bool backward_limit_switch = true;
 	};
@@ -36,10 +43,7 @@ namespace ralgo
 		int alarm_status = 0;
 		//ServoOperationStatus opstat;
 
-		int64_t acctime = 0;
-		int64_t dcctime = 0;
-
-		ralgo::speed_deformator spddeform;
+		//ralgo::speed_deformer spddeform;
 		ralgo::traj1d_line line_traj;
 		ralgo::traj1d * current_trajectory;
 		
@@ -56,6 +60,8 @@ namespace ralgo
 
 		bool is_powered = false;
 
+		int64_t opstart_tstamp;
+
 	private:
 		void set_status(ServoOperationStatus status) 
 		{
@@ -66,32 +72,53 @@ namespace ralgo
 		}
 
 	public:
-		void incremental_move(int64_t imps, float spd) 
+		servo(ralgo::phase_driver* drv) : drv(drv) {}
+
+		int can_operation_start() 
 		{
-			time_t settime = imps / spd;
+			return 
+				current_status != ServoOperationStatus::alarm;
+		}
+
+		void incremental_move_time(int64_t imps, int64_t settime) 
+		{
+			if (!can_operation_start())
+				return;
+
+			dprln("incremental_move");
 			line_traj.reset(imps, settime);
-			spddeform.set_accdcc(options.acc, options.dcc, settime);
+		
+			line_traj.spddeform
+				.reset(0.3,0.3);
 
 			current_trajectory = &line_traj;
-			current_trajectory.set_deform(&spddeform);
+
+			current_status = ServoOperationStatus::moved;
+			opstart_tstamp = millis();
 		}
 
 		void serve(int64_t time) 
 		{
+			//dprchar('s');
+
 			if (external_control)
 				return;
 
-			else 
+			if (status() == ServoOperationStatus::moved)
 			{
-				ralgo::phase<> phase;
-				int ret = current_trajectory->inloctime_deformed(time, &phs);
+				ralgo::phase<int64_t, float> phs;
+				int ret = current_trajectory->inloctime(time - opstart_tstamp, &phs);
+
+				//dprln(ret);
+				dprln(phs.d0, phs.d1);
 
 				if (ret == RALGO_TRAJECTORY_FINISHED) 
 				{
-					dprln("finished TODO.");
+					//dprln("FINISHED");
+					//current_status = ServoOperationStatus::stoped;
 				}
 
-				drv->set_phase(phs);
+				drv->set_phase(phs.d0, phs.d1);
 			}
 		}
 
@@ -106,7 +133,7 @@ namespace ralgo
 			drv->power(en);
 		}
 
-		void stop(uint8_t stopcode) 
+		void stop(ServoStopCommand stopcode) 
 		{
 			if (external_control) 
 			{
@@ -116,10 +143,10 @@ namespace ralgo
 
 			switch (stopcode) 
 			{
-				case RALGO_STOP_IMMEDIATE:
+				case ServoStopCommand::immediate:
 					BUG();
 
-				case RALGO_STOP_SMOOTH:
+				case ServoStopCommand::smooth:
 					BUG();
 
 				default:
@@ -129,12 +156,12 @@ namespace ralgo
 
 		void flimit_event_handler() 
 		{
-			stop(RALGO_STOP_IMMEDIATE);
+			stop(ServoStopCommand::immediate);
 		}
 
 		void blimit_event_handler() 
 		{
-			stop(RALGO_STOP_IMMEDIATE);
+			stop(ServoStopCommand::immediate);
 		}
 
 		void alarm_event_handler(uint8_t errcode) 

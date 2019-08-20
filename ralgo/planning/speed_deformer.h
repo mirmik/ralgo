@@ -14,134 +14,114 @@
 
 namespace ralgo
 {
-	struct speed_deformer
+	class speed_deformer
 	{
-		virtual float spdmod(float param) = 0;
-		virtual float posmod(float param) = 0;
-	};
-
-	class acc_speed_deformer : public speed_deformer
-	{
-		float strt_spd;
-		
-		float fini_acc_pos;
-		float real_spd;
-
 		float acc;
-		
-	public:
-		acc_speed_deformer(float acc, float sspd = 0)
-			: acc(acc), strt_spd(sspd)
-		{
-			real_spd =
-			    (1 - strt_spd * acc / 2) /
-			    (1 - acc / 2);
+		float dcc;
+		//int32_t s_time;
+		float f_time;
 
-			fini_acc_pos = (strt_spd + real_spd) * acc / 2;
-		}
-
-		float posmod(float param) override
-		{
-			if (param < acc)
-			{
-				//return
-				//    param * (real_spd + strt_spd) / 2;
-				return 
-					param * strt_spd 
-					+ param * (param / acc * (real_spd - strt_spd) / 2);
-			}
-
-			else
-			{
-				return
-				    fini_acc_pos 
-				    + real_spd * (param - acc);
-			}
-		}
-
-		float spdmod(float param) override
-		{
-			if (param < acc)
-			{
-				float k = param / acc;
-				return strt_spd * (1 - k) + real_spd * k;
-			}
-
-			else
-			{
-				return real_spd;
-			}
-		}
-
-	};
-
-	class accdcc_speed_deformer : public speed_deformer
-	{
 		float strt_spd;
 		float fini_spd;
+		//float nati_spd;
+		float real_spd;
 
 		float fini_acc_pos;
 		float strt_dcc_pos;
-		float real_spd;
-
-		float acc;
-		float dcc;
 
 	public:
-		accdcc_speed_deformer(float acc, float dcc, float sspd = 0, float fspd = 0)
-			: acc(acc), dcc(dcc), strt_spd(sspd), fini_spd(fspd)
-		{
-			real_spd =
-			    (1 - strt_spd * acc / 2 - fini_spd * dcc / 2) /
-			    (1 - acc / 2 - dcc / 2);
+		speed_deformer(){}
 
+		void reset(float acc, float dcc, float sspd = 0, float fspd = 0) 
+		{
+			this->acc = acc;
+			this->dcc = dcc;
+			this->f_time = 1;
+
+			strt_spd = sspd;
+			fini_spd = fspd;
+
+			// Формула выводится из равенства площадей под идеальной и реальной кривыми.
+			real_spd =
+			    (f_time - strt_spd * acc / 2 - fini_spd * dcc / 2) /
+			    (f_time - acc / 2 - dcc / 2);
+
+			//Вычисляем коэффициенты позиции в точках окончания участков.
 			fini_acc_pos = (strt_spd + real_spd) * acc / 2;
-			strt_dcc_pos = fini_acc_pos + real_spd * (1-acc-dcc);
+			strt_dcc_pos = fini_acc_pos + real_spd * (f_time - acc - dcc);
+
 		}
 
-		float posmod(float param) override
+		speed_deformer& operator = (const speed_deformer& oth) = default;
+
+		speed_deformer(float acc, float dcc, float sspd = 0, float fspd = 0)
+			: acc(acc), dcc(dcc), strt_spd(sspd), fini_spd(fspd)
 		{
-			if (param < acc)
+			reset(acc, dcc, sspd, fspd);
+		}
+
+		float posmod(float t)
+		{
+			DPRINT(acc);
+			DPRINT(dcc);
+			DPRINT(f_time);
+			DPRINT(t);
+
+			//while(1);
+			if (t >= f_time) 
 			{
-				//return
-				//    param * (real_spd + strt_spd) / 2;
-				return 
-					param * strt_spd 
-					+ param * (param / acc * (real_spd - strt_spd) / 2);
+				return 1;
 			}
 
-			if (param < 1 - dcc)
+			if (t < acc)
 			{
+				dprln("variant 1");
+				//return
+				//    t * (real_spd + strt_spd) / 2;
+				return 
+					t * strt_spd 
+					+ t * (t / acc * (real_spd - strt_spd) / 2);
+			}
+
+			if (t < f_time - dcc)
+			{
+				dprln("variant 2");
 				return
 				    fini_acc_pos 
-				    + real_spd * (param - acc);
+				    + real_spd * (t - acc);
 			}
 
 			else
 			{
-				auto locparam = param - 1 + dcc;
+				dprln("variant 3");
+				auto loct = t - f_time + dcc;
 				return strt_dcc_pos 
-				+ (locparam) * real_spd
-				- (locparam) * ((locparam) / dcc * (real_spd - fini_spd)) / 2;
+				+ (loct) * real_spd
+				- (loct) * ((loct) / dcc * (real_spd - fini_spd)) / 2;
 			}
 		}
 
-		float spdmod(float param) override
+		float spdmod(float t)
 		{
-			if (param < acc)
+			if (t >= f_time) 
 			{
-				float k = param / acc;
+				return fini_spd;
+			}
+
+			if (t < acc)
+			{
+				float k = t / acc;
 				return strt_spd * (1 - k) + real_spd * k;
 			}
 
-			else if (param < 1 - dcc)
+			else if (t < f_time - dcc)
 			{
 				return real_spd;
 			}
 
 			else
 			{
-				float k = (1-param) / dcc;
+				float k = (1-t) / dcc;
 				return fini_spd * (1 - k) + real_spd * k;
 			}
 		}

@@ -9,7 +9,7 @@ namespace ralgo
 {
 	class stepctr_server;
 
-	class stepctr : public ralgo::speed_driver
+	class stepctr : public ralgo::phase_driver
 	{
 	public:
 		int32_t accum = 0; // Текущее значение аккумулятора.
