@@ -3,6 +3,10 @@
 
 #include <ralgo/planning/multiax.h>
 #include <ralgo/planning/limit_switch.h>
+
+#define RALGO_STOP_IMMEDIATE 1
+#define RALGO_STOP_SMOOTH 2
+
 namespace ralgo 
 {
 	enum class ServoOperationStatus : uint8_t 
