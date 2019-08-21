@@ -109,8 +109,11 @@ namespace ralgo
 
 	class traj1d_line : public traj1d
 	{
-		int64_t ftime;
-		int64_t length;
+		int64_t strt_time;
+		int64_t fini_time;
+		
+		int64_t strt_pos;
+		int64_t fini_pos;
 
 		float setted_speed;
 
@@ -119,28 +122,20 @@ namespace ralgo
 
 		traj1d_line() {}
 		
-		traj1d_line(int64_t incpos, int64_t time) 
+		void reset(int64_t spos, int64_t stim, int64_t fpos, int64_t ftim) 
 		{
-			reset(incpos, time);
-		}
+			strt_pos = spos;
+			fini_pos = fpos;
 
-		void reset(int64_t incpos, int64_t time) 
-		{
-			length = incpos;
-			ftime = time;
+			strt_time = stim;
+			fini_time = ftim;
 
-			DPRINT(length);
-			DPRINT(ftime);
-
-			//while(1);
-
-			setted_speed = incpos / time;
-
+			setted_speed = (fpos - spos) / (ftim - stim);
 		}
 
 		int inloctime(int64_t time, phase<int64_t, float> *phs) 
 		{
-			float time_unit = (float)time / ftime;
+			float time_unit = (float)time / (ftim - stim);
 
 			auto posmod = spddeform.posmod(time_unit);
 			auto spdmod = spddeform.spdmod(time_unit);
@@ -148,14 +143,10 @@ namespace ralgo
 			float traj_param = posmod * length;
 			float speed_modifier = spdmod;
 
-			//DPRINT(time_unit);
-			DPRINT(traj_param);
-			DPRINT(speed_modifier);
-
 			auto pos = traj_param;
 			auto spd = setted_speed * speed_modifier;
 
-			phs[0].d0 = pos;
+			phs[0].d0 = pos + startpos;
 			phs[0].d1 = spd;
 
 			if (posmod >= 1) return 1;

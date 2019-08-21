@@ -32,6 +32,11 @@ namespace ralgo
 
 			set_speed(evalspeed);
 		}
+
+		void swift_zero(int64_t imps) 
+		{
+			target_impulse_position -= imps * gear;
+		}
 	};
 }
 
