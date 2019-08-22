@@ -97,62 +97,7 @@ namespace ralgo
 
 			return posmod >= 1;
 		}
-	};
-
-	#define RALGO_TRAJECTORY_FINISHED 1
-
-	class traj1d 
-	{
-	public:
-		virtual int inloctime(int64_t time, phase<int64_t, float> *phs) = 0;
-	};
-
-	class traj1d_line : public traj1d
-	{
-		int64_t strt_time;
-		int64_t fini_time;
-		
-		int64_t strt_pos;
-		int64_t fini_pos;
-
-		float setted_speed;
-
-	public:
-		ralgo::speed_deformer spddeform;
-
-		traj1d_line() {}
-		
-		void reset(int64_t spos, int64_t stim, int64_t fpos, int64_t ftim) 
-		{
-			strt_pos = spos;
-			fini_pos = fpos;
-
-			strt_time = stim;
-			fini_time = ftim;
-
-			setted_speed = (fpos - spos) / (ftim - stim);
-		}
-
-		int inloctime(int64_t time, phase<int64_t, float> *phs) 
-		{
-			float time_unit = (float)time / (ftim - stim);
-
-			auto posmod = spddeform.posmod(time_unit);
-			auto spdmod = spddeform.spdmod(time_unit);
-
-			float traj_param = posmod * length;
-			float speed_modifier = spdmod;
-
-			auto pos = traj_param;
-			auto spd = setted_speed * speed_modifier;
-
-			phs[0].d0 = pos + startpos;
-			phs[0].d1 = spd;
-
-			if (posmod >= 1) return 1;
-			else return 0;
-		}
-	};
+	};	
 }
 
 #endif

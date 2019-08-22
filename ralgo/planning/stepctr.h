@@ -3,7 +3,7 @@
 
 #include <limits>
 
-#include <ralgo/planning/speed_driver.h>
+#include <ralgo/planning/phase_driver.h>
 
 namespace ralgo
 {
@@ -18,7 +18,9 @@ namespace ralgo
 		int32_t width = 10*1000*1000;
 
 		float tick_per_timeunit = 1;
-		float timeunit_per_tick = 1;		
+		float timeunit_per_tick = 1;
+
+		bool emulate = false;		
 
 		//stepctr_server * parent;
 
@@ -26,25 +28,34 @@ namespace ralgo
 		stepctr()
 		{}
 
+		int32_t get_accum() override
+		{
+			return accum * tick_per_timeunit / width;
+		}
+
 		// Установить ширину импульса в единицах инкремента.
-		void set_step(int _step) 
+		void set_step(int32_t _step) 
 		{
 			system_lock();
 			step = _step;
 			system_unlock();
+			//DPRINT(step);
+
+			assert((step < width) && (step > -width));
 		}
 
 		void set_declared_serve_freq(float arg) 
 		{
-			tick_per_timeunit = arg;
-			timeunit_per_tick = 1/arg;
+			tick_per_timeunit = arg / ralgo::discrete_time_frequency();
+			timeunit_per_tick = 1/tick_per_timeunit;
 		}
 
-		void set_speed(float posunit_per_timeunit) 
+		void set_speed(float steps_per_timeunit) 
 		{
-			dprln();
-			set_step(width * timeunit_per_tick * posunit_per_timeunit);
+			//DPRINT(steps_per_timeunit);
+			set_step(width * timeunit_per_tick * steps_per_timeunit);
 		}
+
 
 		virtual void inc() = 0;
 		virtual void dec() = 0;
@@ -59,9 +70,11 @@ namespace ralgo
 			{
 				if (accum < -width) 
 				{
-					dec();
+					if (!emulate)
+						dec();
+
 					accum += width;
-					--target_impulse_position;
+					--control_steps_counter;
 				}
 			}
 
@@ -69,9 +82,11 @@ namespace ralgo
 			{
 				if (accum > width) 
 				{
-					inc();
+					if (!emulate)
+						inc();
+					
 					accum -= width; 
-					++target_impulse_position;
+					++control_steps_counter;
 				}
 			}
 		}
