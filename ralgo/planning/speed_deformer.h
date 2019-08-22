@@ -62,10 +62,10 @@ namespace ralgo
 
 		float posmod(float t)
 		{
-			DPRINT(acc);
-			DPRINT(dcc);
-			DPRINT(f_time);
-			DPRINT(t);
+//			DPRINT(acc);
+//			DPRINT(dcc);
+//			DPRINT(f_time);
+//			DPRINT(t);
 
 			//while(1);
 			if (t >= f_time) 
@@ -75,7 +75,7 @@ namespace ralgo
 
 			if (t < acc)
 			{
-				dprln("variant 1");
+				//dprln("variant 1");
 				//return
 				//    t * (real_spd + strt_spd) / 2;
 				return 
@@ -85,7 +85,7 @@ namespace ralgo
 
 			if (t < f_time - dcc)
 			{
-				dprln("variant 2");
+				//dprln("variant 2");
 				return
 				    fini_acc_pos 
 				    + real_spd * (t - acc);
@@ -93,7 +93,7 @@ namespace ralgo
 
 			else
 			{
-				dprln("variant 3");
+				//dprln("variant 3");
 				auto loct = t - f_time + dcc;
 				return strt_dcc_pos 
 				+ (loct) * real_spd

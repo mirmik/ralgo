@@ -5,8 +5,10 @@
 #include <ralgo/planning/phase_driver.h>
 #include <ralgo/planning/position_reader.h>
 
-#include <ralgo/planning/multiax.h>
+#include <ralgo/planning/traj1d.h>
 #include <ralgo/planning/limit_switch.h>
+
+#include <ralgo/planning/disctime.h>
 
 namespace ralgo
 {
@@ -34,6 +36,7 @@ namespace ralgo
 	{
 		int32_t acctime = 0;
 		int32_t dcctime = 0;
+		float nominal_speed = 0;
 
 		bool forward_limit_switch = true;
 		bool backward_limit_switch = true;
@@ -56,18 +59,20 @@ namespace ralgo
 		ralgo::limit_switch * flimit;
 		ralgo::limit_switch * blimit;
 
-		servo_options options;
 
 		bool is_powered = false;
 
 		int64_t opstart_tstamp;
-		int64_t opstart_position;
+	//	int64_t opstart_position;
 
 		servo * mirror; // Ведомый сервоусилитель.
 
 		ralgo::position_reader * absolute_reader;
 
 		float control_to_drive_gear = 1;
+
+	public:
+		servo_options options;
 
 	private:
 		void set_status(ServoOperationStatus status)
@@ -93,21 +98,28 @@ namespace ralgo
 			    current_status != ServoOperationStatus::alarm;
 		}
 
-		void incremental_move_time(int64_t imps, int64_t settime)
+		void incremental_move_time(int64_t incpos, int64_t bytime)
 		{
 			if (!can_operation_start())
 				return;
 
-			dprln("incremental_move");
-			line_traj.reset(imps, settime);
+			auto curpos = drv->target_position();
+			auto curtim = ralgo::discrete_time();
 
-			line_traj.spddeform
-			.reset(0.3, 0.3);
+			line_traj.reset(
+				curpos, curtim,
+				curpos + incpos, curtim + bytime);
+
+			line_traj.set_standart_accdcc_patern(
+				options.acctime, 
+				options.dcctime, 
+				options.nominal_speed				
+			);
 
 			current_trajectory = &line_traj;
 
 			current_status = ServoOperationStatus::moved;
-			opstart_tstamp = millis();
+			opstart_tstamp = curtim;
 		}
 
 		void serve(int64_t time)
@@ -128,7 +140,7 @@ namespace ralgo
 					//current_status = ServoOperationStatus::stoped;
 				}
 
-				set_phase(phs.d0 - opstart_position, phs.d1);
+				set_phase(phs.d0, phs.d1);
 			}
 		}
 
