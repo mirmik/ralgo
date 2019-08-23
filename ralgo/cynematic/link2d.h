@@ -35,12 +35,31 @@ namespace ralgo
 		}
 
 		virtual rabbit::screw2<float> sensivity() = 0;
+		virtual void read_coords();
 	};
 
 	class unit2d_1dof : public cynematic_unit2d
 	{
+		ralgo::coord_reader * coord_reader = nullptr;
+		float readed_coord_multiplier = 1;
+
 	public:
 		virtual void set_coord(float coord) = 0;
+
+		void set_coord_reader(ralgo::coord_reader * reader, float mul) 
+		{
+			coord_reader = reader;
+			readed_coord_multiplier = mul;
+		}
+
+		void read_coords() 
+		{
+			if (coord_reader == nullptr)
+				return;
+
+			float coord = coord_reader->read_coord(readed_coord_multiplier);
+			set_coord(coord);
+		}
 	};
 
 	class rotator : public link2d_1dof
@@ -73,7 +92,6 @@ namespace ralgo
 		}
 
 		rabbit::screw2<float> sensivity() { return { 0, mul * ax }; }
-	
 	};
 }
 

@@ -9,24 +9,38 @@ namespace ralgo
 {
 	class cynematic_chain2d 
 	{
-		igris::array_view<unit2d> chain;
-		igris::array_view<cynematic_unit2d> pairs;
+		igris::array_view<unit2d*> chain;
+		igris::array_view<cynematic_unit2d*> pairs;
 
 	public:
 		cynematic_chain2d(
-			igris::array_view<unit2d> chain
-			igris::array_view<cynematic_unit2d> pairs) 
+			igris::array_view<unit2d*> chain
+			igris::array_view<cynematic_unit2d*> pairs) 
 		: 
 			chain(chain),
 			pairs(pairs) 
 		{}
 
+		void read_coords() 
+		{
+			for (auto& c : pairs)
+			{
+				c->read_coords();
+			}
+		}
+
 		void update_location() 
 		{
 			for (auto& c : chain)
 			{
-				c.update_location();
+				c->update_location();
 			}
+		}
+
+		void update_model_location() 
+		{
+			read_coords();
+			update_location();
 		}
 
 		void sensivity(rabbit::screw2<float>* senses, unit2d basis) 

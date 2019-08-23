@@ -24,7 +24,7 @@ namespace ralgo
 		volatile int64_t control_steps_counter = 0;
 
 	public:
-		virtual void set_speed(float posunit_per_timeunit) = 0;
+		virtual void set_phases_speed(float phases_per_timeunit) = 0;
 		virtual void power(bool en) = 0;
 
 		// Отношение drive_position к реально выдаваемому 
@@ -46,7 +46,7 @@ namespace ralgo
 		{
 			// Счетчик меняется в прерывании, так что 
 			// снимаем локальную копию.
-			auto current = target_position();
+			auto current = control_position();
 
 			// Ошибка по установленному значению.
 			auto diff = tgtpos - current;
@@ -56,16 +56,12 @@ namespace ralgo
 			float evalspeed = 
 				(posunit_per_timeunit + poskoeff * diff) / gear;
 
-			//DPRINT(posunit_per_timeunit);
-			//DPRINT(diff);
-			/*
-			DPRINT(tgtpos);
-			DPRINT(current);
-			DPRINT(evalspeed);
-			//delay(10);
-			//do_after_iteration(5) while(1);
-			*/
-			set_speed(evalspeed);
+			set_phases_speed(evalspeed);
+		}
+
+		void set_speed(float drive_pulses_per_timeunit) 
+		{
+			set_phases_speed(spd / gear);
 		}
 
 		int64_t target_position() 
