@@ -50,7 +50,7 @@ namespace ralgo
 			timeunit_per_tick = 1/tick_per_timeunit;
 		}
 
-		void set_speed(float steps_per_timeunit) 
+		void set_phases_speed(float steps_per_timeunit) 
 		{
 			//DPRINT(steps_per_timeunit);
 			set_step(width * timeunit_per_tick * steps_per_timeunit);

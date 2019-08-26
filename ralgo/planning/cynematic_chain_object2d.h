@@ -2,6 +2,7 @@
 #define RALGO_CYNEMATIC_CHAIN_OBJECT2D_H
 
 #include <ralgo/cynematic/chain2d.h>
+#include <ralgo/planning/disctime.h>
 
 namespace ralgo 
 {
@@ -10,14 +11,23 @@ namespace ralgo
 		ralgo::cynematic_chain2d chain;
 		float compensation_koefficient;
 
-		cynematic_chain2d_output_controller() 
+	public:
+
+		void setup(
+			igris::array_view<ralgo::unit2d*> a,
+			igris::array_view<ralgo::cynematic_unit2d*> b) 
 		{
-			compensation_koefficient = 10 / ralgo::discrete_frequency();
+			chain.setup(a,b);
 		}
 
-		htrans2 location() 
+		cynematic_chain2d_output_controller() 
 		{
-			return chain->out()->global_location;
+			compensation_koefficient = 10 / ralgo::discrete_time_frequency();
+		}
+
+		rabbit::htrans2<float> location() 
+		{
+			return chain.out()->global_location;
 		}
 
 		void update_model_location() 
@@ -25,16 +35,22 @@ namespace ralgo
 			chain.update_model_location();
 		}
 
+		void collect_chain(unit2d* finallink, unit2d* startlink = nullptr) 
+		{
+			chain.collect_chain(finallink, startlink);			
+		}
+
 		void set_phase(rabbit::htrans2<float> pos, rabbit::screw2<float> spd) 
 		{
 			rabbit::screw2<float> senses[chain.pairs.size()];
-			float spdarr[chain.pairs.size()];
+			(void) senses;
+			/*float spdarr[chain.pairs.size()];
 			memset(spdarr, 0, sizeof(float) * chain.pairs.size());
 
-			chain.sensivity(&senses);
+			chain.sensivity(&senses, nullptr);
 
 			rabbit::screw2<float> target = 
-				spd + (pos - location) * compensation_koefficient; 	
+				spd + (pos - location()) * compensation_koefficient; 	
 
 			// Поиск скоростей звеньев удовлетворяющих заданному
 			// управлению.
@@ -49,7 +65,7 @@ namespace ralgo
 				cynematic_unit2d_1dof * unit = (cynematic_unit2d_1dof *) _unit;
 
 				unit -> set_speed_for_linked(spdarr[i]);
-			}
+			}*/
 		}
 	};
 }

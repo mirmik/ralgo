@@ -7,7 +7,7 @@
 namespace ralgo
 {
 
-	class traj1d
+	class traj1d : public speed_deformed
 	{
 	public:
 		virtual int inloctime(int64_t time, phase<int64_t, float> *phs) = 0;
@@ -57,10 +57,9 @@ namespace ralgo
 			else return 0;
 		}
 
-		void set_standart_accdcc_patern(int64_t acctime, int64_t dcctime, float nominal_speed) 
+		void set_standart_accdcc_patern(int64_t acctime, int64_t dcctime, float nominal_speed)
 		{
 			float koeff = setted_speed / nominal_speed;
-
 
 			float acc = acctime * koeff / (ftim - stim);
 			float dcc = dcctime * koeff / (ftim - stim);
@@ -75,20 +74,20 @@ namespace ralgo
 			DPRINT(acctime);
 			DPRINT(dcctime);
 
-			if (acc + dcc > 1) 
+			if (acc + dcc > 1)
 			{
 				//dprln("warn: acc + dcc > 1");
-			
+
 				acc = 0.5;
 				dcc = 0.5;
 			}
 			//dprln(acc, dcc);
 
 			spddeform.reset(
-				acc,dcc
+			    acc, dcc
 
-			//	acc,
-			//	dcc);
+			    //	acc,
+			    //	dcc);
 			);
 		}
 	};

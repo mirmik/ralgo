@@ -5,93 +5,117 @@ namespace ralgo
 {
 	class unit2d
 	{
+	public:
 		unit2d * parent;
 
-		rabbit::htrans2 local_trans;
-		rabbit::htrans2 global_trans;
+		rabbit::htrans2<float> local_location;
+		rabbit::htrans2<float> global_location;
 
 	public:
-		unit2d() : local_trans(), global_trans() {}
+		unit2d() : local_location(), global_location() {}
 
-		void update_location() 
+		void update_location()
 		{
-			global_trans = parent->global_trans * local_trans;
+			global_location = parent->global_location * local_location;
+		}
+
+		void relocate(const rabbit::htrans2<float>& trans)
+		{
+			local_location = trans;
+		}
+
+		virtual bool iscynem() 
+		{
+			return false;	
 		}
 	};
 
 	class cynematic_unit2d : public unit2d
 	{
-		unit2d output;	
+	public:
+		unit2d output;
 
 	public:
-		cynematic_unit2d() 
+		cynematic_unit2d()
 		{
 			output.parent = this;
 		}
-		
-		void link(unit2d* oth) 
+
+		void link(unit2d* oth)
 		{
 			oth->parent = &output;
 		}
 
 		virtual rabbit::screw2<float> sensivity() = 0;
-		virtual void read_coords();
+		virtual void read_coords() = 0;
+
+		bool iscynem() override
+		{
+			return true;	
+		}
 	};
 
 	class unit2d_1dof : public cynematic_unit2d
 	{
-		ralgo::coord_reader * coord_reader = nullptr;
+		ralgo::phase_driver * phase_driver = nullptr;
 		float readed_coord_multiplier = 1;
 
 	public:
+		void set_phase_driver(ralgo::phase_driver * drv)
+		{
+			phase_driver = drv;
+		}
+
 		virtual void set_coord(float coord) = 0;
 
-		void set_coord_reader(ralgo::coord_reader * reader, float mul) 
+		void set_phase_driver(ralgo::phase_driver * reader, float mul)
 		{
-			coord_reader = reader;
+			phase_driver = reader;
 			readed_coord_multiplier = mul;
 		}
 
-		void read_coords() 
+		void read_coords() override
 		{
-			if (coord_reader == nullptr)
+			if (phase_driver == nullptr)
 				return;
 
-			float coord = coord_reader->read_coord(readed_coord_multiplier);
+			float coord = phase_driver->read_coord(readed_coord_multiplier);
 			set_coord(coord);
 		}
 	};
 
-	class rotator : public link2d_1dof
+	class rotator2 : public unit2d_1dof
 	{
 		float mul;
 
 	public:
-		rotator() : mul(1) {}
-		rotator(float mul) : mul(mul) {}
+		rotator2() : mul(1) {}
+		rotator2(float mul) : mul(mul) {}
 
 		void set_coord(float angle)
 		{
-			output.local_trans = rabbit::htrans2(angle, {0,0});
+			output.local_location = rabbit::htrans2<float>(angle, {0, 0});
 		}
 
-		rabbit::screw2<float> sensivity() { return { mul, {0,0} }; }
+		rabbit::screw2<float> sensivity() override
+		{ return { mul, {0, 0} }; }
 	};
 
-	class actuator 
+	class actuator2 : public unit2d_1dof
 	{
 		rabbit::vec2<float> ax;
 		float mul;
 
 	public:
-		actuator(rabbit::vec2<float> ax, float mul) : ax(ax), mul(mul) {}
+		actuator2(rabbit::vec2<float> ax, float mul) : ax(ax), mul(mul) {}
 
 		void set_coord(float angle)
 		{
-			output.local_trans = rabbit::htrans2(angle, {0,0});
+			output.local_location = rabbit::htrans2<float>(angle, {0, 0});
 		}
 
-		rabbit::screw2<float> sensivity() { return { 0, mul * ax }; }
+		rabbit::screw2<float> sensivity() override
+		{ return { 0, mul * ax }; }
 	};
 }
 

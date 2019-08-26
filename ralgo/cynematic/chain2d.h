@@ -2,24 +2,36 @@
 #define RALGO_CYNEMATIC_CHAIN2D_H
 
 #include <ralgo/cynematic/link2d.h>
-
 #include <igris/container/array_view.h>
 
 namespace ralgo 
 {
 	class cynematic_chain2d 
 	{
+	public:
 		igris::array_view<unit2d*> chain;
 		igris::array_view<cynematic_unit2d*> pairs;
 
 	public:
+		cynematic_chain2d(){};
+
+		unit2d* out() { return chain[chain.size() - 1]; }
+
 		cynematic_chain2d(
-			igris::array_view<unit2d*> chain
+			igris::array_view<unit2d*> chain,
 			igris::array_view<cynematic_unit2d*> pairs) 
 		: 
 			chain(chain),
 			pairs(pairs) 
 		{}
+
+		void setup(
+			igris::array_view<unit2d*> chain,
+			igris::array_view<cynematic_unit2d*> pairs) 
+		{
+			this->chain = chain;
+			this->pairs = pairs; 
+		}
 
 		void read_coords() 
 		{
@@ -27,6 +39,23 @@ namespace ralgo
 			{
 				c->read_coords();
 			}
+		}
+
+		void collect_chain(unit2d* finallink, unit2d* startlink = nullptr) 
+		{
+			unit2d* link = finallink;
+			auto cit = chain.rbegin();
+			auto it = chain.rbegin();
+
+			do 
+			{
+				*it++ = link;
+				if (link->iscynem())
+				{
+					*cit++ = link;
+				}
+			} 
+			while(link != startlink);
 		}
 
 		void update_location() 
@@ -43,12 +72,12 @@ namespace ralgo
 			update_location();
 		}
 
-		void sensivity(rabbit::screw2<float>* senses, unit2d basis) 
+		void sensivity(rabbit::screw2<float>* senses, unit2d* basis) 
 		{
-			htrans2 trsf();		
+			rabbit::htrans2<float> trsf{};		
 			auto outtrans = chain[chain.size()-1]->global_location;	
 
-			for (int i = 0; i < pairs.size(); ++i) 
+			for (unsigned int i = 0; i < pairs.size(); ++i) 
 			{
 				rabbit::screw2<float> lsens = pairs[i]->sensivity();
 				auto linktrans = pairs[i]->global_location;
@@ -64,7 +93,7 @@ namespace ralgo
 				{
 					wsens - trsf.rotation(),
 					trsf.inverse_rotate(vsens)
-				}
+				};
 			}
 
 			if (basis != nullptr) 
