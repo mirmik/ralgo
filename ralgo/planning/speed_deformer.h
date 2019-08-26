@@ -30,9 +30,9 @@ namespace ralgo
 		float strt_dcc_pos;
 
 	public:
-		speed_deformer(){}
+		speed_deformer() {}
 
-		void reset(float acc, float dcc, float sspd = 0, float fspd = 0) 
+		void reset(float acc, float dcc, float sspd = 0, float fspd = 0)
 		{
 			this->acc = acc;
 			this->dcc = dcc;
@@ -68,7 +68,7 @@ namespace ralgo
 //			DPRINT(t);
 
 			//while(1);
-			if (t >= f_time) 
+			if (t >= f_time)
 			{
 				return 1;
 			}
@@ -78,16 +78,16 @@ namespace ralgo
 				//dprln("variant 1");
 				//return
 				//    t * (real_spd + strt_spd) / 2;
-				return 
-					t * strt_spd 
-					+ t * (t / acc * (real_spd - strt_spd) / 2);
+				return
+				    t * strt_spd
+				    + t * (t / acc * (real_spd - strt_spd) / 2);
 			}
 
 			if (t < f_time - dcc)
 			{
 				//dprln("variant 2");
 				return
-				    fini_acc_pos 
+				    fini_acc_pos
 				    + real_spd * (t - acc);
 			}
 
@@ -95,15 +95,15 @@ namespace ralgo
 			{
 				//dprln("variant 3");
 				auto loct = t - f_time + dcc;
-				return strt_dcc_pos 
-				+ (loct) * real_spd
-				- (loct) * ((loct) / dcc * (real_spd - fini_spd)) / 2;
+				return strt_dcc_pos
+				       + (loct) * real_spd
+				       - (loct) * ((loct) / dcc * (real_spd - fini_spd)) / 2;
 			}
 		}
 
 		float spdmod(float t)
 		{
-			if (t >= f_time) 
+			if (t >= f_time)
 			{
 				return fini_spd;
 			}
@@ -121,11 +121,25 @@ namespace ralgo
 
 			else
 			{
-				float k = (1-t) / dcc;
+				float k = (1 - t) / dcc;
 				return fini_spd * (1 - k) + real_spd * k;
 			}
 		}
 
+	};
+
+	class speed_deformed
+	{
+		int64_t stim, ftim;
+
+	public:
+		ralgo::speed_deformer spddeform;		
+
+		speed_deformed(){}
+
+		speed_deformed(int64_t stim, int64_t ftim) : 
+			stim(stim), ftim(ftim)
+		{}
 	};
 }
 

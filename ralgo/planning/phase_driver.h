@@ -61,19 +61,24 @@ namespace ralgo
 
 		void set_speed(float drive_pulses_per_timeunit) 
 		{
-			set_phases_speed(spd / gear);
+			set_phases_speed(drive_pulses_per_timeunit / gear);
 		}
 
-		int64_t target_position() 
+		int64_t control_position() 
 		{
 			igris::syslock_guard lock();
 			return control_steps_counter * gear + get_accum();
 		}
 
+		float read_coord(float multiplier) 
+		{
+			return control_position() * multiplier;
+		}
+
 		void swift_zero(int64_t imps) 
 		{
 			igris::syslock_guard lock();
-			control_steps_counter = (target_position() - imps) / gear;
+			control_steps_counter = (control_position() - imps) / gear;
 		}
 
 		void set_gear(int g) 

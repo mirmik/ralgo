@@ -103,7 +103,7 @@ namespace ralgo
 			if (!can_operation_start())
 				return;
 
-			auto curpos = drv->target_position();
+			auto curpos = drv->control_position();
 			auto curtim = ralgo::discrete_time();
 
 			line_traj.reset(
