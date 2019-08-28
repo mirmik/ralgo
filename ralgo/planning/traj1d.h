@@ -3,18 +3,21 @@
 
 #include <ralgo/planning/traj.h>
 #include <ralgo/planning/phase.h>
+#include <ralgo/planning/speed_deformer.h>
 
 namespace ralgo
 {
 
+	template <class P, class V>	
 	class traj1d : public speed_deformed
 	{
 	public:
-		virtual int inloctime(int64_t time, phase<int64_t, float> *phs) = 0;
+		virtual int attime(int64_t time, P& pos, V& spd) = 0;
 	};
 
 
-	class traj1d_line : public traj1d
+	template <class P, class V>
+	class traj1d_line : public traj1d<P,V>
 	{
 		int64_t stim;
 		int64_t ftim;
@@ -40,18 +43,15 @@ namespace ralgo
 			setted_speed = (fpos - spos) / (ftim - stim);
 		}
 
-		int inloctime(int64_t time, phase<int64_t, float> *phs)
+		int attime(int64_t time, P& pos, V& spd) override
 		{
 			float time_unit = (float)time / (ftim - stim);
 
 			auto posmod = spddeform.posmod(time_unit);
 			auto spdmod = spddeform.spdmod(time_unit);
 
-			int64_t pos = fpos * posmod + spos * (1 - posmod);
-			float spd = setted_speed * spdmod;
-
-			phs[0].d0 = pos;
-			phs[0].d1 = spd;
+			pos = fpos * posmod + spos * (1 - posmod);
+			spd = setted_speed * spdmod;
 
 			if (posmod >= 1) return 1;
 			else return 0;
