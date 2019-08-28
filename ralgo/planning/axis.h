@@ -12,7 +12,12 @@ namespace ralgo
 		immediate,
 		smooth
 	};
-
+	
+	enum axis_operation_status 
+	{
+		stoped,
+		moved
+	};
 
 	/**
 		Интерфейс управления осью.
@@ -47,6 +52,19 @@ namespace ralgo
 			backward_limit = back;
 			forward_limit = forw;
 		}
+
+		axis_operation_status status() 
+		{
+			if (current_trajectory->is_finished(ralgo::discrete_time())) 
+			{
+				return axis_operation_status::stoped;
+			}
+
+			else 
+			{
+				return axis_operation_status::moved;
+			}
+		} 
 
 		void incmove_tstamp(P incpos, int64_t tstamp)
 		{
@@ -137,6 +155,16 @@ namespace ralgo
 				pos = 0;
 				spd = 0;
 			}
+		}
+
+		float control_position_unit() 
+		{
+			P pos;
+			V spd;
+
+			attime(ralgo::discrete_time(), pos, spd);
+
+			return pos;
 		}
 	};
 }

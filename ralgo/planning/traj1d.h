@@ -13,6 +13,7 @@ namespace ralgo
 	{
 	public:
 		virtual int attime(int64_t time, P& pos, V& spd) = 0;
+		virtual bool is_finished(int64_t time) = 0;
 	};
 
 
@@ -47,6 +48,11 @@ namespace ralgo
 			{
 				setted_speed = (float)(fpos - spos) / (ftim - stim);
 			}
+		}
+
+		bool is_finished(int64_t time) override
+		{
+			return time > ftim;
 		}
 
 		int attime(int64_t time, P& pos, V& spd) override

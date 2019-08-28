@@ -114,7 +114,7 @@ namespace ralgo
 				for (int i = 0; i < pairs.size(); ++i) 
 				{
 					senses[i].lin = ctrsf.rotate(senses[i].lin);
-				//	PRINT(senses[i]);
+//					PRINT(senses[i]);
 				}
 			}
 		}

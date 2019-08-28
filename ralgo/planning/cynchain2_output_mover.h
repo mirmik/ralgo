@@ -35,7 +35,7 @@ namespace ralgo
 
 		cynchain2_output_mover() 
 		{
-			compensation_koefficient = 100 / ralgo::discrete_time_frequency();
+			compensation_koefficient = 0 / ralgo::discrete_time_frequency();
 		}
 
 		rabbit::htrans2<float> location() 
@@ -85,17 +85,19 @@ namespace ralgo
 				dsenses, chain.pairs.size());
 
 
-//			for (int i = 0; i < chain.pairs.size(); ++i) 
-//			{
-//				mspdarr[i] = spdarr[i] * 1000000;
-//			}
+			for (int i = 0; i < chain.pairs.size(); ++i) 
+			{
+				mspdarr[i] = spdarr[i] * 1000000;
+			}
+//			PRINT(pos);
+//			PRINT(location());
 //			PRINT(spd);
 //			PRINT(pos);
 //			PRINT(location());
 //			PRINT(target);
-			//PRINT(igris::array_view<double>(mspdarr, chain.pairs.size()));
+//			PRINT(igris::array_view<double>(mspdarr, chain.pairs.size()));
 
-			//do_after_iteration(5000) exit(0);
+			//do_after_iteration(5) exit(0);
 
 			// Выставляем найденные скорости прилинкованным 
 			// сервам.
