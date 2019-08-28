@@ -18,7 +18,7 @@ namespace ralgo
 		//TRACE();
 		Alg current;
 
-		auto epsilon = 0.0000000001;
+		auto epsilon = 0.00000000001;
 
 		float tgtnorm = target.norm();
 		float vnorms[dim];

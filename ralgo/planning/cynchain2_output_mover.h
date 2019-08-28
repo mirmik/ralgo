@@ -35,7 +35,7 @@ namespace ralgo
 
 		cynchain2_output_mover() 
 		{
-			compensation_koefficient = 0 / ralgo::discrete_time_frequency();
+			compensation_koefficient = 1 / ralgo::discrete_time_frequency();
 		}
 
 		rabbit::htrans2<float> location() 
