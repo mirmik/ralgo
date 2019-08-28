@@ -7,12 +7,12 @@ namespace ralgo
 {
 	class stepctr_emulator : public stepctr
 	{
-		int64_t pos = 0;
+		//int64_t pos = 0;
 
 		void power(bool en) {}
 
-		void inc() { ++pos; }
-		void dec() { --pos; }
+		void inc() {}
+		void dec() {}
 	};
 }
 

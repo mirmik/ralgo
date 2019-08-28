@@ -78,28 +78,44 @@ namespace ralgo
 			rabbit::htrans2<float> trsf{};		
 			auto outtrans = chain[chain.size()-1]->global_location;	
 
+			//PRINT(outtrans);
+
 			for (unsigned int i = 0; i < pairs.size(); ++i) 
 			{
 				rabbit::screw2<float> lsens = pairs[i]->sensivity();
 
+				//PRINT(lsens);
+
 				auto linktrans = pairs[i]->global_location;
 				trsf = linktrans.inverse() * outtrans;
 
+				//PRINT(linktrans);
+				//PRINT(trsf);
+
 				auto radius = trsf.translation();
 
-				auto wsens = lsens.rotation();
+				float wsens = lsens.rotation();
 				auto vsens = linalg::cross(wsens, radius) + lsens.translation();
+
+				auto itrsf = trsf.inverse();
 
 				senses[i] = 
 				{
-					wsens - trsf.rotation(),
-					trsf.inverse_rotate(vsens)
+					wsens,
+					itrsf.rotate(vsens)
 				};
 			}
 
 			if (basis != nullptr) 
 			{
-				BUG();
+				rabbit::htrans2<float> btrsf = basis->global_location;
+				rabbit::htrans2<float> ctrsf = btrsf.inverse() * outtrans;
+
+				for (int i = 0; i < pairs.size(); ++i) 
+				{
+					senses[i].lin = ctrsf.rotate(senses[i].lin);
+				//	PRINT(senses[i]);
+				}
 			}
 		}
 

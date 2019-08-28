@@ -25,12 +25,18 @@ namespace ralgo
 		//stepctr_server * parent;
 
 	public:
-		stepctr()
+		stepctr() : ralgo::phase_driver()
 		{}
 
-		int32_t get_accum() override
+		float get_accum_part() override
 		{
-			return accum * tick_per_timeunit / width;
+			return (float)accum / width;
+		}
+
+		void set_accum_part(float acc) override
+		{
+			accum = acc * width;
+			assert (accum > -width && accum < width);
 		}
 
 		// Установить ширину импульса в единицах инкремента.
@@ -56,6 +62,11 @@ namespace ralgo
 			set_step(width * timeunit_per_tick * steps_per_timeunit);
 		}
 
+		float phases_speed() override 
+		{
+			PRINT((int32_t)step);
+			return (float)step / timeunit_per_tick / width;
+		}
 
 		virtual void inc() = 0;
 		virtual void dec() = 0;
@@ -63,6 +74,8 @@ namespace ralgo
 		void serve() 
 		{
 			accum += step;
+			//PRINT((int32_t)step);
+			//PRINT(accum);
 
 			bool negative = accum < 0;
 

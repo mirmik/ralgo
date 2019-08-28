@@ -19,7 +19,10 @@ namespace ralgo
 
 		void update_location()
 		{
-			global_location = parent->global_location * local_location;
+			if (parent)
+				global_location = parent->global_location * local_location;
+			else
+				global_location = local_location;
 		}
 
 		void relocate(const rabbit::htrans2<float>& trans)
@@ -64,11 +67,6 @@ namespace ralgo
 		float readed_coord_multiplier = 1;
 
 	public:
-		void set_phase_driver(ralgo::phase_driver * drv)
-		{
-			phase_driver = drv;
-		}
-
 		virtual void set_coord(float coord) = 0;
 
 		void set_phase_driver(ralgo::phase_driver * reader, float mul)
@@ -83,7 +81,14 @@ namespace ralgo
 				return;
 
 			float coord = phase_driver->read_coord(readed_coord_multiplier);
+			//PRINT(coord);
 			set_coord(coord);
+		}
+
+		void set_speed_for_linked(float spd) 
+		{
+			//PRINT(spd * readed_coord_multiplier);
+			phase_driver->set_speed(spd * readed_coord_multiplier);			
 		}
 	};
 
@@ -97,7 +102,7 @@ namespace ralgo
 
 		void set_coord(float angle)
 		{
-			output.local_location = rabbit::htrans2<float>(angle, {0, 0});
+			output.local_location = rabbit::htrans2<float>(angle * mul, {0, 0});
 		}
 
 		rabbit::screw2<float> sensivity() override
@@ -112,9 +117,9 @@ namespace ralgo
 	public:
 		actuator2(rabbit::vec2<float> ax, float mul) : ax(ax), mul(mul) {}
 
-		void set_coord(float angle)
+		void set_coord(float c)
 		{
-			output.local_location = rabbit::htrans2<float>(angle, {0, 0});
+			output.local_location = rabbit::htrans2<float>(0, ax * mul * c);
 		}
 
 		rabbit::screw2<float> sensivity() override

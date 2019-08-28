@@ -1,6 +1,9 @@
 #ifndef RALGO_UTIL_BACKPACK_H
 #define RALGO_UTIL_BACKPACK_H
 
+#include <nos/trace.h>
+#include <igris/util/iteration_counter.h>
+
 namespace ralgo
 {
 	template <class T, class Alg>
@@ -12,9 +15,10 @@ namespace ralgo
 	    int dim
 	)
 	{
-		Alg current{};
+		//TRACE();
+		Alg current;
 
-		auto epsilon = 0.0000000001;
+		//auto epsilon = 0.000000001;
 
 		float tgtnorm = target.norm();
 		float vnorms[dim];
@@ -26,23 +30,35 @@ namespace ralgo
 		}
 
 		int32_t iterations = 0;
+		Alg lastcurrent;
+		float lastnorm;
 		while (1)
 		{
 			iterations++;
 			auto delta = target - current;
 
-			if (delta.norm() < epsilon) 
+			auto norm = delta.norm(); 
+			if (lastnorm > norm) { 
+			//if (predelta == delta)
+			//if (norm < epsilon) {
+				current = lastcurrent;
 				break;
+			}
+
+			//predelta = delta;
+			lastnorm = norm;
 
 			for (int i = 0; i < dim; ++i) 
 			{
 				if (vnorms[i] != 0) 
 				{
-					auto koeff = vnormalized[i].dot(delta) * 0.5;
+					auto koeff = vnormalized[i].dot(delta) * 0.9;
 					coords[i] += koeff / vnorms[i];
 				}
 			}
 
+			//PRINT(delta);
+			lastcurrent = current;
 			current = decltype(current)();
 			for (int i = 0; i < dim; ++i) 
 			{

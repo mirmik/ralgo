@@ -2,6 +2,8 @@
 #define RALGO_PLANNING_AXIS_H
 
 #include <ralgo/planning/traj1d.h>
+#include <igris/event/delegate.h>
+#include <igris/math.h>
 
 namespace ralgo
 {
@@ -34,9 +36,43 @@ namespace ralgo
 		ralgo::traj1d_line<P, V> line_traj;
 		ralgo::traj1d<P, V> * current_trajectory = nullptr;
 
+		igris::delegate<void> trajectory_finish_signal;
+
+		P backward_limit = 0;
+		P forward_limit = 0;
+
 	public:
+		void set_limits(P back, P forw) 
+		{
+			backward_limit = back;
+			forward_limit = forw;
+		}
+
 		void incmove_tstamp(P incpos, int64_t tstamp)
 		{
+		}
+
+		void set_current_position(P pos) 
+		{
+			auto time = ralgo::discrete_time();
+			line_traj.reset(pos, time, pos, time + 1);
+			line_traj.spddeform.nullify();
+			current_trajectory = & line_traj;
+		}
+
+		P current_position(int64_t time) 
+		{
+			P pos;
+			V spd;
+
+			attime(time, pos, spd);
+
+			return pos; 
+		}
+
+		P current_position() 
+		{
+			return current_position(ralgo::discrete_time());
 		}
 
 		/*void incmove(P pulses, V speed)
@@ -45,7 +81,7 @@ namespace ralgo
 		}*/
 
 		void absmove_tstamp(
-			int64_t tgttim, P tgtpos, V tgtspd = 0)
+			P tgtpos, int64_t tgttim)
 		{
 			auto curtim = ralgo::discrete_time();
 			P curpos;
@@ -53,20 +89,21 @@ namespace ralgo
 
 			attime(curtim, curpos, curspd);			
 
-			absmove_tstamp(curtim, tgttim, curpos, tgtpos, curspd, tgtspd);
+			absmove_tstamp(curpos, curtim, tgtpos, tgttim);
 		}
 
 		void absmove_tstamp(
-			int64_t curtim, int64_t tgttim, 
-			P curpos, P tgtpos, 
-			V curspd = 0, V tgtspd = 0)
+			P curpos, int64_t curtim, P tgtpos, int64_t tgttim)
 		{
+			tgtpos = igris::clamp(tgtpos, backward_limit, forward_limit);
+
 			line_traj.reset(curpos, curtim, tgtpos, tgttim);
 
+			line_traj.spddeform.reset(0.3, 0.3);
 			//line_traj.set_standart_accdcc_patern(
-			//    options.acctime,
-			//    options.dcctime,
-			//    options.nominal_speed
+			    //options.acctime,
+			    //options.dcctime,
+			    //options.nominal_speed
 			//);
 
 			current_trajectory = &line_traj;

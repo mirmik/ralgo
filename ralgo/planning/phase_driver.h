@@ -4,6 +4,8 @@
 #include <ralgo/planning/disctime.h>
 #include <igris/util/iteration_counter.h>
 
+#include <nos/trace.h>
+
 namespace ralgo 
 {
 	// Интерфейсный класс для реализации контроллера управления одной оси по скорости.
@@ -25,6 +27,7 @@ namespace ralgo
 
 	public:
 		virtual void set_phases_speed(float phases_per_timeunit) = 0;
+		virtual float phases_speed() = 0;
 		virtual void power(bool en) = 0;
 
 		// Отношение drive_position к реально выдаваемому 
@@ -33,11 +36,13 @@ namespace ralgo
 		// electronic_gear / 4, т.к. на подачу одного импульса 
 		// требуется четыре смены фаз.
 		int gear = 1000 / 4; 
+		float unit_gain = 1;
 
 	public:
-		virtual int32_t get_accum() = 0;
+		virtual float get_accum_part() = 0;
+		virtual void set_accum_part(float) = 0;
 
-		phase_driver() 
+		phase_driver() : control_steps_counter(0)
 		{
 			poskoeff = 100 / ralgo::discrete_time_frequency();
 		}
@@ -61,18 +66,44 @@ namespace ralgo
 
 		void set_speed(float drive_pulses_per_timeunit) 
 		{
+			//PRINT(drive_pulses_per_timeunit);
 			set_phases_speed(drive_pulses_per_timeunit / gear);
+		}
+
+		float speed() 
+		{
+			return phases_speed() * gear;
 		}
 
 		int64_t control_position() 
 		{
 			igris::syslock_guard lock();
-			return control_steps_counter * gear + get_accum();
+
+			//PRINT(get_accum());
+			//PRINT((int32_t)control_steps_counter);
+			//PRINT(gear);
+
+			return control_steps_counter * gear + get_accum_part() * gear;
+		}
+
+		void set_control_position(int64_t pos) 
+		{
+			igris::syslock_guard lock();
+
+			int64_t counter = pos / gear;
+			int64_t accum = pos % gear;
+
+			//PRINT(counter);
+			//PRINT(accum);
+
+			control_steps_counter = counter;
+			set_accum_part((float)accum / gear);
 		}
 
 		float read_coord(float multiplier) 
 		{
-			return control_position() * multiplier;
+			//PRINT(multiplier);
+			return control_position() / multiplier;
 		}
 
 		void swift_zero(int64_t imps) 
@@ -84,6 +115,16 @@ namespace ralgo
 		void set_gear(int g) 
 		{
 			gear = g;
+		}
+
+		void set_unit_gain(float m) 
+		{
+			unit_gain = m;
+		}
+
+		float control_position_unit() 
+		{
+			return control_position() / unit_gain;
 		}
 	};
 }
