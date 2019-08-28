@@ -72,6 +72,8 @@ namespace ralgo
 			pos = fpos * posmod + spos * (1 - posmod);
 			spd = setted_speed * spdmod;
 
+			//PRINT(pos);
+
 			if (posmod >= 1) return 1;
 			else return 0;
 		}
