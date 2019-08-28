@@ -44,16 +44,17 @@ namespace ralgo
 		void collect_chain(unit2d* finallink, unit2d* startlink = nullptr) 
 		{
 			unit2d* link = finallink;
-			auto cit = chain.rbegin();
+			auto cit = pairs.rbegin();
 			auto it = chain.rbegin();
 
 			do 
 			{
-				*it++ = link;
+				*it-- = link;
 				if (link->iscynem())
 				{
-					*cit++ = link;
+					*cit-- = (cynematic_unit2d*)link;
 				}
+				link = link->parent;
 			} 
 			while(link != startlink);
 		}
@@ -80,8 +81,8 @@ namespace ralgo
 			for (unsigned int i = 0; i < pairs.size(); ++i) 
 			{
 				rabbit::screw2<float> lsens = pairs[i]->sensivity();
-				auto linktrans = pairs[i]->global_location;
 
+				auto linktrans = pairs[i]->global_location;
 				trsf = linktrans.inverse() * outtrans;
 
 				auto radius = trsf.translation();

@@ -1,31 +1,41 @@
 #ifndef RALGO_XYALPHA_COORDINATE_CONTROLLER_H
 #define RALGO_XYALPHA_COORDINATE_CONTROLLER_H
 
+#include <ralgo/planning/axis.h>
 #include <ralgo/planning/htrans2_mover.h>
-#include <ralgo/planning/cynematic_chain_object2d.h>
+#include <ralgo/planning/cynchain2_output_mover.h>
 
 namespace ralgo
 {
-	class xyalpha_coordinate_controller_axis : public ralgo::axis
-	{
-		int axno;
+	class xyalpha_coordinate_controller_axis 
+		: public ralgo::position_controlled_axis<float, float>
+	{};
 
-		
-	};
-
-	class xyalpha_coordinate_controller : public htrans2_mover
+	class xyalpha_coordinate_controller : public cynchain2_output_mover
 	{
 	public:
 		xyalpha_coordinate_controller_axis x_axis;
 		xyalpha_coordinate_controller_axis y_axis;
-		xyalpha_coordinate_controller_axis alpha_axis;
+		xyalpha_coordinate_controller_axis a_axis;
 
 	public:
-		ralgo::cynematic_chain2d_output_controller* cchain;
+		void get_control_phase(
+			time_t time,
+			rabbit::htrans2<float>& pos, 
+			rabbit::screw2<float>& spd) 
+		{
+			float xpos, ypos, apos, xspd, yspd, aspd;
 
-		xyalpha_coordinate_controller(ralgo::cynematic_chain2d_output_controller* cchain)
-			: cchain(cchain)
-		{}
+			x_axis.attime(time, xpos, xspd);		
+			y_axis.attime(time, ypos, yspd);		
+			a_axis.attime(time, apos, aspd);
+
+			pos = rabbit::htrans2<float>{ apos, { xpos, ypos } };
+			spd = rabbit::screw2<float>{ aspd, {xspd, yspd} };
+
+			PRINT(pos);
+			PRINT(spd);
+		}
 	};
 }
 

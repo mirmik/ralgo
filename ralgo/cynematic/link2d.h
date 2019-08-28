@@ -1,12 +1,15 @@
 #ifndef RALGO_CYNEMATIC_LINK2D_H
 #define RALGO_CYNEMATIC_LINK2D_H
 
+#include <rabbit/space.h>
+#include <ralgo/planning/phase_driver.h>
+
 namespace ralgo
 {
 	class unit2d
 	{
 	public:
-		unit2d * parent;
+		unit2d * parent = nullptr;
 
 		rabbit::htrans2<float> local_location;
 		rabbit::htrans2<float> global_location;
