@@ -19,20 +19,21 @@ namespace ralgo
 	template <class P, class V>
 	class traj1d_line : public traj1d<P,V>
 	{
-		int64_t stim;
-		int64_t ftim;
+	public:
+		int64_t stim = 0;
+		int64_t ftim = 0;
 
-		int64_t spos;
-		int64_t fpos;
+		P spos = 0;
+		P fpos = 0;
 
-		float setted_speed;
+		V setted_speed = 0;
 
 	public:
 		ralgo::speed_deformer spddeform;
 
 		traj1d_line() {}
 
-		void reset(int64_t spos, int64_t stim, int64_t fpos, int64_t ftim)
+		void reset(P spos, int64_t stim, P fpos, int64_t ftim)
 		{
 			this->spos = spos;
 			this->fpos = fpos;
@@ -40,15 +41,27 @@ namespace ralgo
 			this->stim = stim;
 			this->ftim = ftim;
 
-			setted_speed = (fpos - spos) / (ftim - stim);
+			if (stim == ftim)
+				setted_speed = 0;
+			else
+			{
+				setted_speed = (float)(fpos - spos) / (ftim - stim);
+			}
 		}
 
 		int attime(int64_t time, P& pos, V& spd) override
 		{
-			float time_unit = (float)time / (ftim - stim);
+			float time_unit = (float)(time - stim) / (ftim - stim);
 
 			auto posmod = spddeform.posmod(time_unit);
 			auto spdmod = spddeform.spdmod(time_unit);
+
+			/*PRINT(time);
+			PRINT(stim);
+			PRINT(ftim);*/
+//			PRINT(time_unit);
+			//PRINT(posmod);
+			//PRINT(spdmod);
 
 			pos = fpos * posmod + spos * (1 - posmod);
 			spd = setted_speed * spdmod;

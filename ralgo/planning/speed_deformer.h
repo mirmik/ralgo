@@ -16,18 +16,18 @@ namespace ralgo
 {
 	class speed_deformer
 	{
-		float acc;
-		float dcc;
+		float acc = 0;
+		float dcc = 0;
 		//int32_t s_time;
-		float f_time;
+		float f_time = 1;
 
-		float strt_spd;
-		float fini_spd;
+		float strt_spd = 0;
+		float fini_spd = 0;
 		//float nati_spd;
-		float real_spd;
+		float real_spd = 0;
 
-		float fini_acc_pos;
-		float strt_dcc_pos;
+		float fini_acc_pos = 0;
+		float strt_dcc_pos = 0;
 
 	public:
 		speed_deformer() {}
@@ -126,6 +126,11 @@ namespace ralgo
 			}
 		}
 
+		void nullify() 
+		{
+			strt_spd = fini_spd = 0;
+			f_time = 1;			
+		}
 	};
 
 	class speed_deformed
