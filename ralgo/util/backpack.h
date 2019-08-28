@@ -18,7 +18,7 @@ namespace ralgo
 		//TRACE();
 		Alg current;
 
-		//auto epsilon = 0.000000001;
+		auto epsilon = 0.0000000001;
 
 		float tgtnorm = target.norm();
 		float vnorms[dim];
@@ -38,10 +38,10 @@ namespace ralgo
 			auto delta = target - current;
 
 			auto norm = delta.norm(); 
-			if (lastnorm > norm) { 
+			//if (lastnorm > norm) { 
 			//if (predelta == delta)
-			//if (norm < epsilon) {
-				current = lastcurrent;
+			if (norm < epsilon) {
+			//	current = lastcurrent;
 				break;
 			}
 
