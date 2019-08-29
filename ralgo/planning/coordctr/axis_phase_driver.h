@@ -9,7 +9,12 @@ namespace ralgo
 	class axis_phase_driver_controller 
 		: public axis_controller, public phase_driver_controller
 	{
+		
+		
+		void enable_mirror_mode(axis_controller & ctr, float reference) 
+		{
 
+		}
 	};
 }
 
