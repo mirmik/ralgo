@@ -16,7 +16,8 @@ namespace ralgo
 	enum axis_operation_status 
 	{
 		stoped,
-		moved
+		moved,
+		micromove
 	};
 
 	/**
@@ -36,7 +37,7 @@ namespace ralgo
 	}*/
 
 	template <class P, class V = float>
-	class position_controlled_axis
+	class axis_controller
 	{
 		ralgo::traj1d_line<P, V> line_traj;
 		ralgo::traj1d<P, V> * current_trajectory = nullptr;
@@ -46,7 +47,18 @@ namespace ralgo
 		P backward_limit = 0;
 		P forward_limit = 0;
 
+		axis_controller * mirror = nullptr;
+		P mirror_reference = 0;
+
+		axis_operation_status opstat;
+
 	public:
+		void enable_mirror_mode(axis_controller * mirror, P reference) 
+		{
+			this->mirror = mirror;
+			this->mirror_reference = reference;
+		}
+
 		void set_limits(P back, P forw) 
 		{
 			backward_limit = back;
@@ -55,7 +67,7 @@ namespace ralgo
 
 		axis_operation_status status() 
 		{
-			if (current_trajectory->is_finished(ralgo::discrete_time())) 
+			/*if (current_trajectory->is_finished(ralgo::discrete_time())) 
 			{
 				return axis_operation_status::stoped;
 			}
@@ -63,7 +75,7 @@ namespace ralgo
 			else 
 			{
 				return axis_operation_status::moved;
-			}
+			}*/
 		} 
 
 		void incmove_tstamp(P incpos, int64_t tstamp)

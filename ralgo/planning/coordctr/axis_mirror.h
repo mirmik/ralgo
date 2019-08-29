@@ -3,10 +3,6 @@
 
 namespace ralgo 
 {
-	class axis_mirror : public
-	{
-
-	}
 }
 
 #endif
