@@ -8,7 +8,7 @@
 namespace ralgo
 {
 	class xyalpha_coordinate_controller_axis 
-		: public ralgo::position_controlled_axis<float, float>
+		: public ralgo::axis_controller<float, float>
 	{};
 
 	class xyalpha_coordinate_controller : public cynchain2_output_mover

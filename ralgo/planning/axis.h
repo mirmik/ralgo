@@ -67,7 +67,7 @@ namespace ralgo
 
 		axis_operation_status status() 
 		{
-			/*if (current_trajectory->is_finished(ralgo::discrete_time())) 
+			if (current_trajectory->is_finished(ralgo::discrete_time())) 
 			{
 				return axis_operation_status::stoped;
 			}
@@ -75,7 +75,7 @@ namespace ralgo
 			else 
 			{
 				return axis_operation_status::moved;
-			}*/
+			}
 		} 
 
 		void incmove_tstamp(P incpos, int64_t tstamp)
