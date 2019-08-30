@@ -18,7 +18,8 @@ namespace ralgo
 		//TRACE();
 		Alg current;
 
-		auto epsilon = 0.00000000001;
+		// Точность может существенно влиять на время.
+		auto epsilon = 0.0000001;
 
 		float tgtnorm = target.norm();
 		float vnorms[dim];
