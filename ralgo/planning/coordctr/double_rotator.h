@@ -16,6 +16,14 @@ namespace
 		{
 			float bpos, tpos;
 			float bspd, tspd;
+
+			auto time = ralgo::discrete_time();			
+
+			top.attime(time, tpos, tspd);
+			bot.attime(time, bpos, bspd);
+
+			bot_drv.set_phase(bpos, bspd);
+			top_drv.set_phase(tpos, tspd);
 		}
 
 		void restore_control_model() override 
