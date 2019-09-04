@@ -84,9 +84,16 @@ namespace ralgo
 
 		void set_current_position(P pos) 
 		{
+			//dprln("set_current_position(P pos)");
+			//PRINT(pos);
+
+			//exit(0);
+
 			auto time = ralgo::discrete_time();
+		
 			line_traj.reset(pos, time, pos, time + 1);
 			line_traj.spddeform.nullify();
+		
 			current_trajectory = & line_traj;
 		}
 
@@ -167,6 +174,9 @@ namespace ralgo
 				pos = 0;
 				spd = 0;
 			}
+
+			PRINT(pos);
+			//PRINT(spd * 1000);
 		}
 
 		float control_position_unit() 
