@@ -8,8 +8,62 @@
 
 namespace ralgo 
 {
+	class phase_driver
+	{
+		float poskoeff;
+
+	public:
+		phase_driver()
+		{
+			set_timeconst(0.01);
+		}
+
+		// Установить постоянную времени компенсации ошибки позиционирования.
+		void set_timeconst(float T) 
+		{
+			poskoeff = 1 / (T * ralgo::discrete_time_frequency()); 
+		}
+
+		// Задать фазовое управление в расчетных единицах.
+		// Реализация может использовать множители, но расчеты следует
+		// проводить в расчетных единицах.
+		void set_phase(float pos, float speed);
+
+		// Задать скорость в расчетных единицах.
+		virtual void set_speed(float speed) = 0;
+
+		// Получить позицию в единицах вычисления.
+		virtual float current_position() = 0;
+		virtual float current_speed() = 0;
+
+		// Опциональная операция, устанавливающая текущее расчетное положение,
+		// драйвера. Поведение зависит от имплементации.
+		virtual void set_current_position(float pos) 
+		{ BUG(); }
+
+		// Активировать драйвер / включить питание.
+		// Проверять включенность при вызове serve.
+		virtual void enable(bool en) = 0;
+	};
+
+	void phase_driver::set_phase(float tgtpos, float tgtspd) 
+	{
+		// Счетчик меняется в прерывании, так что 
+		// снимаем локальную копию.
+		auto current = current_position();
+
+		// Ошибка по установленному значению.
+		auto diff = tgtpos - current;
+
+		// Скорость вычисляется как
+		// сумма уставной скорости на 
+		auto evalspeed = tgtspd  + poskoeff * diff;
+
+		set_speed(evalspeed);
+	}
+
 	// Интерфейсный класс для реализации контроллера управления одной оси по скорости.
-	class phase_driver 
+	/*class phase_driver 
 	{
 		// TODO: phase_driver фактически слился со stepctr.
 		// их надо или объединить или phase_driver следует 
@@ -126,7 +180,7 @@ namespace ralgo
 		{
 			return control_position() / unit_gain;
 		}
-	};
+	};*/
 }
 
 #endif

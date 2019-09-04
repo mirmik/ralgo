@@ -12,28 +12,50 @@ namespace ralgo
 	class stepctr : public ralgo::phase_driver
 	{
 	public:
+		volatile int64_t control_steps_counter = 0;
+
 		int32_t accum = 0; // Текущее значение аккумулятора.
 		volatile int32_t step = 0; // Величина инкремента.
 
 		int32_t width = 10*1000*1000;
 
-		float tick_per_timeunit = 1;
-		float timeunit_per_tick = 1;
+		// Позиционный мультипликатор учитывает 
+		// отношение командного импульса к расчетному.
+		float position_multiplier = 1;
 
+		// Позиционный мультипликатор учитывает 
+		// отношение командного импульса к расчетному 
+		// + количество тиков алгоритма за расчетную единицу времени.
+		float speed_multiplier = 1;
+		
 		bool emulate = false;		
 
 		//stepctr_server * parent;
 
 	public:
+		float set_gear(float mul, float ticks_per_timeunit) 
+		{
+			// Учитываем модификатор времени.
+			position_multiplier = mul;
+			speed_multiplier = mul 
+				/ ticks_per_timeunit 
+				* ralgo::discrete_time_frequency();
+		}
+
 		stepctr() : ralgo::phase_driver()
 		{}
 
-		float get_accum_part() override
+		int64_t drive_position() 
+		{
+			return control_steps_counter;
+		}
+
+		float get_accum_part()
 		{
 			return (float)accum / width;
 		}
 
-		void set_accum_part(float acc) override
+		void set_accum_part(float acc)
 		{
 			accum = acc * width;
 			assert (accum > -width && accum < width);
@@ -45,28 +67,65 @@ namespace ralgo
 			system_lock();
 			step = _step;
 			system_unlock();
-			//DPRINT(step);
+			DPRINT(step);
 
 			assert((step < width) && (step > -width));
 		}
 
-		void set_declared_serve_freq(float arg) 
+		/*void set_declared_serve_freq(float arg) 
 		{
 			tick_per_timeunit = arg / ralgo::discrete_time_frequency();
 			timeunit_per_tick = 1/tick_per_timeunit;
-		}
+		}*/
 
-		void set_phases_speed(float steps_per_timeunit) 
+		/*void set_phases_speed(float steps_per_timeunit) 
 		{
 			//DPRINT(steps_per_timeunit);
-			set_step(width * timeunit_per_tick * steps_per_timeunit);
+			//PRINT(steps_per_timeunit);
+			//PRINT(timeunit_per_tick);
+			//PRINT(width);
+			//set_step(width * timeunit_per_tick * steps_per_timeunit);
+		}*/
+
+		//float phases_speed() 
+		//{
+		//	PRINT((int32_t)step);
+		//	return (float)step / timeunit_per_tick / width;
+		//}
+
+		float current_speed() override 
+		{
+			return (float)step / width / speed_multiplier; 
+			//phases_speed() / multiplier;
 		}
 
-		float phases_speed() override 
+		float current_position() override 
 		{
-			PRINT((int32_t)step);
-			return (float)step / timeunit_per_tick / width;
+			igris::syslock_guard lock();
+			return ((float)control_steps_counter + get_accum_part()) 
+				/ position_multiplier;
 		}
+
+		void set_current_position(float pos) override 
+		{
+			igris::syslock_guard lock();
+
+			float fcounter = pos * position_multiplier;
+
+			int64_t counter = round(fcounter);
+
+			set_accum_part(fcounter - counter);
+			control_steps_counter = counter;
+		}
+
+		void set_speed(float spd) 
+		{
+			//set_phases_speed(spd * speed_multiplier);
+			//PRINT(spd);
+			set_step(width * spd * speed_multiplier);
+		}
+
+		void enable(bool en) override {} 
 
 		virtual void inc() = 0;
 		virtual void dec() = 0;

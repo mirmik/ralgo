@@ -1,7 +1,7 @@
 #ifndef RALGO_PLANNING_DOUBLE_ROTATOR_H
 #define RALGO_PLANNING_DOUBLE_ROTATOR_H
 
-namespace 
+namespace ralgo
 {
 	class double_rotator 
 	{
@@ -11,6 +11,12 @@ namespace
 
 		ralgo::phase_driver * bot_drv;
 		ralgo::phase_driver * top_drv;
+
+		double_rotator(ralgo::phase_driver * a, ralgo::phase_driver * b) 
+		{
+			bot_drv = a;
+			top_drv = b;
+		}
 
 		void serve() 
 		{
@@ -22,18 +28,35 @@ namespace
 			top.attime(time, tpos, tspd);
 			bot.attime(time, bpos, bspd);
 
-			bot_drv.set_phase(bpos, bspd);
-			top_drv.set_phase(tpos, tspd);
+			tpos = tpos - bpos;
+			tspd = tspd - bspd;
+
+			/*PRINT(tpos);
+			PRINT(bpos);
+			PRINT(tspd);
+			PRINT(bspd);*/
+
+
+		PRINT(tspd);
+		PRINT(bspd);
+		PRINT(tpos);
+		PRINT(bpos);
+
+			bot_drv->set_phase(bpos, bspd);
+			top_drv->set_phase(tpos, tspd);
 		}
 
-		void restore_control_model() override 
+		void restore_control_model()
 		{
+			PRINT(bot_drv->current_position());
+			PRINT(top_drv->current_position());
+
 			bot.set_current_position(
-				bot_drv.control_position_unit());
+				bot_drv->current_position());
 
 			top.set_current_position(
-				bot_drv.control_position_unit() 
-				+ top_drv.control_position_unit());
+				bot_drv->current_position() 
+				+ top_drv->current_position());
 		}
 	};
 }

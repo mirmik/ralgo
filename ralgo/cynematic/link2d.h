@@ -64,15 +64,15 @@ namespace ralgo
 	class unit2d_1dof : public cynematic_unit2d
 	{
 		ralgo::phase_driver * phase_driver = nullptr;
-		float readed_coord_multiplier = 1;
+		//float readed_coord_multiplier = 1;
 
 	public:
 		virtual void set_coord(float coord) = 0;
 
-		void set_phase_driver(ralgo::phase_driver * reader, float mul)
+		void set_phase_driver(ralgo::phase_driver * reader)
 		{
 			phase_driver = reader;
-			readed_coord_multiplier = mul;
+			//readed_coord_multiplier = mul;
 		}
 
 		void read_coords() override
@@ -80,7 +80,7 @@ namespace ralgo
 			if (phase_driver == nullptr)
 				return;
 
-			float coord = phase_driver->read_coord(readed_coord_multiplier);
+			float coord = phase_driver->current_position();
 			//PRINT(coord);
 			set_coord(coord);
 		}
@@ -88,7 +88,7 @@ namespace ralgo
 		void set_speed_for_linked(float spd) 
 		{
 			//PRINT(spd * readed_coord_multiplier);
-			phase_driver->set_speed(spd * readed_coord_multiplier);			
+			phase_driver->set_speed(spd);			
 		}
 	};
 
