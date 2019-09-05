@@ -30,15 +30,8 @@ namespace ralgo
 			y_axis.attime(time, ypos, yspd);		
 			a_axis.attime(time, apos, aspd);
 
-			//PRINT(time);
-			//PRINT(xpos);
-			//PRINT(xspd);
-
 			pos = rabbit::htrans2<float>{ apos, { xpos, ypos } };
 			spd = rabbit::screw2<float>{ aspd, {xspd, yspd} };
-
-			//PRINT(pos);
-			//PRINT(spd);
 		}
 
 		void restore_control_model() override 
