@@ -43,7 +43,7 @@ namespace ralgo
 
 		// Активировать драйвер / включить питание.
 		// Проверять включенность при вызове serve.
-		virtual void enable(bool en) = 0;
+		virtual void enable_power(bool en) = 0;
 	};
 
 	void phase_driver::set_phase(float tgtpos, float tgtspd) 

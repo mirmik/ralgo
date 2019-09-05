@@ -125,7 +125,7 @@ namespace ralgo
 			set_step(width * spd * speed_multiplier);
 		}
 
-		void enable(bool en) override {} 
+		void enable_power(bool en) override {} 
 
 		virtual void inc() = 0;
 		virtual void dec() = 0;

@@ -2,6 +2,8 @@
 #define RALGO_PLANNING_AXIS_H
 
 #include <ralgo/planning/traj1d.h>
+#include <ralgo/planning/disctime.h>
+
 #include <igris/event/delegate.h>
 #include <igris/math.h>
 

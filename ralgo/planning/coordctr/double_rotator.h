@@ -18,6 +18,14 @@ namespace ralgo
 			top_drv = b;
 		}
 
+		void setup(ralgo::phase_driver * a, ralgo::phase_driver * b) 
+		{
+			bot_drv = a;
+			top_drv = b;
+		}
+
+		double_rotator(){}
+
 		void serve() 
 		{
 			float bpos, tpos;
