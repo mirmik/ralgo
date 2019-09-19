@@ -7,12 +7,12 @@ namespace ralgo
 {
 	class axis_ofsetter 
 	{
-		ralgo::axis_controller<float,float> ctr;
 		ralgo::axis_controller<float,float> * followed;
-
 		ralgo::phase_driver * drv;
 
 	public:
+		ralgo::axis_controller<float,float> ctr;
+
 		void serve() 
 		{
 			auto time = ralgo::discrete_time();

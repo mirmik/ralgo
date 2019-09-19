@@ -20,7 +20,7 @@ namespace ralgo
 
 	public:
 		void get_control_phase(
-			time_t time,
+			int64_t time,
 			rabbit::htrans2<float>& pos, 
 			rabbit::screw2<float>& spd) 
 		{
