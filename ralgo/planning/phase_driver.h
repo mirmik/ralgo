@@ -6,7 +6,7 @@
 
 #include <nos/trace.h>
 
-namespace ralgo 
+namespace ralgo
 {
 	class phase_driver
 	{
@@ -19,16 +19,30 @@ namespace ralgo
 		}
 
 		// Установить постоянную времени компенсации ошибки позиционирования.
-		void set_timeconst(float T) 
+		void set_timeconst(float T)
 		{
-			poskoeff = 1 / (T * ralgo::discrete_time_frequency()); 
+			poskoeff = 1 / (T * ralgo::discrete_time_frequency());
 		}
 
 		// Задать фазовое управление в расчетных единицах.
 		// Реализация может использовать множители, но расчеты следует
 		// проводить в расчетных единицах.
-		void set_phase(float pos, float speed);
+		//void set_phase(float pos, float speed);
+		void set_phase(float tgtpos, float tgtspd)
+		{
+			// Счетчик меняется в прерывании, так что
+			// снимаем локальную копию.
+			auto current = current_position();
 
+			// Ошибка по установленному значению.
+			auto diff = tgtpos - current;
+
+			// Скорость вычисляется как
+			// сумма уставной скорости на
+			auto evalspeed = tgtspd  + poskoeff * diff;
+
+			set_speed(evalspeed);
+		}
 		// Задать скорость в расчетных единицах.
 		virtual void set_speed(float speed) = 0;
 
@@ -38,7 +52,7 @@ namespace ralgo
 
 		// Опциональная операция, устанавливающая текущее расчетное положение,
 		// драйвера. Поведение зависит от имплементации.
-		virtual void set_current_position(float pos) 
+		virtual void set_current_position(float pos)
 		{ BUG(); }
 
 		// Активировать драйвер / включить питание.
@@ -46,33 +60,18 @@ namespace ralgo
 		virtual void enable_power(bool en) = 0;
 	};
 
-	void phase_driver::set_phase(float tgtpos, float tgtspd) 
-	{
-		// Счетчик меняется в прерывании, так что 
-		// снимаем локальную копию.
-		auto current = current_position();
-
-		// Ошибка по установленному значению.
-		auto diff = tgtpos - current;
-
-		// Скорость вычисляется как
-		// сумма уставной скорости на 
-		auto evalspeed = tgtspd  + poskoeff * diff;
-
-		set_speed(evalspeed);
-	}
 
 	// Интерфейсный класс для реализации контроллера управления одной оси по скорости.
-	/*class phase_driver 
+	/*class phase_driver
 	{
 		// TODO: phase_driver фактически слился со stepctr.
-		// их надо или объединить или phase_driver следует 
+		// их надо или объединить или phase_driver следует
 		// сделать интерфейсом.
-		// Рекомендуется принять это решение после встречи 
+		// Рекомендуется принять это решение после встречи
 		// с любым принципиально отличным типом фазового драйвера.
 
-		// Задаёт постоянную времени коррекции уставного положения 
-		// (Инверсно). Масштаб времени совпадает 
+		// Задаёт постоянную времени коррекции уставного положения
+		// (Инверсно). Масштаб времени совпадает
 		// T = 1 / k
 		float poskoeff = 10;
 
@@ -84,12 +83,12 @@ namespace ralgo
 		virtual float phases_speed() = 0;
 		virtual void power(bool en) = 0;
 
-		// Отношение drive_position к реально выдаваемому 
+		// Отношение drive_position к реально выдаваемому
 		// числу смен фаз.
 		// Например: для MitsuServo это будет
-		// electronic_gear / 4, т.к. на подачу одного импульса 
+		// electronic_gear / 4, т.к. на подачу одного импульса
 		// требуется четыре смены фаз.
-		int gear = 1000 / 4; 
+		int gear = 1000 / 4;
 		float unit_gain = 1;
 
 	public:
@@ -103,7 +102,7 @@ namespace ralgo
 
 		void set_phase(int64_t tgtpos, float posunit_per_timeunit)
 		{
-			// Счетчик меняется в прерывании, так что 
+			// Счетчик меняется в прерывании, так что
 			// снимаем локальную копию.
 			auto current = control_position();
 
@@ -111,25 +110,25 @@ namespace ralgo
 			auto diff = tgtpos - current;
 
 			// Скорость вычисляется как
-			// сумма уставной скорости на 
-			float evalspeed = 
+			// сумма уставной скорости на
+			float evalspeed =
 				(posunit_per_timeunit + poskoeff * diff) / gear;
 
 			set_phases_speed(evalspeed);
 		}
 
-		void set_speed(float drive_pulses_per_timeunit) 
+		void set_speed(float drive_pulses_per_timeunit)
 		{
 			//PRINT(drive_pulses_per_timeunit);
 			set_phases_speed(drive_pulses_per_timeunit / gear);
 		}
 
-		float speed() 
+		float speed()
 		{
 			return phases_speed() * gear;
 		}
 
-		int64_t control_position() 
+		int64_t control_position()
 		{
 			igris::syslock_guard lock();
 
@@ -140,7 +139,7 @@ namespace ralgo
 			return control_steps_counter * gear + get_accum_part() * gear;
 		}
 
-		void set_control_position(int64_t pos) 
+		void set_control_position(int64_t pos)
 		{
 			igris::syslock_guard lock();
 
@@ -154,29 +153,29 @@ namespace ralgo
 			set_accum_part((float)accum / gear);
 		}
 
-		float read_coord(float multiplier) 
+		float read_coord(float multiplier)
 		{
 			//PRINT(multiplier);
 			return control_position() / multiplier;
 		}
 
-		void swift_zero(int64_t imps) 
+		void swift_zero(int64_t imps)
 		{
 			igris::syslock_guard lock();
 			control_steps_counter = (control_position() - imps) / gear;
 		}
 
-		void set_gear(int g) 
+		void set_gear(int g)
 		{
 			gear = g;
 		}
 
-		void set_unit_gain(float m) 
+		void set_unit_gain(float m)
 		{
 			unit_gain = m;
 		}
 
-		float control_position_unit() 
+		float control_position_unit()
 		{
 			return control_position() / unit_gain;
 		}

@@ -5,6 +5,7 @@
 #include <math.h>
 
 #include <igris/math/fast_invsqrt.h>
+#include <igris/math/defs.h>
 
 #define RAD_TO_DEG 180.0 / M_PI
 #define SAMPLE_FREQ 1000.0f     // sample frequency in Hz

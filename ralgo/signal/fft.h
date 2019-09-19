@@ -8,6 +8,8 @@
 //#include <nos/print.h>
 #include <ralgo/vecops.h>
 
+#include <igris/math/defs.h>
+
 namespace ralgo
 {
 	namespace signal
