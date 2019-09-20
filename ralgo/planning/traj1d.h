@@ -85,16 +85,6 @@ namespace ralgo
 			float acc = acctime * koeff / (ftim - stim);
 			float dcc = dcctime * koeff / (ftim - stim);
 
-			DPRINT(koeff);
-			DPRINT(nominal_speed);
-			DPRINT(setted_speed);
-			DPRINT(acc);
-			DPRINT(dcc);
-			DPRINT(stim);
-			DPRINT(ftim);
-			DPRINT(acctime);
-			DPRINT(dcctime);
-
 			if (acc + dcc > 1)
 			{
 				//dprln("warn: acc + dcc > 1");
