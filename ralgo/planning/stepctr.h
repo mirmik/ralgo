@@ -67,7 +67,6 @@ namespace ralgo
 			system_lock();
 			step = _step;
 			system_unlock();
-			DPRINT(step);
 
 			assert((step < width) && (step > -width));
 		}

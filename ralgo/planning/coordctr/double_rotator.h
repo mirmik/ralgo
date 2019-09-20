@@ -45,20 +45,12 @@ namespace ralgo
 			PRINT(bspd);*/
 
 
-		PRINT(tspd);
-		PRINT(bspd);
-		PRINT(tpos);
-		PRINT(bpos);
-
 			bot_drv->set_phase(bpos, bspd);
 			top_drv->set_phase(tpos, tspd);
 		}
 
 		void restore_control_model()
 		{
-			PRINT(bot_drv->current_position());
-			PRINT(top_drv->current_position());
-
 			bot.set_current_position(
 				bot_drv->current_position());
 

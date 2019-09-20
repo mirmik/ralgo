@@ -177,8 +177,6 @@ namespace ralgo
 				spd = 0;
 			}
 
-			PRINT(pos);
-			//PRINT(spd * 1000);
 		}
 
 		float control_position_unit() 
