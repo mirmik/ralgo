@@ -98,6 +98,18 @@ namespace ralgo
 			return c;
 		}
 
+		template <class C, class F, class A, class B, class ... Args>
+		void elementwise2_to(C& c, const F& f, const A& a, const B& b, Args&& ... args) 
+		{
+			auto ait = a.begin(), aend = a.end();
+			auto bit = b.begin();
+			auto cit = c.begin();
+
+			for (; ait != aend; ++ait, ++bit, ++cit)
+				*cit = f(*ait, *bit, std::forward<Args>(args) ...); 
+		}
+
+
 		// Создаёт векторизованный вриант функции.
 		template<class V, class R = V, typename F, class ... Args>
 		constexpr auto vectorize(const F& f, Args && ... args)
@@ -159,6 +171,11 @@ namespace ralgo
 		template <class R=void, class A, class B> defsame_t<R,A> mul_vv(const A& a, const B& b) { return elementwise2<R>(ralgo::op::mul(), a, b); }
 		template <class R=void, class A, class B> defsame_t<R,A> div_vv(const A& a, const B& b) { return elementwise2<R>(ralgo::op::div(), a, b); }
 
+		template <class A, class B, class C> void add_vv_to(C& c, const A& a, const B& b) { return elementwise2_to(c, ralgo::op::add(), a, b); }
+		template <class A, class B, class C> void sub_vv_to(C& c, const A& a, const B& b) { return elementwise2_to(c, ralgo::op::sub(), a, b); }
+		template <class A, class B, class C> void mul_vv_to(C& c, const A& a, const B& b) { return elementwise2_to(c, ralgo::op::mul(), a, b); }
+		template <class A, class B, class C> void div_vv_to(C& c, const A& a, const B& b) { return elementwise2_to(c, ralgo::op::div(), a, b); }
+
 		namespace inplace
 		{
 			// Применить функцию f ко всем элементам массива v. Допускается передача дополнительных аргументов.
@@ -169,10 +186,15 @@ namespace ralgo
 				return v;
 			}
 
+			template <class V> void clean(V& v) { 
+				elementwise(v, [](auto& a){a=decltype(a)();}); }
+
 			template <class V, class S> V& add(V& vec, S m) { for (auto& val : vec) val += m; return vec; }
 			template <class V, class S> V& sub(V& vec, S m) { for (auto& val : vec) val -= m; return vec; }
 			template <class V, class S> V& mul(V& vec, S m) { for (auto& val : vec) val *= m; return vec; }
 			template <class V, class S> V& div(V& vec, S m) { for (auto& val : vec) val /= m; return vec; }
+
+			//template <class V, class W> void add(V& a, W& b) {  }
 
 			template <class V> V& conj(V& vec) { for (auto& val : vec) val = std::conj(val); return vec; }
 

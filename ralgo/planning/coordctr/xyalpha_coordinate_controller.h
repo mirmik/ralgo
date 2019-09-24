@@ -30,6 +30,10 @@ namespace ralgo
 			y_axis.attime(time, ypos, yspd);		
 			a_axis.attime(time, apos, aspd);
 
+			//nos::print(xpos, ypos, apos, xspd, yspd, aspd);
+			//nos::print("fadsfa");
+			//nos::print(xpos);
+
 			pos = rabbit::htrans2<float>{ apos, { xpos, ypos } };
 			spd = rabbit::screw2<float>{ aspd, {xspd, yspd} };
 		}

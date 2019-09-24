@@ -36,6 +36,8 @@ namespace ralgo
 			top.attime(time, tpos, tspd);
 			bot.attime(time, bpos, bspd);
 
+			//nos::print(bpos);
+
 			tpos = tpos - bpos;
 			tspd = tspd - bspd;
 

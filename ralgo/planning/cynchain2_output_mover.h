@@ -80,7 +80,10 @@ namespace ralgo
 
 			// Поиск скоростей звеньев удовлетворяющих заданному
 			// управлению.
-			ralgo::gradient_backpack<double, rabbit::screw2<double>>(
+			//ralgo::gradient_backpack<double, rabbit::screw2<double>>(
+			//	spdarr, dtarget, 
+			//	dsenses, chain.pairs.size());
+			ralgo::very_naive_backpack<double, rabbit::screw2<double>>(
 				spdarr, dtarget, 
 				dsenses, chain.pairs.size());
 
@@ -99,6 +102,7 @@ namespace ralgo
 
 			//do_after_iteration(5) exit(0);
 
+			//nos::println(igris::array_view<double>(spdarr, chain.pairs.size()));
 			// Выставляем найденные скорости прилинкованным 
 			// сервам.
 			for (int i = 0; i < chain.pairs.size(); ++i) 

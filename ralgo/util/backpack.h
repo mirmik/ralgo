@@ -67,6 +67,30 @@ namespace ralgo
 			}
 		}
 	}
+
+		template <class T, class Alg>
+	void very_naive_backpack
+	(
+	    T* coords,
+	    const Alg& target,
+	    Alg* vectors,
+	    int dim
+	)
+	{
+		float vnorms[dim];
+		Alg vnormalized[dim];
+
+		for (int i = 0; i < dim; ++i) {
+			vnorms[i] = vectors[i].norm();
+			vnormalized[i] = vectors[i] / vnorms[i]; 
+		}
+
+		for (int i = 0; i < dim; ++i) 
+		{
+			coords[i] = target.dot(vnormalized[i]);
+		}
+	}
+
 }
 
 #endif
