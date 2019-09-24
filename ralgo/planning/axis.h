@@ -7,6 +7,8 @@
 #include <igris/event/delegate.h>
 #include <igris/math.h>
 
+#include <limits>
+
 namespace ralgo
 {
 	enum stop_pattern
@@ -46,8 +48,8 @@ namespace ralgo
 
 		igris::delegate<void> trajectory_finish_signal;
 
-		P backward_limit = 0;
-		P forward_limit = 0;
+		P backward_limit = std::numeric_limits<P>::lowest();
+		P forward_limit = std::numeric_limits<P>::max();
 
 		axis_controller * mirror = nullptr;
 		P mirror_reference = 0;
@@ -187,6 +189,11 @@ namespace ralgo
 			attime(ralgo::discrete_time(), pos, spd);
 
 			return pos;
+		}
+
+		ssize_t print_to(nos::ostream& os) const
+		{
+			return nos::fprint_to(os, "axis_controller");
 		}
 	};
 }
