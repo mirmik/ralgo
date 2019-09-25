@@ -9,24 +9,6 @@
 
 namespace ralgo
 {
-	template <typename T>
-	class vector_view 
-	{
-		T* dat;
-		size_t siz;
-
-	public:
-		vector_view(T* dat, size_t siz) : dat(dat), siz(siz) {}
-
-		T* data() { return dat; }
-		size_t size() { return siz; }
-
-		T*             begin()       { return dat; } 
-		T*             end()         { return dat + siz; }
-		const T*       begin() const { return dat; } 
-		const T* const end()   const { return dat + siz; }
-	};
-
 	namespace vecops
 	{
 		template<class V>
@@ -187,7 +169,7 @@ namespace ralgo
 			}
 
 			template <class V> void clean(V& v) { 
-				elementwise(v, [](auto& a){a=decltype(a)();}); }
+				elementwise(v, [](auto& a){return typename V::value_type();}); }
 
 			template <class V, class S> V& add(V& vec, S m) { for (auto& val : vec) val += m; return vec; }
 			template <class V, class S> V& sub(V& vec, S m) { for (auto& val : vec) val -= m; return vec; }

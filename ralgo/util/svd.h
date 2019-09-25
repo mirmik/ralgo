@@ -3,11 +3,15 @@
 
 #include <limits>
 #include <ralgo/vecops.h>
-
+#include <ralgo/matops.h>
+#include <ralgo/util/math.h>
+#include <ralgo/fault.h>
 // Based on numerical recipes.
 //Attention Row Order.
 
-namespace malgo
+#include <nos/print.h>
+
+namespace ralgo
 {
 
 
@@ -21,26 +25,31 @@ namespace malgo
 		T  eps;
 		T  tsh;
 
-		template<class MA> 
-		SVD(const MA & a, MU& u, MV& v, V& w) : 
-			m(a.size1()), n(a.size2()), // берём размерность. 
+		template<class MA>
+		SVD(const MA & a, MU& u, MV& v, V& w) :
+			m(a.size1()), n(a.size2()), // берём размерность.
 			u(u), v(v), w(w)
 			//u(a), v(n, n), w(n)
 		{
-			if (u.size1() != a.size1() 
-				|| u.size2() != a.size2()
-				|| v.size1() != n 
-				|| v.size2() != n
-				|| w.size() != n) 
+			if (u.size1() != a.size1()
+			        || u.size2() != a.size2()
+			        || v.size1() != n
+			        || v.size2() != n
+			        || w.size() != n)
+				ralgo::fault("incompatible matrices");
 
-			//ralgo::vecops::copy(u, a); // Копируем данные.
-			u = a; // Копируем данные.
+				//ralgo::vecops::copy(u, a); // Копируем данные.
+			ralgo::matops::copy(u, a); // Копируем данные.
 			ralgo::vecops::inplace::clean(v);
 			ralgo::vecops::inplace::clean(w);
 
 			eps = std::numeric_limits<T>::epsilon();
-			//decompose();
-			//reorder();
+
+			decompose();
+			
+			nos::print_matrix(u);
+
+			reorder();
 			tsh = 0.5 * sqrt(m + n + 1.) * w[0] * eps;
 		}
 
@@ -50,11 +59,12 @@ namespace malgo
 			decompose();
 			reorder();
 			tsh = 0.5 * sqrt(m + n + 1.) * w[0] * eps;
-		}
+		}*/
 
-		template<class A, class B> void solve(const vroot<A> &b, vroot<B> &x, type_t<M> thresh = -1.);
-		void solve(const mroot<M> &b, mroot<M> &x, type_t<M> thresh = -1.);
-
+		template<class A, class B> 
+		void solve(const A &b, B &x, T thresh = -1.);
+		//void solve(const mroot<M> &b, mroot<M> &x, type_t<M> thresh = -1.);
+		/*
 		int 			rank(type_t<M> thresh = -1.);
 		int 			nullity(type_t<M> thresh = -1.);
 		matrix_t<M> 	range(type_t<M> thresh = -1.);
@@ -64,20 +74,27 @@ namespace malgo
 		{
 			return (w[0] <= 0. || w[n - 1] <= 0.) ? 0. : w[n - 1] / w[0];
 		}
-
+		*/
 		void decompose();
 		void reorder();
-		type_t<M> pythag(const type_t<M> a, const type_t<M> b);*/
+
+		T pythag(const T a, const T b)
+		{
+			T absa = abs(a), absb = abs(b);
+			return (absa > absb ? absa * sqrt(1.0 + ralgo::sqr(absb / absa)) :
+			        (absb == 0.0 ? 0.0 : absb * sqrt(1.0 + ralgo::sqr(absa / absb))));
+		}
 	};
-	/*
-	template<class M>
+	
+	template<class T, class MU, class MV, class V>
 	template<class A, class B>
-	void SVD<M>::solve(const vroot<A> &b, vroot<B> &x, type_t<M> thresh)
+	void SVD<T, MU, MV, V>::solve(const A &b, B &x, T thresh)
 	{
 		int i, j, jj;
-		type_t<M> s;
-		if (b.size() != m || x.size() != n) throw("SVD::solve bad sizes");
-		vector_t<M> tmp(n);
+		T s;
+		if (b.size() != m || x.size() != n) ralgo::fault("SVD::solve bad sizes");
+		//vector_t<M> tmp(n);
+		T tmp[n];
 		tsh = (thresh >= 0. ? thresh : 0.5 * sqrt(m + n + 1.) * w[0] * eps);
 		for (j = 0; j < n; j++)
 		{
@@ -96,7 +113,7 @@ namespace malgo
 			x[j] = s;
 		}
 	}
-
+/*
 	template <typename M>
 	void SVD<M>::solve(const mroot<M> &b, mroot<M> &x, type_t<M> thresh)
 	{
@@ -161,14 +178,16 @@ namespace malgo
 		}
 		return nullsp;
 	}
-
-	template <typename M>
-	void SVD<M>::decompose()
+	*/
+	template <class T, class MU, class MV, class V>
+	void SVD<T, MU, MV, V>::decompose()
 	{
 		bool flag;
 		int i, its, j, jj, k, l, nm;
-		type_t<M> anorm, c, f, g, h, s, scale, x, y, z;
-		vector_t<M> rv1(n);
+		T anorm, c, f, g, h, s, scale, x, y, z;
+		//vector_t<M> rv1(n);
+		T rv1[n];
+
 		g = scale = anorm = 0.0;
 		for (i = 0; i < n; i++)
 		{
@@ -186,7 +205,7 @@ namespace malgo
 						s += u[k][i] * u[k][i];
 					}
 					f = u[i][i];
-					g = -malgo::sign(sqrt(s), f);
+					g = -ralgo::sign(sqrt(s), f);
 					h = f * g - s;
 					u[i][i] = f - g;
 					for (j = l - 1; j < n; j++)
@@ -211,7 +230,7 @@ namespace malgo
 						s += u[i][k] * u[i][k];
 					}
 					f = u[i][l - 1];
-					g = -malgo::sign(sqrt(s), f);
+					g = -ralgo::sign(sqrt(s), f);
 					h = f * g - s;
 					u[i][l - 1] = f - g;
 					for (k = l - 1; k < n; k++) rv1[k] = u[i][k] / h;
@@ -223,8 +242,9 @@ namespace malgo
 					for (k = l - 1; k < n; k++) u[i][k] *= scale;
 				}
 			}
-			anorm = malgo::max(anorm, (abs(w[i]) + abs(rv1[i])));
+			anorm = ralgo::max(anorm, (abs(w[i]) + abs(rv1[i])));
 		}
+
 		for (i = n - 1; i >= 0; i--)
 		{
 			if (i < n - 1)
@@ -245,7 +265,8 @@ namespace malgo
 			g = rv1[i];
 			l = i;
 		}
-		for (i = malgo::min(m, n) - 1; i >= 0; i--)
+
+		for (i = ralgo::min(m, n) - 1; i >= 0; i--)
 		{
 			l = i + 1;
 			g = w[i];
@@ -313,7 +334,8 @@ namespace malgo
 					}
 					break;
 				}
-				if (its == 29) throw("no convergence in 30 svdcmp iterations");
+				if (its == 29) 
+					ralgo::fault("no convergence in 30 svdcmp iterations");
 				x = w[l];
 				nm = k - 1;
 				y = w[nm];
@@ -321,7 +343,7 @@ namespace malgo
 				h = rv1[k];
 				f = ((y - z) * (y + z) + (g - h) * (g + h)) / (2.0 * h * y);
 				g = pythag(f, 1.0);
-				f = ((x - z) * (x + z) + h * ((y / (f + malgo::sign(g, f))) - h)) / x;
+				f = ((x - z) * (x + z) + h * ((y / (f + ralgo::sign(g, f))) - h)) / x;
 				c = s = 1.0;
 				for (j = l; j <= nm; j++)
 				{
@@ -370,12 +392,14 @@ namespace malgo
 		}
 	}
 
-	template <typename M>
-	void SVD<M>::reorder()
+	template <class T, class MU, class MV, class V>
+	void SVD<T,MU,MV,V>::reorder()
 	{
 		int i, j, k, s, inc = 1;
-		type_t<M> sw;
-		vector_t<M> su(m), sv(n);
+		T sw;
+		//vector_t<M> su(m), sv(n);
+		T su[m];
+		T sv[n];
 		do { inc *= 3; inc++; }
 		while (inc <= n);
 		do
@@ -415,13 +439,15 @@ namespace malgo
 		}
 	}
 
-	template <typename M>
-	type_t<M> SVD<M>::pythag(const type_t<M> a, const type_t<M> b)
+
+
+	template <class MA, class MU, class MV, class V>
+	SVD<typename MA::value_type, MU, MV, V>
+	make_SVD(const MA & a, MU& u, MV& v, V& w)
 	{
-		type_t<M> absa = abs(a), absb = abs(b);
-		return (absa > absb ? absa * sqrt(1.0 + malgo::sqr(absb / absa)) :
-		        (absb == 0.0 ? 0.0 : absb * sqrt(1.0 + malgo::sqr(absa / absb))));
-	}*/
+		return SVD<typename MA::value_type, MU, MV, V>(a, u, v, w);
+	}
 }
+
 
 #endif

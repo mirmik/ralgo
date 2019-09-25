@@ -4,10 +4,11 @@ import licant
 
 licant.include("linalg-v3")
 licant.include("ralgo")
+licant.include("malgo")
 
 licant.cxx_application("target",
 	sources = ["main.cpp"],
-	mdepends = ["ralgo"],
+	mdepends = ["ralgo", "malgo"],
 	libs = ["nos", "igris"]
 )
 

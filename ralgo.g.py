@@ -3,6 +3,9 @@ import licant
 licant.module("ralgo.include",
 	include_paths=["."])
 
+licant.module("ralgo.fault", "exception",
+	sources=["ralgo/fault_exception.cpp"], 
+	default=True)
 
 licant.module("ralgo",
 	sources=[
@@ -19,5 +22,7 @@ licant.module("ralgo",
 		#"igris.dprint", 
 		#"malgo", 
 		#("gxx.dprint", "__none__")
+
+		"ralgo.fault"
 	],
 )

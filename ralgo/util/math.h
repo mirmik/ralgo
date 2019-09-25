@@ -12,9 +12,34 @@ namespace ralgo
 		return val < -zone ? val : val > zone ? val : val < 0 ? -zone : zone;
 	}
 
-	template <class T> inline constexpr T abs(const T &x)
+	template <class T> constexpr T abs(const T &x)
 	{
 		return x > 0 ? x : -x;
+	}
+
+	template <typename A> constexpr A max(A a, A b)
+	{
+		return a > b ? a : b;
+	}
+	
+	template <typename A> constexpr A min(A a, A b)
+	{
+		return a < b ? a : b;
+	}
+	
+	template <typename A> constexpr void swap(A& a, A& b)
+	{
+		A tmp = a; a = b; b = tmp;
+	}
+
+	template <class A, class B> constexpr A sign(const A& mag, const B& sign)
+	{
+		return sign >= 0 ? abs(mag) : -abs(mag);
+	}
+
+	template <class A> constexpr A sqr(const A& a)
+	{
+		return a * a;
 	}
 } // namespace ralgo
 
