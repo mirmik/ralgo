@@ -8,7 +8,7 @@
 #include <ralgo/signal/convolution.h>
 #include <ralgo/signal/signal.h>
 
-#include <ralgo/kinematics/link.h>
+#include <ralgo/cynematic/link.h>
 
 #include <igris/math/deg.h>
 
