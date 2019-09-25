@@ -4,6 +4,8 @@
 #include <nos/trace.h>
 #include <igris/util/iteration_counter.h>
 
+#include <ralgo/linalg/solve.h>
+
 namespace ralgo
 {
 	template <class T, class Alg>
@@ -91,6 +93,28 @@ namespace ralgo
 		}
 	}
 
+	template <class T, class Alg>
+	void svd_backpack(    
+		T* coords,
+	    const Alg& target,
+	    Alg* vectors,
+	    int count_of_vectors
+	) 
+	{
+		double result[count_of_vectors];
+
+		// Размер вектора целей.
+		auto tsize = target.size();
+
+		T matdata[tsize * count_of_vectors];
+		ralgo::matrix_view mat(matdata, count_of_vectors, tsize);
+
+		ralgo::matops::copy_from_cols(mat, vectors, count_of_vectors);
+
+		// Нагрузка на стэк.
+		ralgo::solve_linear_equation_system(result, mat, target);
+		//auto svd = ralgo::make_SVD(mat);
+	};
 }
 
 #endif

@@ -12,6 +12,8 @@ namespace ralgo
 		size_t n;
 
 	public:
+		using value_type = T;
+
 		vector_view(T* dat, size_t n) : dat(dat), n(n) {}
 
 		T& operator[](int i) { return *(dat+i); }
