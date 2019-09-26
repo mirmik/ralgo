@@ -11,7 +11,7 @@ licant.include("igris")
 licant.cxx_application("target",
 	sources=["main.cpp"],
 	mdepends=[
-		"linalg-v3",
+		"linalg",
 		"ralgo"
 	]
 )

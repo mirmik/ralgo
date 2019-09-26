@@ -10,7 +10,7 @@ import licant
 
 licant.include("nos", local_tunel=("build/nos", "nos.g.py"))
 licant.include("igris", local_tunel=("build/igris", "igris.g.py"))
-licant.include("linalg-v3", local_tunel=("build/linalg-v3", "linalg.g.py"))
+licant.include("linalg", local_tunel=("build/linalg", "linalg.g.py"))
 licant.include("malgo", local_tunel=("build/malgo", "malgo.g.py"))
 licant.include("ralgo", "ralgo.g.py")
 

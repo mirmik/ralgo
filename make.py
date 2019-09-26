@@ -7,7 +7,7 @@ import licant
 
 licant.include("igris")
 licant.include("nos")
-licant.include("linalg-v3")
+licant.include("linalg")
 licant.include("malgo")
 licant.include("ralgo", "ralgo.g.py")
 

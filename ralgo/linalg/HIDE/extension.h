@@ -1,7 +1,7 @@
 #ifndef RALGO_LINALG_EXTENSION_H
 #define RALGO_LINALG_EXTENSION_H
 
-#include <linalg-v3/linalg.h>
+#include <linalg/linalg.h>
 
 namespace linalg
 {

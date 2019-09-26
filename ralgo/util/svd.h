@@ -31,12 +31,18 @@ namespace ralgo
 			u(u), v(v), w(w)
 			//u(a), v(n, n), w(n)
 		{
-			if (u.size1() != a.size1()
-			        || u.size2() != a.size2()
-			        || v.size1() != n
-			        || v.size2() != n
-			        || w.size() != n)
-				ralgo::fault("incompatible matrices");
+//			if (u.size1() != a.size1()
+//			        || u.size2() != a.size2()
+//			        || v.size1() != n
+//			        || v.size2() != n
+//			        || w.size() != n)
+//				ralgo::fault("incompatible matrices");
+
+			assert(u.size1() == m);
+			assert(u.size2() == n);
+			assert(v.size1() == n);
+			assert(v.size2() == n);
+			assert(w.size() == n);
 
 				//ralgo::vecops::copy(u, a); // Копируем данные.
 			ralgo::matops::copy(u, a); // Копируем данные.
@@ -47,8 +53,6 @@ namespace ralgo
 
 			decompose();
 			
-			nos::print_matrix(u);
-
 			reorder();
 			tsh = 0.5 * sqrt(m + n + 1.) * w[0] * eps;
 		}

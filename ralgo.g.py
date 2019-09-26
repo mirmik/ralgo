@@ -4,7 +4,11 @@ licant.module("ralgo.include",
 	include_paths=["."])
 
 licant.module("ralgo.fault", "exception",
-	sources=["ralgo/fault_exception.cpp"], 
+	sources=["ralgo/fault-exception.cpp"], 
+	default=True)
+
+licant.module("ralgo.fault", "abort",
+	sources=["ralgo/fault-abort.cpp"], 
 	default=True)
 
 licant.module("ralgo",
@@ -17,7 +21,7 @@ licant.module("ralgo",
 	],
 	include_paths=["."],
 	mdepends=[
-		#"linalg-v3", 
+		#"linalg", 
 		#"nos", 
 		#"igris.dprint", 
 		#"malgo", 

@@ -2,7 +2,7 @@
 
 import licant
 
-licant.include("linalg-v3")
+licant.include("linalg")
 licant.include("ralgo")
 
 licant.cxx_application("target",

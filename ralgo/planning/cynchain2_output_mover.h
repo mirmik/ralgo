@@ -83,7 +83,7 @@ namespace ralgo
 			//ralgo::gradient_backpack<double, rabbit::screw2<double>>(
 			//	spdarr, dtarget, 
 			//	dsenses, chain.pairs.size());
-			ralgo::very_naive_backpack<double, rabbit::screw2<double>>(
+			ralgo::svd_backpack<double, rabbit::screw2<double>>(
 				spdarr, dtarget, 
 				dsenses, chain.pairs.size());
 

@@ -1,26 +1,21 @@
-#include <ralgo/matrix.h>
-#include <ralgo/util/svd.h>
-#include <ralgo/vecops.h>
-
-#include <nos/print.h>
-#include <vector>
-
-#include <malgo/nrecipes/svd.h>
 #include <ralgo/util/backpack.h>
-#include <ralgo/linalg/solve.h>
+#include <rabbit/space/screw.h>
 
 int main()
 {	
-	double a[3*3] = { 1,1,1, 1,8,3, 1,2,3 };
-	ralgo::matrix_view A(a, 3, 3);
+	rabbit::screw2<double> arr[3] = 
+	{
+		{1, {4,2}},
+		{9, {1,5}},
+		{66, {8,5}}
+	};
 
-	double b[3] = {1,1,1};
-	ralgo::vector_view<double> B(b, 3);
+	rabbit::screw2<double> t{66, {8,5}};
 
-	double x[3];
-	ralgo::vector_view<double> X(x, 3);
+	double coords[3];
 
-	ralgo::solve_linear_equation_system(X, A, B);
+	ralgo::svd_backpack(coords, t, arr, 3);
 
-	nos::print_list(X);
+	for (auto a : coords)
+		nos::println(a);
 }

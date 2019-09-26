@@ -40,6 +40,14 @@ namespace ralgo
 		{
 			this->followed = tgt;
 		}
+
+		void restore_control_model() 
+		{
+			auto realpos = drv->current_position();
+			auto mirrpos = followed->current_position();
+
+			ctr.set_current_position(realpos - mirrpos);
+		}
 	};
 }
 
