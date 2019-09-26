@@ -1,7 +1,7 @@
 #ifndef MADGWICK_AHRS_H_
 #define MADGWICK_AHRS_H_
 
-#include <linalg-v3/linalg.h>
+#include <linalg/linalg.h>
 #include <math.h>
 
 #include <igris/math/fast_invsqrt.h>
@@ -19,7 +19,7 @@ namespace ralgo
     public:
         madgwick();
 
-        const linalg::quat<float>& quat() { return q; };
+        const linalg::vec<float,4>& quat() { return q; };
         
         void reset();
 
@@ -47,7 +47,7 @@ namespace ralgo
         volatile float sampleFreq;
         volatile float invSampleFreq;
 
-        linalg::quat<float> q;
+        linalg::vec<float,4> q;
 
         //volatile float q0 = 1.0f;
         //volatile float q1 = 0.0f;

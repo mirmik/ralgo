@@ -5,7 +5,7 @@ import licant
 
 licant.include("igris")
 licant.include("nos")
-licant.include("linalg-v3")
+licant.include("linalg")
 licant.include("malgo")
 licant.include("ralgo")
 
@@ -14,7 +14,7 @@ licant.cxx_application("target",
 	mdepends=[
 		"ralgo", 
 		"nos", 
-		"linalg-v3",
+		"linalg",
 		"igris.dprint"
 	]
 )

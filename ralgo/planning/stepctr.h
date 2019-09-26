@@ -33,12 +33,12 @@ namespace ralgo
 		//stepctr_server * parent;
 
 	public:
-		float set_gear(float mul, float ticks_per_timeunit) 
+		float set_gear(float mul, float ticks_per_second/*ticks_per_timeunit*/) 
 		{
 			// Учитываем модификатор времени.
 			position_multiplier = mul;
 			speed_multiplier = mul 
-				/ ticks_per_timeunit 
+				/ ticks_per_second 
 				* ralgo::discrete_time_frequency();
 		}
 

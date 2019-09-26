@@ -1,5 +1,5 @@
-#include <linalg-v3/linalg.h>
-#include <linalg-v3/linalg-ext.h>
+#include <linalg/linalg.h>
+#include <linalg/linalg-ext.h>
 #include <igris/math/deg.h>
 #include <nos/print.h>
 

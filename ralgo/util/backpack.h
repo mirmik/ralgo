@@ -101,19 +101,19 @@ namespace ralgo
 	    int count_of_vectors
 	) 
 	{
-		double result[count_of_vectors];
+		//double result[count_of_vectors];
+		ralgo::vector_view<T> result(coords, count_of_vectors);
 
 		// Размер вектора целей.
 		auto tsize = target.size();
 
 		T matdata[tsize * count_of_vectors];
-		ralgo::matrix_view mat(matdata, count_of_vectors, tsize);
+		ralgo::matrix_view<T> mat(matdata, tsize, count_of_vectors);
 
 		ralgo::matops::copy_from_cols(mat, vectors, count_of_vectors);
 
 		// Нагрузка на стэк.
 		ralgo::solve_linear_equation_system(result, mat, target);
-		//auto svd = ralgo::make_SVD(mat);
 	};
 }
 

@@ -7,11 +7,11 @@ licant.include("ralgo")
 licant.include("rabbit")
 licant.include("nos")
 licant.include("igris")
-licant.include("linalg-v3")
+licant.include("linalg")
 
 licant.glbfunc.genos_firmware(
 	sources=["main.cpp"],
-	mdepends=["ralgo", "linalg-v3", "rabbit", "nos", "igris"]
+	mdepends=["ralgo", "linalg", "rabbit", "nos", "igris"]
 )
 
 licant.ex("firmware")

@@ -17,7 +17,7 @@ namespace ralgo
 
     void madgwick::reset()
     {
-        q = linalg::identity;
+        q = {0,0,0,1};
     }
 
     /*void madgwick::readQuaternions(float *_q0, float *_q1, float *_q2, float *_q3) {

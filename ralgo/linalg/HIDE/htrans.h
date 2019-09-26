@@ -1,8 +1,8 @@
 #ifndef RALGO_LINALG_HTRANS_H
 #define RALGO_LINALG_HTRANS_H
 
-#include <linalg-v3/linalg.h>
-#include <linalg-v3/linalg-ext.h>
+#include <linalg/linalg.h>
+#include <linalg/linalg-ext.h>
 
 #include <ralgo/linalg/uvec.h>
 
