@@ -2,7 +2,8 @@
 #define RALGO_MSERVO_CONTROLLER_H
 
 #include <limits>
-
+#include <igris/util/bug.h>
+#include <igris/sync/syslock.h>
 #include <ralgo/planning/phase_driver.h>
 
 namespace ralgo
