@@ -121,6 +121,13 @@ namespace ralgo
 
 		}*/
 
+
+		void absmove(
+			P tgtpos, int64_t tim)
+		{
+			absmove_tstamp(tgtpos, ralgo::discrete_time() + tim);
+		}
+
 		void absmove_tstamp(
 			P tgtpos, int64_t tgttim)
 		{
