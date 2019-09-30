@@ -1,6 +1,5 @@
 #ifndef RALGO_PLANNING_AXIS_H
 #define RALGO_PLANNING_AXIS_H
-
 #include <ralgo/planning/traj1d.h>
 #include <ralgo/planning/disctime.h>
 
@@ -54,19 +53,20 @@ namespace ralgo
 		axis_controller * mirror = nullptr;
 		P mirror_reference = 0;
 
-		axis_operation_status opstat;
+		axis_operation_status opstat; 
 
 	public:
-		void enable_mirror_mode(axis_controller * mirror, P reference) 
-		{
-			this->mirror = mirror;
-			this->mirror_reference = reference;
-		}
+		float control_multiplier = 1;
+		//void enable_mirror_mode(axis_controller * mirror, P reference) 
+		//{
+		//	this->mirror = mirror;
+		//	this->mirror_reference = reference;
+		//}
 
 		void set_limits(P back, P forw) 
 		{
-			backward_limit = back;
-			forward_limit = forw;
+			backward_limit = back * control_multiplier;
+			forward_limit = forw * control_multiplier;
 		}
 
 		axis_operation_status status() 
@@ -82,9 +82,9 @@ namespace ralgo
 			}
 		} 
 
-		void incmove_tstamp(P incpos, int64_t tstamp)
-		{
-		}
+		//void incmove_tstamp(P incpos, int64_t tstamp)
+		//{
+		//}
 
 		void set_current_position(P pos) 
 		{
@@ -92,6 +92,7 @@ namespace ralgo
 			//PRINT(pos);
 
 			//exit(0);
+			pos = pos;
 
 			auto time = ralgo::discrete_time();
 		
@@ -116,6 +117,21 @@ namespace ralgo
 			return current_position(ralgo::discrete_time());
 		}
 
+		P control_position(int64_t time) 
+		{
+			return current_position() / control_multiplier;
+		}
+
+		P control_position() 
+		{
+			return current_position(ralgo::discrete_time()) / control_multiplier;
+		}
+
+		void set_control_position(P pos) 
+		{
+			set_current_position(pos * control_multiplier);
+		}
+
 		/*void incmove(P pulses, V speed)
 		{
 
@@ -125,22 +141,42 @@ namespace ralgo
 		void absmove(
 			P tgtpos, int64_t tim)
 		{
-			absmove_tstamp(tgtpos, ralgo::discrete_time() + tim);
+			tgtpos = tgtpos * control_multiplier;
+			_absmove_tstamp(tgtpos, ralgo::discrete_time() + tim);
 		}
 
-		void absmove_tstamp(
+		void absmove_by_speed(P tgtpos, float spd) 
+		{
+			tgtpos = tgtpos * control_multiplier;
+			_absmove_by_speed(tgtpos, spd * control_multiplier);
+		}
+
+		void _absmove_by_speed(
+			P tgtpos, float spd)
+		{
+			auto cpos = current_position();
+			auto mpos = fabs(tgtpos - cpos);
+			spd = fabs(spd);
+			_absmove_tstamp(
+				tgtpos, 
+				ralgo::discrete_time() 
+					+ (mpos / spd) * ralgo::discrete_time_frequency());
+		}
+
+		void _absmove_tstamp(
 			P tgtpos, int64_t tgttim)
 		{
+
 			auto curtim = ralgo::discrete_time();
 			P curpos;
 			V curspd;
 
 			attime(curtim, curpos, curspd);			
 
-			absmove_tstamp(curpos, curtim, tgtpos, tgttim);
+			_absmove_tstamp(curpos, curtim, tgtpos, tgttim);
 		}
 
-		void absmove_tstamp(
+		void _absmove_tstamp(
 			P curpos, int64_t curtim, P tgtpos, int64_t tgttim)
 		{
 			tgtpos = igris::clamp(tgtpos, backward_limit, forward_limit);
@@ -188,7 +224,7 @@ namespace ralgo
 
 		}
 
-		float control_position_unit() 
+		/*float control_position_unit() 
 		{
 			P pos;
 			V spd;
@@ -196,7 +232,7 @@ namespace ralgo
 			attime(ralgo::discrete_time(), pos, spd);
 
 			return pos;
-		}
+		}*/
 
 		ssize_t print_to(nos::ostream& os) const
 		{

@@ -64,12 +64,17 @@ namespace ralgo
 			rabbit::screw2<double> dsenses[chain.pairs.size()];
 			//(void) senses;
 			double spdarr[chain.pairs.size()];
-			double mspdarr[chain.pairs.size()];
 			memset(spdarr, 0, sizeof(spdarr));
 
+			//Можно целевую позицию переводить в связный базис, а чувствительность
+			// брать по связному базису.
+			// Тогда вычитание не понадобится. 
+			// И перевод чувствительности в основной базис не нужен будет тоже.
 			chain.sensivity(senses, chain.chain[0]);
 			rabbit::screw2<float> target = 
 				spd + (pos - location()) * compensation_koefficient; 	
+
+			//nos::println(pos, location(), pos - location(), target);
 
 			rabbit::screw2<double> dtarget = target;
 
@@ -80,29 +85,10 @@ namespace ralgo
 
 			// Поиск скоростей звеньев удовлетворяющих заданному
 			// управлению.
-			//ralgo::gradient_backpack<double, rabbit::screw2<double>>(
-			//	spdarr, dtarget, 
-			//	dsenses, chain.pairs.size());
 			ralgo::svd_backpack<double, rabbit::screw2<double>>(
 				spdarr, dtarget, 
 				dsenses, chain.pairs.size());
 
-
-			for (int i = 0; i < chain.pairs.size(); ++i) 
-			{
-				mspdarr[i] = spdarr[i] * 1000000;
-			}
-//			PRINT(pos);
-//			PRINT(location());
-//			PRINT(spd);
-//			PRINT(pos);
-//			PRINT(location());
-//			PRINT(target);
-//			PRINT(igris::array_view<double>(mspdarr, chain.pairs.size()));
-
-			//do_after_iteration(5) exit(0);
-
-			//nos::println(igris::array_view<double>(spdarr, chain.pairs.size()));
 			// Выставляем найденные скорости прилинкованным 
 			// сервам.
 			for (int i = 0; i < chain.pairs.size(); ++i) 
