@@ -11,6 +11,10 @@ namespace ralgo
 		ralgo::phase_driver * drv;
 
 	public:
+		float mirror_add = 0;
+		float mirror_mul = 1;
+
+	public:
 		ralgo::axis_controller<float,float> ctr;
 
 		void serve() 
@@ -25,6 +29,9 @@ namespace ralgo
 
 			followed->attime(time, followed_pos, followed_spd);
 			ctr.attime(time, pos, spd);
+
+			followed_pos = followed_pos * mirror_mul + mirror_add;
+			followed_spd = followed_spd * mirror_mul;
 
 			drv->set_phase(
 				pos + followed_pos,
@@ -45,6 +52,8 @@ namespace ralgo
 		{
 			auto realpos = drv->current_position();
 			auto mirrpos = followed->current_position();
+
+			mirrpos = mirrpos / mirror_mul - mirror_add;
 
 			ctr.set_current_position(realpos - mirrpos);
 		}
