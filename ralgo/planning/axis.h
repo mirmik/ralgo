@@ -39,19 +39,27 @@ namespace ralgo
 		virtual void stop(ralgo::stop_pattern stpcode);
 	}*/
 
+	static inline bool always_true(auto a, auto b) 
+	{
+		return true;
+	}
+
 	template <class P, class V = float>
 	class axis_controller
 	{
 		ralgo::traj1d_line<P, V> line_traj;
 		ralgo::traj1d<P, V> * current_trajectory = nullptr;
 
-		igris::delegate<void> trajectory_finish_signal;
+		//igris::delegate<void> trajectory_finish_signal;
 
 		P backward_limit = std::numeric_limits<P>::lowest();
 		P forward_limit = std::numeric_limits<P>::max();
 
-		axis_controller * mirror = nullptr;
-		P mirror_reference = 0;
+		igris::delegate<bool, axis_controller&, P> 
+			task_checker = always_true;
+
+		//axis_controller * mirror = nullptr;
+		//P mirror_reference = 0;
 
 		axis_operation_status opstat; 
 
@@ -154,6 +162,9 @@ namespace ralgo
 		void _absmove_by_speed(
 			P tgtpos, float spd)
 		{
+			if (!task_checker(*this,  tgtpos))
+				return;
+
 			auto cpos = current_position();
 			auto mpos = fabs(tgtpos - cpos);
 			spd = fabs(spd);
@@ -212,7 +223,7 @@ namespace ralgo
 				
 				if (sts) 
 				{
-					trajectory_finish_signal.emit();
+					//trajectory_finish_signal.emit();
 				}
 			}
 
