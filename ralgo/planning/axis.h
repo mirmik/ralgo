@@ -1,7 +1,9 @@
 #ifndef RALGO_PLANNING_AXIS_H
 #define RALGO_PLANNING_AXIS_H
+
 #include <ralgo/planning/traj1d.h>
 #include <ralgo/planning/disctime.h>
+#include <ralgo/planning/axis_interface.h>
 
 #include <igris/event/delegate.h>
 #include <igris/math.h>
@@ -45,15 +47,12 @@ namespace ralgo
 	}
 
 	template <class P, class V = float>
-	class axis_controller
+	class axis_controller : public axis_interface<P,V>
 	{
 		ralgo::traj1d_line<P, V> line_traj;
 		ralgo::traj1d<P, V> * current_trajectory = nullptr;
 
 		//igris::delegate<void> trajectory_finish_signal;
-
-		P backward_limit = std::numeric_limits<P>::lowest();
-		P forward_limit = std::numeric_limits<P>::max();
 
 		igris::delegate<bool, axis_controller&, P> 
 			task_checker = always_true;

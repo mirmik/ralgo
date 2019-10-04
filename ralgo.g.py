@@ -30,3 +30,8 @@ licant.module("ralgo",
 		"ralgo.fault"
 	],
 )
+
+licant.module("ralgo.virtdevs", 
+	mdepends=["ralgo.include"],
+	sources=["ralgo/virtdevs/device.cpp"]
+)
