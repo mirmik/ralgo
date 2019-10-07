@@ -1,6 +1,8 @@
 #include <ralgo/planning/disctime.h>
 #include <chrono>
 
+#include <stdint.h>
+
 int64_t ralgo::discrete_time()
 {
 	return std::chrono::duration_cast< std::chrono::milliseconds >(
