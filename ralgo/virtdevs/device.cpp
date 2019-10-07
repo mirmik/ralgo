@@ -56,8 +56,12 @@ void virtdevs::device::alarm(std::string data)
 {
 	std::lock_guard<std::recursive_mutex> lock(mtx);
 
-	if (status == Status::Alarm)
+	if (status == Status::Alarm) 
+	{
+		if (status_string != data) 
+			update_alarm_message(data);
 		return;
+	}
 
 	else
 	{
