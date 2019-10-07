@@ -35,3 +35,6 @@ licant.module("ralgo.virtdevs",
 	mdepends=["ralgo.include"],
 	sources=["ralgo/virtdevs/device.cpp"]
 )
+
+licant.module("ralgo.disctime", "chrono-millis",
+	sources = "ralgo/disctime-chrono-millis.cpp")
