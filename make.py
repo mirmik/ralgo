@@ -20,7 +20,8 @@ install_library_path = os.path.join(install_directory_path, target)
 
 licant.cxx_shared_library("libralgo.so",
 	mdepends=[
-		"ralgo"
+		"ralgo",
+		"linalg"
 	],
 	cxx_flags="-fPIC",
 	cc_flags="-fPIC"
