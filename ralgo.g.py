@@ -37,4 +37,4 @@ licant.module("ralgo.virtdevs",
 )
 
 licant.module("ralgo.disctime", "chrono-millis",
-	sources = "ralgo/disctime-chrono-millis.cpp")
+	sources = ["ralgo/disctime-chrono-millis.cpp"])
