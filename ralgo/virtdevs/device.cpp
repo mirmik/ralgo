@@ -58,7 +58,7 @@ void virtdevs::device::alarm(std::string data)
 
 	if (status == Status::Alarm) 
 	{
-		if (status_string != data) 
+		if (m_status_string != data) 
 			update_alarm_message(data);
 		return;
 	}
@@ -66,7 +66,7 @@ void virtdevs::device::alarm(std::string data)
 	else
 	{
 		status = Status::Alarm;
-		status_string = data;
+		m_status_string = data;
 		increment_supervisors_alarm_counter();
 	}
 }
@@ -81,7 +81,7 @@ void virtdevs::device::allgood()
 	else 
 	{
 		status = Status::Ok;
-		status_string = "";
+		m_status_string = "";
 		decrement_supervisors_alarm_counter();
 	}
 }
