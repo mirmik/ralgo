@@ -8,6 +8,7 @@
 
 namespace ralgo
 {
+	// TODO Шаблонный класс. Задать тип переменной внутреннего состояния.
 	class phase_driver
 	{
 		float poskoeff;
