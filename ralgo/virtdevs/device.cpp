@@ -39,7 +39,7 @@ void virtdevs::device::decrement_supervisors_alarm_counter()
 	}
 }
 
-void virtdevs::device::add_depend_device(device * dev)
+/*void virtdevs::device::add_depend_device(device * dev)
 {
 	std::lock_guard<std::recursive_mutex> lock(mtx);
 
@@ -50,7 +50,7 @@ void virtdevs::device::add_depend_device(device * dev)
 	{}
 	else
 		alarmed_deps++;
-}
+}*/
 
 void virtdevs::device::alarm(std::string data)
 {
