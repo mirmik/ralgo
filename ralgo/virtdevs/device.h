@@ -5,127 +5,277 @@
 #include <igris/sync/syslock.h>
 #include <igris/container/array_view.h>
 
-namespace virtdevs 
+namespace virtdevs
 {
-	const std::pair<int,int> ErrorInDependDevice { -4000, 0 };
-	const std::pair<int,int> DeviceIsNotActive { -4001, 0 };
+	const std::pair<int, int> ErrorInDependDevice { -4000, 0 };
+	const std::pair<int, int> DeviceIsNotActive { -4001, 0 };
+	const std::pair<int, int> UndefinedStatus { -4002, 0 };
+	const std::pair<int, int> NoErrorStatus { 0, 0 };
 
-	enum class Status 
+	using almmsg_t = std::pair<int, int>;
+
+	struct AlarmState
 	{
-		Ok,
-		Alarm
+		std::pair<int, int> almmsg = DeviceIsNotActive;
+		bool in_alarm_state = true;
+
+		std::pair<int, int> message()
+		{
+			return almmsg;
+		}
+
+		bool is_alarmed()
+		{
+			return in_alarm_state;
+		}
+
+		void allgood() 
+		{
+			almmsg = NoErrorStatus;
+			in_alarm_state = false;
+		}
+
+		void set(bool alarmed, almmsg_t msg)
+		{
+			almmsg = msg;
+			in_alarm_state = alarmed;
+		}
 	};
 
-	// Если понадобиться сделать другой тип ошибок, 
+	// Если понадобиться сделать другой тип ошибок,
 	// сделать класс шаблонным и реализовать девайсы
 	// как наследников общего предка.
-	class device 
+	class device
 	{
-		using alarm_t = std::pair<int,int>;
-		Status status = Status::Alarm;		
+		using alarm_t = std::pair<int, int>;
+		//Status status = Status::Alarm;
+		//Status self_status = Status::Ok;
 
-		int alarmed_deps = 0;
-		alarm_t almmsg = DeviceIsNotActive;
+		int ok_deps_counter = 0;
+		AlarmState almstate;
+
+		//alarm_t almmsg = DeviceIsNotActive;
+		//alarm_t self_almmsg = DeviceIsNotActive;
 
 		device * supervisor = nullptr;
-		virtual igris::array_view<device*> dependence() = 0;
-
 		bool active = false;
 
 		const char* m_name;
-		
-	protected:
-		void recursive_alarm(device * source, std::string text);
-		void recursive_allgood();
 
-	public:
-		device(const char* name) 
-			: m_name(name) 
-		{}
+		//protected:
+		//	void recursive_alarm(device * source, std::string text);
+		//	void recursive_allgood();
 
-		const char* name() { return m_name; }
-		const char* name() const { return m_name; }
+	private:
 
-		void alarm(alarm_t almmsg);
-		void allgood();
-
-		void increment_supervisors_alarm_counter();
-		void decrement_supervisors_alarm_counter();
-
-		const alarm_t& alarm_message() { return almmsg; }
-
-		virtual void alarm_handle() 
-		{ 
-			dprln("virtdev::ALARM", name()); 
-		}
-		
-		virtual void ready_handle() 
-		{ 
-			dprln("virtdev::READY", name()); 
-		}
-
-		void reevaluate_alarm_status() 
-		{
-			int alms = 0;
-
-			system_lock();
-			for (device * dev : dependence()) 
-			{
-				if (dev->status == Status::Alarm) 
-				{
-					almmsg = ErrorInDependDevice;
-					break;
-				}
-			}	
-			system_unlock();
-
-			if (status == Status::Alarm) 
-			{
-				alarm_handle();
-			}
-		}
-
-		int take_control() 
+		int take_control()
 		{
 			system_lock();
-			for (device* dev : dependence()) 
+			for (device* dev : dependence())
 			{
-				if (dev->supervisor != nullptr || dev->active != true) 
+				if (dev->supervisor != nullptr || dev->active != true)
 				{
 					system_unlock();
 					return -1;
 				}
 			}
 
-			for (device* dev : dependence()) 
+			for (device* dev : dependence())
 			{
 				dev->supervisor = this;
-				dev->supervisor_enabled_handle();
-			}			
+				dev->supervisor_enabled_handle(this);
+			}
 			active = true;
-			system_unlock(); 
+			system_unlock();
 
-			reevaluate_alarm_status();
+			//reevaluate_alarm_status();
 			return 0;
 		}
 
-		int disable_control() 
+		int put_control()
 		{
 			system_lock();
 			active = false;
-			for (device* dev : dependence()) 
+			for (device* dev : dependence())
 			{
 				dev->supervisor = nullptr;
-				dev->supervisor_disabled_handle();
-			}			
+				dev->supervisor_disabled_handle(this);
+			}
 			system_unlock();
-		} 
+		}
+
+	public:
+		virtual igris::array_view<device*> dependence() = 0;
+
+		device(const char* name)
+			: m_name(name)
+		{}
+
+		almmsg_t alarm_message() 
+		{
+			if (!is_active())
+				return DeviceIsNotActive;
+
+			if (dependence().size() != ok_deps_counter)
+				return ErrorInDependDevice;
+
+			return almstate.almmsg; 
+		}
+
+		bool is_alarmed()
+		{
+			return !is_active()
+				   || almstate.is_alarmed()
+			       || ok_deps_counter != dependence().size();
+		}
+
+		const char* name() { return m_name; }
+		const char* name() const { return m_name; }
+
+		void alarm(almmsg_t msg)
+		{
+			if (almstate.is_alarmed() && almstate.almmsg == msg)
+				return;
+
+			almstate.set(true, msg);
+
+			alarm_handle();
+			if (supervisor)
+			{
+				supervisor->ok_deps_counter--;
+				supervisor->alarm_in_depend_device();
+			}
+		}
+
+		void allgood()
+		{
+			if ( is_alarmed() )
+			{
+				almstate.allgood();
+
+				if (is_ready()) 
+					ready_handle();
+				
+				if (supervisor) 
+				{
+					supervisor->ok_deps_counter++;
+					supervisor->allgood_in_depend_device();
+				}
+			}
+		}
+
+		int activate_device()
+		{
+			int sts;
+
+			if ( is_active() )
+				return 0;
+
+			if (sts = take_control())
+				return sts;
+
+			if (sts = activate_device_handle())
+			{
+				put_control();
+				return sts;
+			}
+
+			ok_deps_counter = 0;
+
+			for(auto d : dependence()) 
+			{
+				if (d->is_ready()) 
+				{
+					ok_deps_counter++;
+				}
+			}
+
+			return 0;
+		}
+
+		void deactivate_device()
+		{
+			if ( ! is_active() )
+				return;
+
+			if (supervisor && supervisor->is_active())
+				supervisor->deactivate_device();
+
+			put_control();
+
+			deactivate_device_handle();
+		}
+
+		virtual void supervisor_enabled_handle(device* svisor) {}
+		virtual void supervisor_disabled_handle(device* svisor) {}
+		virtual int activate_device_handle() { return 0; }
+		virtual void deactivate_device_handle() {}
+		virtual void ready_handle() {}
+		virtual void alarm_handle() {}
+
+		int is_active() { return active; }
+		int is_ready() { return is_active() && !is_alarmed(); }
+
+		void alarm_in_depend_device() 
+		{
+			alarm_handle();
+			//almstate.set(true, ErrorInDependDevice);	
+		}
+
+		void allgood_in_depend_device()
+		{
+			if (ok_deps_counter == dependence().size()
+			        && !is_alarmed())
+			{
+				ready_handle();
+			}
+		}
+
+		int get_ok_deps_counter() { return ok_deps_counter; }
+
+		/*void increment_supervisors_alarm_counter();
+		void decrement_supervisors_alarm_counter();
+
+		const alarm_t& alarm_message() { return almmsg; }
+
+		virtual void alarm_handle()
+		{
+			dprln("virtdev::ALARM", name());
+		}
+
+		virtual void ready_handle()
+		{
+			dprln("virtdev::READY", name());
+		}
+
+		void reevaluate_alarm_status()
+		{
+			int alms = 0;
+
+			system_lock();
+			for (device * dev : dependence())
+			{
+				if (dev->status == Status::Alarm)
+				{
+					almmsg = ErrorInDependDevice;
+					break;
+				}
+			}
+			system_unlock();
+
+			if (status == Status::Alarm)
+			{
+				alarm_handle();
+			}
+		}
 
 		virtual void supervisor_enabled_handle() { dprln(name(), ": svisor enabled"); }
 		virtual void supervisor_disabled_handle() { dprln(name(), ": svisor disabled"); }
 
 		bool is_device_active() { return active; }
+		};
+		}
+		*/
 	};
 }
-
 #endif

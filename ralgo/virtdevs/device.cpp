@@ -12,31 +12,29 @@ std::string collect_status()
 
 void virtdevs::device::increment_supervisors_alarm_counter() 
 {
-	std::lock_guard<std::recursive_mutex> lock(mtx);
-	for (auto s : supervisors) 
+	system_lock();
+	if (supervisor) 
 	{
-		s->alarmed_deps++;
-		assert(s->alarmed_deps < (int)s->supervisors.size());
-		s->increment_supervisors_alarm_counter();
-
-		s->alarm_handle();
+		s->ok_deps_counter--;
+		s->alarm_handle(ErrorInDependDevice);
 	}
+	system_unlock();
 }
 
 void virtdevs::device::decrement_supervisors_alarm_counter() 
 {
-	std::lock_guard<std::recursive_mutex> lock(mtx);
+	system_lock();
 	for (auto s : supervisors) 
 	{
-		s->alarmed_deps--;
-		assert(s->alarmed_deps >= 0);
+		s->ok_deps_counter++;
 		s->decrement_supervisors_alarm_counter();
 
-		if (s->alarmed_deps == 0) 
+		if (s->ok_deps_counter == s->get_dependence().size()) 
 		{
 			s->ready_handle();
 		}
 	}
+	system_unlock();
 }
 
 /*void virtdevs::device::add_depend_device(device * dev)
@@ -51,7 +49,7 @@ void virtdevs::device::decrement_supervisors_alarm_counter()
 	else
 		alarmed_deps++;
 }*/
-
+/*
 void virtdevs::device::alarm(std::string data)
 {
 	std::lock_guard<std::recursive_mutex> lock(mtx);
@@ -84,4 +82,4 @@ void virtdevs::device::allgood()
 		m_status_string = "";
 		decrement_supervisors_alarm_counter();
 	}
-}
+}*/
