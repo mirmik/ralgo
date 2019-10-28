@@ -2,7 +2,7 @@
 
 #include <assert.h>
 #include <mutex>
-
+/*
 static std::recursive_mutex mtx;
 
 std::string collect_status() 
@@ -35,7 +35,7 @@ void virtdevs::device::decrement_supervisors_alarm_counter()
 		}
 	}
 	system_unlock();
-}
+}*/
 
 /*void virtdevs::device::add_depend_device(device * dev)
 {

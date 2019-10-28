@@ -8,6 +8,8 @@
 #include <igris/event/delegate.h>
 #include <igris/math.h>
 
+#include <rabbit/interval.h>
+
 #include <limits>
 
 namespace ralgo
@@ -46,8 +48,8 @@ namespace ralgo
 		return true;
 	}
 
-	template <class P, class V = float>
-	class axis_controller : public axis_interface<P,V>
+	template <class ExtPos, class P, class V = float>
+	class axis_controller : public axis_interface<ExtPos, P, V>
 	{
 		ralgo::traj1d_line<P, V> line_traj;
 		ralgo::traj1d<P, V> * current_trajectory = nullptr;
@@ -62,6 +64,11 @@ namespace ralgo
 
 		axis_operation_status opstat; 
 
+		double gain = 1;
+		bool reverse = false;
+
+		rabbit::interval<P> limits_interal {0,0};
+
 	public:
 		float control_multiplier = 1;
 		//void enable_mirror_mode(axis_controller * mirror, P reference) 
@@ -72,8 +79,8 @@ namespace ralgo
 
 		void set_limits(P back, P forw) 
 		{
-			backward_limit = back * control_multiplier;
-			forward_limit = forw * control_multiplier;
+		//	backward_limit = back * control_multiplier;
+		//	forward_limit = forw * control_multiplier;
 		}
 
 		axis_operation_status status() 
@@ -189,7 +196,7 @@ namespace ralgo
 		void _absmove_tstamp(
 			P curpos, int64_t curtim, P tgtpos, int64_t tgttim)
 		{
-			tgtpos = igris::clamp(tgtpos, backward_limit, forward_limit);
+			//tgtpos = igris::clamp(tgtpos, backward_limit, forward_limit);
 
 			line_traj.reset(curpos, curtim, tgtpos, tgttim);
 

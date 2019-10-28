@@ -1,6 +1,7 @@
 #ifndef VIRTDEVS_DEVICE_H
 #define VIRTDEVS_DEVICE_H
 
+#include <utility>
 #include <igris/dprint.h>
 #include <igris/sync/syslock.h>
 #include <igris/container/array_view.h>
@@ -39,6 +40,11 @@ namespace virtdevs
 		{
 			almmsg = msg;
 			in_alarm_state = alarmed;
+		}
+
+		const char* status_string() 
+		{
+			return "undefined error";
 		}
 	};
 
@@ -232,6 +238,11 @@ namespace virtdevs
 		}
 
 		int get_ok_deps_counter() { return ok_deps_counter; }
+
+		const char* status_string() 
+		{
+			return almstate.status_string();
+		}
 
 		/*void increment_supervisors_alarm_counter();
 		void decrement_supervisors_alarm_counter();
