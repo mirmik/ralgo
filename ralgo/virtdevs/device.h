@@ -221,6 +221,7 @@ namespace virtdevs
 
 		int is_active() { return active; }
 		int is_ready() { return is_active() && !is_alarmed(); }
+		int is_controlled() { return supervisor != nullptr; }
 
 		void alarm_in_depend_device() 
 		{

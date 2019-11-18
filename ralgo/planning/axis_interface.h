@@ -8,12 +8,25 @@
 	Самые простые, часто применяемые функции, которые можно
 	добавить в прототип интерфейса для обеспечения минимального
 	набора функционала.
+
+	Реализацией axis_interface могут 
+	быть axis_controller (18.11.2019 находится в planning/axis.h),
+	который реализует логику траекторного расчёта фаз.
+
+	Прочие реализации, управляющие непосредственно, или методом сообщений.
 */
 
 namespace ralgo
 {
 	static constexpr int FORWARD = 1;
 	static constexpr int BACKWARD = -1;
+
+	enum axis_operation_status
+	{
+		STOPED,
+		MOVED,
+		CONTROLLED
+	};
 
 	template <class ExtPos, class IntPos = ExtPos,
 	          class Speed = float, class Time = int64_t>
@@ -28,7 +41,7 @@ namespace ralgo
 		IntPos _back = 0;
 
 		Time _accdcc_protector = 1000;
-		Time _accdcc = 1000;
+		Time _accdcc = 4000;
 
 		Speed _speed_protector = 1;
 		Speed _speed = 1;
@@ -47,6 +60,11 @@ namespace ralgo
 		int absmove_internal(IntPos pos) { if (!position_in_limits(pos)) return -1; return absmove_internal_unsafe(pos); }
 		virtual int absmove_internal_unsafe(IntPos pos) { BUG(); }
 
+		// RELMOVE
+		int relmove(ExtPos pos) { return relmove_internal(ext2int(pos)); }
+		int relmove_internal(IntPos pos) { if (!position_in_limits(pos)) return -1; return absmove_internal_unsafe(pos); }
+		virtual int relmove_internal_unsafe(IntPos pos) { BUG(); }
+
 		// POSITION
 		ExtPos position() { return int2ext(internal_position()); }
 		virtual IntPos internal_position() { BUG(); }
@@ -63,9 +81,9 @@ namespace ralgo
 		void set_limits(ExtPos back, ExtPos forw) { _back = ext2int(back); _forw = ext2int(forw); }
 
 		void set_backward_limit(ExtPos back) { _back = ext2int(back); }
-		void set_forwward_limit(ExtPos forw) { _forw = ext2int(forw); }
+		void set_forward_limit (ExtPos forw) { _forw = ext2int(forw); }
 		void set_backward_limit_internal(IntPos back) { _back = back; }
-		void set_forwward_limit_internal(IntPos forw) { _forw = forw; }
+		void set_forward_limit_internal (IntPos forw) { _forw = forw; }
 
 		ExtPos backward_limit() { return int2ext(_back); }
 		ExtPos forwward_limit() { return int2ext(_forw); }
@@ -84,13 +102,13 @@ namespace ralgo
 
 		// SPEED
 		virtual void set_speed(Speed spd) { _speed = protect_speed(spd); }
-		Speed speed() { return _speed; }
+		Speed setted_speed() { return _speed; }
 		Speed internal_speed() { return ext2int(_speed); }
 		Speed protect_speed(Speed spd) { if (spd > _speed_protector) return _speed_protector; else return spd; }
 
 		// ACCDCC
 		virtual void set_accdcc(Time accdcc) { _accdcc = protect_accdcc(accdcc); }
-		Time accdcc() { return _accdcc; }
+		Time setted_accdcc() { return _accdcc; }
 		Time protect_accdcc(Time accdcc) { if (accdcc < _accdcc_protector) return _accdcc_protector; else return accdcc; }
 	};
 }

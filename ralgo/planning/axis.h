@@ -12,97 +12,52 @@
 
 #include <limits>
 
+/*
+	Axis controller реализует логику траекторного расчета фаз,
+	в единицах IntPos. Используется для реализации объектов из папки 
+	planning/coordctr.
+*/
+
 namespace ralgo
 {
-	enum stop_pattern
+	template <class ExtPos, class IntPos, class Speed=float, class Time=int64_t>
+	class axis_controller : public axis_interface<ExtPos, IntPos, Speed, Time>
 	{
-		immediate,
-		smooth
-	};
-	
-	enum axis_operation_status 
-	{
-		stoped,
-		moved,
-		micromove
-	};
-
-	/**
-		Интерфейс управления осью.
-		может предствавлять локальные и удаленные интерфейсы.
-	*/
-	// TODO должен быть нешаблонным.
-	/*class axis
-	{
-	public:
-		virtual void incmove_tstamp(P pulses, int64_t tstamp);
-		virtual void incmove(P pulses, V speed);
-		virtual void absmove_tstamp(P pulses, int64_t tstamp);
-		virtual void absmove(P pulses, V speed);
-
-		virtual void stop(ralgo::stop_pattern stpcode);
-	}*/
-
-	static inline bool always_true(auto a, auto b) 
-	{
-		return true;
-	}
-
-	template <class ExtPos, class P, class V = float>
-	class axis_controller : public axis_interface<ExtPos, P, V>
-	{
-		ralgo::traj1d_line<P, V> line_traj;
-		ralgo::traj1d<P, V> * current_trajectory = nullptr;
-
-		//igris::delegate<void> trajectory_finish_signal;
-
-		igris::delegate<bool, axis_controller&, P> 
-			task_checker = always_true;
-
-		//axis_controller * mirror = nullptr;
-		//P mirror_reference = 0;
-
-		axis_operation_status opstat; 
+		ralgo::traj1d_line<IntPos, Speed> line_traj;
+		ralgo::traj1d<IntPos, Speed> * current_trajectory = nullptr;
 
 		double gain = 1;
 		bool reverse = false;
 
-		rabbit::interval<P> limits_interal {0,0};
+		rabbit::interval<IntPos> limits_interal {0,0};
 
 	public:
-		float control_multiplier = 1;
-		//void enable_mirror_mode(axis_controller * mirror, P reference) 
-		//{
-		//	this->mirror = mirror;
-		//	this->mirror_reference = reference;
-		//}
-
-		void set_limits(P back, P forw) 
-		{
-		//	backward_limit = back * control_multiplier;
-		//	forward_limit = forw * control_multiplier;
-		}
 
 		axis_operation_status status() 
 		{
+			if (this->is_controlled()) 
+			{
+				return axis_operation_status::CONTROLLED;
+			}
+
 			if (current_trajectory->is_finished(ralgo::discrete_time())) 
 			{
-				return axis_operation_status::stoped;
+				return axis_operation_status::STOPED;
 			}
 
 			else 
 			{
-				return axis_operation_status::moved;
+				return axis_operation_status::MOVED;
 			}
 		} 
 
-		//void incmove_tstamp(P incpos, int64_t tstamp)
+		//void incmove_tstamp(IntPos incpos, int64_t tstamp)
 		//{
 		//}
 
-		void set_current_position(P pos) 
+		void set_current_position(IntPos pos) 
 		{
-			//dprln("set_current_position(P pos)");
+			//dprln("set_current_position(IntPos pos)");
 			//PRINT(pos);
 
 			//exit(0);
@@ -116,60 +71,60 @@ namespace ralgo
 			current_trajectory = & line_traj;
 		}
 
-		P current_position(int64_t time) 
+		IntPos current_position(int64_t time) 
 		{
-			P pos;
-			V spd;
+			IntPos pos;
+			Speed spd;
 
 			attime(time, pos, spd);
 
 			return pos; 
 		}
 
-		P current_position() 
+		IntPos current_position() 
 		{
 			return current_position(ralgo::discrete_time());
 		}
 
-		P control_position(int64_t time) 
+/*		IntPos control_position(int64_t time) 
 		{
 			return current_position() / control_multiplier;
-		}
+		}*/
 
-		P control_position() 
+/*		IntPos control_position() 
 		{
 			return current_position(ralgo::discrete_time()) / control_multiplier;
 		}
 
-		void set_control_position(P pos) 
+		void set_control_position(IntPos pos) 
 		{
 			set_current_position(pos * control_multiplier);
-		}
+		}*/
 
-		/*void incmove(P pulses, V speed)
+		/*void incmove(IntPos pulses, Speed speed)
 		{
 
 		}*/
 
 
-		void absmove(
-			P tgtpos, int64_t tim)
+		/*void absmove(
+			IntPos tgtpos, int64_t tim)
 		{
 			tgtpos = tgtpos * control_multiplier;
 			_absmove_tstamp(tgtpos, ralgo::discrete_time() + tim);
+		}*/
+
+		int absmove_internal_unsafe(IntPos tgtpos) override 
+		{
+			return _absmove_by_speed(tgtpos, this->internal_speed());
 		}
 
-		void absmove_by_speed(P tgtpos, float spd) 
+		int _absmove_by_speed(
+			IntPos tgtpos, float spd)
 		{
-			tgtpos = tgtpos * control_multiplier;
-			_absmove_by_speed(tgtpos, spd * control_multiplier);
-		}
-
-		void _absmove_by_speed(
-			P tgtpos, float spd)
-		{
-			if (!task_checker(*this,  tgtpos))
-				return;
+			//TODO PROTECT VIRTDEV
+			//if (!task_checker(*this,  tgtpos))
+			//	return;
 
 			auto cpos = current_position();
 			auto mpos = fabs(tgtpos - cpos);
@@ -178,15 +133,17 @@ namespace ralgo
 				tgtpos, 
 				ralgo::discrete_time() 
 					+ (mpos / spd) * ralgo::discrete_time_frequency());
+
+			return 0;
 		}
 
 		void _absmove_tstamp(
-			P tgtpos, int64_t tgttim)
+			IntPos tgtpos, int64_t tgttim)
 		{
 
 			auto curtim = ralgo::discrete_time();
-			P curpos;
-			V curspd;
+			IntPos curpos;
+			Speed curspd;
 
 			attime(curtim, curpos, curspd);			
 
@@ -194,7 +151,7 @@ namespace ralgo
 		}
 
 		void _absmove_tstamp(
-			P curpos, int64_t curtim, P tgtpos, int64_t tgttim)
+			IntPos curpos, int64_t curtim, IntPos tgtpos, int64_t tgttim)
 		{
 			//tgtpos = igris::clamp(tgtpos, backward_limit, forward_limit);
 
@@ -210,18 +167,24 @@ namespace ralgo
 			current_trajectory = &line_traj;
 		}
 
-		/*void absmove(P pulses, V speed)
+		/*void absmove(IntPos pulses, Speed speed)
 		{
 
 		}*/
 
-		void stop(ralgo::stop_pattern stpcode)
+		int stop() override
 		{
+			//VIRTDEV
 
+			IntPos curpos = current_position();
+			Speed curspd = this->setted_speed();
+
+			BUG();
+			return 0;
 		}
 
 	public:
-		void attime(int64_t time, P& pos, V& spd)
+		void attime(int64_t time, IntPos& pos, Speed& spd)
 		{
 			if (current_trajectory)
 			{
@@ -243,8 +206,8 @@ namespace ralgo
 
 		/*float control_position_unit() 
 		{
-			P pos;
-			V spd;
+			IntPos pos;
+			Speed spd;
 
 			attime(ralgo::discrete_time(), pos, spd);
 
