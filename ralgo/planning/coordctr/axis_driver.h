@@ -20,7 +20,7 @@ namespace ralgo
 			float pos;
 			float spd;
 
-			attime(ralgo::discrete_time(), pos, spd);
+			this->attime(ralgo::discrete_time(), pos, spd);
 		
 			drv->set_phase(
 				pos * output_multiplier, 

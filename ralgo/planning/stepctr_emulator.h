@@ -8,6 +8,9 @@ namespace ralgo
 	class stepctr_emulator : public stepctr
 	{
 		//int64_t pos = 0;
+	public:
+
+		stepctr_emulator(const char* str) : stepctr(str) {}
 
 		void power(bool en) {}
 

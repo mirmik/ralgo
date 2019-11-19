@@ -6,6 +6,8 @@
 #include <igris/sync/syslock.h>
 #include <igris/container/array_view.h>
 
+#include <igris/datastruct/dlist.h>
+
 namespace virtdevs
 {
 	const std::pair<int, int> ErrorInDependDevice { -4000, 0 };
@@ -14,6 +16,8 @@ namespace virtdevs
 	const std::pair<int, int> NoErrorStatus { 0, 0 };
 
 	using almmsg_t = std::pair<int, int>;
+
+	extern dlist_head vitrdev_list;
 
 	struct AlarmState
 	{
@@ -53,6 +57,8 @@ namespace virtdevs
 	// как наследников общего предка.
 	class device
 	{
+		dlist_head vitrdev_list_lnk = DLIST_HEAD_INIT(vitrdev_list_lnk);
+
 		using alarm_t = std::pair<int, int>;
 		//Status status = Status::Alarm;
 		//Status self_status = Status::Ok;
@@ -115,7 +121,9 @@ namespace virtdevs
 
 		device(const char* name)
 			: m_name(name)
-		{}
+		{
+			dlist_add( &vitrdev_list_lnk, &vitrdev_list);
+		}
 
 		almmsg_t alarm_message() 
 		{

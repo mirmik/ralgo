@@ -2,6 +2,10 @@
 
 #include <assert.h>
 #include <mutex>
+
+
+dlist_head virtdevs::vitrdev_list = DLIST_HEAD_INIT(virtdevs::vitrdev_list);
+
 /*
 static std::recursive_mutex mtx;
 

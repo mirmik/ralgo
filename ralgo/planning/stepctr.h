@@ -24,7 +24,7 @@ namespace ralgo
 		// отношение командного импульса к расчетному.
 		float position_multiplier = 1;
 
-		// Позиционный мультипликатор учитывает 
+		// Скоростной мультипликатор учитывает 
 		// отношение командного импульса к расчетному 
 		// + количество тиков алгоритма за расчетную единицу времени.
 		float speed_multiplier = 1;
@@ -43,7 +43,7 @@ namespace ralgo
 				* ralgo::discrete_time_frequency();
 		}
 
-		stepctr() : ralgo::phase_driver()
+		stepctr(const char* drvname) : ralgo::phase_driver(drvname)
 		{}
 
 		int64_t drive_position() 
