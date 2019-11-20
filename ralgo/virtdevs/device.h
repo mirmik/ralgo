@@ -57,8 +57,10 @@ namespace virtdevs
 	// как наследников общего предка.
 	class device
 	{
+	public:
 		dlist_head vitrdev_list_lnk = DLIST_HEAD_INIT(vitrdev_list_lnk);
 
+	private:
 		using alarm_t = std::pair<int, int>;
 		//Status status = Status::Alarm;
 		//Status self_status = Status::Ok;
