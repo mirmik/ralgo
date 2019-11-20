@@ -11,14 +11,28 @@ namespace ralgo
 		: public ralgo::axis_controller<float, float>
 	{};
 
-	class xyalpha_coordinate_controller : public cynchain2_output_mover
+	class xyalpha_coordinate_controller 
+		: public cynchain2_output_mover, public virtdevs::device
 	{
 	public:
 		xyalpha_coordinate_controller_axis x_axis;
 		xyalpha_coordinate_controller_axis y_axis;
 		xyalpha_coordinate_controller_axis a_axis;
 
+		virtdevs::device* _deps[3];
+
 	public:
+		xyalpha_coordinate_controller(const char* name) 
+			: virtdevs::device(name)
+		{
+
+		}
+
+		igris::array_view<virtdevs::device*> dependence() override 
+		{
+			return _deps;
+		}
+
 		void get_control_phase(
 			int64_t time,
 			rabbit::htrans2<float>& pos, 
