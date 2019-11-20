@@ -297,5 +297,7 @@ namespace virtdevs
 		}
 		*/
 	};
+
+	int cli_utility(int argc, char** argv, char* ret, int retmax);
 }
 #endif

@@ -27,6 +27,7 @@ licant.module("ralgo",
 		#"malgo", 
 		#("gxx.dprint", "__none__")
 
+		"ralgo.virtdevs",
 		"ralgo.fault"
 	],
 )

@@ -1,89 +1,11 @@
 #include "device.h"
-
-#include <assert.h>
-#include <mutex>
-
+#include <stdio.h>
 
 dlist_head virtdevs::vitrdev_list = DLIST_HEAD_INIT(virtdevs::vitrdev_list);
 
-/*
-static std::recursive_mutex mtx;
 
-std::string collect_status() 
+int virtdevs::cli_utility(int argc, char** argv, char* ret, int retmax) 
 {
-	return "StatusCollectAlgoToDo";
+	sprintf(ret, "hello %s", "mirmik");
+	return 0;
 }
-
-void virtdevs::device::increment_supervisors_alarm_counter() 
-{
-	system_lock();
-	if (supervisor) 
-	{
-		s->ok_deps_counter--;
-		s->alarm_handle(ErrorInDependDevice);
-	}
-	system_unlock();
-}
-
-void virtdevs::device::decrement_supervisors_alarm_counter() 
-{
-	system_lock();
-	for (auto s : supervisors) 
-	{
-		s->ok_deps_counter++;
-		s->decrement_supervisors_alarm_counter();
-
-		if (s->ok_deps_counter == s->get_dependence().size()) 
-		{
-			s->ready_handle();
-		}
-	}
-	system_unlock();
-}*/
-
-/*void virtdevs::device::add_depend_device(device * dev)
-{
-	std::lock_guard<std::recursive_mutex> lock(mtx);
-
-	depends.push_back(dev);
-	dev->supervisors.push_back(this);
-
-	if (dev->status == Status::Ok)
-	{}
-	else
-		alarmed_deps++;
-}*/
-/*
-void virtdevs::device::alarm(std::string data)
-{
-	std::lock_guard<std::recursive_mutex> lock(mtx);
-
-	if (status == Status::Alarm) 
-	{
-		if (m_status_string != data) 
-			update_alarm_message(data);
-		return;
-	}
-
-	else
-	{
-		status = Status::Alarm;
-		m_status_string = data;
-		increment_supervisors_alarm_counter();
-	}
-}
-
-void virtdevs::device::allgood()
-{
-	std::lock_guard<std::recursive_mutex> lock(mtx);
-
-	if (status == Status::Ok)
-		return;
-
-	else 
-	{
-		status = Status::Ok;
-		m_status_string = "";
-		decrement_supervisors_alarm_counter();
-	}
-}*/
