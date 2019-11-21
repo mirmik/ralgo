@@ -1,9 +1,13 @@
 #ifndef RALGO_PLANNING_DOUBLE_ROTATOR_H
 #define RALGO_PLANNING_DOUBLE_ROTATOR_H
 
+#include <ralgo/virtdevs/device.h>
+
+#warning "TODO Referenced axis."
+
 namespace ralgo
 {
-	class double_rotator 
+	class double_rotator : public virtdevs::device
 	{
 	public:
 		ralgo::axis_controller<float, float> bot;
@@ -12,7 +16,23 @@ namespace ralgo
 		ralgo::phase_driver * bot_drv;
 		ralgo::phase_driver * top_drv;
 
-		double_rotator(ralgo::phase_driver * a, ralgo::phase_driver * b) 
+		union 
+		{
+			virtdevs::device * _deps[2];
+			struct {
+				ralgo::axis_controller<float, float> * real_bot;
+				ralgo::axis_controller<float, float> * real_top;
+			};
+		};
+
+		igris::array_view<virtdevs::device *> dependence() 
+		{
+			return { _deps, 2 };
+		}
+
+		double_rotator(const char* name, 
+			ralgo::phase_driver * a, ralgo::phase_driver * b) 
+				: virtdevs::device(name)
 		{
 			bot_drv = a;
 			top_drv = b;
@@ -24,7 +44,7 @@ namespace ralgo
 			top_drv = b;
 		}
 
-		double_rotator(){}
+		double_rotator(const char* name) : virtdevs::device(name) {}
 
 		void serve() 
 		{
