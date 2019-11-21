@@ -59,6 +59,7 @@ namespace virtdevs
 	{
 	public:
 		dlist_head vitrdev_list_lnk = DLIST_HEAD_INIT(vitrdev_list_lnk);
+		dlist_head supervisor_lnk = DLIST_HEAD_INIT(supervisor_lnk);
 
 	private:
 		using alarm_t = std::pair<int, int>;
