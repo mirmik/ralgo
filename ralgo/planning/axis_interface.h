@@ -4,6 +4,8 @@
 #include <igris/util/bug.h>
 #include <ralgo/virtdevs/device.h>
 
+#include <ralgo/objects/named.h>
+
 /**
 	Интерфейс управления базовыми функциями осей.
 	Самые простые, часто применяемые функции, которые можно
@@ -31,7 +33,7 @@ namespace ralgo
 
 	template <class ExtPos, class IntPos = ExtPos,
 	          class Speed = float, class Time = int64_t>
-	class axis_interface : public virtdevs::device
+	class axis_interface : public ralgo::named
 	{
 		float c_ext2int = 1;
 		float c_int2ext = 1;
