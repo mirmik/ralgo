@@ -3,11 +3,11 @@
 
 #include <ralgo/planning/axis.h>
 
-#warning "Reference over axis"
-
 namespace ralgo 
 {
-	class axis_ofsetter : public: virtdevs::device 
+	class axis_ofsetter : 
+		public axis_controller<float, float>,
+		public ralgo::served
 	{
 		ralgo::axis_controller<float,float> * followed;
 		ralgo::phase_driver * drv;
@@ -19,9 +19,10 @@ namespace ralgo
 	public:
 		ralgo::axis_controller<float,float> ctr;
 
-		igris::array_view<virtdevs::device *> dependence() 
+		axis_ofsetter(const char* name) 
 		{
-			return { _deps, 2 };
+			this->set_name(name);
+			ctr.set_name(name, "ctr");
 		}
 
 		void serve() 
@@ -64,6 +65,9 @@ namespace ralgo
 
 			ctr.set_current_position(realpos - mirrpos);
 		}
+
+		void activate() override { restore_control_model(); }
+		void deactivate() override {}
 	};
 }
 

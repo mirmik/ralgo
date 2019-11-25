@@ -11,9 +11,12 @@
 #include <nos/trace.h>
 #include <nos/print.h>
 
+#include <ralgo/objects/served.h>
+
 namespace ralgo 
 {
-	class cynchain2_output_mover : public htrans2_mover 
+	class cynchain2_output_mover : public htrans2_mover, 
+		virtual public ralgo::served
 	{
 	public:
 		ralgo::cynematic_chain2d chain;
@@ -103,7 +106,7 @@ namespace ralgo
 		virtual void get_control_phase(int64_t time,
 			rabbit::htrans2<float>& pos, rabbit::screw2<float>& spd) = 0;
 
-		void serve() 
+		void serve() override
 		{
 			//TRACE();
 			/*if (external_controller != nullptr 
@@ -118,6 +121,14 @@ namespace ralgo
 			get_control_phase(ralgo::discrete_time(), pos, spd);
 			set_phase(pos, spd);	
 		}
+
+		void activate() override
+		{
+			restore_control_model();
+		}
+
+		void deactivate() override
+		{} 
 	};
 }
 

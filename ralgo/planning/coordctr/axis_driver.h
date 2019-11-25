@@ -9,24 +9,20 @@ namespace ralgo
 		class ExtPos=float, class IntPos=float, 
 		class Speed=float, class Time=int64_t>
 	class axis_driver : 
-		public axis_controller<ExtPos, IntPos, Speed, Time>, public virtdevs::device
+		public axis_controller<ExtPos, IntPos, Speed, Time>,
+		public ralgo::served
 	{
 		float output_multiplier = 1;
-
-		union {
-			virtdevs::device * _deps[1];
-			ralgo::phase_driver * drv;
-		};
+		ralgo::phase_driver * drv;
 		
 	public:
-		axis_driver(const char * name) : virtdevs::device(name) {}
-
-		igris::array_view<virtdevs::device*> dependence() 
+		axis_driver(const char * name, ralgo::phase_driver * drv) 
+			: drv(drv)
 		{
-			return _deps;
+			this->set_name(name);
 		}
 
-		void serve() 
+		void serve() override
 		{
 			float pos;
 			float spd;
@@ -42,6 +38,9 @@ namespace ralgo
 		{
 			this->drv = drv;
 		}
+
+		void activate() {}
+		void deactivate() {}
 	};
 }
 

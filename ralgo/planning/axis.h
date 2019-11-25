@@ -21,7 +21,10 @@
 namespace ralgo
 {
 	template <class ExtPos, class IntPos, class Speed=float, class Time=int64_t>
-	class axis_controller : public axis_interface<ExtPos, IntPos, Speed, Time>
+	class axis_controller 
+			: 
+				public axis_interface<ExtPos, IntPos, Speed, Time>,
+				public ralgo::named_buffer<16>
 	{
 		ralgo::traj1d_line<IntPos, Speed> line_traj;
 		ralgo::traj1d<IntPos, Speed> * current_trajectory = nullptr;
@@ -32,7 +35,6 @@ namespace ralgo
 		rabbit::interval<IntPos> limits_interal {0,0};
 
 	public:
-
 		axis_operation_status status() 
 		{
 			if (this->is_controlled()) 

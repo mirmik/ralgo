@@ -1,13 +1,13 @@
 #ifndef RALGO_PLANNING_DOUBLE_ROTATOR_H
 #define RALGO_PLANNING_DOUBLE_ROTATOR_H
 
-#include <ralgo/virtdevs/device.h>
-
-#warning "TODO Referenced axis."
+//#include <ralgo/virtdevs/device.h>
+#include <ralgo/objects/served.h>
 
 namespace ralgo
 {
-	class double_rotator : public virtdevs::device
+	class double_rotator : 
+		public virtual named_buffer<16>, public virtual served
 	{
 	public:
 		ralgo::axis_controller<float, float> bot;
@@ -16,23 +16,9 @@ namespace ralgo
 		ralgo::phase_driver * bot_drv;
 		ralgo::phase_driver * top_drv;
 
-		union 
-		{
-			virtdevs::device * _deps[2];
-			struct {
-				ralgo::axis_controller<float, float> * real_bot;
-				ralgo::axis_controller<float, float> * real_top;
-			};
-		};
-
-		igris::array_view<virtdevs::device *> dependence() 
-		{
-			return { _deps, 2 };
-		}
-
 		double_rotator(const char* name, 
 			ralgo::phase_driver * a, ralgo::phase_driver * b) 
-				: virtdevs::device(name)
+				:double_rotator(name)
 		{
 			bot_drv = a;
 			top_drv = b;
@@ -44,9 +30,13 @@ namespace ralgo
 			top_drv = b;
 		}
 
-		double_rotator(const char* name) : virtdevs::device(name) {}
+		double_rotator(const char* name) 
+		{
+			bot.set_name(name, "bot");
+			top.set_name(name, "top");
+		}
 
-		void serve() 
+		void serve() override
 		{
 			float bpos, tpos;
 			float bspd, tspd;
@@ -69,6 +59,16 @@ namespace ralgo
 
 			bot_drv->set_phase(bpos, bspd);
 			top_drv->set_phase(tpos, tspd);
+		}
+
+		void activate() override 
+		{
+			restore_control_model();
+		}
+
+		void deactivate() override 
+		{
+
 		}
 
 		void restore_control_model()
