@@ -5,6 +5,7 @@ namespace ralgo
 {
 	class served 
 	{
+	public:
 		virtual void serve() = 0;
 		virtual void activate() = 0;
 		virtual void deactivate() = 0;

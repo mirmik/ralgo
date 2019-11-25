@@ -33,7 +33,7 @@ namespace ralgo
 
 	template <class ExtPos, class IntPos = ExtPos,
 	          class Speed = float, class Time = int64_t>
-	class axis_interface : public ralgo::named
+	class axis_interface : public virtual ralgo::named
 	{
 		float c_ext2int = 1;
 		float c_int2ext = 1;
