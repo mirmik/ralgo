@@ -2,7 +2,7 @@
 #define RALGO_PLANNING_AXIS_INTERFACE_H
 
 #include <igris/util/bug.h>
-#include <ralgo/virtdevs/device.h>
+//#include <ralgo/virtdevs/device.h>
 
 #include <ralgo/objects/named.h>
 

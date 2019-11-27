@@ -8,7 +8,7 @@
 #include <igris/event/delegate.h>
 #include <igris/math.h>
 
-#include <rabbit/interval.h>
+//#include <rabbit/interval.h>
 
 #include <limits>
 
@@ -32,7 +32,7 @@ namespace ralgo
 		double gain = 1;
 		bool reverse = false;
 
-		rabbit::interval<IntPos> limits_interal {0,0};
+		//rabbit::interval<IntPos> limits_interal {0,0};
 
 	public:
 		axis_operation_status status() 

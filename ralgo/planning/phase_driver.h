@@ -4,23 +4,23 @@
 #include <ralgo/planning/disctime.h>
 #include <igris/util/iteration_counter.h>
 
-#include <ralgo/virtdevs/device.h>
+//#include <ralgo/virtdevs/device.h>
 #include <nos/trace.h>
 
 namespace ralgo
 {
 	// TODO Шаблонный класс. Задать тип переменной внутреннего состояния.
-	class phase_driver : public virtdevs::device
+	class phase_driver// : public virtdevs::device
 	{
 		float poskoeff;
 
 	public:
-		igris::array_view<device*> dependence() override
-		{
-			return {nullptr, 0};
-		}
+		//igris::array_view<device*> dependence() override
+		//{
+		//	return {nullptr, 0};
+		//}
 
-		phase_driver(const char* drvname) : virtdevs::device(drvname)
+		phase_driver(const char* drvname) //: virtdevs::device(drvname)
 		{
 			set_timeconst(0.01);
 		}
