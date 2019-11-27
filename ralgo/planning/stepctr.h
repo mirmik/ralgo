@@ -34,7 +34,7 @@ namespace ralgo
 		//stepctr_server * parent;
 
 	public:
-		float set_gear(float mul, float ticks_per_second/*ticks_per_timeunit*/) 
+		void set_gear(float mul, float ticks_per_second/*ticks_per_timeunit*/) 
 		{
 			// Учитываем модификатор времени.
 			position_multiplier = mul;
@@ -120,9 +120,18 @@ namespace ralgo
 
 		void set_speed(float spd) 
 		{
+			auto s = width * spd * speed_multiplier;
+			if (!((s < width) && (s > -width))) 
+			{
+				DPRINT(width);
+				DPRINT(s);
+				DPRINT(spd);
+				DPRINT(speed_multiplier);
+			}
+
 			//set_phases_speed(spd * speed_multiplier);
 			//PRINT(spd);
-			set_step(width * spd * speed_multiplier);
+			set_step(s);
 		}
 
 		void enable_power(bool en) override {} 
