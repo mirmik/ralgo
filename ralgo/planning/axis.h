@@ -178,8 +178,8 @@ namespace ralgo
 		{
 			//VIRTDEV
 
-			IntPos curpos = current_position();
-			Speed curspd = this->setted_speed();
+			//IntPos curpos = current_position();
+			//Speed curspd = this->setted_speed();
 
 			BUG();
 			return 0;
