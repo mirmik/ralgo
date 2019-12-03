@@ -28,6 +28,7 @@ namespace ralgo
 		// отношение командного импульса к расчетному 
 		// + количество тиков алгоритма за расчетную единицу времени.
 		float speed_multiplier = 1;
+		float ticks_per_second = 1;
 		
 		bool emulate = false;		
 
@@ -38,9 +39,15 @@ namespace ralgo
 		{
 			// Учитываем модификатор времени.
 			position_multiplier = mul;
+			this->ticks_per_second = ticks_per_second;
 			speed_multiplier = mul 
 				/ ticks_per_second 
 				* ralgo::discrete_time_frequency();
+		}
+
+		void set_gear(float mul) 
+		{
+			set_gear(mul, ticks_per_second);
 		}
 
 		stepctr(const char* drvname) : ralgo::phase_driver(drvname)
