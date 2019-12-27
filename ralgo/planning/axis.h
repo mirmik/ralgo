@@ -8,6 +8,9 @@
 #include <igris/event/delegate.h>
 #include <igris/math.h>
 
+#define NODTRACE 0 
+#include <igris/dtrace.h>
+
 //#include <rabbit/interval.h>
 
 #include <limits>
@@ -63,13 +66,18 @@ namespace ralgo
 			//PRINT(pos);
 
 			//exit(0);
+			dprln(0);
 			pos = pos;
 
+			dprln(1);
 			auto time = ralgo::discrete_time();
 		
+			dprln(2);
 			line_traj.reset(pos, time, pos, time + 1);
+			dprln(3);
 			line_traj.spddeform.nullify();
 		
+			dprln(4);
 			current_trajectory = & line_traj;
 		}
 
@@ -118,6 +126,8 @@ namespace ralgo
 
 		int absmove_internal_unsafe(IntPos tgtpos) override 
 		{
+			auto spd= this->internal_speed();
+			DTRACE_ARGS_2(tgtpos, spd);
 			return _absmove_by_speed(tgtpos, this->internal_speed());
 		}
 
@@ -176,12 +186,22 @@ namespace ralgo
 
 		int stop() override
 		{
-			//VIRTDEV
+			DTRACE();
+			//TODO
+			hardstop();
+			return 0;
+		}
 
-			//IntPos curpos = current_position();
-			//Speed curspd = this->setted_speed();
+		int hardstop() 
+		{
+			DTRACE();
+			auto curtim = ralgo::discrete_time();
+			IntPos curpos;
+			Speed curspd;
 
-			BUG();
+			attime(curtim, curpos, curspd);			
+
+			_absmove_tstamp(curpos, curtim, curpos, curtim);
 			return 0;
 		}
 
