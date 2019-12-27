@@ -12,6 +12,7 @@ namespace ralgo
 		public axis_controller<ExtPos, IntPos, Speed, Time>,
 		public ralgo::served
 	{
+	public:
 		float output_multiplier = 1;
 		ralgo::phase_driver * drv;
 		

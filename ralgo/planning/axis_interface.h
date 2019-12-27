@@ -2,9 +2,13 @@
 #define RALGO_PLANNING_AXIS_INTERFACE_H
 
 #include <igris/util/bug.h>
+
+#define NODTRACE 0
+#include <igris/dtrace.h>
 //#include <ralgo/virtdevs/device.h>
 
 #include <ralgo/objects/named.h>
+
 
 /**
 	Интерфейс управления базовыми функциями осей.
@@ -40,16 +44,18 @@ namespace ralgo
 
 		float _gain = 1;
 		bool _reverse = false;
-		IntPos _forw = 0;
-		IntPos _back = 0;
+		IntPos _forw = 1000;
+		IntPos _back = -1000;
 
 		Time _accdcc_protector = 1000;
 		Time _accdcc = 4000;
 
-		Speed _speed_protector = 1;
+		Speed _speed_protector = 1000;
 		Speed _speed = 1;
 
 	public:
+		bool debug_mode = false;
+
 		// JOG
 		virtual int jog(int direction) { BUG(); }
 
@@ -59,8 +65,8 @@ namespace ralgo
 		virtual int incmove_internal_unsafe(IntPos pos) { BUG(); }
 
 		// ABSMOVE
-		int absmove(ExtPos pos) { return absmove_internal(ext2int(pos)); }
-		int absmove_internal(IntPos pos) { if (!position_in_limits(pos)) return -1; return absmove_internal_unsafe(pos); }
+		int absmove(ExtPos pos) { DTRACE(); return absmove_internal(ext2int(pos)); }
+		int absmove_internal(IntPos pos) { DTRACE(); if (!position_in_limits(pos)) return -1; return absmove_internal_unsafe(pos); }
 		virtual int absmove_internal_unsafe(IntPos pos) { BUG(); }
 
 		// RELMOVE
@@ -80,7 +86,7 @@ namespace ralgo
 		virtual int set_home_position() { BUG(); }
 
 		// LIMITS
-		bool position_in_limits(ExtPos pos) { return pos > _back && pos < _forw; }
+		bool position_in_limits(ExtPos pos) { return DTRACE_RET(pos > _back && pos < _forw); }
 		void set_limits(ExtPos back, ExtPos forw) { _back = ext2int(back); _forw = ext2int(forw); }
 
 		void set_backward_limit(ExtPos back) { _back = ext2int(back); }

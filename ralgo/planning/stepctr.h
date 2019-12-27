@@ -6,6 +6,9 @@
 #include <igris/sync/syslock.h>
 #include <ralgo/planning/phase_driver.h>
 
+#define NODTRACE 0
+#include <igris/dtrace.h>
+
 namespace ralgo
 {
 	class stepctr_server;
@@ -65,40 +68,23 @@ namespace ralgo
 
 		void set_accum_part(float acc)
 		{
+			DTRACE();
 			accum = acc * width;
+			DPRINT(accum);
 			assert (accum > -width && accum < width);
 		}
 
 		// Установить ширину импульса в единицах инкремента.
 		void set_step(int32_t _step) 
 		{
+			DTRACE();
 			system_lock();
 			step = _step;
 			system_unlock();
 
+			DPRINT(step);
 			assert((step < width) && (step > -width));
 		}
-
-		/*void set_declared_serve_freq(float arg) 
-		{
-			tick_per_timeunit = arg / ralgo::discrete_time_frequency();
-			timeunit_per_tick = 1/tick_per_timeunit;
-		}*/
-
-		/*void set_phases_speed(float steps_per_timeunit) 
-		{
-			//DPRINT(steps_per_timeunit);
-			//PRINT(steps_per_timeunit);
-			//PRINT(timeunit_per_tick);
-			//PRINT(width);
-			//set_step(width * timeunit_per_tick * steps_per_timeunit);
-		}*/
-
-		//float phases_speed() 
-		//{
-		//	PRINT((int32_t)step);
-		//	return (float)step / timeunit_per_tick / width;
-		//}
 
 		float current_speed() override 
 		{
@@ -115,11 +101,19 @@ namespace ralgo
 
 		void set_current_position(float pos) override 
 		{
+			dprln("HERE");
 			igris::syslock_guard lock();
 
 			float fcounter = pos * position_multiplier;
 
-			int64_t counter = round(fcounter);
+			dprln("roundl");
+			int64_t counter = llround(fcounter);
+			dprln("roundl...ok");
+
+			DPRINT(pos);
+			DPRINT(position_multiplier);
+			DPRINT(fcounter);
+			DPRINT(counter);
 
 			set_accum_part(fcounter - counter);
 			control_steps_counter = counter;
