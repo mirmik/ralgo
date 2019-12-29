@@ -77,12 +77,12 @@ namespace ralgo
 		// Установить ширину импульса в единицах инкремента.
 		void set_step(int32_t _step) 
 		{
-			DTRACE();
+			//DTRACE();
 			system_lock();
 			step = _step;
 			system_unlock();
 
-			DPRINT(step);
+			//DPRINT(step);
 			assert((step < width) && (step > -width));
 		}
 
@@ -121,7 +121,7 @@ namespace ralgo
 
 		void set_speed(float spd) 
 		{
-			auto s = width * spd * speed_multiplier;
+			float s = (float)width * spd * speed_multiplier;
 			if (!((s < width) && (s > -width))) 
 			{
 				DPRINT(width);
