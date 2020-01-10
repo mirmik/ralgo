@@ -23,7 +23,7 @@
 
 namespace ralgo
 {
-	template <class ExtPos, class IntPos, class Speed=float, class Time=int64_t>
+	template <class ExtPos, class IntPos=int64_t, class Speed=float, class Time=int64_t>
 	class axis_controller 
 			: 
 				public axis_interface<ExtPos, IntPos, Speed, Time>,
@@ -34,6 +34,20 @@ namespace ralgo
 
 		double gain = 1;
 		bool reverse = false;
+		float poskoeff = 0.001;
+
+		// Устанавливаются в процессе обработки.
+		IntPos tgtpos;
+		Speed tgtspd; 
+
+		// Скорость с учетом компенсации позиции.
+		// Используется в режиме self-driving.
+		Speed compspd; 
+
+		//IntPos current_position = 0;
+		//IntPos target_position = 0;
+
+
 
 		//rabbit::interval<IntPos> limits_interal {0,0};
 
@@ -81,7 +95,7 @@ namespace ralgo
 			current_trajectory = & line_traj;
 		}
 
-		IntPos current_position(int64_t time) 
+		IntPos planned_position(int64_t time) 
 		{
 			IntPos pos;
 			Speed spd;
@@ -91,38 +105,15 @@ namespace ralgo
 			return pos; 
 		}
 
-		IntPos current_position() 
+		IntPos planned_position() 
 		{
 			return current_position(ralgo::discrete_time());
 		}
 
-/*		IntPos control_position(int64_t time) 
-		{
-			return current_position() / control_multiplier;
-		}*/
-
-/*		IntPos control_position() 
-		{
-			return current_position(ralgo::discrete_time()) / control_multiplier;
-		}
-
-		void set_control_position(IntPos pos) 
-		{
-			set_current_position(pos * control_multiplier);
-		}*/
-
-		/*void incmove(IntPos pulses, Speed speed)
-		{
-
-		}*/
-
-
-		/*void absmove(
-			IntPos tgtpos, int64_t tim)
-		{
-			tgtpos = tgtpos * control_multiplier;
-			_absmove_tstamp(tgtpos, ralgo::discrete_time() + tim);
-		}*/
+		// Driver must implement that
+		// It can be real or virtual position
+		// for different axis`s types
+		virtual IntPos current_position() = 0;
 
 		int absmove_internal_unsafe(IntPos tgtpos) override 
 		{
@@ -192,7 +183,7 @@ namespace ralgo
 			return 0;
 		}
 
-		int hardstop() 
+		int hardstop() override
 		{
 			DTRACE();
 			auto curtim = ralgo::discrete_time();
@@ -226,15 +217,41 @@ namespace ralgo
 
 		}
 
-		/*float control_position_unit() 
+		// Установить постоянную времени компенсации ошибки позиционирования.
+		void set_position_compensator_filter_timeconst(float T)
 		{
-			IntPos pos;
-			Speed spd;
+			poskoeff = 1 / (T * ralgo::discrete_time_frequency());
+		}
 
-			attime(ralgo::discrete_time(), pos, spd);
+// Self Driving:
+		// Вычислить желаемую скорость по текущей фазе
+		Speed eval_compensated_speed(float tgtpos, float tgtspd)
+		{
+			// Счетчик меняется в прерывании, так что
+			// снимаем локальную копию.
+			auto current = current_position();
 
-			return pos;
-		}*/
+			// Ошибка по установленному значению.
+			auto diff = tgtpos - current;
+
+			// Скорость вычисляется как
+			// сумма уставной скорости на
+			auto evalspeed = tgtspd  + poskoeff * diff;
+			return evalspeed;
+		}
+
+		// Вычислить текущую фазу.
+		void update_phase() 
+		{
+			// Установить текущие целевые параметры.
+			attime(ralgo::discrete_time(), tgtpos, tgtspd);
+			compspd = eval_compensated_speed(tgtpos, tgtspd);
+		}
+
+		Speed compensated_speed() 
+		{
+			return compspd; 
+		}
 
 		ssize_t print_to(nos::ostream& os) const
 		{
