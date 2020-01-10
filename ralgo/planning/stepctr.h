@@ -22,16 +22,17 @@ namespace ralgo
 		volatile int32_t step = 0; // Величина инкремента.
 
 		int32_t width = 10*1000*1000;
+		float _gear = 1;
 
 		// Позиционный мультипликатор учитывает 
 		// отношение командного импульса к расчетному.
-		float position_multiplier = 1;
+		//float position_multiplier = 1;
 
 		// Скоростной мультипликатор учитывает 
 		// отношение командного импульса к расчетному 
 		// + количество тиков алгоритма за расчетную единицу времени.
-		float speed_multiplier = 1;
-		float ticks_per_second = 1;
+		float _speed_multiplier = 1;
+		float _ticks_per_second = 1;
 		
 		bool emulate = false;		
 
@@ -41,16 +42,16 @@ namespace ralgo
 		void set_gear(float mul, float ticks_per_second/*ticks_per_timeunit*/) 
 		{
 			// Учитываем модификатор времени.
-			position_multiplier = mul;
-			this->ticks_per_second = ticks_per_second;
-			speed_multiplier = mul 
-				/ ticks_per_second 
+			_gear = mul;
+			this->_ticks_per_second = ticks_per_second;
+			_speed_multiplier = mul 
+				/ _ticks_per_second 
 				* ralgo::discrete_time_frequency();
 		}
 
 		void set_gear(float mul) 
 		{
-			set_gear(mul, ticks_per_second);
+			set_gear(mul, _ticks_per_second);
 		}
 
 		stepctr(const char* drvname) : ralgo::phase_driver(drvname)
@@ -61,7 +62,7 @@ namespace ralgo
 			return control_steps_counter;
 		}
 
-		float get_accum_part()
+		float accum_part()
 		{
 			return (float)accum / width;
 		}
@@ -88,50 +89,44 @@ namespace ralgo
 
 		float current_speed() override 
 		{
-			return (float)step / width / speed_multiplier; 
+			return (float)step / width / _speed_multiplier; 
 			//phases_speed() / multiplier;
 		}
 
-		float current_position() override 
+		int64_t current_position() override 
 		{
 			igris::syslock_guard lock();
-			return ((float)control_steps_counter + get_accum_part()) 
-				/ position_multiplier;
+			return control_steps_counter * _gear + accum_part() * _gear; 
 		}
 
-		void set_current_position(float pos) override 
+		void set_current_position(int64_t pos) override 
 		{
-			dprln("HERE");
 			igris::syslock_guard lock();
+			control_steps_counter = pos / _gear;
+			set_accum_part( (float)(pos - control_steps_counter * _gear) / _gear );	
 
-			float fcounter = pos * position_multiplier;
-
-			dprln("roundl");
-			int64_t counter = llround(fcounter);
-			dprln("roundl...ok");
-
-			DPRINT(pos);
-			DPRINT(position_multiplier);
-			DPRINT(fcounter);
-			DPRINT(counter);
-
-			set_accum_part(fcounter - counter);
-			control_steps_counter = counter;
+			// Попытка выполнения позиционирования при смене текущей
+			// позиции может быть фатальна, так что состояние 
+			// контроллера нужно пересчитать.
+			if (controller) 
+			{
+				controller->update_control();
+				controller->stop();
+			}
 		}
 
 		void set_speed(float spd) 
 		{
-			float s = (float)width * spd * speed_multiplier;
+			//DTRACE();
+			float s = (float)width * spd * _speed_multiplier;
 			if (!((s < width) && (s > -width))) 
 			{
 				DPRINT(width);
 				DPRINT(s);
 				DPRINT(spd);
-				DPRINT(speed_multiplier);
+				DPRINT(_speed_multiplier);
 			}
 
-			//set_phases_speed(spd * speed_multiplier);
-			//PRINT(spd);
 			set_step(s);
 		}
 
@@ -143,8 +138,6 @@ namespace ralgo
 		void serve() 
 		{
 			accum += step;
-			//PRINT((int32_t)step);
-			//PRINT(accum);
 
 			bool negative = accum < 0;
 
@@ -174,82 +167,5 @@ namespace ralgo
 		}
 	};
 }
-/*	class stepctr_server
-	{
-	public:
-
-		stepctr ** axes;
-		int axtotal;
-
-	public:
-		stepctr_server(stepctr ** ptr, int total)
-		{
-			axes = ptr;
-			axtotal = total;
-
-			stepctr * ax;
-
-			for (int i = 0; i < axtotal; ++i)
-			{
-				ax = axes[i];
-				ax->parent = this;
-			}
-		}
-
-		// Установить стоимость шага обслуживания.
-		void set_tdelta(int32_t delta)
-		{
-			tdelta = delta;
-		}
-
-		void serve()
-		{
-			int diff;
-			stepctr * ax;
-
-			for (int i = 0; i < axtotal; ++i)
-			{
-				ax = axes[i];
-
-				if ((diff = ax->imptarget - ax->impcurrent) != 0)
-				{
-					ax->stepaccum += tdelta;
-					if (ax->stepaccum > ax->stepwidth)
-					{
-						ax->stepaccum -= ax->stepwidth;
-						if (diff > 0)
-						{
-							ax->inc();
-							++ax->impcurrent;
-						}
-						else
-						{
-							ax->dec();
-							--ax->impcurrent;
-						}
-
-						if (ax->impcurrent == ax->imptarget)
-							ax->stepaccum = 0;
-					}
-				}
-			}
-		}
-	};
-}
-
-
-void ralgo::stepctr::set_stepwidth(int stepwidth)
-{
-	assert(stepwidth >= parent->tdelta);
-	//if (parent->tdelta > stepwidth)
-	//	BUG();
-
-	this->stepwidth = stepwidth;
-}
-
-void ralgo::stepctr::serve() 
-{
-
-}*/
 
 #endif

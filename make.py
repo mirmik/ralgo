@@ -4,6 +4,7 @@
 import os
 import shutil
 import licant
+import licant.install
 
 licant.include("igris")
 licant.include("nos")
@@ -27,14 +28,11 @@ licant.cxx_shared_library("libralgo.so",
 	cc_flags="-fPIC"
 )
 
-@licant.routine(deps=["libralgo.so"])
-def install():
-	os.system("cp {0} {1}".format(target, install_directory_path))
-	
-	shutil.rmtree(install_include_path, True)
-	shutil.copytree("ralgo", install_include_path, 
-		symlinks=False, ignore=shutil.ignore_patterns('*.cpp', '*.c'))
-	
-	print("successfully installed")
+licant.install.install_library(
+	tgt="install",
+	uninstall="uninstall",
+	libtgt="libralgo.so",
+	hroot="ralgo",
+	headers="ralgo")
 
 licant.ex("libralgo.so")

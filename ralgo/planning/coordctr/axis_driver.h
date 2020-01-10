@@ -2,46 +2,53 @@
 #define RALGO_PLANNING_AXIS_DRIVER_H
 
 #include <ralgo/planning/axis.h>
+#include <ralgo/planning/speed_phaser.h>
 
-namespace ralgo 
+namespace ralgo
 {
 	template <
-		class ExtPos=float, class IntPos=float, 
-		class Speed=float, class Time=int64_t>
-	class axis_driver : 
-		public axis_controller<ExtPos, IntPos, Speed, Time>,
+	    class ExtPos = float, class IntPos = int64_t,
+	    class Speed = float, class Time = int64_t >
+	class axis_driver :
+		public virtual axis_controller<ExtPos, IntPos, Speed, Time>,
 		public ralgo::served
 	{
+		using parent = axis_controller<ExtPos, IntPos, Speed, Time>;
+
 	public:
 		float output_multiplier = 1;
-		ralgo::phase_driver * drv;
-		
+		ralgo::speed_phaser<IntPos, Speed> * drv;
+
 	public:
-		axis_driver(const char * name, ralgo::phase_driver * drv) 
-			: drv(drv)
+		axis_driver(
+		    const char * name,
+		    ralgo::speed_phaser<IntPos, Speed> * drv)
+			:
+			drv(drv)
 		{
 			this->set_name(name);
 		}
 
+		IntPos current_position() 
+		{
+			return drv->current_position();
+		}
+
 		void serve() override
 		{
-			float pos;
-			float spd;
+			parent::update_phase();
+			drv->set_speed(parent::compensated_speed());
+		}
 
-			this->attime(ralgo::discrete_time(), pos, spd);
-		
-			drv->set_phase(
-				pos * output_multiplier, 
-				spd * output_multiplier);
-		}				
-	
-		void set_driver(ralgo::phase_driver * drv) 
+		void set_driver(ralgo::speed_phaser<IntPos, Speed> * drv)
 		{
 			this->drv = drv;
 		}
 
 		void activate() {}
 		void deactivate() {}
+
+		void update_control() {  }
 	};
 }
 

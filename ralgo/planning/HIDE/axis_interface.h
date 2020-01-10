@@ -8,7 +8,6 @@
 //#include <ralgo/virtdevs/device.h>
 
 #include <ralgo/objects/named.h>
-#include <ralgo/planning/driver_controller.h>
 
 
 /**
@@ -38,9 +37,7 @@ namespace ralgo
 
 	template <class ExtPos, class IntPos = ExtPos,
 	          class Speed = float, class Time = int64_t>
-	class axis_interface : 
-		public virtual ralgo::named,
-		public virtual ralgo::driver_controller_api
+	class axis_interface : public virtual ralgo::named
 	{
 		float c_ext2int = 1;
 		float c_int2ext = 1;
@@ -107,13 +104,13 @@ namespace ralgo
 		bool reverse() { return _reverse; }
 
 		// GAIN
-		void set_workspace_gain(double gain) { c_ext2int = gain; c_int2ext = 1 / gain; }
-		auto workspace_gain() { return c_ext2int; }
+		void set_gain(double gain) { c_ext2int = gain; c_int2ext = 1 / gain; }
+		auto gain() { return c_ext2int; }
 		IntPos ext2int(ExtPos e) { return e * c_ext2int * (reverse() ? -1 : 1); }
 		ExtPos int2ext(IntPos i) { return i * c_int2ext * (reverse() ? -1 : 1); }
 
 		// SPEED
-		virtual void set_speed(Speed spd) { DTRACE_ARGS(spd); _speed = protect_speed(spd); }
+		virtual void set_speed(Speed spd) { _speed = protect_speed(spd); }
 		Speed setted_speed() { return _speed; }
 		Speed internal_speed() { return ext2int(_speed); }
 		Speed protect_speed(Speed spd) { if (spd > _speed_protector) return _speed_protector; else return spd; }
