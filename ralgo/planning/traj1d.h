@@ -62,17 +62,8 @@ namespace ralgo
 			auto posmod = spddeform.posmod(time_unit);
 			auto spdmod = spddeform.spdmod(time_unit);
 
-			/*PRINT(time);
-			PRINT(stim);
-			PRINT(ftim);*/
-//			PRINT(time_unit);
-			//PRINT(posmod);
-			//PRINT(spdmod);
-
 			pos = fpos * posmod + spos * (1 - posmod);
 			spd = setted_speed * spdmod;
-
-			//PRINT(pos);
 
 			if (posmod >= 1) return 1;
 			else return 0;

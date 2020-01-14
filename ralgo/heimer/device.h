@@ -2,6 +2,7 @@
 #define RALGO_HEIMER_DEVICE_H
 
 #include <igris/container/array_view.h>
+#include <igris/dprint.h>
 
 namespace ralgo
 {
@@ -29,7 +30,7 @@ namespace ralgo
 
 			bool take_control(device * controller)
 			{
-				bool busy_signal;
+				bool busy_signal = false;
 
 				if (is_busy())
 					return false;
@@ -54,6 +55,8 @@ namespace ralgo
 					_is_busy = true;
 					this->_controller = controller;
 				}
+
+				return busy_signal;
 			}
 
 			bool release_control(device * controller)
