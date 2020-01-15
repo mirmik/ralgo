@@ -19,13 +19,13 @@ namespace ralgo
 		{
 		protected:
 			using phaser = speed_phaser<Position, IntPos, Speed>;
-			Position steps_total;
+			Position steps_total = 0;
 
-			Position curstep;
+			Position curstep = 0;
 
-			Position pulsewidth;
-			Position pulsewidth_triggered;
-			Position accum;
+			Position pulsewidth = 0;
+			Position pulsewidth_triggered = 0;
+			Position accum = 0;
 
 			float triglevel = 0.7;
 			Position virtual_pos = 0;

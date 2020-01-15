@@ -4,6 +4,8 @@
 #include <igris/container/array_view.h>
 #include <igris/dprint.h>
 
+#include <nos/print.h>
+
 namespace ralgo
 {
 	namespace heimer
@@ -11,6 +13,7 @@ namespace ralgo
 		class device
 		{
 		public:
+			const char * _name = "unnamed";
 			device * _controller;
 			igris::array_view<device*> _controlled;
 
@@ -19,7 +22,9 @@ namespace ralgo
 		public:
 			device * controller() { return _controller; }
 			igris::array_view<device*> controlled() { return _controlled; }
+			void set_name(const char * name) { _name = name; }
 			bool is_busy() { return _is_busy; }
+			const char* name() { return _name; }
 
 			device(){}
 			device(igris::array_view<device*> controlled) : _controlled(controlled) {}
@@ -37,7 +42,7 @@ namespace ralgo
 
 				for (auto dev : _controlled)
 				{
-					busy_signal = take_control(this);
+					busy_signal = dev->take_control(this);
 
 					if (busy_signal)
 						break;
@@ -71,6 +76,16 @@ namespace ralgo
 			}
 
 			bool take_control() { return take_control(nullptr); }
+
+			void print_controlled_devices(nos::ostream * os, int tabs = 0) 
+			{
+				os->fill('\t', tabs);
+				os->println(name());
+				for (auto d : _controlled) 
+				{
+					d->print_controlled_devices(os, tabs+1);
+				}
+			}
 		};
 	}
 }

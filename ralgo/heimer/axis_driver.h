@@ -29,7 +29,7 @@ namespace ralgo
 			ralgo::traj1d<Position, Speed> * _current_trajectory = nullptr;
 
 		public:
-			void set_position_compensate(float koeff) 
+			void set_position_compensate(float koeff)
 			{
 				poskoeff = koeff;
 			}
@@ -44,13 +44,13 @@ namespace ralgo
 				auto curpos = current_position();
 				int64_t curtim = ralgo::discrete_time();
 				auto tgtpos = curpos + dist;
-				int64_t tgttim = curtim 
-					+ (int64_t)((Speed)abs(dist) / parent::_speed
-					* ralgo::discrete_time_frequency());
+				int64_t tgttim = curtim
+				                 + (int64_t)((Speed)abs(dist) / parent::_speed
+				                             * ralgo::discrete_time_frequency());
 
 				auto acc = parent::_accdcc / (tgttim - curtim);
 				auto dcc = parent::_accdcc / (tgttim - curtim);
-				
+
 				//auto acc = 0.1;
 				//auto dcc = 0.1;
 
@@ -70,11 +70,12 @@ namespace ralgo
 				return _current_trajectory->attime(time, pos, spd);
 			}
 
-			std::pair<Position,Speed> phase() 
+			std::pair<Position, Speed> phase()
 			{
-				Position pos;
-				Speed spd;
-				_current_trajectory->attime(ralgo::discrete_time(), pos, spd);
+				Position pos = 0;
+				Speed spd = 0;
+				if (_current_trajectory)
+					_current_trajectory->attime(ralgo::discrete_time(), pos, spd);
 				return std::make_pair(pos, spd);
 			}
 
@@ -109,8 +110,11 @@ namespace ralgo
 
 			void serve()
 			{
-				update_phase();
-				apply_speed(compensated_speed());
+				if (_current_trajectory)
+				{
+					update_phase();
+					apply_speed(compensated_speed());
+				}
 			}
 
 			virtual void apply_speed(Speed spd) = 0;
