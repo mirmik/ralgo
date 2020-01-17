@@ -9,7 +9,7 @@ namespace ralgo
 {
 
 	template <class P, class V>	
-	class traj1d : public speed_deformed
+	class traj1d
 	{
 	public:
 		virtual int attime(int64_t time, P& pos, V& spd) = 0;

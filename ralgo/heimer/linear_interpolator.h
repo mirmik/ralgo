@@ -1,13 +1,21 @@
 #ifndef RALGO_HEIMER_LINEAR_INTERPOLATOR_H
 #define RALGO_HEIMER_LINEAR_INTERPOLATOR_H
 
+#include <ralgo/planning/trajNd.h>
+
 namespace ralgo
 {
 	namespace heimer
 	{
-		template<class Position, class Speed>
+		template<size_t Dim, class Position, class Speed>
 		class linear_interpolator : public heimer::device
 		{
+			Speed _speed = 0;
+			float _accdcc;
+
+			trajNd<Dim, Position, Speed> * trajectory;
+			trajNd_line<Dim, Position, Speed> lintraj;
+
 		public:
 			linear_interpolator(
 			    igris::array_view<heimer::device*> axes)
@@ -25,6 +33,18 @@ namespace ralgo
 			) 
 			{
 				take_control();
+
+
+			}
+
+			void set_speed(Speed speed) 
+			{
+				_speed = speed;
+			}
+
+			void set_accdcc(float accdcc) 
+			{
+				_accdcc = accdcc;
 			}
 		};
 	}

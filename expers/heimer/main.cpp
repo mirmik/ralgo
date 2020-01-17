@@ -23,7 +23,7 @@ int main()
 	ax1.set_name("ax1");
 
 	ralgo::heimer::device * linint_axes[] = { &ax0, &ax1 };	
-	ralgo::heimer::linear_interpolator<float, float> linint(linint_axes);
+	ralgo::heimer::linear_interpolator<2, float, float> linint(linint_axes);
 	linint.set_name("linint");
 
 	linint.take_control();
