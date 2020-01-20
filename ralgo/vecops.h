@@ -11,6 +11,7 @@ namespace ralgo
 {
 	namespace vecops
 	{
+		// построить целочисленный вектор арифметической прогрессии [start;stop) с шагом step. 
 		template<class V>
 		auto arange(int start, int stop, int step)
 		{
@@ -33,6 +34,7 @@ namespace ralgo
 			return r;
 		}
 
+		// Построить линейное пространство аля numpy.
 		template<class R>
 		auto linspace(double s, double f, int n)
 		{
@@ -48,7 +50,7 @@ namespace ralgo
 			return r;
 		}
 
-		// Применить функцию f ко всем элементам массива v. Допускается передача дополнительных аргументов.
+		// Применить функцию f ко всем элементам массива a. Допускается передача дополнительных аргументов.
 		template <class R=void, class F, class A, class ... Args>
 		defsame_t<R,A> elementwise(const F& f, const A & a, Args&& ... args)
 		{
@@ -63,7 +65,7 @@ namespace ralgo
 			return ret;
 		}
 
-		// Применить функцию f ко всем элементам массива v. Допускается передача дополнительных аргументов.
+		// Применить функцию f ко всем элементам массивов a и b. Допускается передача дополнительных аргументов.
 		template <class R, class F, class A, class B, class ... Args>
 		R elementwise2(const F& f, const A& a, const B& b, Args&& ... args) 
 		{
@@ -100,12 +102,13 @@ namespace ralgo
 			return lamda;
 		}
 
+		// Векторизованные операции над комплексными числами.
 		template <class R=void, class A> defsame_t<R,A> abs(const A& obj) { return elementwise<R>(ralgo::op::abs(), obj); }
 		template <template<class C> class V, class T> auto real(const V<T>& obj) { return elementwise<V<T>>([](const auto & c) {return c.real();}, obj); }
 		template <template<class C> class V, class T> auto imag(const V<T>& obj) { return elementwise<V<T>>([](const auto & c) {return c.imag();}, obj); }
 
-		template <typename T>
-		T reverse(const T& src)
+		// Вернуть реверс вектора src
+		template <typename T> T reverse(const T& src)
 		{
 			T dst(src.size());
 			auto sit = src.begin();
@@ -133,6 +136,7 @@ namespace ralgo
 			return dst;
 		}
 
+		// Вычислить длину вектора по евклидовой метрике.
 		template <typename V>
 		auto norm(const V& vec) -> typename V::value_type
 		{
@@ -175,8 +179,6 @@ namespace ralgo
 			template <class V, class S> V& sub(V& vec, S m) { for (auto& val : vec) val -= m; return vec; }
 			template <class V, class S> V& mul(V& vec, S m) { for (auto& val : vec) val *= m; return vec; }
 			template <class V, class S> V& div(V& vec, S m) { for (auto& val : vec) val /= m; return vec; }
-
-			//template <class V, class W> void add(V& a, W& b) {  }
 
 			template <class V> V& conj(V& vec) { for (auto& val : vec) val = std::conj(val); return vec; }
 
@@ -230,31 +232,14 @@ namespace ralgo
 		}
 	}
 
-	using vecops::elementwise;
+	/*using vecops::elementwise;
 	using vecops::elementwise2;
 	using vecops::vectorize;
-
 	using vecops::arange;
 	using vecops::linspace;
+	using vecops::merge_sorted;*/
 
-	using vecops::merge_sorted;
-
-	namespace inplace 
-	{
-		using vecops::inplace::elementwise;
-		//using vecops::inplace::vectorize;
-
-		using vecops::inplace::normalize;
-
-		using vecops::inplace::sin;
-		using vecops::inplace::cos;
-		using vecops::inplace::tan;
-		
-		using vecops::inplace::exp;
-		using vecops::inplace::log;
-		using vecops::inplace::log2;
-		using vecops::inplace::log10;
-	}
+	namespace inplace = vecops::inplace;
 }
 
 #endif

@@ -110,7 +110,7 @@ namespace ralgo
 
 			void serve()
 			{
-				if (_current_trajectory)
+				if (_current_trajectory && parent::controller() == this)
 				{
 					update_phase();
 					apply_speed(compensated_speed());
