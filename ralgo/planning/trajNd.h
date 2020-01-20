@@ -40,16 +40,22 @@ namespace ralgo
 	public:
 		ralgo::speed_deformer spddeform;
 
+		void set_start_position(int i, Position pos) 
+		{
+			spos[i] = pos;
+		}
+
+		void set_finish_position_inc(int i, Position inc) 
+		{
+			fpos[i] = spos[i] + inc;
+		}
+
+		// Инициализировать траекторию, когда spos и fpos уже установлены.
 		int reset(
-		    igris::array_view<Position>& spos,
 		    int64_t stim,
-		    igris::array_view<Position>& fpos,
 		    int64_t ftim
 		)
 		{
-			std::copy(std::begin(spos), std::end(spos), std::begin(this->spos));
-			std::copy(std::begin(fpos), std::end(fpos), std::begin(this->fpos));
-
 			this->stim = stim;
 			this->ftim = ftim;
 
@@ -62,6 +68,18 @@ namespace ralgo
 					setted_speed[i] = (float)(fpos[i] - spos[i]) / (ftim - stim);
 				}
 			}
+		}
+
+		int reset(
+		    igris::array_view<Position>& spos,
+		    int64_t stim,
+		    igris::array_view<Position>& fpos,
+		    int64_t ftim
+		)
+		{
+			std::copy(std::begin(spos), std::end(spos), std::begin(this->spos));
+			std::copy(std::begin(fpos), std::end(fpos), std::begin(this->fpos));
+			reset(stim, ftim);
 		}
 
 		int attime(int64_t time, 

@@ -45,6 +45,9 @@ int main()
 	ax1.set_position_compensate(0.01);
 	//ax1.incmove(10);
 
+	linint.set_speed(1);
+	linint.incmove({ 30, 30 });
+
 	auto start = std::chrono::system_clock::now();
 	auto waituntil = start;
 
@@ -65,6 +68,7 @@ int main()
 		{
 			ax0.serve();
 			ax1.serve();
+			linint.serve();
 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		}
 	}};
