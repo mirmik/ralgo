@@ -77,6 +77,8 @@ namespace ralgo
 			// HOME_POSITION
 			virtual int set_home_position() { BUG(); }
 
+			virtual void direct_control(Speed spd) { BUG(); }
+
 			// LIMITS
 			bool position_in_limits(Position pos) { return pos > _back && pos < _forw; }
 			void set_limits(Position back, Position forw) { _back = back; _forw = forw; _limited = true; }

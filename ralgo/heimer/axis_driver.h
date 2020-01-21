@@ -118,6 +118,11 @@ namespace ralgo
 			}
 
 			virtual void apply_speed(Speed spd) = 0;
+
+			void direct_control(Speed spd) 
+			{
+				apply_speed(spd);
+			}
 		};
 	}
 }
