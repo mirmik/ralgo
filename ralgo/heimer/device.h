@@ -35,20 +35,20 @@ namespace ralgo
 
 			bool take_control(device * controller)
 			{
-				bool busy_signal = false;
-
+				bool success = true;
+				
 				if (is_busy())
 					return false;
 
 				for (auto dev : _controlled)
 				{
-					busy_signal = dev->take_control(this);
+					success = dev->take_control(this);
 
-					if (busy_signal)
+					if ( !success )
 						break;
 				}
 
-				if (busy_signal)
+				if ( !success )
 				{
 					for (auto dev : _controlled)
 					{
@@ -61,7 +61,7 @@ namespace ralgo
 					this->_controller = controller;
 				}
 
-				return busy_signal;
+				return true;
 			}
 
 			bool release_control(device * controller)
@@ -75,7 +75,7 @@ namespace ralgo
 				}
 			}
 
-			bool take_control() { return take_control(nullptr); }
+			bool take_control() { return take_control(this); }
 
 			void print_controlled_devices(nos::ostream * os, int tabs = 0) 
 			{

@@ -1,6 +1,7 @@
 #ifndef RALGO_PLANNING_TRAJ_ND_H
 #define RALGO_PLANNING_TRAJ_ND_H
 
+#include <nos/fprint.h>
 #include <ralgo/planning/phase.h>
 #include <ralgo/planning/speed_deformer.h>
 
@@ -65,7 +66,12 @@ namespace ralgo
 					setted_speed[i] = 0;
 				else
 				{
+					DPRINT(spos[i]);
+					DPRINT(fpos[i]);
+					DPRINT(stim);
+					DPRINT(ftim);
 					setted_speed[i] = (float)(fpos[i] - spos[i]) / (ftim - stim);
+					DPRINT(setted_speed[i]);
 				}
 			}
 		}
@@ -97,6 +103,11 @@ namespace ralgo
 
 			if (posmod >= 1) return 1;
 			else return 0;
+		}
+
+		ssize_t print_to(nos::ostream& os) const 
+		{
+			return nos::fprint_to(os, "({},{},{})", spos, fpos, setted_speed);
 		}
 	};
 }
