@@ -46,6 +46,7 @@ int main()
 	//ax1.incmove(10);
 
 	linint.set_speed(1);
+	linint.set_accdcc_value(0.1, 0.1);
 	linint.incmove({ -5, 5 });
 
 	auto start = std::chrono::system_clock::now();

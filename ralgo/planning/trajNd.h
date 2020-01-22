@@ -11,6 +11,8 @@ namespace ralgo
 	class trajNd
 	{
 	protected:
+		// Время в дискретных единицах времени. 
+		// (см. ralgo::discrete_time_frequency) 
 		int64_t stim;
 		int64_t ftim;
 
@@ -66,12 +68,7 @@ namespace ralgo
 					setted_speed[i] = 0;
 				else
 				{
-					DPRINT(spos[i]);
-					DPRINT(fpos[i]);
-					DPRINT(stim);
-					DPRINT(ftim);
 					setted_speed[i] = (float)(fpos[i] - spos[i]) / (ftim - stim);
-					DPRINT(setted_speed[i]);
 				}
 			}
 		}
@@ -103,6 +100,27 @@ namespace ralgo
 
 			if (posmod >= 1) return 1;
 			else return 0;
+		}
+
+		void set_speed_pattern(float acc, float dcc, float speed) 
+		{
+			// Чтобы расчитать интервал времени разгона, необходимо
+			// соотнести значение ускорения и скорости.
+			// Здесь acc - тангенс угла, 
+			// setted_speed - установленная скорость в дискреных единицах
+			// тогда setted_speed / acc = acc_time в дискретных единицах
+
+			float time = ftim - stim;
+
+			float acc_time = speed / acc * ralgo::discrete_time_frequency();
+			float dcc_time = speed / dcc * ralgo::discrete_time_frequency();
+
+			float acc_part = acc_time / time;
+			float dcc_part = dcc_time / time;
+
+			//ralgo::speed_deformer::acc_dcc_balance(acc_part, dcc_part);
+
+			spddeform.reset2(acc_part, dcc_part);
 		}
 
 		ssize_t print_to(nos::ostream& os) const 

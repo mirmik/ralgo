@@ -11,10 +11,16 @@ namespace ralgo
 		template<size_t Dim, class Position, class Speed>
 		class linear_interpolator : public heimer::device
 		{
+			// Линейная интерполяция в декартовой метрике.
+			// Disclaimer: Линейная интерполяция - это немного другое...
+			// ее тут пока нет...
+
 			using parent = heimer::device;
 
 			Speed _speed = 0;
-			float _accdcc = 0;
+			//float _accdcc = 0;
+			float _acc_val = 0;
+			float _dcc_val = 0;
 
 			trajNd<Dim, Position, Speed> * trajectory;
 			trajNd_line<Dim, Position, Speed> lintraj;
@@ -59,7 +65,8 @@ namespace ralgo
 				}
 
 				lintraj.reset(curtime, tgttim);
-				lintraj.spddeform.reset(_accdcc, _accdcc);
+				lintraj.set_speed_pattern(_acc_val, _dcc_val, _speed);
+				//lintraj.spddeform.reset(_accdcc, _accdcc);
 
 				trajectory = &lintraj;
 			}
@@ -69,9 +76,16 @@ namespace ralgo
 				_speed = speed;
 			}
 
-			void set_accdcc(float accdcc)
+			//void set_accdcc(float accdcc)
+			//{
+				// _accdcc = accdcc;
+			//}
+
+			// Установить ускорение в собственных единицах 1/c^2. 
+			void set_accdcc_value(float acc, float dcc) 
 			{
-				_accdcc = accdcc;
+				_acc_val = acc;
+				_dcc_val = dcc; 
 			}
 
 			void update_phase()
