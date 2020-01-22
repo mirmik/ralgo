@@ -18,12 +18,10 @@ namespace ralgo
 	{
 		float acc = 0;
 		float dcc = 0;
-		//int32_t s_time;
 		float f_time = 1;
 
 		float strt_spd = 0;
 		float fini_spd = 0;
-		//float nati_spd;
 		float real_spd = 0;
 
 		float fini_acc_pos = 0;
@@ -49,7 +47,47 @@ namespace ralgo
 			//Вычисляем коэффициенты позиции в точках окончания участков.
 			fini_acc_pos = (strt_spd + real_spd) * acc / 2;
 			strt_dcc_pos = fini_acc_pos + real_spd * (f_time - acc - dcc);
+		}
 
+		// Второй вариант инициализации, когда вместо увеличения максимальной скорости
+		// расширяется время довода изделия.
+		void reset2(float acc, float dcc, float sspd = 0, float fspd = 0)
+		{
+			PRINT(acc);
+			PRINT(dcc);
+
+			this->acc = acc;
+			this->dcc = dcc;
+
+			strt_spd = sspd;
+			fini_spd = fspd;
+			real_spd = 1;
+
+			if (acc + dcc < 2) 
+			{
+				f_time = 1 
+					+ (1 - sspd) * acc; 
+					+ (1 - fspd) * dcc;	
+			}
+			else 
+			{
+				PRINT(acc);
+				PRINT(dcc);
+				real_spd = sqrt(2 / (acc + dcc));
+				this->acc = acc * real_spd;
+				this->dcc = dcc * real_spd;	
+				f_time = this->acc + this->dcc;
+			}
+
+			DPRINT(this->acc);
+			DPRINT(this->dcc);
+			DPRINT(this->f_time);
+			DPRINT(real_spd);
+
+			//Вычисляем коэффициенты позиции в точках окончания участков.
+			fini_acc_pos = (strt_spd + real_spd) * this->acc / 2;
+			strt_dcc_pos = fini_acc_pos + real_spd 
+				* (f_time - this->acc - this->dcc);
 		}
 
 		speed_deformer& operator = (const speed_deformer& oth) = default;
@@ -62,12 +100,6 @@ namespace ralgo
 
 		float posmod(float t)
 		{
-//			DPRINT(acc);
-//			DPRINT(dcc);
-//			DPRINT(f_time);
-//			DPRINT(t);
-
-			//while(1);
 			if (t >= f_time)
 			{
 				return 1;
@@ -75,9 +107,6 @@ namespace ralgo
 
 			if (t < acc)
 			{
-				//dprln("variant 1");
-				//return
-				//    t * (real_spd + strt_spd) / 2;
 				return
 				    t * strt_spd
 				    + t * (t / acc * (real_spd - strt_spd) / 2);
@@ -85,7 +114,6 @@ namespace ralgo
 
 			if (t < f_time - dcc)
 			{
-				//dprln("variant 2");
 				return
 				    fini_acc_pos
 				    + real_spd * (t - acc);
@@ -93,7 +121,6 @@ namespace ralgo
 
 			else
 			{
-				//dprln("variant 3");
 				auto loct = t - f_time + dcc;
 				return strt_dcc_pos
 				       + (loct) * real_spd
@@ -121,31 +148,42 @@ namespace ralgo
 
 			else
 			{
-				float k = (1 - t) / dcc;
+				float k = (f_time - t) / dcc;
 				return fini_spd * (1 - k) + real_spd * k;
 			}
 		}
 
-		void nullify() 
+		void nullify()
 		{
 			strt_spd = fini_spd = 0;
-			f_time = 1;			
+			f_time = 1;
+		}
+
+		static void acc_dcc_balance(float& acc, float& dcc)
+		{
+			float sum = acc + dcc;
+
+			if (sum > 1.0)
+			{
+				acc = acc / sum;
+				dcc = dcc / sum;
+			}
 		}
 	};
 
-	class speed_deformed
+	/*class speed_deformed
 	{
 		int64_t stim, ftim;
 
 	public:
-		ralgo::speed_deformer spddeform;		
+		ralgo::speed_deformer spddeform;
 
 		speed_deformed(){}
 
-		speed_deformed(int64_t stim, int64_t ftim) : 
+		speed_deformed(int64_t stim, int64_t ftim) :
 			stim(stim), ftim(ftim)
 		{}
-	};
+	};*/
 }
 
 #endif
