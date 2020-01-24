@@ -36,6 +36,9 @@ namespace ralgo
 			bool take_control(device * controller)
 			{
 				bool success = true;
+
+				if (_controller == this) 
+					return true;
 				
 				if (is_busy())
 					return false;

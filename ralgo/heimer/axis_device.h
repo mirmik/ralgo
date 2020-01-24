@@ -3,6 +3,7 @@
 
 #include <igris/util/bug.h>
 #include <igris/math.h>
+#include <igris/dtrace.h>
 
 #include <ralgo/info.h>
 
@@ -37,7 +38,7 @@ namespace ralgo
 			// INCMODE
 			virtual int incmove(Position dist)
 			{
-				if (take_control())
+				if (!take_control())
 				{
 					ralgo::warning("axis_device take_control fault");
 					return false;
@@ -57,8 +58,13 @@ namespace ralgo
 
 			virtual int absmove(Position tgtpos)
 			{
-				if (take_control())
+				DTRACE();
+
+				if (!take_control())
+				{
+					ralgo::warning("axis_device take_control fault");
 					return false;
+				}
 
 				if (_limited)
 					tgtpos = igris::clamp(tgtpos, _back, _forw);

@@ -39,11 +39,11 @@ namespace ralgo
 				_current_trajectory = traj;
 			}
 
-			int incmove_unsafe(Position dist) override
+			int _absmove_unsafe(Position curpos, Position tgtpos)
 			{
-				auto curpos = current_position();
+				DTRACE();
+				auto dist = tgtpos - curpos;
 				int64_t curtim = ralgo::discrete_time();
-				auto tgtpos = curpos + dist;
 				int64_t tgttim = curtim
 				                 + (int64_t)((Speed)abs(dist) / parent::_speed
 				                             * ralgo::discrete_time_frequency());
@@ -51,18 +51,30 @@ namespace ralgo
 				auto acc = parent::_accdcc / (tgttim - curtim);
 				auto dcc = parent::_accdcc / (tgttim - curtim);
 
-				//auto acc = 0.1;
-				//auto dcc = 0.1;
-
 				line_traj.reset(curpos, curtim, tgtpos, tgttim);
 				line_traj.spddeform.reset(acc, dcc);
 
+				DPRINT(curtim);
+				DPRINT(tgttim);
+				DPRINT(curpos);
+				DPRINT(tgtpos);
+
 				set_trajectory(&line_traj);
+				return 0;
+			}
+			
+			int incmove_unsafe(Position dist) override
+			{
+				DTRACE();
+				auto curpos = current_position();
+				return _absmove_unsafe(curpos, curpos + dist);
 			}
 
 			int absmove_unsafe(Position pos) override
 			{
-				BUG();
+				DTRACE();
+				auto curpos = current_position();
+				return _absmove_unsafe(curpos, pos);
 			}
 
 			int attime(int64_t time, Position& pos, Speed& spd)

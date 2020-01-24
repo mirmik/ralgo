@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <igris/math.h>
 #include <igris/sync/syslock.h>
+#include <ralgo/heimer/speed_phaser.h>
 
 namespace ralgo
 {
@@ -34,6 +35,8 @@ namespace ralgo
 			//float speed_multiplier = 1;
 
 		public:
+			Position current_step() { return curstep; }
+
 			//Position position () { return virtual_pos; }
 			//Position current_position () { return virtual_pos; }
 			void set_current_position(Position pos)

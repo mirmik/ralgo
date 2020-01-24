@@ -27,6 +27,11 @@ namespace ralgo
 			{
 				_phaser->set_speed(spd);
 			}
+
+			speed_phaser<Position,IntPos,Speed> * phaser() 
+			{
+				return _phaser;
+			}
 		};
 	}
 }
