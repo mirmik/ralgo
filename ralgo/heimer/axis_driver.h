@@ -96,6 +96,8 @@ namespace ralgo
 			{
 				// Установить текущие целевые параметры.
 				attime(ralgo::discrete_time(), tgtpos, tgtspd);
+				tgtspd = tgtspd * ralgo::discrete_time_frequency();
+				//DPRINT(tgtspd);
 				compspd = eval_compensated_speed(tgtpos, tgtspd);
 			}
 
