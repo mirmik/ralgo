@@ -4,6 +4,7 @@
 #include <ralgo/disctime.h>
 #include <ralgo/heimer/device.h>
 
+#include <igris/dprint.h>
 #include <iostream>
 
 namespace ralgo 
@@ -14,8 +15,8 @@ namespace ralgo
 		class speed_phaser : public ralgo::heimer::device
 		{
 		protected:
-			IntPos _feedback_position = 0;
-			IntPos _target_position = 0;
+			volatile IntPos _feedback_position = 0;
+			volatile IntPos _target_position = 0;
 			float _deltatime = 1;
 			float _gain = 1;
 
@@ -43,9 +44,11 @@ namespace ralgo
 
 			virtual void serve() = 0;
 			
-			void set_gain(float gain) { _gain = gain; } 
+			void set_gain(float gain) { DTRACE(); DPRINT(gain); _gain = gain; } 
 			void set_deltatime(int32_t ticks_per_second) 
-			{	_deltatime = ralgo::discrete_time_frequency() / ticks_per_second; }
+			{	//_deltatime = ralgo::discrete_time_frequency() / ticks_per_second; 
+				_deltatime = 1 / ticks_per_second; 
+			}
 		};
 
 		template <class ExtPos, class IntPos, class Speed>
