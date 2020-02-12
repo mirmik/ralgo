@@ -7,6 +7,11 @@ namespace ralgo
 {
 	int64_t discrete_time();
 	float discrete_time_frequency();
+
+	template<class Time> Time current_time() 
+	{
+		return (Time)discrete_time() / discrete_time_frequency();
+	}
 }
 
 #endif

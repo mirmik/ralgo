@@ -12,7 +12,8 @@ namespace ralgo
 	class traj1d
 	{
 	public:
-		virtual int attime(int64_t time, P& pos, V& spd) = 0;
+		virtual int attime(int64_t time, P& pos, V& spd, 
+			int64_t time_multiplier) = 0;
 		virtual bool is_finished(int64_t time) = 0;
 	};
 
@@ -55,15 +56,20 @@ namespace ralgo
 			return time > ftim;
 		}
 
-		int attime(int64_t time, P& pos, V& spd) override
+		int attime(int64_t time, P& pos, V& spd,
+			int64_t time_multiplier) override
 		{
+			// Умножение на коэффициент времени перерасщитывает скорость
+			// взятую на дискретную единицу времени в скорость взятую
+			// на единицу времени рабочего пространства.  
+
 			float time_unit = (float)(time - stim) / (ftim - stim);
 
 			auto posmod = spddeform.posmod(time_unit);
 			auto spdmod = spddeform.spdmod(time_unit);
 
 			pos = fpos * posmod + spos * (1 - posmod);
-			spd = setted_speed * spdmod;
+			spd = setted_speed * spdmod * time_multiplier;
 
 			if (posmod >= 1) return 1;
 			else return 0;
@@ -92,6 +98,39 @@ namespace ralgo
 			    //	dcc);
 			);
 		}
+
+		void set_speed_pattern(float acc, float dcc, float speed) 
+		{
+			// Чтобы расчитать интервал времени разгона, необходимо
+			// соотнести значение ускорения и скорости.
+			// Здесь acc - тангенс угла, 
+			// setted_speed - установленная скорость в дискреных единицах
+			// тогда setted_speed / acc = acc_time в дискретных единицах
+
+			DTRACE();
+
+			float time = ftim - stim;
+
+			float acc_time = speed / acc * ralgo::discrete_time_frequency();
+			float dcc_time = speed / dcc * ralgo::discrete_time_frequency();
+
+			float acc_part = acc_time / time;
+			float dcc_part = dcc_time / time;
+
+			DPRINT(acc);
+			DPRINT(dcc);
+			DPRINT(speed);
+			DPRINT(stim);
+			DPRINT(ftim);
+
+			DPRINT(acc_part);
+			DPRINT(dcc_part);
+
+			//ralgo::speed_deformer::acc_dcc_balance(acc_part, dcc_part);
+
+			spddeform.reset2(acc_part, dcc_part);
+		}
+
 	};
 }
 

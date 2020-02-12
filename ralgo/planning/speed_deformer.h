@@ -53,8 +53,8 @@ namespace ralgo
 		// расширяется время довода изделия.
 		void reset2(float acc, float dcc, float sspd = 0, float fspd = 0)
 		{
-			PRINT(acc);
-			PRINT(dcc);
+			DPRINT(acc);
+			DPRINT(dcc);
 
 			this->acc = acc;
 			this->dcc = dcc;
@@ -71,8 +71,8 @@ namespace ralgo
 			}
 			else 
 			{
-				PRINT(acc);
-				PRINT(dcc);
+				DPRINT(acc);
+				DPRINT(dcc);
 				real_spd = sqrt(2 / (acc + dcc));
 				this->acc = acc * real_spd;
 				this->dcc = dcc * real_spd;	

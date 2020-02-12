@@ -25,7 +25,8 @@ namespace ralgo
 			int32_t _accdcc_protector = 0;
 
 			Speed _speed = 0;
-			int32_t _accdcc = 0;
+			float _acc_val = 0; 
+			float _dcc_val = 0;
 
 			bool _reverse = false;
 			Position _offset = 0;
@@ -111,14 +112,31 @@ namespace ralgo
 			}
 
 			// ACCDCC
-			virtual void set_accdcc(Time accdcc) { _accdcc = protect_accdcc(accdcc); }
-			Time setted_accdcc() { return _accdcc; }
+			virtual void set_accdcc_value(float acc, float dcc) 
+			{
+				DTRACE();
+				DPRINT(acc);
+				DPRINT(dcc); 
+				_acc_val = protect_accdcc(acc);
+				_dcc_val = protect_accdcc(dcc);
+			}
+			//Time setted_accdcc() { return _accdcc; }
 			Time protect_accdcc(Time accdcc)
 			{
 				if (accdcc < _accdcc_protector)
 					return _accdcc_protector;
 				else
 					return accdcc;
+			}
+
+			Speed acceleration_value() 
+			{
+				return _acc_val;
+			}
+
+			Speed decceleration_value() 
+			{
+				return _dcc_val;
 			}
 		};
 	}

@@ -29,6 +29,16 @@ namespace ralgo
 			ralgo::traj1d<Position, Speed> * _current_trajectory = nullptr;
 
 		public:
+			ralgo::traj1d_line<Position, Speed> * linear_trajectory() 
+			{
+				return &line_traj;
+			}
+
+			ralgo::traj1d<Position, Speed> * current_trajectory() 
+			{
+				return _current_trajectory;
+			}
+
 			void set_position_compensate(float koeff)
 			{
 				poskoeff = koeff;
@@ -42,27 +52,47 @@ namespace ralgo
 			int _absmove_unsafe(Position curpos, Position tgtpos)
 			{
 				DTRACE();
+
+				dprln("1");
 				auto dist = tgtpos - curpos;
+
+				dprln("2");
 				int64_t curtim = ralgo::discrete_time();
-				int64_t tgttim = curtim
-				                 + (int64_t)((Speed)abs(dist) / parent::_speed
-				                             * ralgo::discrete_time_frequency());
+				
+				Speed dist_mul_freq = (Speed)fabs(dist) * ralgo::discrete_time_frequency();
+				int64_t tgttim = curtim + (int64_t)(dist_mul_freq / parent::_speed);
 
-				auto acc = parent::_accdcc / (tgttim - curtim);
-				auto dcc = parent::_accdcc / (tgttim - curtim);
 
-				line_traj.reset(curpos, curtim, tgtpos, tgttim);
-				line_traj.spddeform.reset(acc, dcc);
+				DPRINT(fabs(dist));
+				DPRINT(ralgo::discrete_time_frequency());
+				DPRINT(dist_mul_freq);
+				DPRINT(parent::_speed);
+				//DPRINT(((Speed)abs(dist)) * ((Speed)ralgo::discrete_time_frequency()) / parent::_speed);
 
+				//auto acc = parent::_acc / (tgttim - curtim);
+				//auto dcc = parent::_accdcc / (tgttim - curtim);
+
+				dprln("3");
+				DPRINT(parent::_acc_val);
+				DPRINT(parent::_dcc_val);
+
+				dprln("a");
+				DPRINT(dist);
+				DPRINT(parent::_speed);
 				DPRINT(curtim);
 				DPRINT(tgttim);
-				DPRINT(curpos);
-				DPRINT(tgtpos);
+				line_traj.reset(curpos, curtim, tgtpos, tgttim);
+				
+				dprln("c");
+				line_traj.set_speed_pattern(parent::_acc_val, parent::_dcc_val,
+					parent::_speed);
 
+				dprln("b");
 				set_trajectory(&line_traj);
+				dprln("out");
 				return 0;
 			}
-			
+
 			int incmove_unsafe(Position dist) override
 			{
 				DTRACE();
@@ -79,7 +109,7 @@ namespace ralgo
 
 			int attime(int64_t time, Position& pos, Speed& spd)
 			{
-				return _current_trajectory->attime(time, pos, spd);
+				return _current_trajectory->attime(time, pos, spd, ralgo::discrete_time_frequency());
 			}
 
 			std::pair<Position, Speed> phase()
@@ -87,7 +117,9 @@ namespace ralgo
 				Position pos = 0;
 				Speed spd = 0;
 				if (_current_trajectory)
-					_current_trajectory->attime(ralgo::discrete_time(), pos, spd);
+					_current_trajectory->attime(
+					    ralgo::discrete_time(), pos, spd,
+					    ralgo::discrete_time_frequency());
 				return std::make_pair(pos, spd);
 			}
 
@@ -96,7 +128,7 @@ namespace ralgo
 			{
 				// Установить текущие целевые параметры.
 				attime(ralgo::discrete_time(), tgtpos, tgtspd);
-				tgtspd = tgtspd * ralgo::discrete_time_frequency();
+				//tgtspd = tgtspd * ralgo::discrete_time_frequency();
 				//DPRINT(tgtspd);
 				compspd = eval_compensated_speed(tgtpos, tgtspd);
 			}
@@ -133,7 +165,7 @@ namespace ralgo
 
 			virtual void apply_speed(Speed spd) = 0;
 
-			void direct_control(Speed spd) 
+			void direct_control(Speed spd)
 			{
 				apply_speed(spd);
 			}

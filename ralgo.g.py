@@ -21,6 +21,7 @@ licant.module("ralgo",
 	],
 	include_paths=["."],
 	mdepends=[
+		"ralgo.include",
 		"ralgo.info",
 		"ralgo.fault",
 		"ralgo.disctime"
