@@ -20,7 +20,8 @@ namespace ralgo
 		virtual int attime(
 		    int64_t time,
 		    igris::array_view<Position> pos,
-		    igris::array_view<Speed> spd
+		    igris::array_view<Speed> spd,
+		    int64_t time_multiplier
 		) = 0;
 		
 		virtual bool is_finished(int64_t time) 
@@ -87,15 +88,20 @@ namespace ralgo
 
 		int attime(int64_t time, 
 			igris::array_view<Position> pos, 
-			igris::array_view<Speed> spd) override
+			igris::array_view<Speed> spd,
+			int64_t time_multiplier) override
 		{
+			// Умножение на коэффициент времени перерасщитывает скорость
+			// взятую на дискретную единицу времени в скорость взятую
+			// на единицу времени рабочего пространства.  
+
 			float time_unit = (float)(time - stim) / (ftim - stim);
 			auto posmod = spddeform.posmod(time_unit);
 			auto spdmod = spddeform.spdmod(time_unit);
 
 			for (int i = 0; i < Dim; ++i) {
 				pos[i] = fpos[i] * posmod + spos[i] * (1 - posmod);
-				spd[i] = setted_speed[i] * spdmod;
+				spd[i] = setted_speed[i] * spdmod * time_multiplier;
 			}
 
 			if (posmod >= 1) return 1;

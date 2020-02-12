@@ -22,17 +22,19 @@ namespace ralgo
 		{
 		protected:
 			using phaser = speed_phaser<Position, IntPos, Speed>;
+			using phaser::ext2int_pos;
+
 			int32_t steps_total = 0;
 
-			volatile IntPos curstep = 0;
+			volatile double curstep = 0;
 
 			IntPos pulsewidth = 0;
 			IntPos pulsewidth_triggered = 0;
 			IntPos accum = 0;
 
 			float triglevel = 0.7;
-			volatile IntPos virtual_pos = 0;
-			volatile IntPos control_pos = 0;
+			volatile double virtual_pos = 0;
+			volatile double control_pos = 0;
 
 			//float speed_multiplier = 1;
 
@@ -46,8 +48,8 @@ namespace ralgo
 			//Position current_position () { return virtual_pos; }
 			void set_current_position(Position pos)
 			{
-				virtual_pos = pos;
-				control_pos = pos;
+				virtual_pos = ext2int_pos(pos);
+				control_pos = ext2int_pos(pos);
 			}
 
 			void set_gear(Position gear)
@@ -56,6 +58,8 @@ namespace ralgo
 				pulsewidth_triggered = gear * triglevel;
 			}
 
+			auto get_gear() { return pulsewidth; }
+
 			virtual void inc() = 0;
 			virtual void dec() = 0;
 
@@ -63,10 +67,6 @@ namespace ralgo
 			{
 				igris::syslock lock();
 				curstep = spd * phaser::_deltatime;
-
-				DPRINT(spd);
-				DPRINT(phaser::_deltatime);
-				DPRINT(curstep);
 
 				if ( ABS(curstep) > pulsewidth )
 				{

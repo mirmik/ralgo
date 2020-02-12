@@ -147,6 +147,36 @@ namespace ralgo
 			return sqrt(res);
 		}
 
+		// Вычислить расстояние между кортежами равного размера по 
+		// евклидовой метрике.
+		template <class R=double, class A, class B>
+		R distance2(const A& a, const B& b) 
+		{
+			R accum = 0;
+
+			for (int i = 0; i < a.size(); ++i) 
+			{
+				auto diff = a[i] - b[i];
+				accum += diff * diff;
+			}
+
+			return accum;
+		}
+
+		// Вычислить расстояние между кортежами равного размера по 
+		// евклидовой метрике.
+		template <class R=double, class A, class B>
+		R distance(const A& a, const B& b) 
+		{
+			return sqrt(distance2<R,A,B>(a,b));
+		}
+
+		template <class R, class A>
+		R cast(const A& a) 
+		{
+			return elementwise<R>([](auto x){ return x; }, a);
+		}
+
 		template <class R=void, class A, class B> defsame_t<R,A> add_vs(const A& a, B b) { return elementwise<R>(ralgo::op::add(), a, b); }
 		template <class R=void, class A, class B> defsame_t<R,A> sub_vs(const A& a, B b) { return elementwise<R>(ralgo::op::sub(), a, b); }
 		template <class R=void, class A, class B> defsame_t<R,A> mul_vs(const A& a, B b) { return elementwise<R>(ralgo::op::mul(), a, b); }

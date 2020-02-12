@@ -1,6 +1,9 @@
 #ifndef RALGO_HEIMER_LINEAR_INTERPOLATOR_H
 #define RALGO_HEIMER_LINEAR_INTERPOLATOR_H
 
+#include <iterator>
+
+#include <ralgo/heimer/interpolation_group.h>
 #include <ralgo/planning/trajNd.h>
 #include <ralgo/vecops.h>
 
@@ -8,14 +11,14 @@ namespace ralgo
 {
 	namespace heimer
 	{
-		template<size_t Dim, class Position, class Speed>
-		class linear_interpolator : public heimer::device
+		template<int Dim, class Position, class Speed>
+		class linear_interpolator : public interpolation_group<Position, Speed>
 		{
 			// Линейная интерполяция в декартовой метрике.
 			// Disclaimer: Линейная интерполяция - это немного другое...
 			// ее тут пока нет...
 
-			using parent = heimer::device;
+			using parent = interpolation_group<Position, Speed>;
 
 			Speed _speed = 0;
 			//float _accdcc = 0;
@@ -34,63 +37,112 @@ namespace ralgo
 			linear_interpolator(
 			    igris::array_view<heimer::device*> axes)
 			{
-				set_controlled(axes);
+				parent::set_controlled(axes);
 			}
+
+			constexpr int dim() override { return Dim; }
 
 			axis_device<float, float> * get_axis(int index)
 			{
-				return static_cast<axis_device<float, float>*>(controlled()[index]);
+				return static_cast<axis_device<Position, Speed>*>(
+					parent::controlled()[index]);
 			}
 
-			void incmove(
-			    igris::array_view<Position> mov
-			)
+			int move(
+				igris::array_view<Position> curpos, 
+				igris::array_view<Position> tgtpos) 
 			{
-				take_control();
-				auto dist = ralgo::vecops::norm(mov);
+				int success = parent::take_control();
+				if (success == false) 
+				{
+					return -1;
+				}
+
+				auto dist = ralgo::vecops::distance(curpos, tgtpos);
 				int64_t time = (int64_t)((Speed)abs(dist) / _speed * ralgo::discrete_time_frequency());
 				int64_t curtime = ralgo::discrete_time();
 				int64_t tgttim = curtime + time;
 
-				for (int i = 0; i < mov.size(); ++i)
-				{
-					auto curpos = static_cast<ralgo::heimer::axis_device<Position, Speed>*>(
-					                               _controlled[i])->current_position();
-					lintraj.set_start_position(i, curpos);
-				}
+//				for (int i = 0; i < mov.size(); ++i)
+//				{
+//					auto curpos = get_axis(i)->current_position();
+//					lintraj.set_start_position(i, curpos);
+//				}
 
-				for (int i = 0; i < mov.size(); ++i)
-				{
-					lintraj.set_finish_position_inc(i, mov[i]);
-				}
+//				for (int i = 0; i < tgtpos.size(); ++i)
+//				{
+//					lintraj.set_finish_position_inc(i, tgtpos[i]);
+//				}
 
-				lintraj.reset(curtime, tgttim);
+				lintraj.reset(curpos, curtime, tgtpos, tgttim);
 				lintraj.set_speed_pattern(_acc_val, _dcc_val, _speed);
 				//lintraj.spddeform.reset(_accdcc, _accdcc);
 
 				trajectory = &lintraj;
+
+				return 0;
 			}
 
-			void set_speed(Speed speed)
+			int incmove(
+			    igris::array_view<Position> mov
+			)
+			{
+				Position curpos[Dim];
+				Position tgtpos[Dim];
+			
+				for (int i = 0; i < mov.size(); ++i) 
+				{
+					curpos[i] = get_axis(i)->current_position();
+					tgtpos[i] = curpos[i] + mov[i];
+				}
+
+				return move(curpos, tgtpos);	
+			}
+
+			int absmove(
+			    igris::array_view<Position> pos
+			)
+			{
+				Position curpos[Dim];
+				Position tgtpos[Dim];
+			
+				for (int i = 0; i < pos.size(); ++i) 
+				{
+					curpos[i] = get_axis(i)->current_position();
+					tgtpos[i] = pos[i];
+				}
+
+				return move(curpos, tgtpos);	
+			}
+
+			int incmove(Position * mov) override 
+			{
+				return incmove({mov,Dim});
+			}
+
+			int absmove(Position * pos) override 
+			{
+				return incmove({pos,Dim});
+			}
+
+			int set_speed(Speed speed) override
 			{
 				_speed = speed;
+				return 0;
 			}
 
-			//void set_accdcc(float accdcc)
-			//{
-				// _accdcc = accdcc;
-			//}
-
 			// Установить ускорение в собственных единицах 1/c^2. 
-			void set_accdcc_value(float acc, float dcc) 
+			int set_accdcc_value(float acc, float dcc) override
 			{
 				_acc_val = acc;
 				_dcc_val = dcc; 
+				return 0;
 			}
 
 			void update_phase()
 			{
-				trajectory->attime(ralgo::discrete_time(), tgtpos, tgtspd);
+				trajectory->attime(ralgo::discrete_time(), tgtpos, tgtspd, 
+					ralgo::discrete_time_frequency() /*time_multiplier*/);
 
 				// Счетчик меняется в прерывании, так что
 				// снимаем локальную копию.
@@ -100,8 +152,7 @@ namespace ralgo
 				for (int i = 0; i < Dim; ++i)
 				{
 
-					Position current = static_cast<ralgo::heimer::axis_device<Position, Speed>*>(
-					                 _controlled[i])->current_position();
+					Position current = get_axis(i)->current_position();
 
 					// Ошибка по установленному значению.
 					Position diff = tgtpos[i] - current;
@@ -116,8 +167,7 @@ namespace ralgo
 			{
 				for (int i = 0; i < Dim; ++i)
 				{
-					static_cast<ralgo::heimer::axis_device<Position, Speed>*>(
-					                 _controlled[i])->direct_control(compspd[i]);
+					get_axis(i)->direct_control(compspd[i]);
 				}
 			}
 
@@ -129,6 +179,10 @@ namespace ralgo
 					apply_phase();
 				}
 			}
+
+			Speed speed() override { return _speed; }
+			Speed acceleration() override { return _acc_val; }
+			Speed deceleration() override { return _dcc_val; }
 		};
 	}
 }

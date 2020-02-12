@@ -5,6 +5,7 @@
 #include <ralgo/heimer/device.h>
 
 #include <igris/dprint.h>
+#include <igris/dtrace.h>
 #include <iostream>
 
 namespace ralgo 
@@ -44,10 +45,11 @@ namespace ralgo
 
 			virtual void serve() = 0;
 			
-			void set_gain(float gain) { DTRACE(); DPRINT(gain); _gain = gain; } 
+			void set_gain(float gain) { _gain = gain; } 
+			auto get_gain() { return _gain; }
 			void set_deltatime(int32_t ticks_per_second) 
 			{	//_deltatime = ralgo::discrete_time_frequency() / ticks_per_second; 
-				_deltatime = 1 / ticks_per_second; 
+				_deltatime = 1.0 / ticks_per_second; 
 			}
 		};
 
