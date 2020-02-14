@@ -106,9 +106,6 @@ namespace ralgo
 			// Здесь acc - тангенс угла, 
 			// setted_speed - установленная скорость в дискреных единицах
 			// тогда setted_speed / acc = acc_time в дискретных единицах
-
-			DTRACE();
-
 			float time = ftim - stim;
 
 			float acc_time = speed / acc * ralgo::discrete_time_frequency();
@@ -116,17 +113,6 @@ namespace ralgo
 
 			float acc_part = acc_time / time;
 			float dcc_part = dcc_time / time;
-
-			DPRINT(acc);
-			DPRINT(dcc);
-			DPRINT(speed);
-			DPRINT(stim);
-			DPRINT(ftim);
-
-			DPRINT(acc_part);
-			DPRINT(dcc_part);
-
-			//ralgo::speed_deformer::acc_dcc_balance(acc_part, dcc_part);
 
 			spddeform.reset2(acc_part, dcc_part);
 		}

@@ -53,9 +53,6 @@ namespace ralgo
 		// расширяется время довода изделия.
 		void reset2(float acc, float dcc, float sspd = 0, float fspd = 0)
 		{
-			DPRINT(acc);
-			DPRINT(dcc);
-
 			this->acc = acc;
 			this->dcc = dcc;
 
@@ -71,18 +68,11 @@ namespace ralgo
 			}
 			else 
 			{
-				DPRINT(acc);
-				DPRINT(dcc);
 				real_spd = sqrt(2 / (acc + dcc));
 				this->acc = acc * real_spd;
 				this->dcc = dcc * real_spd;	
 				f_time = this->acc + this->dcc;
 			}
-
-			DPRINT(this->acc);
-			DPRINT(this->dcc);
-			DPRINT(this->f_time);
-			DPRINT(real_spd);
 
 			//Вычисляем коэффициенты позиции в точках окончания участков.
 			fini_acc_pos = (strt_spd + real_spd) * this->acc / 2;
