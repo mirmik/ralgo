@@ -114,9 +114,6 @@ namespace ralgo
 			// ACCDCC
 			virtual void set_accdcc_value(float acc, float dcc) 
 			{
-				DTRACE();
-				DPRINT(acc);
-				DPRINT(dcc); 
 				_acc_val = protect_accdcc(acc);
 				_dcc_val = protect_accdcc(dcc);
 			}

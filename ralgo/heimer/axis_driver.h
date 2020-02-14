@@ -5,6 +5,7 @@
 #include <ralgo/planning/traj1d.h>
 
 #include <igris/dtrace.h>
+#include <igris/event/event.h>
 
 #include <iostream>
 
@@ -22,19 +23,29 @@ namespace ralgo
 			Speed tgtspd = 0;
 			float poskoeff = 0;
 
+			bool operation_finished_flag = true;
+
 		public:
 			using parent::current_position;
 			using parent::set_speed;
 			ralgo::traj1d_line<Position, Speed> line_traj;
 			ralgo::traj1d<Position, Speed> * _current_trajectory = nullptr;
 
+			igris::event operation_finish_event;
+
+			void set_operation_finish_event(igris::event ev)
+			{
+				DTRACE();
+				operation_finish_event = ev;
+			}
+
 		public:
-			ralgo::traj1d_line<Position, Speed> * linear_trajectory() 
+			ralgo::traj1d_line<Position, Speed> * linear_trajectory()
 			{
 				return &line_traj;
 			}
 
-			ralgo::traj1d<Position, Speed> * current_trajectory() 
+			ralgo::traj1d<Position, Speed> * current_trajectory()
 			{
 				return _current_trajectory;
 			}
@@ -53,43 +64,21 @@ namespace ralgo
 			{
 				DTRACE();
 
-				dprln("1");
 				auto dist = tgtpos - curpos;
 
-				dprln("2");
 				int64_t curtim = ralgo::discrete_time();
-				
+
 				Speed dist_mul_freq = (Speed)fabs(dist) * ralgo::discrete_time_frequency();
 				int64_t tgttim = curtim + (int64_t)(dist_mul_freq / parent::_speed);
 
 
-				DPRINT(fabs(dist));
-				DPRINT(ralgo::discrete_time_frequency());
-				DPRINT(dist_mul_freq);
-				DPRINT(parent::_speed);
-				//DPRINT(((Speed)abs(dist)) * ((Speed)ralgo::discrete_time_frequency()) / parent::_speed);
-
-				//auto acc = parent::_acc / (tgttim - curtim);
-				//auto dcc = parent::_accdcc / (tgttim - curtim);
-
-				dprln("3");
-				DPRINT(parent::_acc_val);
-				DPRINT(parent::_dcc_val);
-
-				dprln("a");
-				DPRINT(dist);
-				DPRINT(parent::_speed);
-				DPRINT(curtim);
-				DPRINT(tgttim);
 				line_traj.reset(curpos, curtim, tgtpos, tgttim);
-				
-				dprln("c");
-				line_traj.set_speed_pattern(parent::_acc_val, parent::_dcc_val,
-					parent::_speed);
 
-				dprln("b");
+				line_traj.set_speed_pattern(parent::_acc_val, parent::_dcc_val,
+				                            parent::_speed);
+
+				operation_finished_flag = false;
 				set_trajectory(&line_traj);
-				dprln("out");
 				return 0;
 			}
 
@@ -127,9 +116,13 @@ namespace ralgo
 			void update_phase()
 			{
 				// Установить текущие целевые параметры.
-				attime(ralgo::discrete_time(), tgtpos, tgtspd);
-				//tgtspd = tgtspd * ralgo::discrete_time_frequency();
-				//DPRINT(tgtspd);
+				int sts = attime(ralgo::discrete_time(), tgtpos, tgtspd);
+				if (sts && !operation_finished_flag)
+				{
+					operation_finished_flag = true;
+					operation_finish_event((void*)parent::name());
+				}
+//				if (sts) operation_finish_event(nullptr);
 				compspd = eval_compensated_speed(tgtpos, tgtspd);
 			}
 
