@@ -14,6 +14,7 @@ namespace ralgo
 		template <class Position, class Speed>
 		class axis_device : public ralgo::heimer::device
 		{
+			using parent = ralgo::heimer::device;
 			using Time = int64_t;
 
 		protected:
@@ -42,7 +43,7 @@ namespace ralgo
 				if (!take_control())
 				{
 					ralgo::warning("axis_device take_control fault");
-					return false;
+					return -1;
 				}
 
 				Position curpos = current_position();
@@ -64,7 +65,7 @@ namespace ralgo
 				if (!take_control())
 				{
 					ralgo::warning("axis_device take_control fault");
-					return false;
+					return -1;
 				}
 
 				if (_limited)
@@ -77,14 +78,10 @@ namespace ralgo
 			// POSITION
 			virtual Position current_position() { BUG(); }
 
-			// STOP
-			virtual int stop() { BUG(); }
-			virtual int hardstop() { BUG(); }
-
 			// HOME_POSITION
 			virtual int set_home_position() { BUG(); }
 
-			virtual void direct_control(Speed spd) { BUG(); }
+			virtual void direct_control(Position pos, Speed spd) = 0;
 
 			// LIMITS
 			bool position_in_limits(Position pos) { return pos > _back && pos < _forw; }
@@ -135,6 +132,18 @@ namespace ralgo
 			{
 				return _dcc_val;
 			}
+	
+			// STOP
+			virtual int hardstop() = 0;
+		
+			void stop() 
+			{
+				parent::take_control_force();
+				stop_impl(); 
+			}
+
+			virtual void stop_impl() = 0;
+
 		};
 	}
 }

@@ -7,6 +7,8 @@
 #include <ralgo/planning/trajNd.h>
 #include <ralgo/vecops.h>
 
+#include <igris/dtrace.h>
+
 namespace ralgo
 {
 	namespace heimer
@@ -28,14 +30,16 @@ namespace ralgo
 			trajNd<Dim, Position, Speed> * trajectory;
 			trajNd_line<Dim, Position, Speed> lintraj;
 
-			Position tgtpos[Dim];
+			Position ctrpos[Dim];
 			Speed compspd[Dim];
-			Speed tgtspd[Dim];
+			Speed ctrspd[Dim];
 			float poskoeff = 0.01;
 
 		public:
 			linear_interpolator(
-			    igris::array_view<heimer::device*> axes)
+				const char* name,
+			    igris::array_view<heimer::device*> axes) :
+					parent(name)
 			{
 				parent::set_controlled(axes);
 			}
@@ -52,6 +56,8 @@ namespace ralgo
 				igris::array_view<Position> curpos, 
 				igris::array_view<Position> tgtpos) 
 			{
+				DTRACE();
+
 				int success = parent::take_control();
 				if (success == false) 
 				{
@@ -73,6 +79,17 @@ namespace ralgo
 //				{
 //					lintraj.set_finish_position_inc(i, tgtpos[i]);
 //				}
+				DPRINT(dist);
+				DPRINT(time);
+				DPRINT(curtime);
+				DPRINT(tgttim);
+
+				for (int i = 0; i < Dim; ++i) 
+				{
+					DPRINT(tgtpos[i]);
+					DPRINT(curpos[i]);
+				}
+
 
 				lintraj.reset(curpos, curtime, tgtpos, tgttim);
 				lintraj.set_speed_pattern(_acc_val, _dcc_val, _speed);
@@ -90,6 +107,12 @@ namespace ralgo
 				Position curpos[Dim];
 				Position tgtpos[Dim];
 			
+				if (!parent::take_control()) 
+				{
+					ralgo::warning("linint take_control fault");
+					return -1;
+				}
+
 				for (int i = 0; i < mov.size(); ++i) 
 				{
 					curpos[i] = get_axis(i)->current_position();
@@ -105,6 +128,12 @@ namespace ralgo
 			{
 				Position curpos[Dim];
 				Position tgtpos[Dim];
+
+				if (!parent::take_control()) 
+				{
+					ralgo::warning("linint take_control fault");
+					return -1;
+				}
 			
 				for (int i = 0; i < pos.size(); ++i) 
 				{
@@ -141,33 +170,15 @@ namespace ralgo
 
 			void update_phase()
 			{
-				trajectory->attime(ralgo::discrete_time(), tgtpos, tgtspd, 
+				int is_finish = trajectory->attime(ralgo::discrete_time(), ctrpos, ctrspd, 
 					ralgo::discrete_time_frequency() /*time_multiplier*/);
-
-				// Счетчик меняется в прерывании, так что
-				// снимаем локальную копию.
-				//		auto current[Dim];
-				//		auto diff[Dim];
-
-				for (int i = 0; i < Dim; ++i)
-				{
-
-					Position current = get_axis(i)->current_position();
-
-					// Ошибка по установленному значению.
-					Position diff = tgtpos[i] - current;
-
-					// Скорость вычисляется как
-					// сумма уставной скорости на
-					compspd[i] = tgtspd[i]  + poskoeff * diff;
-				}
 			}
 
 			void apply_phase()
 			{
 				for (int i = 0; i < Dim; ++i)
 				{
-					get_axis(i)->direct_control(compspd[i]);
+					get_axis(i)->direct_control(ctrpos[i], ctrspd[i]);
 				}
 			}
 
@@ -183,6 +194,26 @@ namespace ralgo
 			Speed speed() override { return _speed; }
 			Speed acceleration() override { return _acc_val; }
 			Speed deceleration() override { return _dcc_val; }
+
+			void debug_print_traj() 
+			{
+				for (int i = 0; i < Dim; i++) 
+				{
+					DPRINT(i);
+					DPRINT(lintraj.spos[i]);
+					DPRINT(lintraj.fpos[i]);
+				}
+			}
+
+			void debug_print_state() 
+			{
+				for (int i = 0; i < Dim; i++) 
+				{
+					DPRINT(i);
+					DPRINT(ctrpos[i]);
+					DPRINT(ctrspd[i]);
+				}
+			}
 		};
 	}
 }

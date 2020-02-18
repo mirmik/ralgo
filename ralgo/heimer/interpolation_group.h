@@ -13,6 +13,8 @@ namespace ralgo
 			using parent = heimer::device;
 
 		public:
+			interpolation_group(const char* name) : parent(name) {}
+
 			virtual int incmove(Position * mov) = 0;
 			virtual int absmove(Position * pos) = 0;
 
@@ -23,6 +25,9 @@ namespace ralgo
 			virtual Speed speed() = 0;
 			virtual Speed acceleration() = 0;
 			virtual Speed deceleration() = 0;
+
+			virtual void debug_print_traj() = 0;
+			virtual void debug_print_state() = 0;
 		};
 	}
 }
