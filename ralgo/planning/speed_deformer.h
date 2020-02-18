@@ -60,11 +60,22 @@ namespace ralgo
 			fini_spd = fspd;
 			real_spd = 1;
 
+			/*DPRINT(acc);
+			DPRINT(dcc);
+			DPRINT(sspd);
+			DPRINT(fspd);*/
+
 			if (acc + dcc < 2) 
 			{
 				f_time = 1 
-					+ (1 - sspd) * acc; 
-					+ (1 - fspd) * dcc;	
+					+ (1 - sspd) * acc / 2
+					+ (1 - fspd) * dcc / 2;	
+
+			/*	DPRINT(sspd);
+				DPRINT(fspd);
+				DPRINT(acc);
+				DPRINT(dcc);
+				DPRINT(f_time);*/
 			}
 			else 
 			{
@@ -78,6 +89,8 @@ namespace ralgo
 			fini_acc_pos = (strt_spd + real_spd) * this->acc / 2;
 			strt_dcc_pos = fini_acc_pos + real_spd 
 				* (f_time - this->acc - this->dcc);
+
+//			exit(0);
 		}
 
 		speed_deformer& operator = (const speed_deformer& oth) = default;
@@ -92,11 +105,13 @@ namespace ralgo
 		{
 			if (t >= f_time)
 			{
+				//dprln("pa");
 				return 1;
 			}
 
 			if (t < acc)
 			{
+				//dprln("pb");
 				return
 				    t * strt_spd
 				    + t * (t / acc * (real_spd - strt_spd) / 2);
@@ -104,6 +119,7 @@ namespace ralgo
 
 			if (t < f_time - dcc)
 			{
+				//dprln("pc");
 				return
 				    fini_acc_pos
 				    + real_spd * (t - acc);
@@ -111,6 +127,7 @@ namespace ralgo
 
 			else
 			{
+				//dprln("pd");
 				auto loct = t - f_time + dcc;
 				return strt_dcc_pos
 				       + (loct) * real_spd
@@ -120,24 +137,30 @@ namespace ralgo
 
 		float spdmod(float t)
 		{
+			//DPRINT(t);
+			//DPRINT(f_time);
 			if (t >= f_time)
 			{
+				//dprln("a");
 				return fini_spd;
 			}
 
 			if (t < acc)
 			{
+				//dprln("b");
 				float k = t / acc;
 				return strt_spd * (1 - k) + real_spd * k;
 			}
 
 			else if (t < f_time - dcc)
 			{
+				//dprln("c");
 				return real_spd;
 			}
 
 			else
 			{
+				//dprln("d");
 				float k = (f_time - t) / dcc;
 				return fini_spd * (1 - k) + real_spd * k;
 			}
@@ -147,6 +170,20 @@ namespace ralgo
 		{
 			strt_spd = fini_spd = 0;
 			f_time = 1;
+		}
+
+		void set_stop_pattern() 
+		{
+			acc = 0;
+			dcc = 1;
+			f_time = 1;
+
+			strt_spd = 1;
+			fini_spd = 0;
+			real_spd = 1;
+
+			fini_acc_pos = 0;
+			strt_dcc_pos = 0;
 		}
 
 		static void acc_dcc_balance(float& acc, float& dcc)

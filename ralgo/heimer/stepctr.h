@@ -32,6 +32,8 @@ namespace ralgo
 			IntPos pulsewidth_triggered = 0;
 			IntPos accum = 0;
 
+			int not_corrected_counter = 0;
+
 			float triglevel = 0.7;
 			volatile double virtual_pos = 0;
 			volatile double control_pos = 0;
@@ -58,13 +60,15 @@ namespace ralgo
 				pulsewidth_triggered = gear * triglevel;
 			}
 
-			auto get_gear() { return pulsewidth; }
+			auto gear() { return pulsewidth; }
 
 			virtual void inc() = 0;
 			virtual void dec() = 0;
 
 			void set_speed_internal_impl(Speed spd) override
 			{
+				not_corrected_counter = 0;
+
 				igris::syslock lock();
 				curstep = spd * phaser::_deltatime;
 
@@ -80,6 +84,13 @@ namespace ralgo
 
 			void serve()
 			{
+				not_corrected_counter++;
+				if (not_corrected_counter > 10000) 
+				{
+					set_speed_internal_impl(0);
+					return;
+				}
+
 				virtual_pos += curstep;
 				auto diffpos = virtual_pos - control_pos;
 

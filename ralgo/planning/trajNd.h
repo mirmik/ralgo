@@ -33,6 +33,7 @@ namespace ralgo
 	template <size_t Dim, class Position, class Speed>
 	class trajNd_line : public trajNd<Dim, Position, Speed>
 	{
+	public:
 		using trajNd<Dim, Position, Speed>::stim;
 		using trajNd<Dim, Position, Speed>::ftim;
 

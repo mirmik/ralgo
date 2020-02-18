@@ -18,9 +18,9 @@ namespace ralgo
 		class axis_driver : public axis_device<Position, Speed>
 		{
 			using parent = axis_device<Position, Speed>;
-			Position tgtpos = 0;
+			Position ctrpos = 0;
 			Speed compspd = 0;
-			Speed tgtspd = 0;
+			Speed ctrspd = 0;
 			float poskoeff = 0;
 
 			bool operation_finished_flag = true;
@@ -29,8 +29,7 @@ namespace ralgo
 			using parent::current_position;
 			using parent::set_speed;
 			ralgo::traj1d_line<Position, Speed> line_traj;
-			ralgo::traj1d<Position, Speed> * _current_trajectory = nullptr;
-
+			
 			igris::event operation_finish_event;
 
 			void set_operation_finish_event(igris::event ev)
@@ -38,6 +37,9 @@ namespace ralgo
 				DTRACE();
 				operation_finish_event = ev;
 			}
+
+		private:
+			ralgo::traj1d<Position, Speed> * _current_trajectory = nullptr;
 
 		public:
 			ralgo::traj1d_line<Position, Speed> * linear_trajectory()
@@ -52,11 +54,13 @@ namespace ralgo
 
 			void set_position_compensate(float koeff)
 			{
+				DTRACE();
 				poskoeff = koeff;
 			}
 
 			void set_trajectory(ralgo::traj1d<Position, Speed> * traj)
 			{
+				DTRACE();
 				_current_trajectory = traj;
 			}
 
@@ -105,6 +109,7 @@ namespace ralgo
 			{
 				Position pos = 0;
 				Speed spd = 0;
+				
 				if (_current_trajectory)
 					_current_trajectory->attime(
 					    ralgo::discrete_time(), pos, spd,
@@ -113,32 +118,33 @@ namespace ralgo
 			}
 
 			// Вычислить текущую фазу.
-			void update_phase()
+			void update_control_by_trajectory()
 			{
 				// Установить текущие целевые параметры.
-				int sts = attime(ralgo::discrete_time(), tgtpos, tgtspd);
+				int sts = attime(ralgo::discrete_time(), ctrpos, ctrspd);
 				if (sts && !operation_finished_flag)
 				{
+					dprln("operation finish!!!!!!!!!!!!!!!!");
 					operation_finished_flag = true;
 					operation_finish_event((void*)parent::name());
+					_current_trajectory = nullptr;
 				}
-//				if (sts) operation_finish_event(nullptr);
-				compspd = eval_compensated_speed(tgtpos, tgtspd);
 			}
 
 			// Вычислить желаемую скорость по текущей фазе
-			Speed eval_compensated_speed(float tgtpos, float tgtspd)
+			Speed eval_compensated_speed()
 			{
 				// Счетчик меняется в прерывании, так что
 				// снимаем локальную копию.
 				auto current = current_position();
 
 				// Ошибка по установленному значению.
-				auto diff = tgtpos - current;
+				auto diff = ctrpos - current;
 
 				// Скорость вычисляется как
 				// сумма уставной скорости на
-				auto evalspeed = tgtspd + poskoeff * diff;
+				auto evalspeed = ctrspd + poskoeff * diff;
+				//DPRINT(evalspeed);
 				return evalspeed;
 			}
 
@@ -149,18 +155,47 @@ namespace ralgo
 
 			void serve()
 			{
+
+				//DPRINTPTR(parent::controller());
 				if (_current_trajectory && parent::controller() == this)
 				{
-					update_phase();
-					apply_speed(compensated_speed());
+					update_control_by_trajectory();
 				}
+
+				apply_control();
 			}
 
 			virtual void apply_speed(Speed spd) = 0;
 
-			void direct_control(Speed spd)
+			void apply_control() 
 			{
-				apply_speed(spd);
+				compspd = eval_compensated_speed();
+				apply_speed(compspd);
+			} 
+
+			void direct_control(Position pos, Speed spd)
+			{
+				ctrpos = pos;
+				ctrspd = spd;
+			}
+
+			int hardstop() override
+			{
+				parent::release_control_force();
+				ctrpos = 0;
+				ctrspd = 0;
+				_current_trajectory = nullptr;
+				return 0;
+			}
+
+			void stop_impl() override
+			{
+				line_traj.set_stop_trajectory(
+					current_position(), 
+					compspd,
+					parent::_dcc_val);
+			
+				_current_trajectory = & line_traj;
 			}
 		};
 	}

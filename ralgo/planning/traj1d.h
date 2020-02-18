@@ -68,6 +68,9 @@ namespace ralgo
 			auto posmod = spddeform.posmod(time_unit);
 			auto spdmod = spddeform.spdmod(time_unit);
 
+			//DPRINT(posmod);
+		//	DPRINT(spdmod);
+
 			pos = fpos * posmod + spos * (1 - posmod);
 			spd = setted_speed * spdmod * time_multiplier;
 
@@ -115,6 +118,21 @@ namespace ralgo
 			float dcc_part = dcc_time / time;
 
 			spddeform.reset2(acc_part, dcc_part);
+		}
+
+		void set_stop_trajectory(P curpos, V curspd, V dccval) 
+		{
+			stim = ralgo::discrete_time();
+			ftim = stim + (int64_t)(curspd / dccval * ralgo::discrete_time_frequency());
+
+			spos = curpos;
+			fpos = curpos + curspd * ((ftim - stim) / 2 / ralgo::discrete_time_frequency());
+
+			setted_speed = curspd / ralgo::discrete_time_frequency();
+			//setted_speed = (float)(fpos - spos) / (ftim - stim);
+
+
+			spddeform.set_stop_pattern();
 		}
 
 	};
