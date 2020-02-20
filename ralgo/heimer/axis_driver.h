@@ -190,6 +190,7 @@ namespace ralgo
 
 			void stop_impl() override
 			{
+				DPRINT(compspd);
 				line_traj.set_stop_trajectory(
 					current_position(), 
 					compspd,

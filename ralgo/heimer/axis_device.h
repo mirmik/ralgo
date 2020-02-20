@@ -128,7 +128,7 @@ namespace ralgo
 				return _acc_val;
 			}
 
-			Speed decceleration_value() 
+			Speed deceleration_value() 
 			{
 				return _dcc_val;
 			}

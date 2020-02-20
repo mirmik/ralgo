@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
 	{
 		ax0.set_speed(3);
 		ax0.set_accdcc_value(1, 1);
-		ax0.incmove(10);
+		ax0.incmove(-10);
 	//	ax0.stop();
 	}
 

@@ -64,7 +64,7 @@ namespace ralgo
 			this->stim = stim;
 			this->ftim = ftim;
 
-			for (int i = 0; i < Dim; ++i)
+			for (unsigned int i = 0; i < Dim; ++i)
 			{
 				if (stim == ftim)
 					setted_speed[i] = 0;
@@ -73,6 +73,8 @@ namespace ralgo
 					setted_speed[i] = (float)(fpos[i] - spos[i]) / (ftim - stim);
 				}
 			}
+
+			return 0;
 		}
 
 		int reset(
@@ -85,6 +87,8 @@ namespace ralgo
 			std::copy(std::begin(spos), std::end(spos), std::begin(this->spos));
 			std::copy(std::begin(fpos), std::end(fpos), std::begin(this->fpos));
 			reset(stim, ftim);
+
+			return 0;
 		}
 
 		int attime(int64_t time, 
@@ -100,7 +104,7 @@ namespace ralgo
 			auto posmod = spddeform.posmod(time_unit);
 			auto spdmod = spddeform.spdmod(time_unit);
 
-			for (int i = 0; i < Dim; ++i) {
+			for (unsigned int i = 0; i < Dim; ++i) {
 				pos[i] = fpos[i] * posmod + spos[i] * (1 - posmod);
 				spd[i] = setted_speed[i] * spdmod * time_multiplier;
 			}
