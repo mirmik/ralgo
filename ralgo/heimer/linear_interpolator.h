@@ -113,7 +113,7 @@ namespace ralgo
 					return -1;
 				}
 
-				for (int i = 0; i < mov.size(); ++i) 
+				for (unsigned int i = 0; i < mov.size(); ++i) 
 				{
 					curpos[i] = get_axis(i)->current_position();
 					tgtpos[i] = curpos[i] + mov[i];
@@ -172,6 +172,8 @@ namespace ralgo
 			{
 				int is_finish = trajectory->attime(ralgo::discrete_time(), ctrpos, ctrspd, 
 					ralgo::discrete_time_frequency() /*time_multiplier*/);
+
+				(void) is_finish;
 			}
 
 			void apply_phase()

@@ -85,9 +85,11 @@ namespace ralgo
 				{
 					dev->take_control_force(controller);
 				}
+
+				return true;
 			}
 
-			bool release_control(device * controller)
+			void release_control(device * controller)
 			{
 				if (this->_controller == controller)
 				{
@@ -99,7 +101,7 @@ namespace ralgo
 				}
 			}
 
-			bool release_control_force(device * controller)
+			void release_control_force(device * controller)
 			{
 				_controller = nullptr;
 				for (auto dev : _controlled)

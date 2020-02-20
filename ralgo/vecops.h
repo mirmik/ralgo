@@ -154,7 +154,7 @@ namespace ralgo
 		{
 			R accum = 0;
 
-			for (int i = 0; i < a.size(); ++i) 
+			for (unsigned int i = 0; i < a.size(); ++i) 
 			{
 				auto diff = a[i] - b[i];
 				accum += diff * diff;
