@@ -1,8 +1,8 @@
-#ifndef RALGO_CYNEMATIC_LINK2D_H
-#define RALGO_CYNEMATIC_LINK2D_H
+#ifndef RALGO_KINEMATIC_LINK2D_H
+#define RALGO_KINEMATIC_LINK2D_H
 
 #include <rabbit/space.h>
-#include <ralgo/planning/phase_driver.h>
+//#include <ralgo/planning/phase_driver.h>
 
 namespace ralgo
 {
@@ -36,13 +36,13 @@ namespace ralgo
 		}
 	};
 
-	class cynematic_unit2d : public unit2d
+	class kinematic_unit2d : public unit2d
 	{
 	public:
 		unit2d output;
 
 	public:
-		cynematic_unit2d()
+		kinematic_unit2d()
 		{
 			output.parent = this;
 		}
@@ -61,21 +61,21 @@ namespace ralgo
 		}
 	};
 
-	class unit2d_1dof : public cynematic_unit2d
+	class unit2d_1dof : public kinematic_unit2d
 	{
-		ralgo::phase_driver * phase_driver = nullptr;
+		//ralgo::phase_driver * phase_driver = nullptr;
 		//float readed_coord_multiplier = 1;
 
 	public:
 		virtual void set_coord(float coord) = 0;
 
-		void set_phase_driver(ralgo::phase_driver * reader)
-		{
-			phase_driver = reader;
+		//void set_phase_driver(ralgo::phase_driver * reader)
+		//{
+			//phase_driver = reader;
 			//readed_coord_multiplier = mul;
-		}
+		//}
 
-		void read_coords() override
+		/*void read_coords() override
 		{
 			if (phase_driver == nullptr)
 				return;
@@ -83,12 +83,12 @@ namespace ralgo
 			float coord = phase_driver->current_position();
 			//PRINT(coord);
 			set_coord(coord);
-		}
+		}*/
 
 		void set_speed_for_linked(float spd) 
 		{
 			//PRINT(spd * readed_coord_multiplier);
-			phase_driver->set_speed(spd);			
+			//phase_driver->set_speed(spd);			
 		}
 	};
 

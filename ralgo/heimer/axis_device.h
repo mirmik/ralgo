@@ -12,7 +12,7 @@ namespace ralgo
 	namespace heimer
 	{
 		template <class Position, class Speed>
-		class axis_device : public ralgo::heimer::device
+		class axis_device
 		{
 			using parent = ralgo::heimer::device;
 			using Time = int64_t;
@@ -26,7 +26,7 @@ namespace ralgo
 			int32_t _accdcc_protector = 0;
 
 			Speed _speed = 0;
-			float _acc_val = 0; 
+			float _acc_val = 0;
 			float _dcc_val = 0;
 
 			bool _reverse = false;
@@ -40,7 +40,7 @@ namespace ralgo
 			// INCMODE
 			virtual int incmove(Position dist)
 			{
-				if (!take_control())
+				if (!try_operation_begin(0))
 				{
 					ralgo::warning("axis_device take_control fault");
 					return -1;
@@ -62,7 +62,7 @@ namespace ralgo
 			{
 				DTRACE();
 
-				if (!take_control())
+				if (!try_operation_begin(0))
 				{
 					ralgo::warning("axis_device take_control fault");
 					return -1;
@@ -76,7 +76,9 @@ namespace ralgo
 			virtual int absmove_unsafe(Position dist) = 0;
 
 			// POSITION
-			virtual Position current_position() { BUG(); }
+			virtual Position current_position() = 0;
+			virtual Speed current_speed() = 0;
+			//virtual void set_current_position(Position pos) = 0;
 
 			// HOME_POSITION
 			virtual int set_home_position() { BUG(); }
@@ -109,7 +111,7 @@ namespace ralgo
 			}
 
 			// ACCDCC
-			virtual void set_accdcc_value(float acc, float dcc) 
+			virtual void set_accdcc_value(float acc, float dcc)
 			{
 				_acc_val = protect_accdcc(acc);
 				_dcc_val = protect_accdcc(dcc);
@@ -123,27 +125,29 @@ namespace ralgo
 					return accdcc;
 			}
 
-			Speed acceleration_value() 
+			Speed acceleration_value()
 			{
 				return _acc_val;
 			}
 
-			Speed deceleration_value() 
+			Speed deceleration_value()
 			{
 				return _dcc_val;
 			}
-	
+
 			// STOP
 			virtual int hardstop() = 0;
-		
-			void stop() 
+
+			void stop()
 			{
-				parent::take_control_force();
-				stop_impl(); 
+				try_operation_begin(1);
+				stop_impl();
 			}
 
 			virtual void stop_impl() = 0;
 
+			virtual bool try_operation_begin(int priority) = 0;
+			virtual void operation_finish(int priority) = 0;
 		};
 	}
 }
