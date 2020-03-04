@@ -9,6 +9,8 @@
 
 #include <igris/dtrace.h>
 
+#include <ralgo/heimer/coordinate_checker.h>
+
 namespace ralgo
 {
 	namespace heimer
@@ -21,6 +23,7 @@ namespace ralgo
 			// ее тут пока нет...
 
 			using parent = interpolation_group<Position, Speed>;
+			interpolation_coordinate_checker<Position> * coord_checker = nullptr;
 
 			Speed _speed = 0;
 			//float _accdcc = 0;
@@ -35,21 +38,24 @@ namespace ralgo
 			Speed ctrspd[Dim];
 			float poskoeff = 0.01;
 
+			igris::array_view<heimer::axis_device<Position,Speed>*> _axes;
+
 		public:
 			linear_interpolator(
 				const char* name,
-			    igris::array_view<heimer::device*> axes) :
-					parent(name)
+			    igris::array_view<heimer::axis_device<Position,Speed>*> axes) :
+					parent(name), _axes(axes)
 			{
-				parent::set_controlled(axes);
+				//parent::set_controlled(axes);
 			}
 
 			constexpr int dim() override { return Dim; }
 
 			axis_device<float, float> * get_axis(int index)
 			{
-				return static_cast<axis_device<Position, Speed>*>(
-					parent::controlled()[index]);
+			//	return static_cast<axis_device<Position, Speed>*>(
+			//		parent::controlled()[index]);
+				return _axes[index];
 			}
 
 			int move(

@@ -4,6 +4,8 @@
 #include <ralgo/heimer/stepctr.h>
 #include <ralgo/heimer/linear_interpolator.h>
 
+#include <ralgo/heimer/xyalpha_controller.h>
+
 #include <nos/fprint.h>
 
 #include <thread>
@@ -24,9 +26,11 @@ int main(int argc, char* argv[])
 	ax0.set_name("ax0");
 	ax1.set_name("ax1");
 
-	ralgo::heimer::device * linint_axes[] = { &ax0, &ax1 };	
+	ralgo::heimer::axis_device<float,float> * linint_axes[] = { &ax0, &ax1 };	
 	ralgo::heimer::linear_interpolator<2, float, float> linint("linint", linint_axes);
 	linint.set_name("linint");
+
+	ralgo::heimer::xyalpha_controller<float,float> k2;
 
 //	linint.take_control();
 //	linint.print_controlled_devices(nos::current_ostream);

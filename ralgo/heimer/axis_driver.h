@@ -19,14 +19,15 @@ namespace ralgo
 		{
 			using parent = axis_device<Position, Speed>;
 			Position ctrpos = 0;
-			Speed compspd = 0;
 			Speed ctrspd = 0;
 			float poskoeff = 0;
 
 			bool operation_finished_flag = true;
 
 		public:
+			using parent::operation_finish;
 			using parent::current_position;
+			using parent::current_speed;
 			using parent::set_speed;
 			ralgo::traj1d_line<Position, Speed> line_traj;
 			
@@ -38,7 +39,7 @@ namespace ralgo
 				operation_finish_event = ev;
 			}
 
-		private:
+		protected:
 			ralgo::traj1d<Position, Speed> * _current_trajectory = nullptr;
 
 		public:
@@ -124,9 +125,8 @@ namespace ralgo
 				int sts = attime(ralgo::discrete_time(), ctrpos, ctrspd);
 				if (sts && !operation_finished_flag)
 				{
-					dprln("operation finish!!!!!!!!!!!!!!!!");
 					operation_finished_flag = true;
-					operation_finish_event((void*)parent::name());
+					operation_finish_event(this);
 					_current_trajectory = nullptr;
 				}
 			}
@@ -148,31 +148,6 @@ namespace ralgo
 				return evalspeed;
 			}
 
-			Speed compensated_speed()
-			{
-				return compspd;
-			}
-
-			void serve()
-			{
-
-				//DPRINTPTR(parent::controller());
-				if (_current_trajectory && parent::controller() == this)
-				{
-					update_control_by_trajectory();
-				}
-
-				apply_control();
-			}
-
-			virtual void apply_speed(Speed spd) = 0;
-
-			void apply_control() 
-			{
-				compspd = eval_compensated_speed();
-				apply_speed(compspd);
-			} 
-
 			void direct_control(Position pos, Speed spd)
 			{
 				ctrpos = pos;
@@ -181,23 +156,26 @@ namespace ralgo
 
 			int hardstop() override
 			{
-				parent::release_control_force();
 				ctrpos = 0;
 				ctrspd = 0;
 				_current_trajectory = nullptr;
+			
+				operation_finish(1);
+			
 				return 0;
 			}
 
 			void stop_impl() override
 			{
-				DPRINT(compspd);
 				line_traj.set_stop_trajectory(
 					current_position(), 
-					compspd,
+					current_speed(),
 					parent::_dcc_val);
 			
 				_current_trajectory = & line_traj;
 			}
+
+			virtual controlled* as_controlled() = 0;
 		};
 	}
 }

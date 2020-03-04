@@ -1,25 +1,25 @@
-#ifndef RALGO_CYNEMATIC_CHAIN2D_H
-#define RALGO_CYNEMATIC_CHAIN2D_H
+#ifndef RALGO_kinematic_CHAIN2D_H
+#define RALGO_kinematic_CHAIN2D_H
 
-#include <ralgo/cynematic/link2d.h>
+#include <ralgo/kinematic/link2d.h>
 #include <igris/container/array_view.h>
 
 namespace ralgo 
 {
-	class cynematic_chain2d 
+	class kinematic_chain2d 
 	{
 	public:
 		igris::array_view<unit2d*> chain;
-		igris::array_view<cynematic_unit2d*> pairs;
+		igris::array_view<kinematic_unit2d*> pairs;
 
 	public:
-		cynematic_chain2d(){};
+		kinematic_chain2d(){};
 
 		unit2d* out() { return chain[chain.size() - 1]; }
 
-		cynematic_chain2d(
+		kinematic_chain2d(
 			igris::array_view<unit2d*> chain,
-			igris::array_view<cynematic_unit2d*> pairs) 
+			igris::array_view<kinematic_unit2d*> pairs) 
 		: 
 			chain(chain),
 			pairs(pairs) 
@@ -27,7 +27,7 @@ namespace ralgo
 
 		void setup(
 			igris::array_view<unit2d*> chain,
-			igris::array_view<cynematic_unit2d*> pairs) 
+			igris::array_view<kinematic_unit2d*> pairs) 
 		{
 			this->chain = chain;
 			this->pairs = pairs; 
@@ -52,7 +52,7 @@ namespace ralgo
 				*it-- = link;
 				if (link->iscynem())
 				{
-					*cit-- = (cynematic_unit2d*)link;
+					*cit-- = (kinematic_unit2d*)link;
 				}
 				link = link->parent;
 			} 
@@ -134,7 +134,7 @@ namespace ralgo
 
 		Возможно следует использовать второй и сразу же перегонять в btrsf вместо outtrans"""
 
-			for link in self.cynematic_pairs:
+			for link in self.kinematic_pairs:
 				lsenses = link.senses()
 				
 				linktrans = link.output.global_location
