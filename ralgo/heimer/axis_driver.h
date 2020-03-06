@@ -35,7 +35,7 @@ namespace ralgo
 
 			void set_operation_finish_event(igris::event ev)
 			{
-				DTRACE();
+				//DTRACE();
 				operation_finish_event = ev;
 			}
 

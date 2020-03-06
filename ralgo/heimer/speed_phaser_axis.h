@@ -92,7 +92,7 @@ namespace ralgo
 				return compspd;
 			}
 
-			heimer::controlled* as_controlled() override { this; }
+			heimer::controlled* as_controlled() override { return this; }
 		};
 	}
 }
