@@ -20,12 +20,12 @@ namespace ralgo
 		class xyalpha_axis
 			: public heimer::axis_driver<P, V>, public heimer::controlled
 		{
-			xyalpha_controller<P,V> * parent;
+			xyalpha_controller<P, V> * parent;
 			int index;
 
 		public:
-			xyalpha_axis(xyalpha_controller<P,V>* parent, int index) : 
-				parent(parent), index(index) 
+			xyalpha_axis(xyalpha_controller<P, V>* parent, int index) :
+				parent(parent), index(index)
 			{
 				//igris::array_view<heimer::device*> arr {parent, 1};
 				//set_controlled(arr);
@@ -36,7 +36,7 @@ namespace ralgo
 				return parent->axposes[index];
 			}
 
-			V current_speed() override 
+			V current_speed() override
 			{
 				BUG();
 			}
@@ -44,10 +44,10 @@ namespace ralgo
 			bool try_operation_begin(int priority) override { BUG(); }
 			void operation_finish(int priority) override { BUG(); }
 
-			heimer::controlled* as_controlled() { this; }
+			heimer::controlled* as_controlled() { return this; }
 
-			bool take_control(device * dev) override { parent->take_control(dev); }
-			bool take_control_force(device * dev) override { parent->take_control_force(dev); }
+			bool take_control(device * dev) override { return parent->take_control(dev); }
+			bool take_control_force(device * dev) override { return parent->take_control_force(dev); }
 			void release_control(device * dev) override { parent->release_control(dev); }
 			void release_control_force(device * dev) override { parent->release_control_force(dev); }
 
@@ -55,14 +55,15 @@ namespace ralgo
 		};
 
 		template <class P, class V>
-		class xyalpha_controller: public kin2d_controller<P,V>, public heimer::device
+		class xyalpha_controller: public kin2d_controller<P, V>, public heimer::device
 		{
-		using kin2d_controller<P,V>::chain;
-			
+			using kin2d = kin2d_controller<P,V>;
+			using kin2d::chain;
+
 		public:
-			xyalpha_axis<P,V> x_axis;
-			xyalpha_axis<P,V> y_axis;
-			xyalpha_axis<P,V> a_axis;
+			xyalpha_axis<P, V> x_axis;
+			xyalpha_axis<P, V> y_axis;
+			xyalpha_axis<P, V> a_axis;
 
 			rabbit::htrans2<float> curpos;
 			P axposes[3];
@@ -88,6 +89,8 @@ namespace ralgo
 			{
 				float xpos, ypos, apos, xspd, yspd, aspd;
 
+				dprln("get control phase");
+
 				x_axis.attime(time, xpos, xspd);
 				y_axis.attime(time, ypos, yspd);
 				a_axis.attime(time, apos, aspd);
@@ -108,6 +111,19 @@ namespace ralgo
 				axposes[1] = curpos.translation().y;
 				axposes[2] = curpos.rotation();
 			}
+
+			void serve()
+			{
+				if (heimer::device::controller())
+				{
+					rabbit::htrans2<float> pos{};
+					rabbit::screw2<float> spd{};
+
+					get_control_phase(ralgo::discrete_time(), pos, spd);
+					kin2d::set_phase(pos, spd);
+				}
+			}
+
 		};
 	}
 }

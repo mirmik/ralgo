@@ -9,7 +9,7 @@ namespace ralgo
 	namespace heimer
 	{
 		template < class Position, class IntPos, class Speed >
-		class speed_phaser_axis : public axis_driver<Position, Speed>, public ralgo::heimer::device
+		class speed_phaser_axis : public axis_driver<Position, Speed>
 		{
 			using parent = axis_driver<Position, Speed>;
 
@@ -43,23 +43,23 @@ namespace ralgo
 
 			bool try_operation_begin(int priority) override
 			{
-				switch (priority)
+				/*switch (priority)
 				{
 					case 0: return take_control();
 					case 1: take_control_force(); break;
 					default: BUG();
 				}
-				return true;
+				return true;*/
 			}
 
 			void operation_finish(int priority) override
 			{
-				switch (priority)
+				/*switch (priority)
 				{
 					case 0: release_control(); break;
 					case 1: release_control_force(); break;
 					default: BUG();
-				}
+				}*/
 			}
 
 

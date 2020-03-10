@@ -33,13 +33,13 @@ namespace ralgo
 			this->pairs = pairs; 
 		}
 
-		void read_coords() 
+		/*void read_coords() 
 		{
 			for (auto& c : pairs)
 			{
 				c->read_coords();
 			}
-		}
+		}*/
 
 		void collect_chain(unit2d* finallink, unit2d* startlink = nullptr) 
 		{
@@ -69,7 +69,7 @@ namespace ralgo
 
 		void update_model_location() 
 		{
-			read_coords();
+		//	read_coords();
 			update_location();
 		}
 
@@ -111,7 +111,7 @@ namespace ralgo
 				rabbit::htrans2<float> btrsf = basis->global_location;
 				rabbit::htrans2<float> ctrsf = btrsf.inverse() * outtrans;
 
-				for (int i = 0; i < pairs.size(); ++i) 
+				for (unsigned int i = 0; i < pairs.size(); ++i) 
 				{
 					senses[i].lin = ctrsf.rotate(senses[i].lin);
 //					PRINT(senses[i]);

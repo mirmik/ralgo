@@ -38,11 +38,11 @@ namespace ralgo
 //			        || w.size() != n)
 //				ralgo::fault("incompatible matrices");
 
-			assert(u.size1() == m);
-			assert(u.size2() == n);
-			assert(v.size1() == n);
-			assert(v.size2() == n);
-			assert(w.size() == n);
+			assert(u.size1() == (unsigned)m);
+			assert(u.size2() == (unsigned)n);
+			assert(v.size1() == (unsigned)n);
+			assert(v.size2() == (unsigned)n);
+			assert(w.size() == (unsigned)n);
 
 				//ralgo::vecops::copy(u, a); // Копируем данные.
 			ralgo::matops::copy(u, a); // Копируем данные.
@@ -96,7 +96,7 @@ namespace ralgo
 	{
 		int i, j, jj;
 		T s;
-		if (b.size() != m || x.size() != n) ralgo::fault("SVD::solve bad sizes");
+		if (b.size() != (unsigned)m || x.size() != (unsigned)n) ralgo::fault("SVD::solve bad sizes");
 		//vector_t<M> tmp(n);
 		T tmp[n];
 		tsh = (thresh >= 0. ? thresh : 0.5 * sqrt(m + n + 1.) * w[0] * eps);
