@@ -2,8 +2,8 @@
 #define CYNEMATIC_LINK_H
 
 //#include <linalg-add.h>
-#include <linalg/linalg-ext.h>
-#include <linalg/linalg.h>
+#include <linalg-v3/linalg-ext.h>
+#include <linalg-v3/linalg.h>
 
 //#include <nos/trace.h>
 //#include <gxx/panic.h>

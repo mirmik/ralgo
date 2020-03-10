@@ -8,6 +8,7 @@
 #include <igris/event/event.h>
 
 #include <iostream>
+#include <ralgo/heimer/device.h>
 
 namespace ralgo
 {
@@ -15,7 +16,7 @@ namespace ralgo
 	{
 		// Возможно следует объединить с классом axis_device.
 		template <class Position, class Speed>
-		class axis_driver : public axis_device<Position, Speed>
+		class axis_driver : public axis_device<Position, Speed>, public cohtrolled
 		{
 			using parent = axis_device<Position, Speed>;
 			Position ctrpos = 0;
@@ -103,6 +104,7 @@ namespace ralgo
 
 			int attime(int64_t time, Position& pos, Speed& spd)
 			{
+				//if (!_current_trajectory) return;
 				return _current_trajectory->attime(time, pos, spd, ralgo::discrete_time_frequency());
 			}
 

@@ -53,7 +53,7 @@ namespace ralgo
 		}
 
 		virtual rabbit::screw2<float> sensivity() = 0;
-		virtual void read_coords() = 0;
+		//virtual void read_coords() = 0;
 
 		bool iscynem() override
 		{

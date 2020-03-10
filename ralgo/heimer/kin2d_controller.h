@@ -84,7 +84,7 @@ namespace ralgo
 
 				rabbit::screw2<double> dtarget = target;
 
-				for (int i = 0; i < chain.pairs.size(); ++i)
+				for (unsigned int i = 0; i < chain.pairs.size(); ++i)
 				{
 					dsenses[i] = senses[i];
 				}
@@ -97,7 +97,7 @@ namespace ralgo
 
 				// Выставляем найденные скорости прилинкованным
 				// сервам.
-				for (int i = 0; i < chain.pairs.size(); ++i)
+				for (unsigned int i = 0; i < chain.pairs.size(); ++i)
 				{
 					kinematic_unit2d * _unit = chain.pairs[i];
 					unit2d_1dof * unit = (unit2d_1dof *) _unit;
@@ -108,22 +108,6 @@ namespace ralgo
 
 			virtual void get_control_phase(int64_t time,
 			                               rabbit::htrans2<float>& pos, rabbit::screw2<float>& spd) = 0;
-
-			void serve()
-			{
-				//TRACE();
-				/*if (external_controller != nullptr
-					|| current_trajectory == nullptr)
-				{
-					return;
-				} */
-
-				rabbit::htrans2<float> pos{};
-				rabbit::screw2<float> spd{};
-
-				get_control_phase(ralgo::discrete_time(), pos, spd);
-				set_phase(pos, spd);
-			}
 
 			void activate()
 			{
