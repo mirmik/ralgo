@@ -40,6 +40,11 @@ namespace ralgo
 				operation_finish_event = ev;
 			}
 
+			bool is_in_operation_state() 
+			{
+				return !operation_finished_flag;
+			}
+
 		protected:
 			ralgo::traj1d<Position, Speed> * _current_trajectory = nullptr;
 
@@ -85,6 +90,16 @@ namespace ralgo
 
 				operation_finished_flag = false;
 				set_trajectory(&line_traj);
+				return 0;
+			}
+
+			int _set_point_trajectory(Position coord) 
+			{
+				line_traj.set_point_trajectory(coord);
+				line_traj.set_null_speed_pattern();
+
+				set_trajectory(&line_traj);
+
 				return 0;
 			}
 
