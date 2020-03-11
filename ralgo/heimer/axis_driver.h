@@ -16,7 +16,7 @@ namespace ralgo
 	{
 		// Возможно следует объединить с классом axis_device.
 		template <class Position, class Speed>
-		class axis_driver : public axis_device<Position, Speed>, public cohtrolled
+		class axis_driver : public axis_device<Position, Speed>
 		{
 			using parent = axis_device<Position, Speed>;
 			Position ctrpos = 0;
