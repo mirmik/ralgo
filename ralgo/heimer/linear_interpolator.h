@@ -38,7 +38,10 @@ namespace ralgo
 			Speed ctrspd[Dim];
 			float poskoeff = 0.01;
 
-			igris::array_view<heimer::axis_device<Position,Speed>*> _axes;
+			union {
+				igris::array_view<heimer::axis_device<Position,Speed>*> _axes;
+				igris::array_view<heimer::controlled*> _controlled_device;
+			};
 
 		public:
 			linear_interpolator(
@@ -222,6 +225,10 @@ namespace ralgo
 					DPRINT(ctrspd[i]);
 				}
 			}
+
+		private:
+			void after_take_control_handle() override {}
+			igris::array_view<controlled*> controlled_devices() override { return _controlled_device; }
 		};
 	}
 }

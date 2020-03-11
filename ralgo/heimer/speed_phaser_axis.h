@@ -17,8 +17,8 @@ namespace ralgo
 			Speed compspd = 0;
 
 		public:
-			speed_phaser_axis(speed_phaser<Position, IntPos, Speed>* phaser)
-				: _phaser(phaser)
+			speed_phaser_axis(const char* name, speed_phaser<Position, IntPos, Speed>* phaser)
+				: device(name), _phaser(phaser)
 			{}
 
 			Position current_position() override
@@ -43,6 +43,7 @@ namespace ralgo
 
 			bool try_operation_begin(int priority) override
 			{
+				DTRACE();
 				switch (priority)
 				{
 					case 0: return take_control();
@@ -54,6 +55,7 @@ namespace ralgo
 
 			void operation_finish(int priority) override
 			{
+				DTRACE();
 				switch (priority)
 				{
 					case 0: release_control(); break;
@@ -87,12 +89,20 @@ namespace ralgo
 				return compspd;
 			}
 
-			Speed current_speed() 
+			Speed current_speed()
 			{
 				return compspd;
 			}
 
+		private:
 			heimer::controlled* as_controlled() override { return this; }
+
+		private:
+			void after_take_control_handle() override {}
+			igris::array_view<controlled*> controlled_devices() override
+			{
+				return igris::array_view<controlled*>(nullptr, 0);
+			}
 		};
 	}
 }

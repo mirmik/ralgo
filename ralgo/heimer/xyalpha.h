@@ -14,80 +14,76 @@ namespace ralgo
 {
 	namespace heimer
 	{
-		template <class P, class V> class xyalpha_controller;
-
-		template <class P, class V>
-		class xyalpha_axis
-			: public heimer::axis_driver<P, V>, public heimer::controlled
-		{
-			xyalpha_controller<P, V> * parent;
-			int index;
-
-		public:
-			xyalpha_axis(xyalpha_controller<P, V>* parent, int index) :
-				parent(parent), index(index)
-			{
-				//igris::array_view<heimer::device*> arr {parent, 1};
-				//set_controlled(arr);
-			}
-
-			P current_position() override
-			{
-				return parent->axposes[index];
-			}
-
-			V current_speed() override
-			{
-				BUG();
-			}
-
-			bool try_operation_begin(int priority) override 
-			{ 
-				if (heimer::controlled::controller() == nullptr) 
-				{
-					return take_control(parent);
-				}
-				
-				return CONTROL_ERROR;
-			}
-			
-			void operation_finish(int priority) override 
-			{ 
-				release_control(parent);
-			}
-
-			heimer::controlled* as_controlled() { return this; }
-
-			bool take_control(device * dev) override { return parent->take_control(dev); }
-			bool take_control_force(device * dev) override { return parent->take_control_force(dev); }
-			void release_control(device * dev) override { parent->release_control(dev); }
-			void release_control_force(device * dev) override { parent->release_control_force(dev); }
-
-			const char* name() { BUG(); }
-		};
-
 		template <class P, class V>
 		class xyalpha_controller: public kin2d_controller<P, V>
 		{
-			using kin2d = kin2d_controller<P,V>;
+			using kin2d = kin2d_controller<P, V>;
 			using kin2d::chain;
 
-		public:
-			xyalpha_axis<P, V> x_axis;
-			xyalpha_axis<P, V> y_axis;
-			xyalpha_axis<P, V> a_axis;
+			ralgo::actuator2 x_link;
+			ralgo::actuator2 y_link;
+			ralgo::rotator2 a_link;
+			ralgo::unit2d output_link;
+			
+			ralgo::unit2d* axylinks[7];
+			ralgo::kinematic_unit2d* axypairs[3];
 
+		public:
+			axis_driver<P, V>* controlled_axes[3];
+			heimer::controlled* _controlled_devices[3];
+
+			union
+			{
+				virtual_multiax_axis<P, V> ctraxes[3];
+
+				struct
+				{
+					virtual_multiax_axis<P, V> x_axis;
+					virtual_multiax_axis<P, V> y_axis;
+					virtual_multiax_axis<P, V> a_axis;
+				};
+			};
 			rabbit::htrans2<float> curpos;
 			P axposes[3];
 
 			//virtdevs::device* _deps[3];
 
 		public:
-			xyalpha_controller() :
+			xyalpha_controller(const char* name, axis_driver<P,V>* controlleds[3]) :
+				kin2d(name, ctraxes, axposes, 3),
+				
+				x_link({1,0},1),
+				y_link({0,1},1),
+				a_link(1),
+				
 				x_axis(this, 0),
 				y_axis(this, 1),
 				a_axis(this, 2)
-			{}
+			{
+				x_link.link(&y_link);
+				y_link.link(&a_link);
+				a_link.link(&output_link);
+
+				kin2d::setup(axylinks, axypairs, &output_link);
+
+				for (int i = 0; i < 3; ++i) 
+				{
+					controlled_axes[i]  = controlleds[i];
+					_controlled_devices[i] = controlleds[i]->as_controlled();
+				}
+			}
+
+			void relocate(
+				rabbit::htrans2<float> x, 
+				rabbit::htrans2<float> y, 
+				rabbit::htrans2<float> a, 
+				rabbit::htrans2<float> out) 
+			{
+				x_link.relocate(x);
+				y_link.relocate(y);
+				a_link.relocate(a);
+				output_link.relocate(out);
+			}
 
 			/*igris::array_view<virtdevs::device*> dependence() override
 			{
@@ -117,25 +113,21 @@ namespace ralgo
 
 			void restore_control_model() override
 			{
+
+
 				curpos = chain.out()->global_location;
 
 				axposes[0] = curpos.translation().x;
 				axposes[1] = curpos.translation().y;
 				axposes[2] = curpos.rotation();
+
+				//x_axis._set_point_trajectory(axposes);
 			}
 
-			void serve()
+			igris::array_view<controlled*> controlled_devices() override
 			{
-				if (heimer::device::controller())
-				{
-					rabbit::htrans2<float> pos{};
-					rabbit::screw2<float> spd{};
-
-					get_control_phase(ralgo::discrete_time(), pos, spd);
-					kin2d::set_phase(pos, spd);
-				}
+				return _controlled_devices;
 			}
-
 		};
 	}
 }

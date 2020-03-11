@@ -13,7 +13,7 @@ namespace ralgo
 	namespace heimer 
 	{
 		template <class ExtPos, class IntPos, class Speed>
-		class speed_phaser : public ralgo::heimer::device
+		class speed_phaser
 		{
 		protected:
 			volatile IntPos _feedback_position = 0;

@@ -16,8 +16,8 @@ licant.module("ralgo.info",
 licant.module("ralgo",
 	sources=[
 		"ralgo/madgwick.cpp",
-		"ralgo/signal/fft.cpp"
-
+		"ralgo/signal/fft.cpp",
+		"ralgo/heimer/device.cpp"
 	],
 	include_paths=["."],
 	mdepends=[

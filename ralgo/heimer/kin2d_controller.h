@@ -8,17 +8,14 @@
 #include <ralgo/disctime.h>
 #include <ralgo/util/backpack.h>
 
-#include <nos/trace.h>
-#include <nos/print.h>
-
-#include <ralgo/objects/served.h>
+#include <ralgo/heimer/multiax.h>
 
 namespace ralgo
 {
 	namespace heimer
 	{
 		template <class P, class V>
-		class kin2d_controller: public heimer::device
+		class kin2d_controller: public virtual_multiax<P,V>
 		//	virtual public ralgo::served
 		{
 		public:
@@ -34,12 +31,15 @@ namespace ralgo
 
 			void setup(
 			    igris::array_view<ralgo::unit2d*> a,
-			    igris::array_view<ralgo::kinematic_unit2d*> b)
+			    igris::array_view<ralgo::kinematic_unit2d*> b,
+			    unit2d* finallink, unit2d* startlink = nullptr)
 			{
 				chain.setup(a, b);
+				chain.collect_chain(finallink, startlink);
 			}
 
-			kin2d_controller()
+			kin2d_controller(const char* name, axis_driver<P,V>* arr, P* poses, size_t sz)
+				: virtual_multiax<P,V>(name, arr, poses, sz)
 			{
 				compensation_koefficient = 1 / ralgo::discrete_time_frequency();
 			}
@@ -56,11 +56,6 @@ namespace ralgo
 			void update_model_location()
 			{
 				chain.update_model_location();
-			}
-
-			void collect_chain(unit2d* finallink, unit2d* startlink = nullptr)
-			{
-				chain.collect_chain(finallink, startlink);
 			}
 
 			void set_phase(rabbit::htrans2<float> pos, rabbit::screw2<float> spd)
@@ -109,13 +104,26 @@ namespace ralgo
 			virtual void get_control_phase(int64_t time,
 			                               rabbit::htrans2<float>& pos, rabbit::screw2<float>& spd) = 0;
 
-			void activate()
+
+			/*void activate()
 			{
 				restore_control_model();
 			}
 
 			void deactivate()
-			{}
+			{}*/
+
+			void serve()
+			{
+				if (heimer::device::controller())
+				{
+					rabbit::htrans2<float> pos{};
+					rabbit::screw2<float> spd{};
+
+					get_control_phase(ralgo::discrete_time(), pos, spd);
+					set_phase(pos, spd);
+				}
+			}
 		};
 	}
 }
