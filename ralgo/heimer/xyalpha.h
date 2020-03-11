@@ -41,8 +41,20 @@ namespace ralgo
 				BUG();
 			}
 
-			bool try_operation_begin(int priority) override { BUG(); }
-			void operation_finish(int priority) override { BUG(); }
+			bool try_operation_begin(int priority) override 
+			{ 
+				if (heimer::controlled::controller() == nullptr) 
+				{
+					return take_control(parent);
+				}
+				
+				return CONTROL_ERROR;
+			}
+			
+			void operation_finish(int priority) override 
+			{ 
+				release_control(parent);
+			}
 
 			heimer::controlled* as_controlled() { return this; }
 
@@ -55,7 +67,7 @@ namespace ralgo
 		};
 
 		template <class P, class V>
-		class xyalpha_controller: public kin2d_controller<P, V>, public heimer::device
+		class xyalpha_controller: public kin2d_controller<P, V>
 		{
 			using kin2d = kin2d_controller<P,V>;
 			using kin2d::chain;

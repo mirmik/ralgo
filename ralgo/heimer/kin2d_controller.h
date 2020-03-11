@@ -18,7 +18,7 @@ namespace ralgo
 	namespace heimer
 	{
 		template <class P, class V>
-		class kin2d_controller //: public htrans2_mover
+		class kin2d_controller: public heimer::device
 		//	virtual public ralgo::served
 		{
 		public:

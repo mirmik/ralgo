@@ -6,6 +6,9 @@
 
 #include <nos/print.h>
 
+#define CONTROL_SUCCESS true
+#define CONTROL_ERROR false
+
 namespace ralgo
 {
 	namespace heimer
@@ -15,6 +18,9 @@ namespace ralgo
 		class controlled 
 		{		
 		public:		
+			device * _controller = nullptr;
+			device * controller() { return _controller; }
+			
 			virtual bool take_control(device * controller) = 0;
 			virtual bool take_control_force(device * controller) = 0;
 
@@ -22,7 +28,6 @@ namespace ralgo
 			virtual void release_control_force(device * controller) = 0;
 
 			virtual const char* name() = 0;
-
 			virtual bool is_device_controller() { return false; } 
 		};
 
@@ -30,7 +35,6 @@ namespace ralgo
 		{
 		public:
 			const char * _name = "unnamed";
-			device * _controller = nullptr;
 			igris::array_view<controlled*> _controlled;
 
 			bool _is_busy = false;
@@ -41,7 +45,6 @@ namespace ralgo
 			device(const char* name, igris::array_view<heimer::controlled*> c) : _controlled(c) {}
 			device(const char* name, controlled ** table, size_t total) : _controlled(table, total) {}
 
-			device * controller() { return _controller; }
 			igris::array_view<heimer::controlled*> controlled() { return _controlled; }
 			void set_name(const char * name) { _name = name; }
 			bool is_busy() { return _is_busy; }
