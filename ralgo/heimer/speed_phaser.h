@@ -36,6 +36,7 @@ namespace ralgo
 
 			void set_speed(Speed spd) { set_speed_internal(ext2int_spd(spd)); }
 			Speed setted_speed() { return int2ext_spd(setted_speed_internal()); }
+			Speed feedback_speed() { return setted_speed(); }
 		
 			IntPos target_position_internal() { return _target_position; }
 			IntPos feedback_position_internal() { return _feedback_position; }

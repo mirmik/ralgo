@@ -18,11 +18,6 @@ namespace ralgo
 				parent(parent), index(index)
 			{}
 
-			P current_position() override
-			{
-				return parent->poses[index];
-			}
-
 			V current_speed() override
 			{
 				BUG();
@@ -42,7 +37,7 @@ namespace ralgo
 
 			bool take_control(device * dev) override { return parent->take_control(dev); }
 			bool take_control_force(device * dev) override { return parent->take_control_force(dev); }
-			void release_control(device * dev) override { parent->release_control(dev); }
+			bool release_control(device * dev) override { return parent->release_control(dev); }
 			void release_control_force(device * dev) override { parent->release_control_force(dev); }
 
 			const char* name() { BUG(); }

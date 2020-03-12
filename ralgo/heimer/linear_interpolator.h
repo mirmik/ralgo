@@ -65,7 +65,6 @@ namespace ralgo
 				igris::array_view<Position> curpos, 
 				igris::array_view<Position> tgtpos) 
 			{
-				DTRACE();
 
 				int success = parent::take_control();
 				if (success == false) 

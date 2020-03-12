@@ -3,7 +3,6 @@
 
 #include <igris/util/bug.h>
 #include <igris/math.h>
-#include <igris/dtrace.h>
 
 #include <ralgo/info.h>
 
@@ -60,8 +59,6 @@ namespace ralgo
 
 			virtual int absmove(Position tgtpos)
 			{
-				DTRACE();
-
 				if (!try_operation_begin(0))
 				{
 					ralgo::warning("axis_device take_control fault");

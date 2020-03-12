@@ -40,6 +40,7 @@ namespace ralgo
 	{
 	public:
 		unit2d output;
+		double coord = 0;
 
 	public:
 		kinematic_unit2d()
@@ -102,6 +103,7 @@ namespace ralgo
 
 		void set_coord(float angle)
 		{
+			coord = angle;
 			output.local_location = rabbit::htrans2<float>(angle * mul, {0, 0});
 		}
 
@@ -119,6 +121,7 @@ namespace ralgo
 
 		void set_coord(float c)
 		{
+			coord = c;
 			output.local_location = rabbit::htrans2<float>(0, ax * mul * c);
 		}
 

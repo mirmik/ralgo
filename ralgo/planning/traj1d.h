@@ -125,19 +125,13 @@ namespace ralgo
 			stim = ralgo::discrete_time();
 			ftim = stim + (int64_t)(fabs(curspd) / dccval * ralgo::discrete_time_frequency());
 
-			assert(ftim > stim);
+			assert(ftim >= stim);
 
 			spos = curpos;
 			fpos = curpos + curspd * ((ftim - stim) / 2 / ralgo::discrete_time_frequency());
 
 			setted_speed = curspd / ralgo::discrete_time_frequency();
 			//setted_speed = (float)(fpos - spos) / (ftim - stim);
-
-			DPRINT(stim);
-			DPRINT(ftim);
-			DPRINT(spos);
-			DPRINT(fpos);
-			DPRINT(setted_speed);
 
 			spddeform.set_stop_pattern();
 		}

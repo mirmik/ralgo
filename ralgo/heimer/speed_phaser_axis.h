@@ -21,10 +21,10 @@ namespace ralgo
 				: device(name), _phaser(phaser)
 			{}
 
-			Position current_position() override
-			{
-				return _phaser->target_position();
-			}
+			//Position current_position() override
+			//{
+			//	return _phaser->target_position();
+			//}
 
 			/*void set_current_position(Position pos) override
 			{
@@ -43,7 +43,6 @@ namespace ralgo
 
 			bool try_operation_begin(int priority) override
 			{
-				DTRACE();
 				switch (priority)
 				{
 					case 0: return take_control();
@@ -55,7 +54,6 @@ namespace ralgo
 
 			void operation_finish(int priority) override
 			{
-				DTRACE();
 				switch (priority)
 				{
 					case 0: release_control(); break;
@@ -92,6 +90,12 @@ namespace ralgo
 			Speed current_speed()
 			{
 				return compspd;
+			}
+
+			void update_state() 
+			{
+				parent::feedpos = _phaser->target_position();
+				parent::feedspd = _phaser->feedback_speed();
 			}
 
 		private:
