@@ -60,22 +60,11 @@ namespace ralgo
 			fini_spd = fspd;
 			real_spd = 1;
 
-			/*DPRINT(acc);
-			DPRINT(dcc);
-			DPRINT(sspd);
-			DPRINT(fspd);*/
-
 			if (acc + dcc < 2) 
 			{
 				f_time = 1 
 					+ (1 - sspd) * acc / 2
 					+ (1 - fspd) * dcc / 2;	
-
-			/*	DPRINT(sspd);
-				DPRINT(fspd);
-				DPRINT(acc);
-				DPRINT(dcc);
-				DPRINT(f_time);*/
 			}
 			else 
 			{

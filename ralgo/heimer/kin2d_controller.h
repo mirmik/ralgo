@@ -58,13 +58,13 @@ namespace ralgo
 				chain.update_model_location();
 			}
 
-			void set_phase(rabbit::htrans2<float> pos, rabbit::screw2<float> spd)
+			void evaluate_links_speeds(rabbit::htrans2<float> pos, rabbit::screw2<float> spd)
 			{
 				//TRACE();
 				rabbit::screw2<float> senses[chain.pairs.size()];
 				rabbit::screw2<double> dsenses[chain.pairs.size()];
 				//(void) senses;
-				double spdarr[chain.pairs.size()];
+				double* spdarr = ctrspd_array();
 				memset(spdarr, 0, sizeof(spdarr));
 
 				//Можно целевую позицию переводить в связный базис, а чувствительность
@@ -92,18 +92,24 @@ namespace ralgo
 
 				// Выставляем найденные скорости прилинкованным
 				// сервам.
-				for (unsigned int i = 0; i < chain.pairs.size(); ++i)
-				{
-					kinematic_unit2d * _unit = chain.pairs[i];
-					unit2d_1dof * unit = (unit2d_1dof *) _unit;
+				//for (unsigned int i = 0; i < chain.pairs.size(); ++i)
+				//{
+				//	kinematic_unit2d * _unit = chain.pairs[i];
+				//	unit2d_1dof * unit = (unit2d_1dof *) _unit;
+				//}
 
-					unit -> set_speed_for_linked(spdarr[i]);
-				}
+				//auto axes = controlled_axes();
 			}
+
+			virtual igris::array_view<axis_driver<P,V>*> controlled_axes() = 0;
 
 			virtual void get_control_phase(int64_t time,
 			                               rabbit::htrans2<float>& pos, rabbit::screw2<float>& spd) = 0;
 
+
+			virtual double* ctrspd_array() = 0;
+
+			virtual void apply_control() = 0;
 
 			/*void activate()
 			{
@@ -121,7 +127,8 @@ namespace ralgo
 					rabbit::screw2<float> spd{};
 
 					get_control_phase(ralgo::discrete_time(), pos, spd);
-					set_phase(pos, spd);
+					evaluate_links_speeds(pos, spd);
+					apply_control();
 				}
 			}
 		};
