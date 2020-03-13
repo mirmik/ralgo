@@ -11,9 +11,8 @@
 	Количество столбцов - matrix.size2()
 */
 
-#include <ralgo/vector.h>
+#include <ralgo/linalg/vector_view.h>
 #include <ralgo/fault.h>
-#include <nos/print.h>
 
 namespace ralgo 
 {
@@ -47,8 +46,6 @@ namespace ralgo
 		template<class M>
 		matrix_view& operator = (const M& oth) 
 		{
-			nos::println("operator = ");
-
 			if (oth.size1() != size1() || oth.size2() != size2())
 				ralgo::fault("incompatible matrices");
 
@@ -61,8 +58,6 @@ namespace ralgo
 
 		matrix_view& operator = (const matrix_view& oth) 
 		{
-			nos::println("operator = ");
-
 			if (oth.size1() != size1() || oth.size2() != size2())
 				ralgo::fault("incompatible matrices");
 

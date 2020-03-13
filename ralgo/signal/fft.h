@@ -6,8 +6,7 @@
 #include <stdlib.h>
 
 //#include <nos/print.h>
-#include <ralgo/vecops.h>
-
+#include <ralgo/linalg/vecops.h>
 #include <igris/math/defs.h>
 
 namespace ralgo

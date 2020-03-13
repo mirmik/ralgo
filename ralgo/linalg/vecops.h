@@ -7,12 +7,19 @@
 #include <ralgo/util/helpers.h>
 #include <igris/dprint.h>
 
-#include <ralgo/vecops_base.h>
+#include <ralgo/linalg/vecops_base.h>
 
 namespace ralgo
 {
 	namespace vecops
 	{
+		template<class V>
+		void fill(V& arr, const value_t<V>& val)
+		{
+			for (auto & a : arr) 
+				a = val;
+		}
+
 		// построить целочисленный вектор арифметической прогрессии [start;stop) с шагом step.
 		template<class V>
 		auto arange(int start, int stop, int step)
@@ -140,7 +147,7 @@ namespace ralgo
 		template <class A> bool all(const A& a) { return fold(op_and(), true, a); }
 		template <class A> bool any(const A& a) { return fold(op_or(), false, a); }
 
-		//template <class A, class B> bool equal_all(const A& a, const B& b) 
+		//template <class A, class B> bool equal_all(const A& a, const B& b)
 		//{ return fold(ralgo::op_not_eq(), a, veciter(b)); }
 
 		template <class A, class B> bool equal_all(const A& a, const B& b) { return boolean_all(ralgo::op_eq(), a, b); }

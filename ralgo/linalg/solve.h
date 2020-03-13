@@ -1,11 +1,11 @@
 #ifndef RALGO_LINALG_SOLVE_H
 #define RALGO_LINALG_SOLVE_H
 
-#include <ralgo/vector.h>
-#include <ralgo/matrix.h>
-#include <ralgo/vecops.h>
-#include <ralgo/matops.h>
-#include <ralgo/util/svd.h>
+#include <ralgo/linalg/vector_view.h>
+#include <ralgo/linalg/matrix_view.h>
+#include <ralgo/linalg/vecops.h>
+#include <ralgo/linalg/matops.h>
+#include <ralgo/linalg/svd.h>
 
 namespace ralgo
 {
