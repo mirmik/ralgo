@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <string.h>
 
+#include <igris/dprint.h>
 #include <igris/container/array_view.h>
 
 // Массив для реализации алгоритмов скользящего окна.
@@ -43,6 +44,11 @@ namespace ralgo
 			return igris::array_view<double>(dataarr + cursor, halfsize);
 		}
 
+		void cursor_fixup() 
+		{
+			if (cursor >= halfsize) cursor = 0;
+		}
+
 		void _push_part(T* dt, size_t sz)
 		{
 			T* ptr1 = dataarr + cursor;
@@ -50,6 +56,9 @@ namespace ralgo
 
 			std::copy(dt, dt + sz, ptr1);
 			std::copy(dt, dt + sz, ptr2);
+
+			cursor += sz;
+			cursor_fixup();
 		}
 
 		size_t right_room()
@@ -60,14 +69,28 @@ namespace ralgo
 		void push(T* dt, size_t sz)
 		{
 			assert(sz <= halfsize);
-
 			size_t rroom = right_room();
-			size_t d0_size = sz > rroom < 0 ? sz - rroom : sz;
-			size_t d1_size = sz - d0_size;
 
-			_push_part(dt, d0_size);
-			cursor = 0;
-			_push_part(dt + d0_size, d1_size);
+			if (sz > rroom)
+			{
+				size_t d0_size = rroom;
+				size_t d1_size = sz - rroom;
+
+				_push_part(dt, d0_size);
+				_push_part(dt + d0_size, d1_size);
+			}
+
+			else 
+			{
+				_push_part(dt, sz);
+			}
+		}
+
+		void push(const T& val)
+		{
+			*(dataarr + cursor) = *(dataarr + halfsize + cursor) = val;
+			++cursor; 
+			cursor_fixup();
 		}
 	};
 }
