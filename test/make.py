@@ -17,17 +17,13 @@ tests_c = [
 ]
 
 application("runtests",
-	sources = (
-		["main.cpp"] 
-		+ [t+".cpp" for t in tests] 
-		+ [t+".c" for t in tests_c]),
+	sources = (["main.cpp"]),
 
 	ld_flags = "-L/usr/local/lib/",
 
 	include_paths = ["."],
-	mdepends = ["ralgo", "linalg", "igris"],
-
-	libs = ["gtest", "pthread", "igris", "nos"],
+	mdepends = ["ralgo", "igris"],
+	#libs = ["gtest", "pthread", "igris", "nos"],
 )
 
 licant.ex("runtests")

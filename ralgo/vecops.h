@@ -66,8 +66,8 @@ namespace ralgo
 		}
 
 		// Применить функцию f ко всем элементам массивов a и b. Допускается передача дополнительных аргументов.
-		template <class R, class F, class A, class B, class ... Args>
-		R elementwise2(const F& f, const A& a, const B& b, Args&& ... args) 
+		template <class R=void, class F, class A, class B, class ... Args>
+		defsame_t<R,A> elementwise2(const F& f, const A& a, const B& b, Args&& ... args) 
 		{
 			assert(a.size() == b.size());
 			R c(a.size());
@@ -176,6 +176,25 @@ namespace ralgo
 		{
 			return elementwise<R>([](auto x){ return x; }, a);
 		}
+
+		template <class A, class B, class F> bool reduce_and(const A& a, const B& b, F&& op) 
+		{
+			for (unsigned int i = 0; i < a.size(); ++i) 
+				if (!op(a[i], b[i]))
+					return false;
+			return true;
+		}
+
+		template <class A, class B, class F> bool reduce_or(const A& a, const B& b, F&& op) 
+		{
+			for (unsigned int i = 0; i < a.size(); ++i) 
+				if (op(a[i], b[i]))
+					return true;
+			return false;
+		}
+
+		template <class A, class B> bool equal(const A& a, const B& b) { reduce_and(a,b,ralgo::op::eq()); }
+		
 
 		template <class R=void, class A, class B> defsame_t<R,A> add_vs(const A& a, B b) { return elementwise<R>(ralgo::op::add(), a, b); }
 		template <class R=void, class A, class B> defsame_t<R,A> sub_vs(const A& a, B b) { return elementwise<R>(ralgo::op::sub(), a, b); }
