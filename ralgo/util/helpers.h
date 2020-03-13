@@ -29,22 +29,20 @@ namespace ralgo
 	template <class T> constexpr T log2(T x) { return std::log2(x); }
 	template <class T> constexpr T log10(T x) { return std::log10(x); }
 
-	namespace op 
-	{
-		//template <class A, class B> constexpr auto add(const A& a, const B& b) { return a + b; }
-		//template <class A, class B> constexpr auto sub(const A& a, const B& b) { return a - b; }
-		//template <class A, class B> constexpr auto mul(const A& a, const B& b) { return a * b; }
-		//template <class A, class B> constexpr auto div(const A& a, const B& b) { return a / b; }
-
-		struct add { template<class A, class B> auto operator()(const A& a, const B& b) const { return a + b; } };
-		struct sub { template<class A, class B> auto operator()(const A& a, const B& b) const { return a - b; } };
-		struct mul { template<class A, class B> auto operator()(const A& a, const B& b) const { return a * b; } };
-		struct div { template<class A, class B> auto operator()(const A& a, const B& b) const { return a / b; } };
+		struct op_add { template<class A, class B> auto operator()(const A& a, const B& b) const { return a + b; } };
+		struct op_sub { template<class A, class B> auto operator()(const A& a, const B& b) const { return a - b; } };
+		struct op_mul { template<class A, class B> auto operator()(const A& a, const B& b) const { return a * b; } };
+		struct op_div { template<class A, class B> auto operator()(const A& a, const B& b) const { return a / b; } };
 	
-		struct abs { template<class A> auto operator()(const A& a) const { return std::abs(a); } };
+		struct op_abs { template<class A> auto operator()(const A& a) const { return std::abs(a); } };
 
-		struct eq { template<class A, class B> auto operator()(const A& a, const B& b) const { return a == b; } };
-	}
+		struct op_eq { template<class A, class B> auto operator()(const A& a, const B& b) const { return a == b; } };
+		struct op_not_eq { template<class A, class B> auto operator()(const A& a, const B& b) const { return a != b; } };
+
+		struct op_and { template<class A, class B> bool operator()(const A& a, const B& b) const { return a && b; } };
+		struct op_or { template<class A, class B> bool operator()(const A& a, const B& b) const { return a || b; } };
+		struct op_bin_and { template<class A, class B> auto operator()(const A& a, const B& b) const { return a & b; } };
+		struct op_bin_or { template<class A, class B> auto operator()(const A& a, const B& b) const { return a | b; } };
 
 	template <typename ... T> struct rettype {};
 	template <class A, class B> struct rettype<A,B> { using type = A; };
@@ -56,18 +54,10 @@ namespace ralgo
 	template<class V> struct defvec<void, V> { using type = std::vector<value_t<V>>; };
 	template<class R, class V> using defvec_t = typename defvec<R,V>::type; 
 
-	// Определяет тип по умолчанию. Если тип равен void, то используется тип по умолчанию.
-	template<class R, class V> struct defsame { using type = R; };
-	template<class V> struct defsame<void, V> { using type = V; };
-	template<class R, class V> using defsame_t = typename defsame<R,V>::type; 
-
 	// Определяет тип по умолчанию. Если тип равен void, то используется тип результат функтора.
 	template<class R, class F> struct fretvec { using type = R; };
 	template<class F> struct fretvec<void, F> { using type = std::vector<std::result_of<F>>; };
 	template<class R, class F> using fretvec_t = typename fretvec<R,F>::type; 
-
-
-
 }
 
 #endif

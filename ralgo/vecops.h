@@ -7,11 +7,13 @@
 #include <ralgo/util/helpers.h>
 #include <igris/dprint.h>
 
+#include <ralgo/vecops_base.h>
+
 namespace ralgo
 {
 	namespace vecops
 	{
-		// построить целочисленный вектор арифметической прогрессии [start;stop) с шагом step. 
+		// построить целочисленный вектор арифметической прогрессии [start;stop) с шагом step.
 		template<class V>
 		auto arange(int start, int stop, int step)
 		{
@@ -41,69 +43,27 @@ namespace ralgo
 			R r(n);
 			double k;
 
-			for (int i = 0; i < n; ++i) 
+			for (int i = 0; i < n; ++i)
 			{
 				k = (double)i / ((double)n - 1);
-				r[i] = s * (1-k) + f * k;
+				r[i] = s * (1 - k) + f * k;
 			}
 
 			return r;
 		}
 
-		// Применить функцию f ко всем элементам массива a. Допускается передача дополнительных аргументов.
-		template <class R=void, class F, class A, class ... Args>
-		defsame_t<R,A> elementwise(const F& f, const A & a, Args&& ... args)
-		{
-			defsame_t<R,A> ret(a.size());
-
-			auto ait = a.begin(), aend = a.end();
-			auto cit = ret.begin();
-
-			for (; ait != aend; ++ait, ++cit)
-				*cit = f(*ait, std::forward<Args>(args) ...);
-
-			return ret;
-		}
-
-		// Применить функцию f ко всем элементам массивов a и b. Допускается передача дополнительных аргументов.
-		template <class R=void, class F, class A, class B, class ... Args>
-		defsame_t<R,A> elementwise2(const F& f, const A& a, const B& b, Args&& ... args) 
-		{
-			assert(a.size() == b.size());
-			R c(a.size());
-
-			auto ait = a.begin(), aend = a.end();
-			auto bit = b.begin();
-			auto cit = c.begin();
-
-			for (; ait != aend; ++ait, ++bit, ++cit)
-				*cit = f(*ait, *bit, std::forward<Args>(args) ...); 
-
-			return c;
-		}
-
-		template <class C, class F, class A, class B, class ... Args>
-		void elementwise2_to(C& c, const F& f, const A& a, const B& b, Args&& ... args) 
-		{
-			auto ait = a.begin(), aend = a.end();
-			auto bit = b.begin();
-			auto cit = c.begin();
-
-			for (; ait != aend; ++ait, ++bit, ++cit)
-				*cit = f(*ait, *bit, std::forward<Args>(args) ...); 
-		}
 
 
 		// Создаёт векторизованный вриант функции.
 		template<class V, class R = V, typename F, class ... Args>
 		constexpr auto vectorize(const F& f, Args && ... args)
 		{
-			auto lamda = [=](const V & vec){ return elementwise<R>(f, vec, args...); };
+			auto lamda = [ = ](const V & vec) { return elementwise<R>(f, vec, args...); };
 			return lamda;
 		}
 
 		// Векторизованные операции над комплексными числами.
-		template <class R=void, class A> defsame_t<R,A> abs(const A& obj) { return elementwise<R>(ralgo::op::abs(), obj); }
+		template <class R = void, class A> defsame_t<R, A> abs(const A& obj) { return elementwise<R>(ralgo::op_abs(), obj); }
 		template <template<class C> class V, class T> auto real(const V<T>& obj) { return elementwise<V<T>>([](const auto & c) {return c.real();}, obj); }
 		template <template<class C> class V, class T> auto imag(const V<T>& obj) { return elementwise<V<T>>([](const auto & c) {return c.imag();}, obj); }
 
@@ -147,14 +107,14 @@ namespace ralgo
 			return sqrt(res);
 		}
 
-		// Вычислить расстояние между кортежами равного размера по 
+		// Вычислить расстояние между кортежами равного размера по
 		// евклидовой метрике.
-		template <class R=double, class A, class B>
-		R distance2(const A& a, const B& b) 
+		template <class R = double, class A, class B>
+		R distance2(const A& a, const B& b)
 		{
 			R accum = 0;
 
-			for (unsigned int i = 0; i < a.size(); ++i) 
+			for (unsigned int i = 0; i < a.size(); ++i)
 			{
 				auto diff = a[i] - b[i];
 				accum += diff * diff;
@@ -163,53 +123,43 @@ namespace ralgo
 			return accum;
 		}
 
-		// Вычислить расстояние между кортежами равного размера по 
+		// Вычислить расстояние между кортежами равного размера по
 		// евклидовой метрике.
-		template <class R=double, class A, class B>
-		R distance(const A& a, const B& b) 
+		template <class R = double, class A, class B>
+		R distance(const A& a, const B& b)
 		{
-			return sqrt(distance2<R,A,B>(a,b));
+			return sqrt(distance2<R, A, B>(a, b));
 		}
 
 		template <class R, class A>
-		R cast(const A& a) 
+		R cast(const A& a)
 		{
-			return elementwise<R>([](auto x){ return x; }, a);
+			return elementwise<R>([](auto x) { return x; }, a);
 		}
 
-		template <class A, class B, class F> bool reduce_and(const A& a, const B& b, F&& op) 
-		{
-			for (unsigned int i = 0; i < a.size(); ++i) 
-				if (!op(a[i], b[i]))
-					return false;
-			return true;
-		}
+		template <class A> bool all(const A& a) { return fold(op_and(), true, a); }
+		template <class A> bool any(const A& a) { return fold(op_or(), false, a); }
 
-		template <class A, class B, class F> bool reduce_or(const A& a, const B& b, F&& op) 
-		{
-			for (unsigned int i = 0; i < a.size(); ++i) 
-				if (op(a[i], b[i]))
-					return true;
-			return false;
-		}
+		//template <class A, class B> bool equal_all(const A& a, const B& b) 
+		//{ return fold(ralgo::op_not_eq(), a, veciter(b)); }
 
-		template <class A, class B> bool equal(const A& a, const B& b) { reduce_and(a,b,ralgo::op::eq()); }
-		
+		template <class A, class B> bool equal_all(const A& a, const B& b) { return boolean_all(ralgo::op_eq(), a, b); }
+		template <class A, class B> bool equal_any(const A& a, const B& b) { return boolean_any(ralgo::op_eq(), a, b); }
 
-		template <class R=void, class A, class B> defsame_t<R,A> add_vs(const A& a, B b) { return elementwise<R>(ralgo::op::add(), a, b); }
-		template <class R=void, class A, class B> defsame_t<R,A> sub_vs(const A& a, B b) { return elementwise<R>(ralgo::op::sub(), a, b); }
-		template <class R=void, class A, class B> defsame_t<R,A> mul_vs(const A& a, B b) { return elementwise<R>(ralgo::op::mul(), a, b); }
-		template <class R=void, class A, class B> defsame_t<R,A> div_vs(const A& a, B b) { return elementwise<R>(ralgo::op::div(), a, b); }
+		template <class R = void, class A, class B> defsame_t<R, A> add_vs(const A& a, B b) { return elementwise<R>(ralgo::op_add(), a, b); }
+		template <class R = void, class A, class B> defsame_t<R, A> sub_vs(const A& a, B b) { return elementwise<R>(ralgo::op_sub(), a, b); }
+		template <class R = void, class A, class B> defsame_t<R, A> mul_vs(const A& a, B b) { return elementwise<R>(ralgo::op_mul(), a, b); }
+		template <class R = void, class A, class B> defsame_t<R, A> div_vs(const A& a, B b) { return elementwise<R>(ralgo::op_div(), a, b); }
 
-		template <class R=void, class A, class B> defsame_t<R,A> add_vv(const A& a, const B& b) { return elementwise2<R>(ralgo::op::add(), a, b); }
-		template <class R=void, class A, class B> defsame_t<R,A> sub_vv(const A& a, const B& b) { return elementwise2<R>(ralgo::op::sub(), a, b); }
-		template <class R=void, class A, class B> defsame_t<R,A> mul_vv(const A& a, const B& b) { return elementwise2<R>(ralgo::op::mul(), a, b); }
-		template <class R=void, class A, class B> defsame_t<R,A> div_vv(const A& a, const B& b) { return elementwise2<R>(ralgo::op::div(), a, b); }
+		template <class R = void, class A, class B> defsame_t<R, A> add_vv(const A& a, const B& b) { return elementwise2<R>(ralgo::op_add(), a, b); }
+		template <class R = void, class A, class B> defsame_t<R, A> sub_vv(const A& a, const B& b) { return elementwise2<R>(ralgo::op_sub(), a, b); }
+		template <class R = void, class A, class B> defsame_t<R, A> mul_vv(const A& a, const B& b) { return elementwise2<R>(ralgo::op_mul(), a, b); }
+		template <class R = void, class A, class B> defsame_t<R, A> div_vv(const A& a, const B& b) { return elementwise2<R>(ralgo::op_div(), a, b); }
 
-		template <class A, class B, class C> void add_vv_to(C& c, const A& a, const B& b) { return elementwise2_to(c, ralgo::op::add(), a, b); }
-		template <class A, class B, class C> void sub_vv_to(C& c, const A& a, const B& b) { return elementwise2_to(c, ralgo::op::sub(), a, b); }
-		template <class A, class B, class C> void mul_vv_to(C& c, const A& a, const B& b) { return elementwise2_to(c, ralgo::op::mul(), a, b); }
-		template <class A, class B, class C> void div_vv_to(C& c, const A& a, const B& b) { return elementwise2_to(c, ralgo::op::div(), a, b); }
+		template <class A, class B, class C> void add_vv_to(C& c, const A& a, const B& b) { return elementwise2_to(c, ralgo::op_add(), a, b); }
+		template <class A, class B, class C> void sub_vv_to(C& c, const A& a, const B& b) { return elementwise2_to(c, ralgo::op_sub(), a, b); }
+		template <class A, class B, class C> void mul_vv_to(C& c, const A& a, const B& b) { return elementwise2_to(c, ralgo::op_mul(), a, b); }
+		template <class A, class B, class C> void div_vv_to(C& c, const A& a, const B& b) { return elementwise2_to(c, ralgo::op_div(), a, b); }
 
 		namespace inplace
 		{
@@ -221,8 +171,10 @@ namespace ralgo
 				return v;
 			}
 
-			template <class V> void clean(V& v) { 
-				elementwise(v, [](auto& a){return typename V::value_type();}); }
+			template <class V> void clean(V& v)
+			{
+				elementwise(v, [](auto & a) {return typename V::value_type();});
+			}
 
 			template <class V, class S> V& add(V& vec, S m) { for (auto& val : vec) val += m; return vec; }
 			template <class V, class S> V& sub(V& vec, S m) { for (auto& val : vec) val -= m; return vec; }
@@ -239,7 +191,7 @@ namespace ralgo
 			template <class V> V& log2(V& vec) { return elementwise(vec, ralgo::log2<value_t<V>>); }
 			template <class V> V& log10(V& vec) { return elementwise(vec, ralgo::log10<value_t<V>>); }
 
-			template <class V> V& normalize(V& vec) 
+			template <class V> V& normalize(V& vec)
 			{
 				double norm = ralgo::vecops::norm(vec);
 				ralgo::vecops::inplace::div(vec, norm);
@@ -247,37 +199,37 @@ namespace ralgo
 		}
 
 		template <class VI, class WI, class RI>
-		void merge_sorted(VI vit, const VI vend, WI wit, const WI wend, RI rit) 
+		void merge_sorted(VI vit, const VI vend, WI wit, const WI wend, RI rit)
 		{
-			while(vit != vend && wit != wend) 
+			while (vit != vend && wit != wend)
 			{
 				bool cmp = *vit < *wit;
 
-				if (cmp) { *rit++ = *vit++; } 
+				if (cmp) { *rit++ = *vit++; }
 				else     { *rit++ = *wit++; }
 			}
 
-			while (vit != vend) { *rit++ = *vit++; } 
-			while (wit != wend) { *rit++ = *wit++; } 
+			while (vit != vend) { *rit++ = *vit++; }
+			while (wit != wend) { *rit++ = *wit++; }
 		}
 
 		template <class V, class W, class R>
-		void merge_sorted(const V& v, const W& w, R writer, double start, double stop) 
+		void merge_sorted(const V& v, const W& w, R writer, double start, double stop)
 		{
 			auto vit = std::lower_bound(v.begin(), v.end(), start);
 			auto wit = std::lower_bound(w.begin(), w.end(), start);
 			auto vend = std::upper_bound(v.begin(), v.end(), stop);
 			auto wend = std::upper_bound(w.begin(), w.end(), stop);
 
-			return merge_sorted(vit, vend, wit, wend, writer);			
+			return merge_sorted(vit, vend, wit, wend, writer);
 		}
 
 		template <class V, class W>
-		auto merge_sorted(const V& v, const W& w, double start, double stop) 
+		auto merge_sorted(const V& v, const W& w, double start, double stop)
 		{
 			std::vector<value_t<V>> r;
-			merge_sorted(v,w,std::back_inserter(r),start,stop);	
-			return r;	
+			merge_sorted(v, w, std::back_inserter(r), start, stop);
+			return r;
 		}
 	}
 
