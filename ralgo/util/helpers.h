@@ -42,6 +42,8 @@ namespace ralgo
 		struct div { template<class A, class B> auto operator()(const A& a, const B& b) const { return a / b; } };
 	
 		struct abs { template<class A> auto operator()(const A& a) const { return std::abs(a); } };
+
+		struct eq { template<class A, class B> auto operator()(const A& a, const B& b) const { return a == b; } };
 	}
 
 	template <typename ... T> struct rettype {};
@@ -63,6 +65,9 @@ namespace ralgo
 	template<class R, class F> struct fretvec { using type = R; };
 	template<class F> struct fretvec<void, F> { using type = std::vector<std::result_of<F>>; };
 	template<class R, class F> using fretvec_t = typename fretvec<R,F>::type; 
+
+
+
 }
 
 #endif
