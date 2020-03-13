@@ -2,8 +2,8 @@
 #define RALGO_SVD_H
 
 #include <limits>
-#include <ralgo/vecops.h>
-#include <ralgo/matops.h>
+#include <ralgo/linalg/vecops.h>
+#include <ralgo/linalg/matops.h>
 #include <ralgo/util/math.h>
 #include <ralgo/fault.h>
 // Based on numerical recipes.

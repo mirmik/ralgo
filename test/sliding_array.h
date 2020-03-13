@@ -1,5 +1,5 @@
-#include <ralgo/mstruct/sliding_array.h>
-#include <ralgo/vecops.h>
+#include <ralgo/signal/sliding_array.h>
+#include <ralgo/linalg/vecops.h>
 
 using namespace ralgo;
 

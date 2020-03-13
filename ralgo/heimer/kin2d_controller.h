@@ -6,7 +6,7 @@
 //#include <ralgo/planning/htrans2_mover.h>
 
 #include <ralgo/disctime.h>
-#include <ralgo/util/backpack.h>
+#include <ralgo/linalg/backpack.h>
 
 #include <ralgo/heimer/multiax.h>
 
@@ -41,7 +41,7 @@ namespace ralgo
 			kin2d_controller(const char* name, axis_driver<P,V>* arr, P* poses, size_t sz)
 				: virtual_multiax<P,V>(name, arr, poses, sz)
 			{
-				compensation_koefficient = 1 / ralgo::discrete_time_frequency();
+				compensation_koefficient = 1;//10 / ralgo::discrete_time_frequency();
 			}
 
 			rabbit::htrans2<float> location()
@@ -75,8 +75,6 @@ namespace ralgo
 				rabbit::screw2<float> target =
 				    spd + (pos - location()) * compensation_koefficient;
 
-				//nos::println(pos, location(), pos - location(), target);
-
 				rabbit::screw2<double> dtarget = target;
 
 				for (unsigned int i = 0; i < chain.pairs.size(); ++i)
@@ -90,15 +88,7 @@ namespace ralgo
 				            spdarr, dtarget,
 				            dsenses, chain.pairs.size());
 
-				// Выставляем найденные скорости прилинкованным
-				// сервам.
-				//for (unsigned int i = 0; i < chain.pairs.size(); ++i)
-				//{
-				//	kinematic_unit2d * _unit = chain.pairs[i];
-				//	unit2d_1dof * unit = (unit2d_1dof *) _unit;
-				//}
-
-				//auto axes = controlled_axes();
+				// Результат возвращается через spdarr.
 			}
 
 			virtual igris::array_view<axis_driver<P,V>*> controlled_axes() = 0;

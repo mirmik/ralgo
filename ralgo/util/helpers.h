@@ -11,8 +11,8 @@ namespace ralgo
 	constexpr const double epsilon = std::numeric_limits<double>::epsilon();
 
 	// Достать тип значения из контейнера.
-	template <typename V> struct value { using type = typename V::value_type; };
-	template <typename T> using value_t = typename value<T>::type;
+	//template <typename V> struct value { using type = typename V::value_type; };
+	template <typename T> using value_t = typename T::value_type;
 
 	// Превести тип комплексного аргумента или вектора к соответствующему базовому скалярному типу.
 	template <typename T> struct scalar { using type = T; };
@@ -58,6 +58,12 @@ namespace ralgo
 	template<class R, class F> struct fretvec { using type = R; };
 	template<class F> struct fretvec<void, F> { using type = std::vector<std::result_of<F>>; };
 	template<class R, class F> using fretvec_t = typename fretvec<R,F>::type; 
+
+	// Определяет тип по умолчанию. Если тип равен void, то используется тип по умолчанию.
+	template<class R, class V> struct defsame { using type = R; };
+	template<class V> struct defsame<void, V> { using type = V; };
+	template<class R, class V> using defsame_t = typename defsame<R, V>::type;
+
 }
 
 #endif

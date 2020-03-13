@@ -5,7 +5,7 @@
 
 #include <ralgo/heimer/interpolation_group.h>
 #include <ralgo/planning/trajNd.h>
-#include <ralgo/vecops.h>
+#include <ralgo/linalg/vecops.h>
 
 #include <igris/dtrace.h>
 

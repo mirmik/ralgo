@@ -1,4 +1,4 @@
-#include <ralgo/vecops.h>
+#include <ralgo/linalg/vecops.h>
 
 using namespace ralgo;
 

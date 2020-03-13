@@ -8,6 +8,9 @@
 //#include <ralgo/objects/served.h>
 //#include <ralgo/objects/named.h>
 
+#include <nos/print.h>
+#include <nos/fprint.h>
+#include <rabbit/space/screw.h>
 #include <ralgo/heimer/kin2d_controller.h>
 
 namespace ralgo
@@ -146,9 +149,9 @@ namespace ralgo
 				chain.update_location();
 				outpos = chain.out()->global_location;
 
-				x_axis._set_point_trajectory(curpos.translation().x);
-				y_axis._set_point_trajectory(curpos.translation().y);
-				a_axis._set_point_trajectory(curpos.rotation());
+				x_axis._set_point_trajectory(outpos.translation().x);
+				y_axis._set_point_trajectory(outpos.translation().y);
+				a_axis._set_point_trajectory(outpos.rotation());
 			}
 
 			igris::array_view<controlled*> controlled_devices() override
@@ -206,6 +209,17 @@ namespace ralgo
 				nos::fprintln("control: {} {} {}", ctrpos[0], ctrpos[1], ctrpos[2]);
 				nos::fprintln("ctrspd: {} {} {}", ctrspd[0], ctrspd[1], ctrspd[2]);
 				nos::fprintln("links: {} {} {}", x_link.coord, y_link.coord, a_link.coord);
+
+				nos::println("link poses");
+				nos::fprintln("x_link: {} {}", x_link.global_location, x_link.output.global_location);
+				nos::fprintln("y_link: {} {}", y_link.global_location, y_link.output.global_location);
+				nos::fprintln("a_link: {} {}", a_link.global_location, a_link.output.global_location);
+				nos::fprintln("o_link: {}", output_link.global_location);
+
+				nos::println("link senses");
+				nos::fprintln("x_link: {}", x_link.sensivity());
+				nos::fprintln("y_link: {}", y_link.sensivity());
+				nos::fprintln("a_link: {}", a_link.sensivity());	
 			}
 		};
 	}

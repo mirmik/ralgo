@@ -2,49 +2,45 @@
 #define RALGO_VECOPS_BASE_H
 
 #include <type_traits>
+#include <ralgo/util/helpers.h>
 
 namespace ralgo
 {
 	namespace vecops
 	{
-			// Определяет тип по умолчанию. Если тип равен void, то используется тип по умолчанию.
-			template<class R, class V> struct defsame { using type = R; };
-			template<class V> struct defsame<void, V> { using type = V; };
-			template<class R, class V> using defsame_t = typename defsame<R,V>::type; 
 
+		/*		// Тип, соответствующий типу возвращаемому при итерации контейнера.
+				template <class V> using veciter_ret_t = std::result_of<decltype(V::operator[])>;
 
-/*		// Тип, соответствующий типу возвращаемому при итерации контейнера.
-		template <class V> using veciter_ret_t = std::result_of<decltype(V::operator[])>;
+				// Итератор, передаваемый в обобщенные функции, использующие распаковку.
+				template <class A> struct veciter
+				{
+					const A& ref;
+					constexpr inline veciter(const A& ref) : ref(ref) {}
+				};
 
-		// Итератор, передаваемый в обобщенные функции, использующие распаковку.
-		template <class A> struct veciter
-		{
-			const A& ref;
-			constexpr inline veciter(const A& ref) : ref(ref) {}
-		};
+				// Функция итерирует
+				template <class A> struct veciter_unpack
+				{
+					constexpr auto operator()(A&& arg)
+					{
+						return std::forward<A>(arg);
+					}
+				};
 
-		// Функция итерирует
-		template <class A> struct veciter_unpack
-		{
-			constexpr auto operator()(A&& arg)
-			{
-				return std::forward<A>(arg);
-			}
-		};
-
-		template <class A> struct iter_unpack<veciter<A>>
-		{
-			constexpr auto operator()(const veciter<A>& arg)
-			{
-				return arg.ref;
-			}
-		};*/
+				template <class A> struct iter_unpack<veciter<A>>
+				{
+					constexpr auto operator()(const veciter<A>& arg)
+					{
+						return arg.ref;
+					}
+				};*/
 
 		template <class F, class A, class R = std::result_of_t<F(A)>>
-		R fold(F&& func, const R& initval, const A& a)
+		R fold(F && func, const R& initval, const A& a)
 		{
 			R accum = initval;
-			
+
 			auto ait = a.begin();
 			auto aeit = a.end();
 
@@ -54,8 +50,8 @@ namespace ralgo
 			return accum;
 		}
 
-		template <class F, class A, class B> bool boolean_all(F&& func, const A& a, const B& b) { auto ait = a.begin(); auto bit = b.begin(); auto aeit = a.end(); for (;ait != aeit; ++ait, ++bit) if (func(*ait, *bit) == false) return false; return true; }
-		template <class F, class A, class B> bool boolean_any(F&& func, const A& a, const B& b) { auto ait = a.begin(); auto bit = b.begin(); auto aeit = a.end(); for (;ait != aeit; ++ait, ++bit) if (func(*ait, *bit) == true) return true; return false; }
+		template <class F, class A, class B> bool boolean_all(F&& func, const A& a, const B& b) { auto ait = a.begin(); auto bit = b.begin(); auto aeit = a.end(); for (; ait != aeit; ++ait, ++bit) if (func(*ait, *bit) == false) return false; return true; }
+		template <class F, class A, class B> bool boolean_any(F&& func, const A& a, const B& b) { auto ait = a.begin(); auto bit = b.begin(); auto aeit = a.end(); for (; ait != aeit; ++ait, ++bit) if (func(*ait, *bit) == true) return true; return false; }
 
 		// Применить функцию f ко всем элементам массива a. Допускается передача дополнительных аргументов.
 		template <class R = void, class F, class A, class ... Args>

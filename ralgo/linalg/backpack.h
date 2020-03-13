@@ -110,10 +110,20 @@ namespace ralgo
 		T matdata[tsize * count_of_vectors];
 		ralgo::matrix_view<T> mat(matdata, tsize, count_of_vectors);
 
-		ralgo::matops::copy_from_cols(mat, vectors, count_of_vectors);
+		ralgo::matops::copy_from_cols(mat, igris::array_view<Alg>(vectors, count_of_vectors));
 
 		// Нагрузка на стэк.
 		ralgo::solve_linear_equation_system(result, mat, target);
+	};
+
+	template <class C, class T, class M>
+	void svd_backpack(    
+		C& coords,
+	    const T& target,
+		const M& matrix
+	) 
+	{
+		ralgo::solve_linear_equation_system(coords, matrix, target);
 	};
 }
 
