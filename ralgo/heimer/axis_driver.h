@@ -8,7 +8,7 @@
 
 #include <nos/log/logger.h>
 #include <iostream>
-#include <ralgo/heimer/device.h>
+#include <ralgo/heimer/control.h>
 
 extern nos::log::logger * syslog;
 
@@ -18,10 +18,12 @@ namespace ralgo
 	{
 		// Возможно следует объединить с классом axis_device.
 		template <class Position, class Speed>
-		class axis_driver : public axis_device<Position, Speed>
+		class axis_driver : 
+			public axis_device<Position, Speed>,
+			public external_control_slot
 		{
 			using parent = axis_device<Position, Speed>;
-			float poskoeff = 0;
+			float poskoeff = 10;
 
 			bool operation_finished_flag = true;
 
@@ -76,8 +78,9 @@ namespace ralgo
 
 			int _absmove_unsafe(Position curpos, Position tgtpos)
 			{
-
+				DTRACE();
 				auto dist = tgtpos - curpos;
+				DPRINT(dist);
 
 				int64_t curtim = ralgo::discrete_time();
 
@@ -89,6 +92,15 @@ namespace ralgo
 
 				line_traj.set_speed_pattern(parent::_acc_val, parent::_dcc_val,
 				                            parent::_speed);
+
+				DPRINT(curpos);
+				DPRINT(tgtpos);
+				DPRINT(curtim);
+				DPRINT(tgttim);
+
+				DPRINT(parent::_acc_val);
+				DPRINT(parent::_dcc_val);
+				DPRINT(parent::_speed);
 
 				operation_finished_flag = false;
 				set_trajectory(&line_traj);
@@ -107,12 +119,14 @@ namespace ralgo
 
 			int incmove_unsafe(Position dist) override
 			{
+				DTRACE();
 				auto curpos = current_position();
 				return _absmove_unsafe(curpos, curpos + dist);
 			}
 
 			int absmove_unsafe(Position pos) override
 			{
+				DTRACE();
 				auto curpos = current_position();
 				return _absmove_unsafe(curpos, pos);
 			}
@@ -142,11 +156,12 @@ namespace ralgo
 				int sts = attime(ralgo::discrete_time(), ctrpos, ctrspd);
 				if (sts && !operation_finished_flag)
 				{
-					syslog->trace("trajectory_finished: {}", as_controlled()->name());
+					//syslog->trace("trajectory_finished: {}", as_controlled()->name());
 					operation_finished_flag = true;
+					operation_finish(0);
 					operation_finish_event(this);
 					_current_trajectory = nullptr;
-					as_controlled()->release_control_self();
+					//as_controlled()->release_control_self();
 				}
 			}
 
@@ -169,7 +184,7 @@ namespace ralgo
 
 			void direct_control(Position pos, Speed spd)
 			{
-				assert(as_controlled()->controller());
+				assert(is_extern_controlled());
 
 				ctrpos = pos;
 				ctrspd = spd;
@@ -196,9 +211,15 @@ namespace ralgo
 				_current_trajectory = & line_traj;
 			}
 
-			virtual controlled* as_controlled() = 0;
+			virtual external_control_slot * as_controlled() = 0;
 
+			virtual const char * name() = 0;
 			virtual Position current_position() final { return feedpos; }
+		
+			bool in_operation() 
+			{
+				return _current_trajectory != nullptr;
+			}
 		};
 	}
 }

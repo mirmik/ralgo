@@ -2,7 +2,7 @@
 #define RALGO_HEIMER_SPEED_PHASER
 
 #include <ralgo/disctime.h>
-#include <ralgo/heimer/device.h>
+#include <ralgo/heimer/control.h>
 
 #include <igris/dprint.h>
 #include <igris/dtrace.h>

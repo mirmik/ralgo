@@ -13,7 +13,6 @@ namespace ralgo
 		template <class Position, class Speed>
 		class axis_device
 		{
-			using parent = ralgo::heimer::device;
 			using Time = int64_t;
 
 		protected:
@@ -39,7 +38,7 @@ namespace ralgo
 			// INCMODE
 			virtual int incmove(Position dist)
 			{
-				if (!try_operation_begin(0))
+				if (try_operation_begin(0))
 				{
 					ralgo::warning("axis_device take_control fault");
 					return -1;
@@ -59,7 +58,7 @@ namespace ralgo
 
 			virtual int absmove(Position tgtpos)
 			{
-				if (!try_operation_begin(0))
+				if (try_operation_begin(0))
 				{
 					ralgo::warning("axis_device take_control fault");
 					return -1;
@@ -143,7 +142,7 @@ namespace ralgo
 
 			virtual void stop_impl() = 0;
 
-			virtual bool try_operation_begin(int priority) = 0;
+			virtual int try_operation_begin(int priority) = 0;
 			virtual void operation_finish(int priority) = 0;
 		};
 	}

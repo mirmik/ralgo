@@ -1,19 +1,17 @@
 #ifndef RALGO_HEIMER_INTERPOLATION_GROUP_H
 #define RALGO_HEIMER_INTERPOLATION_GROUP_H
 
-#include <ralgo/heimer/device.h>
+#include <ralgo/heimer/control.h>
 
 namespace ralgo 
 {
 	namespace heimer 
 	{
 		template<class Position, class Speed>
-		class interpolation_group : public heimer::device
+		class interpolation_group
 		{
-			using parent = heimer::device;
-
 		public:
-			interpolation_group(const char* name) : parent(name) {}
+			interpolation_group() {}
 
 			virtual int incmove(Position * mov) = 0;
 			virtual int absmove(Position * pos) = 0;

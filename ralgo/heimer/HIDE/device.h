@@ -1,3 +1,4 @@
+
 #ifndef RALGO_HEIMER_DEVICE_H
 #define RALGO_HEIMER_DEVICE_H
 
@@ -8,7 +9,6 @@
 #include <igris/datastruct/dlist.h>
 
 #include <igris/shell/cli.h>
-
 #include <igris/util/bug.h>
 
 #define CONTROL_SUCCESS true
@@ -25,6 +25,7 @@ namespace ralgo
 		public:		
 			device * _controller = nullptr;
 			device * controller() { return _controller; }
+			void set_controller_force(device * dev) { _controller = dev; } 
 			
 			virtual bool take_control(device * controller) = 0;
 			virtual bool take_control_force(device * controller) = 0;
@@ -115,6 +116,7 @@ namespace ralgo
 				if (this->_controller == controller)
 				{
 					_controller =nullptr;
+					after_uncontrol_handle();
 					for (auto dev : controlled_devices())
 					{
 						dev->release_control(controller);
@@ -127,6 +129,7 @@ namespace ralgo
 			void release_control_force(device * controller) override
 			{
 				_controller = nullptr;
+				after_uncontrol_handle();
 				for (auto dev : controlled_devices())
 				{
 					dev->release_control(controller);
@@ -168,6 +171,7 @@ namespace ralgo
 
 		protected:
 			virtual void after_take_control_handle() = 0;
+			virtual void after_uncontrol_handle() {}
 			virtual igris::array_view<controlled*> controlled_devices() = 0;
 		};
 

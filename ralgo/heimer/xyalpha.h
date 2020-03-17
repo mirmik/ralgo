@@ -18,7 +18,9 @@ namespace ralgo
 	namespace heimer
 	{
 		template <class P, class V>
-		class xyalpha_controller: public kin2d_controller<P, V>
+		class xyalpha_controller:
+			public kin2d_controller<P, V>,
+			public control_info_node
 		{
 			using kin2d = kin2d_controller<P, V>;
 			using kin2d::chain;
@@ -32,6 +34,9 @@ namespace ralgo
 			int64_t lasttime = 0;
 
 			rabbit::htrans2<float> outpos;
+			bool finish_inited = false;
+			int finish_timeout = 100;
+			int64_t finish_inited_time;
 
 		public:
 			ralgo::actuator2 x_link;
@@ -40,7 +45,9 @@ namespace ralgo
 			ralgo::unit2d output_link;
 
 			axis_driver<P, V>* _controlled_axes[3];
-			heimer::controlled* _controlled_devices[3];
+
+			rabbit::htrans2<float> nullpos;
+			rabbit::htrans2<float> invnullpos;
 
 			union
 			{
@@ -60,15 +67,16 @@ namespace ralgo
 
 		public:
 			xyalpha_controller(const char* name, axis_driver<P, V>* controlleds[3]) :
-				kin2d(name, ctraxes, axposes, 3),
+				kin2d(ctraxes, 3),
+				control_info_node(name, this, this, nullptr),
 
-				x_link( {1, 0}, 1),
+					x_link({1, 0}, 1),
 			        y_link({0, 1}, 1),
 			        a_link(1),
 
-			        x_axis(this, 0),
-			        y_axis(this, 1),
-			        a_axis(this, 2)
+			        x_axis("x", this, 0),
+			        y_axis("y", this, 1),
+			        a_axis("a", this, 2)
 			{
 				x_link.link(&y_link);
 				y_link.link(&a_link);
@@ -79,7 +87,7 @@ namespace ralgo
 				for (int i = 0; i < 3; ++i)
 				{
 					_controlled_axes[i]  = controlleds[i];
-					_controlled_devices[i] = controlleds[i]->as_controlled();
+					//_controlled_devices[i] = controlleds[i]->as_controlled();
 				}
 			}
 
@@ -107,40 +115,58 @@ namespace ralgo
 			{
 				float xpos, ypos, apos, xspd, yspd, aspd;
 
-				if (this->controller() == this)
+				/*if (kin2d::is_extern_controlled() == false)
 				{
-					x_axis.attime(time, xpos, xspd);
-					y_axis.attime(time, ypos, yspd);
-					a_axis.attime(time, apos, aspd);
+					int sts = 1;
+					sts = sts & x_axis.attime(time, xpos, xspd);
+					sts = sts & y_axis.attime(time, ypos, yspd);
+					sts = sts & a_axis.attime(time, apos, aspd);
 
-					ctrpos[0] = xpos; 
-					ctrpos[1] = ypos; 
-					ctrpos[2] = apos; 
+					ctrpos[0] = xpos;
+					ctrpos[1] = ypos;
+					ctrpos[2] = apos;
+
+					if (sts)
+					{
+						finish_inited = true;
+						finish_inited_time = ralgo::discrete_time();
+					}
 
 					//syslog->info("control: {} {} {}", xpos, ypos, apos);
 				}
 				else
-				{
-					BUG();
-				//	xpos = x_axis.ctrpos;
-				//	xspd = x_axis.ctrspd;
-				//	ypos = y_axis.ctrpos;
-				//	yspd = y_axis.ctrspd;
-				//	apos = a_axis.ctrpos;
-				//	aspd = a_axis.ctrspd;
-				}
+				{*/
+					//	BUG();
+				BUG();
+
+					xpos = x_axis.ctrpos;
+					xspd = x_axis.ctrspd;
+					ypos = y_axis.ctrpos;
+					yspd = y_axis.ctrspd;
+					apos = a_axis.ctrpos;
+					aspd = a_axis.ctrspd;
+				
+				//}
 
 				pos = rabbit::htrans2<float> { apos, { xpos, ypos } };
 				spd = rabbit::screw2<float> { aspd, {xspd, yspd} };
+
+				pos = nullpos * pos;
+				spd = nullpos.rotate_screw(spd);
 			}
 
 			void restore_control_model() override
 			{
-				double xpos,ypos,apos;
+				finish_inited = false;
+				double xpos, ypos, apos;
 
 				xpos = _controlled_axes[0]->current_position();
 				ypos = _controlled_axes[1]->current_position();
 				apos = _controlled_axes[2]->current_position();
+
+				DPRINT(xpos);
+				DPRINT(ypos);
+				DPRINT(apos);
 
 				x_link.set_coord(xpos);
 				y_link.set_coord(ypos);
@@ -149,22 +175,24 @@ namespace ralgo
 				chain.update_location();
 				outpos = chain.out()->global_location;
 
-				x_axis._set_point_trajectory(outpos.translation().x);
-				y_axis._set_point_trajectory(outpos.translation().y);
-				a_axis._set_point_trajectory(outpos.rotation());
+				auto outpos_corrected = invnullpos * outpos;
+
+				x_axis._set_point_trajectory(outpos_corrected.translation().x);
+				y_axis._set_point_trajectory(outpos_corrected.translation().y);
+				a_axis._set_point_trajectory(outpos_corrected.rotation());
 			}
 
-			igris::array_view<controlled*> controlled_devices() override
-			{
-				return _controlled_devices;
-			}
+			//igris::array_view<controlled*> controlled_devices() override
+			//{
+			//	return _controlled_devices;
+			//}
 
-			igris::array_view<axis_driver<float,float>*> controlled_axes() override 
+			igris::array_view<axis_driver<float, float>*> controlled_axes() override
 			{
 				return _controlled_axes;
 			}
 
-			void update_state() 
+			void update_state()
 			{
 				double xpos = _controlled_axes[0]->current_position();
 				double ypos = _controlled_axes[1]->current_position();
@@ -177,33 +205,48 @@ namespace ralgo
 				chain.update_location();
 				outpos = chain.out()->global_location;
 
-				x_axis.feedpos = xpos;
-				y_axis.feedpos = ypos;
-				a_axis.feedpos = apos;
+				auto outpos_corrected = invnullpos * outpos;
+
+				x_axis.feedpos = outpos_corrected.translation().x;
+				y_axis.feedpos = outpos_corrected.translation().y;
+				a_axis.feedpos = outpos_corrected.rotation();
+
+				if (finish_inited & (ralgo::discrete_time() - finish_inited_time > finish_timeout))
+				{
+					BUG();
+					//device::release_control_self();
+					//x_axis.set_controller_force(nullptr);
+					//y_axis.set_controller_force(nullptr);
+					//a_axis.set_controller_force(nullptr);
+					finish_inited = false;
+				}
 
 				//syslog->info("current: {} {} {}", _controlled_axes[0]->current_position(), _controlled_axes[1]->current_position(), _controlled_axes[2]->current_position());
-				
+
 				chain.update_location();
 			}
 
 			double * ctrspd_array() override { return ctrspd; }
 
-			void apply_control() 
+			void apply_control()
 			{
-				int64_t time = millis(); 
+				int64_t time = millis();
 				//syslog->info("{} {} {}", ctrspd[0], ctrspd[1], ctrspd[2]);
 
-				double delta = (double)(time - lasttime) / 1000;
+				//double delta = (double)(time - lasttime) / 1000;
 				lasttime = time;
 
-				_controlled_axes[0]->direct_control(_controlled_axes[0]->current_position() + ctrspd[0]*delta, ctrspd[0]);	
-				_controlled_axes[1]->direct_control(_controlled_axes[1]->current_position() + ctrspd[1]*delta, ctrspd[1]);	
-				_controlled_axes[2]->direct_control(_controlled_axes[2]->current_position() + ctrspd[2]*delta, ctrspd[2]);	
+				//_controlled_axes[0]->direct_control(_controlled_axes[0]->current_position() + ctrspd[0]*delta, ctrspd[0]);
+				//_controlled_axes[1]->direct_control(_controlled_axes[1]->current_position() + ctrspd[1]*delta, ctrspd[1]);
+				//_controlled_axes[2]->direct_control(_controlled_axes[2]->current_position() + ctrspd[2]*delta, ctrspd[2]);
+
+				_controlled_axes[0]->direct_control(_controlled_axes[0]->current_position(), ctrspd[0]);
+				_controlled_axes[1]->direct_control(_controlled_axes[1]->current_position(), ctrspd[1]);
+				_controlled_axes[2]->direct_control(_controlled_axes[2]->current_position(), ctrspd[2]);
 			}
 
 			void print_info() override
 			{
-				nos::fprintln("device: {}", device::name());
 				nos::fprintln("current: {} {} {}", _controlled_axes[0]->current_position(), _controlled_axes[1]->current_position(), _controlled_axes[2]->current_position());
 				nos::fprintln("outpos: {}", outpos);
 				nos::fprintln("control: {} {} {}", ctrpos[0], ctrpos[1], ctrpos[2]);
@@ -219,8 +262,34 @@ namespace ralgo
 				nos::println("link senses");
 				nos::fprintln("x_link: {}", x_link.sensivity());
 				nos::fprintln("y_link: {}", y_link.sensivity());
-				nos::fprintln("a_link: {}", a_link.sensivity());	
+				nos::fprintln("a_link: {}", a_link.sensivity());
 			}
+
+			void control_interrupt_from(external_control_slot * slot)
+			{
+				BUG();
+				//try_release_control();
+				//deactivate();
+			}
+
+			external_control_slot* iterate(external_control_slot* slt) override
+			{
+				if (slt == nullptr)
+					return _controlled_axes[0]->as_controlled();
+
+				if (slt == _controlled_axes[0]->as_controlled())
+					return _controlled_axes[1]->as_controlled();
+
+				if (slt == _controlled_axes[1]->as_controlled())
+					return _controlled_axes[2]->as_controlled();
+
+				if (slt == _controlled_axes[2]->as_controlled())
+					return nullptr;
+				else
+					return nullptr;
+			}
+
+			const char * name() override { return mnemo(); }
 		};
 	}
 }

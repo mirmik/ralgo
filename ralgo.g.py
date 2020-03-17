@@ -17,7 +17,7 @@ licant.module("ralgo",
 	sources=[
 		"ralgo/madgwick.cpp",
 		"ralgo/signal/fft.cpp",
-		"ralgo/heimer/device.cpp"
+		"ralgo/heimer/control.cpp"
 	],
 	include_paths=["."],
 	mdepends=[
