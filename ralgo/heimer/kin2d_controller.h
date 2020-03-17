@@ -38,10 +38,10 @@ namespace ralgo
 				chain.collect_chain(finallink, startlink);
 			}
 
-			kin2d_controller(const char* name, axis_driver<P,V>* arr, P* poses, size_t sz)
-				: virtual_multiax<P,V>(name, arr, poses, sz)
+			kin2d_controller(virtual_multiax_axis<P,V>* arr, size_t sz)
+				: virtual_multiax<P,V>(arr, sz)
 			{
-				compensation_koefficient = 1;//10 / ralgo::discrete_time_frequency();
+				compensation_koefficient = 10;//10 / ralgo::discrete_time_frequency();
 			}
 
 			rabbit::htrans2<float> location()
@@ -71,8 +71,9 @@ namespace ralgo
 				// брать по связному базису.
 				// Тогда вычитание не понадобится.
 				// И перевод чувствительности в основной базис не нужен будет тоже.
+				
 				chain.sensivity(senses, chain.chain[0]);
-				rabbit::screw2<float> target =
+				rabbit::screw2<float> target = //spd;
 				    spd + (pos - location()) * compensation_koefficient;
 
 				rabbit::screw2<double> dtarget = target;
@@ -101,25 +102,25 @@ namespace ralgo
 
 			virtual void apply_control() = 0;
 
-			/*void activate()
+			void on_activate_handle() override
 			{
 				restore_control_model();
 			}
 
-			void deactivate()
-			{}*/
+			void on_deactivate_handle() override
+			{}
 
-			void serve()
+			void serve_impl() override
 			{
-				if (heimer::device::controller())
-				{
+				//if (heimer::device::controller())
+				//{
 					rabbit::htrans2<float> pos{};
 					rabbit::screw2<float> spd{};
 
 					get_control_phase(ralgo::discrete_time(), pos, spd);
 					evaluate_links_speeds(pos, spd);
 					apply_control();
-				}
+				//}
 			}
 		};
 	}

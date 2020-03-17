@@ -4,12 +4,18 @@
 #include <ralgo/heimer/speed_phaser.h>
 #include <ralgo/heimer/axis_driver.h>
 
+#include <ralgo/heimer/control.h>
+
 namespace ralgo
 {
 	namespace heimer
 	{
 		template < class Position, class IntPos, class Speed >
-		class speed_phaser_axis : public axis_driver<Position, Speed>, public heimer::device
+		class speed_phaser_axis : 
+			public axis_driver<Position, Speed>, 
+			public external_controller, 
+			public control_served,
+			public control_info_node
 		{
 			using parent = axis_driver<Position, Speed>;
 
@@ -18,7 +24,7 @@ namespace ralgo
 
 		public:
 			speed_phaser_axis(const char* name, speed_phaser<Position, IntPos, Speed>* phaser)
-				: device(name), _phaser(phaser)
+				: control_info_node(name, this, this, this), _phaser(phaser)
 			{}
 
 			//Position current_position() override
@@ -41,40 +47,28 @@ namespace ralgo
 				return _phaser;
 			}
 
-			bool try_operation_begin(int priority) override
+			int try_operation_begin(int priority) override
 			{
-				switch (priority)
-				{
-					case 0: return take_control();
-					case 1: take_control_force(); break;
-					default: BUG();
-				}
-				return true;
+				if (!is_active()) return -1;
+				if (parent::in_operation()) return -1;
+				if (parent::is_extern_controlled()) return -1;
+				return 0; 
 			}
 
 			void operation_finish(int priority) override
 			{
-				switch (priority)
-				{
-					case 0: release_control(); break;
-					case 1: release_control_force(); break;
-					default: BUG();
-				}
 			}
 
 
-			void serve()
+			void serve_impl()
 			{
-				//DPRINTPTR(parent::controller());
-				if (parent::_current_trajectory && controller() == this)
+				if (parent::_current_trajectory && !parent::is_extern_controlled())
 				{
 					parent::update_control_by_trajectory();
 				}
 
 				apply_control();
 			}
-
-//			virtual void apply_speed(Speed spd) {}
 
 			void apply_control()
 			{
@@ -92,21 +86,34 @@ namespace ralgo
 				return compspd;
 			}
 
-			void update_state() 
+			void update_state()
 			{
 				parent::feedpos = _phaser->target_position();
 				parent::feedspd = _phaser->feedback_speed();
 			}
 
-		private:
-			heimer::controlled* as_controlled() override { return this; }
 
 		private:
-			void after_take_control_handle() override {}
-			igris::array_view<controlled*> controlled_devices() override
+			void control_interrupt_from(external_control_slot*) override { BUG(); } // никогда не вызывается
+			external_control_slot* iterate(external_control_slot*) { return nullptr; }
+
+			int try_take_external_control_impl(external_controller * controller) override 
 			{
-				return igris::array_view<controlled*>(nullptr, 0);
+				if (is_active() == false) return -1;
+				if (parent::in_operation()) return -1;
+				return 0;
 			}
+
+			int try_release_external_control_impl(external_controller * controller) override 
+			{
+				return 0;
+			}
+
+			void on_activate_handle() override {}
+			void on_deactivate_handle() override {}
+			external_control_slot* as_controlled() override { return this; }
+
+			const char * name() { return mnemo(); }
 		};
 	}
 }

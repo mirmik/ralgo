@@ -10,13 +10,18 @@
 #include <igris/dtrace.h>
 
 #include <ralgo/heimer/coordinate_checker.h>
+#include <ralgo/heimer/control.h>
 
 namespace ralgo
 {
 	namespace heimer
 	{
 		template<int Dim, class Position, class Speed>
-		class linear_interpolator : public interpolation_group<Position, Speed>
+		class linear_interpolator : 
+			public interpolation_group<Position, Speed>,
+			public external_controller,
+			public control_served,
+			public control_info_node
 		{
 			// Линейная интерполяция в декартовой метрике.
 			// Disclaimer: Линейная интерполяция - это немного другое...
@@ -38,16 +43,14 @@ namespace ralgo
 			Speed ctrspd[Dim];
 			float poskoeff = 0.01;
 
-			union {
-				igris::array_view<heimer::axis_device<Position,Speed>*> _axes;
-				igris::array_view<heimer::controlled*> _controlled_device;
-			};
+			
+			igris::array_view<heimer::axis_driver<Position,Speed>*> _axes;
 
 		public:
 			linear_interpolator(
 				const char* name,
-			    igris::array_view<heimer::axis_device<Position,Speed>*> axes) :
-					parent(name), _axes(axes)
+			    igris::array_view<heimer::axis_driver<Position,Speed>*> axes) :
+					control_info_node(name, this, this, nullptr), _axes(axes)
 			{
 				//parent::set_controlled(axes);
 			}
@@ -65,9 +68,10 @@ namespace ralgo
 				igris::array_view<Position> curpos, 
 				igris::array_view<Position> tgtpos) 
 			{
+				BUG();
 
-				int success = parent::take_control();
-				if (success == false) 
+				//int success = parent::take_control();
+				/*if (success == false) 
 				{
 					return -1;
 				}
@@ -103,8 +107,7 @@ namespace ralgo
 				lintraj.set_speed_pattern(_acc_val, _dcc_val, _speed);
 				//lintraj.spddeform.reset(_accdcc, _accdcc);
 
-				trajectory = &lintraj;
-
+				trajectory = &lintraj;*/
 				return 0;
 			}
 
@@ -115,11 +118,13 @@ namespace ralgo
 				Position curpos[Dim];
 				Position tgtpos[Dim];
 			
-				if (!parent::take_control()) 
-				{
-					ralgo::warning("linint take_control fault");
-					return -1;
-				}
+
+				BUG();
+				//if (!parent::take_control()) 
+				//{
+				//	ralgo::warning("linint take_control fault");
+				//	return -1;
+				//}
 
 				for (unsigned int i = 0; i < mov.size(); ++i) 
 				{
@@ -192,13 +197,13 @@ namespace ralgo
 				}
 			}
 
-			void serve()
+			void serve_impl()
 			{
-				if (trajectory && parent::controller() == this)
-				{
+				//if (trajectory && parent::controller() == this)
+				//{
 					update_phase();
 					apply_phase();
-				}
+				//}
 			}
 
 			Speed speed() override { return _speed; }
@@ -225,9 +230,33 @@ namespace ralgo
 				}
 			}
 
+			void control_interrupt_from(external_control_slot * slot)  override
+			{
+				BUG();
+			}
+
+			external_control_slot* iterate(external_control_slot* slt) override
+			{
+				if (slt == nullptr) 
+					return _axes[0]->as_controlled();
+				
+				for (unsigned int i = 0; i < _axes.size(); ++i) 
+				{
+					if (slt == _axes[i]) 
+					{
+						if (i == _axes.size() - 1) return nullptr;
+						else return _axes[i+1];
+					}
+				}
+				BUG();
+			}
+
+			void on_activate_handle() override {BUG();}
+			void on_deactivate_handle() override {BUG();}
+
 		private:
-			void after_take_control_handle() override {}
-			igris::array_view<controlled*> controlled_devices() override { return _controlled_device; }
+			//void after_take_control_handle() override {}
+			//igris::array_view<controlled*> controlled_devices() override { return _controlled_device; }
 		};
 	}
 }

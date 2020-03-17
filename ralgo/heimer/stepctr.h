@@ -74,11 +74,12 @@ namespace ralgo
 
 				if ( ABS(curstep) > pulsewidth )
 				{
-					DPRINT(pulsewidth);
-					DPRINT(curstep);
-					DPRINT(phaser::_deltatime);
-					DPRINT(spd);
-					assert(ABS(curstep) <= pulsewidth);
+				//	DPRINT(pulsewidth);
+				//	DPRINT(curstep);
+				//	DPRINT(phaser::_deltatime);
+				//	DPRINT(spd);
+				//	assert(ABS(curstep) <= pulsewidth);
+					curstep = pulsewidth > 0 ? pulsewidth : -pulsewidth;	
 				}
 			}
 
