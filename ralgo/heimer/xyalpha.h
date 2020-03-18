@@ -1,13 +1,6 @@
 #ifndef RALGO_HEIMER_XYALPHA_COORDINATE_CONTROLLER_H
 #define RALGO_HEIMER_XYALPHA_COORDINATE_CONTROLLER_H
 
-//#include <ralgo/planning/axis.h>
-//#include <ralgo/planning/htrans2_mover.h>
-//#include <ralgo/planning/cynchain2_output_mover.h>
-
-//#include <ralgo/objects/served.h>
-//#include <ralgo/objects/named.h>
-
 #include <nos/print.h>
 #include <nos/fprint.h>
 #include <rabbit/space/screw.h>
@@ -34,9 +27,6 @@ namespace ralgo
 			int64_t lasttime = 0;
 
 			rabbit::htrans2<float> outpos;
-			bool finish_inited = false;
-			int finish_timeout = 100;
-			int64_t finish_inited_time;
 
 		public:
 			ralgo::actuator2 x_link;
@@ -115,38 +105,16 @@ namespace ralgo
 			{
 				float xpos, ypos, apos, xspd, yspd, aspd;
 
-				/*if (kin2d::is_extern_controlled() == false)
-				{
-					int sts = 1;
-					sts = sts & x_axis.attime(time, xpos, xspd);
-					sts = sts & y_axis.attime(time, ypos, yspd);
-					sts = sts & a_axis.attime(time, apos, aspd);
+				x_axis.evaluate_ctrvars();
+				y_axis.evaluate_ctrvars();
+				a_axis.evaluate_ctrvars();
 
-					ctrpos[0] = xpos;
-					ctrpos[1] = ypos;
-					ctrpos[2] = apos;
-
-					if (sts)
-					{
-						finish_inited = true;
-						finish_inited_time = ralgo::discrete_time();
-					}
-
-					//syslog->info("control: {} {} {}", xpos, ypos, apos);
-				}
-				else
-				{*/
-					//	BUG();
-				BUG();
-
-					xpos = x_axis.ctrpos;
-					xspd = x_axis.ctrspd;
-					ypos = y_axis.ctrpos;
-					yspd = y_axis.ctrspd;
-					apos = a_axis.ctrpos;
-					aspd = a_axis.ctrspd;
-				
-				//}
+				xpos = x_axis.ctrpos;
+				xspd = x_axis.ctrspd;
+				ypos = y_axis.ctrpos;
+				yspd = y_axis.ctrspd;
+				apos = a_axis.ctrpos;
+				aspd = a_axis.ctrspd;
 
 				pos = rabbit::htrans2<float> { apos, { xpos, ypos } };
 				spd = rabbit::screw2<float> { aspd, {xspd, yspd} };
@@ -157,16 +125,11 @@ namespace ralgo
 
 			void restore_control_model() override
 			{
-				finish_inited = false;
 				double xpos, ypos, apos;
 
 				xpos = _controlled_axes[0]->current_position();
 				ypos = _controlled_axes[1]->current_position();
 				apos = _controlled_axes[2]->current_position();
-
-				DPRINT(xpos);
-				DPRINT(ypos);
-				DPRINT(apos);
 
 				x_link.set_coord(xpos);
 				y_link.set_coord(ypos);
@@ -177,9 +140,9 @@ namespace ralgo
 
 				auto outpos_corrected = invnullpos * outpos;
 
-				x_axis._set_point_trajectory(outpos_corrected.translation().x);
-				y_axis._set_point_trajectory(outpos_corrected.translation().y);
-				a_axis._set_point_trajectory(outpos_corrected.rotation());
+				x_axis.set_ctrphase(outpos_corrected.translation().x, 0);
+				y_axis.set_ctrphase(outpos_corrected.translation().y, 0);
+				a_axis.set_ctrphase(outpos_corrected.rotation(), 0);
 			}
 
 			//igris::array_view<controlled*> controlled_devices() override
@@ -210,18 +173,6 @@ namespace ralgo
 				x_axis.feedpos = outpos_corrected.translation().x;
 				y_axis.feedpos = outpos_corrected.translation().y;
 				a_axis.feedpos = outpos_corrected.rotation();
-
-				if (finish_inited & (ralgo::discrete_time() - finish_inited_time > finish_timeout))
-				{
-					BUG();
-					//device::release_control_self();
-					//x_axis.set_controller_force(nullptr);
-					//y_axis.set_controller_force(nullptr);
-					//a_axis.set_controller_force(nullptr);
-					finish_inited = false;
-				}
-
-				//syslog->info("current: {} {} {}", _controlled_axes[0]->current_position(), _controlled_axes[1]->current_position(), _controlled_axes[2]->current_position());
 
 				chain.update_location();
 			}

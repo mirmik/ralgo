@@ -39,9 +39,8 @@ namespace ralgo
 			}
 
 			kin2d_controller(virtual_multiax_axis<P,V>* arr, size_t sz)
-				: virtual_multiax<P,V>(arr, sz)
 			{
-				compensation_koefficient = 10;//10 / ralgo::discrete_time_frequency();
+				compensation_koefficient = 1;//10 / ralgo::discrete_time_frequency();
 			}
 
 			rabbit::htrans2<float> location()
@@ -90,6 +89,12 @@ namespace ralgo
 				            dsenses, chain.pairs.size());
 
 				// Результат возвращается через spdarr.
+			}
+
+
+			void set_compensate(double k) 
+			{
+				compensation_koefficient = k;	
 			}
 
 			virtual igris::array_view<axis_driver<P,V>*> controlled_axes() = 0;

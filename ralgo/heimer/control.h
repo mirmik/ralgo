@@ -22,23 +22,45 @@ namespace ralgo
 			virtual void serve_impl() = 0;
 			void serve() { if (_is_activate) serve_impl(); }
 
-			void activate()
+			int activate()
 			{
 				if (_is_activate)
-					return;
+					return 0;
 
-				_is_activate = true;
-				on_activate_handle();
+				if (try_activate_impl()) 
+				{
+					return -1;
+				}
+
+				else
+				{
+					_is_activate = true;
+					on_activate_handle();
+					return 0;
+				}
 			}
 
-			void deactivate()
+			int deactivate()
 			{
 				if (!_is_activate)
-					return ;
+					return 0;
 
-				_is_activate = false;
-				on_deactivate_handle();
+
+				if (try_deactivate_impl()) 
+				{
+					return -1;
+				}
+				
+				else
+				{
+					_is_activate = false;
+					on_deactivate_handle();
+					return 0;
+				}
 			}
+
+			virtual int try_activate_impl() = 0;
+			virtual int try_deactivate_impl() = 0;
 
 			bool is_active() { return _is_activate; }
 
@@ -52,6 +74,9 @@ namespace ralgo
 		public:
 			virtual void control_interrupt_from(external_control_slot * slot) = 0;
 			virtual external_control_slot* iterate(external_control_slot*) = 0;
+
+			int take_control();
+			int release_control();
 		};
 
 

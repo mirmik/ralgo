@@ -257,6 +257,17 @@ namespace ralgo
 		private:
 			//void after_take_control_handle() override {}
 			//igris::array_view<controlled*> controlled_devices() override { return _controlled_device; }
+		
+			
+			int try_activate_impl() override
+			{
+				return take_control();
+			}
+
+			int try_deactivate_impl() override
+			{
+				return release_control();
+			}
 		};
 	}
 }
