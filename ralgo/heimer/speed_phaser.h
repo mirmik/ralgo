@@ -49,7 +49,7 @@ namespace ralgo
 			void set_gain(float gain) { _gain = gain; } 
 			auto gain() { return _gain; }
 			void set_deltatime(int32_t ticks_per_second) 
-			{	//_deltatime = ralgo::discrete_time_frequency() / ticks_per_second; 
+			{	
 				_deltatime = 1.0 / ticks_per_second; 
 			}
 		};

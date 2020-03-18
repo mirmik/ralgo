@@ -29,7 +29,6 @@ namespace ralgo
 			    igris::array_view<double> offsets
 			)
 				:
-				virtual_multiax<P, V>(&axis, 1),
 				control_info_node(name, this, this, nullptr),
 				axis("ax", this, 0),
 				_controlled_axes(_controlled_axes),
@@ -62,8 +61,7 @@ namespace ralgo
 					    - _controlled_axes[0]->current_position();
 				}
 
-				axis._set_point_trajectory(
-				    _controlled_axes[0]->current_position());
+				axis.set_ctrphase(_controlled_axes[0]->current_position(), 0);
 			}
 
 			void update_state()

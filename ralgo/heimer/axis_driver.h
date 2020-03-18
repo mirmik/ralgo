@@ -23,7 +23,7 @@ namespace ralgo
 			public external_control_slot
 		{
 			using parent = axis_device<Position, Speed>;
-			float poskoeff = 10;
+			float poskoeff = 0;
 
 			bool operation_finished_flag = true;
 
@@ -78,62 +78,46 @@ namespace ralgo
 
 			int _absmove_unsafe(Position curpos, Position tgtpos)
 			{
-				DTRACE();
 				auto dist = tgtpos - curpos;
-				DPRINT(dist);
-
 				int64_t curtim = ralgo::discrete_time();
 
 				Speed dist_mul_freq = (Speed)fabs(dist) * ralgo::discrete_time_frequency();
 				int64_t tgttim = curtim + (int64_t)(dist_mul_freq / parent::_speed);
 
+				if (curtim == tgttim) 
+				{
+					operation_finished_flag = true;
+					operation_finish(0);
+					operation_finish_event(this);
+					_current_trajectory = nullptr;
+
+					return 0;
+				}
 
 				line_traj.reset(curpos, curtim, tgtpos, tgttim);
 
 				line_traj.set_speed_pattern(parent::_acc_val, parent::_dcc_val,
 				                            parent::_speed);
 
-				DPRINT(curpos);
-				DPRINT(tgtpos);
-				DPRINT(curtim);
-				DPRINT(tgttim);
-
-				DPRINT(parent::_acc_val);
-				DPRINT(parent::_dcc_val);
-				DPRINT(parent::_speed);
-
 				operation_finished_flag = false;
 				set_trajectory(&line_traj);
 				return 0;
 			}
 
-			int _set_point_trajectory(Position coord) 
-			{
-				line_traj.set_stop_trajectory(coord, 0, 1/*nonzero*/);
-				//line_traj.set_null_speed_pattern();
-
-				set_trajectory(&line_traj);
-
-				return 0;
-			}
-
 			int incmove_unsafe(Position dist) override
 			{
-				DTRACE();
 				auto curpos = current_position();
 				return _absmove_unsafe(curpos, curpos + dist);
 			}
 
 			int absmove_unsafe(Position pos) override
 			{
-				DTRACE();
 				auto curpos = current_position();
 				return _absmove_unsafe(curpos, pos);
 			}
 
 			int attime(int64_t time, Position& pos, Speed& spd)
 			{
-				//if (!_current_trajectory) return;
 				return _current_trajectory->attime(time, pos, spd, ralgo::discrete_time_frequency());
 			}
 
@@ -156,12 +140,10 @@ namespace ralgo
 				int sts = attime(ralgo::discrete_time(), ctrpos, ctrspd);
 				if (sts && !operation_finished_flag)
 				{
-					//syslog->trace("trajectory_finished: {}", as_controlled()->name());
 					operation_finished_flag = true;
 					operation_finish(0);
 					operation_finish_event(this);
 					_current_trajectory = nullptr;
-					//as_controlled()->release_control_self();
 				}
 			}
 
@@ -190,6 +172,12 @@ namespace ralgo
 				ctrspd = spd;
 			}
 
+			void set_ctrphase(Position pos, Speed spd)
+			{
+				ctrpos = pos;
+				ctrspd = spd;
+			}
+
 			int hardstop() override
 			{
 				ctrpos = 0;
@@ -201,6 +189,16 @@ namespace ralgo
 				return 0;
 			}
 
+			// Обновляет текущие переменные контроля.
+			// Или на основе траекторрии, или ничего не делает, если контролль внешний.
+			void evaluate_ctrvars() 
+			{
+				if (_current_trajectory && !is_extern_controlled())
+				{
+					update_control_by_trajectory();
+				}
+			}
+
 			void stop_impl() override
 			{
 				line_traj.set_stop_trajectory(
@@ -209,6 +207,12 @@ namespace ralgo
 					parent::_dcc_val);
 			
 				_current_trajectory = & line_traj;
+			}
+
+
+			void set_compensate(double k) 
+			{
+				poskoeff = k;	
 			}
 
 			virtual external_control_slot * as_controlled() = 0;

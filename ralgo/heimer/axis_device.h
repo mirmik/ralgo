@@ -21,7 +21,7 @@ namespace ralgo
 			Position _back = 0;
 
 			Speed _speed_protector = 0;
-			int32_t _accdcc_protector = 0;
+			Speed _accdcc_protector = 0;
 
 			Speed _speed = 0;
 			float _acc_val = 0;
@@ -38,6 +38,8 @@ namespace ralgo
 			// INCMODE
 			virtual int incmove(Position dist)
 			{
+				dist = dist * _gain;
+
 				if (try_operation_begin(0))
 				{
 					ralgo::warning("axis_device take_control fault");
@@ -58,6 +60,8 @@ namespace ralgo
 
 			virtual int absmove(Position tgtpos)
 			{
+				tgtpos = tgtpos * _gain;
+
 				if (try_operation_begin(0))
 				{
 					ralgo::warning("axis_device take_control fault");
@@ -96,7 +100,17 @@ namespace ralgo
 			bool reverse() { return _reverse; }
 
 			// SPEED
-			virtual void set_speed(Speed spd) { _speed = protect_speed(spd); }
+			virtual void set_speed(Speed spd)
+			{
+				spd = spd * _gain;
+				_speed = protect_speed(spd);
+			}
+			
+			void set_gain(float gain) 
+			{
+				_gain = gain;
+			}
+
 			Speed setted_speed() { return _speed; }
 			Speed protect_speed(Speed spd)
 			{
@@ -109,11 +123,13 @@ namespace ralgo
 			// ACCDCC
 			virtual void set_accdcc_value(float acc, float dcc)
 			{
+				acc = acc * _gain;
+				dcc = dcc * _gain;
 				_acc_val = protect_accdcc(acc);
 				_dcc_val = protect_accdcc(dcc);
 			}
 			//Time setted_accdcc() { return _accdcc; }
-			Time protect_accdcc(Time accdcc)
+			Speed protect_accdcc(Speed accdcc)
 			{
 				if (accdcc < _accdcc_protector)
 					return _accdcc_protector;

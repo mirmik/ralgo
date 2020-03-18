@@ -13,7 +13,6 @@ namespace ralgo
 		template < class Position, class IntPos, class Speed >
 		class speed_phaser_axis : 
 			public axis_driver<Position, Speed>, 
-			public external_controller, 
 			public control_served,
 			public control_info_node
 		{
@@ -24,7 +23,7 @@ namespace ralgo
 
 		public:
 			speed_phaser_axis(const char* name, speed_phaser<Position, IntPos, Speed>* phaser)
-				: control_info_node(name, this, this, this), _phaser(phaser)
+				: control_info_node(name, this, 0, this), _phaser(phaser)
 			{}
 
 			//Position current_position() override
@@ -62,10 +61,7 @@ namespace ralgo
 
 			void serve_impl()
 			{
-				if (parent::_current_trajectory && !parent::is_extern_controlled())
-				{
-					parent::update_control_by_trajectory();
-				}
+				parent::evaluate_ctrvars();
 
 				apply_control();
 			}
@@ -74,6 +70,16 @@ namespace ralgo
 			{
 				compspd = parent::eval_compensated_speed();
 				apply_speed(compspd);
+			}
+
+			int try_activate_impl() override 
+			{
+				return 0;
+			}
+
+			int try_deactivate_impl() override 
+			{
+				return 0;
 			}
 
 			Speed compensated_speed()
@@ -92,11 +98,7 @@ namespace ralgo
 				parent::feedspd = _phaser->feedback_speed();
 			}
 
-
 		private:
-			void control_interrupt_from(external_control_slot*) override { BUG(); } // никогда не вызывается
-			external_control_slot* iterate(external_control_slot*) { return nullptr; }
-
 			int try_take_external_control_impl(external_controller * controller) override 
 			{
 				if (is_active() == false) return -1;
