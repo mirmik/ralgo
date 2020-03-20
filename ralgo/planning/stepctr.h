@@ -16,6 +16,8 @@ namespace ralgo
 	class stepctr : public ralgo::phase_driver
 	{
 	public:
+		const char* name;
+
 		volatile int64_t control_steps_counter = 0;
 
 		int32_t accum = 0; // Текущее значение аккумулятора.
@@ -39,6 +41,8 @@ namespace ralgo
 		//stepctr_server * parent;
 
 	public:
+		stepctr(const char* name) : name(name) {}
+
 		void set_gear(float mul, float ticks_per_second/*ticks_per_timeunit*/) 
 		{
 			// Учитываем модификатор времени.
@@ -125,6 +129,7 @@ namespace ralgo
 				DPRINT(s);
 				DPRINT(spd);
 				DPRINT(_speed_multiplier);
+				DPRINT(name);
 			}
 
 			set_step(s);

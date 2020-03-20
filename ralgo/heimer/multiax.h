@@ -39,16 +39,25 @@ namespace ralgo
 				strcat(_name, axname);
 			}
 
+			bool can_operate() override 
+			{
+				return parent->is_active() && !driver::is_extern_controlled() && !driver::in_operation();
+			}
+
 			V current_speed() override
 			{
-				BUG();
+				return driver::feedspd;
 			}
 
 			int try_operation_begin(int priority) override
 			{
 				if (!parent->is_active()) return -1;
-				if (driver::in_operation()) return -1;
 				if (driver::is_extern_controlled()) return -1;
+				if (driver::in_operation() && priority == 0) 
+				{
+					driver::stop();
+					return -1;
+				}
 				return 0;
 			}
 

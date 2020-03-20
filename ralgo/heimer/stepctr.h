@@ -24,7 +24,7 @@ namespace ralgo
 			using phaser = speed_phaser<Position, IntPos, Speed>;
 			using phaser::ext2int_pos;
 
-			int32_t steps_total = 0;
+			int64_t steps_total = 0;
 
 			volatile double curstep = 0;
 
@@ -39,8 +39,11 @@ namespace ralgo
 			volatile double control_pos = 0;
 
 			//float speed_multiplier = 1;
+			const char * name;
 
 		public:
+			stepctr(const char * name) : name(name) {}
+
 			IntPos current_step() { return curstep; }
 			void set_curstep(IntPos curstep) { this->curstep = curstep; }
 
@@ -78,6 +81,7 @@ namespace ralgo
 					DPRINT(curstep);
 					DPRINT(phaser::_deltatime);
 					DPRINT(spd);
+					DPRINT(name);
 					DPRINT(phaser::int2ext_spd(spd));
 					assert(ABS(curstep) <= pulsewidth);
 					curstep = pulsewidth > 0 ? pulsewidth : -pulsewidth;	
@@ -94,7 +98,7 @@ namespace ralgo
 				}
 
 				virtual_pos += curstep;
-				auto diffpos = virtual_pos - control_pos;
+				int64_t diffpos = virtual_pos - control_pos;
 
 				bool positive = diffpos > 0;
 
@@ -124,7 +128,10 @@ namespace ralgo
 		template <class Position, class IntPos, class Speed>
 		class stepctr_emulator : public stepctr<Position, IntPos, Speed>
 		{
+		public:
 			using parent = stepctr<Position, IntPos, Speed>;
+			stepctr_emulator(const char * name) : stepctr<Position, IntPos, Speed>(name) {}
+
 			void inc()
 			{
 				parent::_feedback_position += parent::pulsewidth;

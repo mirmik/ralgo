@@ -30,6 +30,7 @@ namespace ralgo
 	public:
 		speed_deformer() {}
 
+		// Вариант движения с увеличением максимальной скорости.
 		void reset(float acc, float dcc, float sspd = 0, float fspd = 0)
 		{
 			this->acc = acc;
@@ -164,8 +165,8 @@ namespace ralgo
 		void set_stop_pattern() 
 		{
 			acc = 0;
-			dcc = 1;
-			f_time = 1;
+			dcc = 2;
+			f_time = 2;
 
 			strt_spd = 1;
 			fini_spd = 0;
