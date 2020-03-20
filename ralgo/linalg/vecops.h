@@ -109,9 +109,14 @@ namespace ralgo
 		{
 			double res = 0;
 
-			for (auto& val : vec) { auto a = std::abs(val); res += a * a; }
+			for (const auto& val : vec) { auto a = std::abs(val); res += a * a; }
 
 			return sqrt(res);
+		}
+		template <typename V>
+		auto length(const V& vec) -> typename V::value_type
+		{
+			return norm(vec);
 		}
 
 		// Вычислить расстояние между кортежами равного размера по

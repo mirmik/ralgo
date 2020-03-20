@@ -48,9 +48,14 @@ namespace ralgo
 
 			int try_operation_begin(int priority) override
 			{
+				// Вынести в класс axis_driver.
 				if (!is_active()) return -1;
-				if (parent::in_operation()) return -1;
 				if (parent::is_extern_controlled()) return -1;
+				if (parent::in_operation() && priority == 0) 
+				{
+					parent::stop();
+					return -1;
+				}
 				return 0; 
 			}
 
@@ -116,6 +121,11 @@ namespace ralgo
 			external_control_slot* as_controlled() override { return this; }
 
 			const char * name() { return mnemo(); }
+
+			bool can_operate() override 
+			{
+				return is_active() && !parent::is_extern_controlled() && !parent::in_operation();
+			}
 		};
 	}
 }

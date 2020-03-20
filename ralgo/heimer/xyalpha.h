@@ -174,6 +174,11 @@ namespace ralgo
 				y_axis.feedpos = outpos_corrected.translation().y;
 				a_axis.feedpos = outpos_corrected.rotation();
 
+				// TODO: Реимплементировать через подчиненные оси 
+				x_axis.feedspd = x_axis.ctrspd;
+				y_axis.feedspd = y_axis.ctrspd;
+				a_axis.feedspd = a_axis.ctrspd;
+
 				chain.update_location();
 			}
 

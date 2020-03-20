@@ -2,6 +2,7 @@
 #define RALGO_HEIMER_AXIS_DRIVER_H
 
 #include <ralgo/heimer/axis_device.h>
+#include <ralgo/disctime.h>
 #include <ralgo/planning/traj1d.h>
 
 #include <igris/event/event.h>
@@ -18,7 +19,7 @@ namespace ralgo
 	{
 		// Возможно следует объединить с классом axis_device.
 		template <class Position, class Speed>
-		class axis_driver : 
+		class axis_driver :
 			public axis_device<Position, Speed>,
 			public external_control_slot
 		{
@@ -33,13 +34,13 @@ namespace ralgo
 
 			Position feedpos = 0;
 			Speed feedspd = 0;
-		
+
 			using parent::operation_finish;
 			using parent::current_position;
 			using parent::current_speed;
 			using parent::set_speed;
 			ralgo::traj1d_line<Position, Speed> line_traj;
-			
+
 			igris::event operation_finish_event;
 
 			void set_operation_finish_event(igris::event ev)
@@ -47,7 +48,7 @@ namespace ralgo
 				operation_finish_event = ev;
 			}
 
-			bool is_in_operation_state() 
+			bool is_in_operation_state()
 			{
 				return !operation_finished_flag;
 			}
@@ -84,7 +85,7 @@ namespace ralgo
 				Speed dist_mul_freq = (Speed)fabs(dist) * ralgo::discrete_time_frequency();
 				int64_t tgttim = curtim + (int64_t)(dist_mul_freq / parent::_speed);
 
-				if (curtim == tgttim) 
+				if (curtim == tgttim)
 				{
 					operation_finished_flag = true;
 					operation_finish(0);
@@ -125,7 +126,7 @@ namespace ralgo
 			{
 				Position pos = 0;
 				Speed spd = 0;
-				
+
 				if (_current_trajectory)
 					_current_trajectory->attime(
 					    ralgo::discrete_time(), pos, spd,
@@ -180,18 +181,15 @@ namespace ralgo
 
 			int hardstop() override
 			{
-				ctrpos = 0;
-				ctrspd = 0;
 				_current_trajectory = nullptr;
-			
 				operation_finish(1);
-			
+
 				return 0;
 			}
 
 			// Обновляет текущие переменные контроля.
 			// Или на основе траекторрии, или ничего не делает, если контролль внешний.
-			void evaluate_ctrvars() 
+			void evaluate_ctrvars()
 			{
 				if (_current_trajectory && !is_extern_controlled())
 				{
@@ -201,29 +199,39 @@ namespace ralgo
 
 			void stop_impl() override
 			{
+				if (_current_trajectory == nullptr)
+					return;
+
 				line_traj.set_stop_trajectory(
-					current_position(), 
-					current_speed(),
-					parent::_dcc_val);
-			
+				    current_position(),
+				    current_speed(),
+				    parent::_dcc_val);
+
 				_current_trajectory = & line_traj;
 			}
 
 
-			void set_compensate(double k) 
+			void set_compensate(double k)
 			{
-				poskoeff = k;	
+				poskoeff = k;
 			}
 
 			virtual external_control_slot * as_controlled() = 0;
 
 			virtual const char * name() = 0;
 			virtual Position current_position() final { return feedpos; }
-		
-			bool in_operation() 
+
+			bool in_operation()
 			{
 				return _current_trajectory != nullptr;
 			}
+
+			virtual bool can_operate() = 0;
+
+			void print_feed()  override
+			{
+				nos::fprintln("feed:(pos:{},spd:{})", feedpos, feedspd);
+			};
 		};
 	}
 }

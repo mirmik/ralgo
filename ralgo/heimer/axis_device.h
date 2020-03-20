@@ -1,9 +1,11 @@
 #ifndef RALGO_HEIMER_AXIS_DEVICE_H
 #define RALGO_HEIMER_AXIS_DEVICE_H
 
+#include <igris/util/numconvert.h>
 #include <igris/util/bug.h>
 #include <igris/math.h>
 
+#include <nos/fprint.h>
 #include <ralgo/info.h>
 
 namespace ralgo
@@ -105,11 +107,12 @@ namespace ralgo
 				spd = spd * _gain;
 				_speed = protect_speed(spd);
 			}
-			
-			void set_gain(float gain) 
+
+			void set_gain(float gain)
 			{
 				_gain = gain;
 			}
+			float gain() { return _gain; }
 
 			Speed setted_speed() { return _speed; }
 			Speed protect_speed(Speed spd)
@@ -152,15 +155,63 @@ namespace ralgo
 
 			void stop()
 			{
-				try_operation_begin(1);
-				stop_impl();
+				int sts = try_operation_begin(1);
+
+				if (sts == 0)
+					stop_impl();
 			}
 
 			virtual void stop_impl() = 0;
 
 			virtual int try_operation_begin(int priority) = 0;
 			virtual void operation_finish(int priority) = 0;
+
+			int command(int argc, char** argv)
+			{
+				float fltarg;
+
+				if (strcmp(argv[0], "mov") == 0)
+				{
+					fltarg = atof32(argv[1], nullptr);
+					return absmove(fltarg);
+				}
+
+				else if (strcmp(argv[0], "incmov") == 0)
+				{
+					fltarg = atof32(argv[1], nullptr);
+					return incmove(fltarg);
+				}
+
+				else if (strcmp(argv[0], "setspd") == 0)
+				{
+					fltarg = atof32(argv[1], nullptr);
+					set_speed(fltarg);
+					return 0;
+				}
+
+				else if (strcmp(argv[0], "setacc") == 0)
+				{
+					fltarg = atof32(argv[1], nullptr);
+					set_accdcc_value(fltarg, fltarg);
+					return 0;
+				}
+
+				else if (strcmp(argv[0], "feed") == 0)
+				{
+					print_feed();
+					return 0;
+				}
+
+				else
+				{
+					nos::println("warn: unresolved command");
+				}
+
+				return 0;
+			}
+			virtual void print_feed() = 0;
 		};
+
 	}
 }
 

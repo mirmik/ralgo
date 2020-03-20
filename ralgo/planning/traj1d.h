@@ -122,13 +122,17 @@ namespace ralgo
 
 		void set_stop_trajectory(P curpos, V curspd, V dccval) 
 		{
+			// скоростной деформатор работает с точным выведением в позицию, и изменяет время,
+			// поэтому подменяем время в два раза, чтобы соответствовать равнозамедленному паттерну.
+
 			stim = ralgo::discrete_time();
-			ftim = stim + (int64_t)(fabs(curspd) / dccval * ralgo::discrete_time_frequency());
+			float realdiff = (fabs(curspd) / dccval);
+			ftim = stim + realdiff / 2 * ralgo::discrete_time_frequency();
 
 			assert(ftim >= stim);
 
 			spos = curpos;
-			fpos = curpos + curspd * ((ftim - stim) / 2 / ralgo::discrete_time_frequency());
+			fpos = curpos + curspd * realdiff / 2;
 
 			setted_speed = curspd / ralgo::discrete_time_frequency();
 			//setted_speed = (float)(fpos - spos) / (ftim - stim);
