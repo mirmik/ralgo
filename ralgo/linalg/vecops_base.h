@@ -36,6 +36,7 @@ namespace ralgo
 					}
 				};*/
 
+		// Свёртка списка по функции func.
 		template <class F, class A, class R = std::result_of_t<F(A)>>
 		R fold(F && func, const R& initval, const A& a)
 		{

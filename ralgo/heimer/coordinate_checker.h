@@ -2,6 +2,7 @@
 #define RALGO_HEIMER_COORDINATE_CHECKER_H
 
 #include <linalg/linalg.h>
+#include <ralgo/geom/zone_checker.h>
 #include <igris/container/array_view.h>
 
 namespace ralgo
@@ -18,30 +19,16 @@ namespace ralgo
 		class plane_zone_checker : public interpolation_coordinate_checker<P>
 		{
 		public:
-			igris::array_view<P> polysegment;			
+			igris::array_view<linalg::vec<P,2>> polygon;
 
-			bool is_valid(igris::array_view<P> arr) 
+			plane_zone_checker(igris::array_view<P> arr) :
+				polygon(arr.data(), arr.size()/2) 
+			{}
+				
+			bool is_valid(igris::array_view<P> pnt) 
 			{
-				assert(arr.size() == 2);
-
-				int lastsign = 0;
-				for (int i = 0; i < polysegment.size(); i += 2) 
-				{
-					linalg::vec<P,2> a = { polysegment[i], polysegment[i+1] }; 
-					linalg::vec<P,2> b = { polysegment[i+1], polysegment[i+2] };
-
-					auto ba = b - a;
-
-					linalg::vec<P,2> t = { arr[0], arr[1] };
-					auto ta = t - a;
-
-					int sign = linalg::cross(ba, ta) >= 0 ? +1 : -1;
-					if (lastsign != 0 && lastsign!=sign)
-						return false;
-
-					lastsign = sign;
-				}
-				return true;
+				linalg::vec<P,2> t(pnt[0], pnt[1]);
+				return point2_in_polygon(polygon, t);
 			}	
 		};
 	}

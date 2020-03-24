@@ -22,8 +22,8 @@ application("runtests",
 	ld_flags = "-L/usr/local/lib/",
 
 	include_paths = ["."],
-	mdepends = ["ralgo", "igris"],
-	#libs = ["gtest", "pthread", "igris", "nos"],
+	mdepends = ["ralgo", "linalg"],
+	libs = ["igris", "nos"],
 )
 
 licant.ex("runtests")
