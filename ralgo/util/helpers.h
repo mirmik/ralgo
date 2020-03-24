@@ -54,6 +54,11 @@ namespace ralgo
 	template<class V> struct defvec<void, V> { using type = std::vector<value_t<V>>; };
 	template<class R, class V> using defvec_t = typename defvec<R,V>::type; 
 
+	// Определяет тип по умолчанию. Если тип равен void, то используется std::vector<>.
+	template<class R, class V> struct defvec_of { using type = R; };
+	template<class V> struct defvec_of<void, V> { using type = std::vector<V>; };
+	template<class R, class V> using defvec_of_t = typename defvec_of<R,V>::type; 
+
 	// Определяет тип по умолчанию. Если тип равен void, то используется тип результат функтора.
 	template<class R, class F> struct fretvec { using type = R; };
 	template<class F> struct fretvec<void, F> { using type = std::vector<std::result_of<F>>; };

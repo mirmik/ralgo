@@ -3,10 +3,13 @@
 
 namespace ralgo
 {
+	//Функция ограничения в заданном диапазоне.
 	template <class T> T clamp(T val, T lo, T hi)
 	{
 		return val < lo ? lo : val > hi ? hi : val;
 	}
+
+	//Функция ограничения вне заданного диапазона.
 	template <class T> T rlamp(T val, T zone)
 	{
 		return val < -zone ? val : val > zone ? val : val < 0 ? -zone : zone;

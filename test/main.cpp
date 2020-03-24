@@ -18,6 +18,7 @@ LT_END_SUITE(ralgo_test_suite)
 #include "vecops.h"
 #include "matops.hpp"
 #include "backpack.h"
+#include "geom.hpp"
 
 LT_BEGIN_AUTO_TEST_ENV()
     AUTORUN_TESTS()

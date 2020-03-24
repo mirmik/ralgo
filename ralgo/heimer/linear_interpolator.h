@@ -65,6 +65,11 @@ namespace ralgo
 
 			constexpr int dim() override { return Dim; }
 
+			void set_polysegment_checker(interpolation_coordinate_checker<Position> * coord_checker)	
+			{
+
+			}
+
 			axis_device<float, float> * get_axis(int index)
 			{
 				//	return static_cast<axis_device<Position, Speed>*>(

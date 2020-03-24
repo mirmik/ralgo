@@ -5,14 +5,31 @@
 #include <algorithm>
 #include <iterator>
 #include <ralgo/util/helpers.h>
+
 #include <igris/dprint.h>
+#include <igris/util/signature.h>
 
 #include <ralgo/linalg/vecops_base.h>
 
 namespace ralgo
 {
+	IGRIS_SIGNATURE_ATTRIBUTE_CHECKER(has_reserve, reserve);
+
 	namespace vecops
 	{
+		template < class R=void, class V >
+		defvec_t<R,V> list(const V& u) 
+		{
+			defvec_t<R,V> ret;
+
+			if constexpr (has_reserve<defvec_t<R,V>>()) ret.reserve(u.size());
+
+			for (const auto& a : u) 
+				ret.push_back(a);
+
+			return ret;
+		}
+
 		template<class V>
 		void fill(V& arr, const value_t<V>& val)
 		{
@@ -21,6 +38,7 @@ namespace ralgo
 		}
 
 		// построить целочисленный вектор арифметической прогрессии [start;stop) с шагом step.
+		// TODO: дополнить нецелочисленным вариантом
 		template<class V>
 		auto arange(int start, int stop, int step)
 		{
@@ -33,10 +51,10 @@ namespace ralgo
 			return r;
 		}
 
-		template<class V>
-		auto arange(int stop)
+		template<class V=void>
+		defvec_of_t<V,int> arange(int stop)
 		{
-			V r(stop);
+			defvec_of_t<V,int> r(stop);
 
 			for (int i = 0; i < stop; ++i) { r[i] = i; }
 
