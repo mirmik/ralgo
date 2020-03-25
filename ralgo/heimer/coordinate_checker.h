@@ -2,7 +2,7 @@
 #define RALGO_HEIMER_COORDINATE_CHECKER_H
 
 #include <linalg/linalg.h>
-#include <ralgo/geom/zone_checker.h>
+#include <ralgo/geom/zone_check.h>
 #include <igris/container/array_view.h>
 
 namespace ralgo

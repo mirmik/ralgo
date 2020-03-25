@@ -2,6 +2,7 @@
 #define RALGO_HEIMER_INTERPOLATION_GROUP_H
 
 #include <ralgo/heimer/control.h>
+#include <linalg/linalg.h>
 
 namespace ralgo
 {
@@ -42,12 +43,17 @@ namespace ralgo
 				if (strcmp(argv[0], "mov") == 0)
 				{
 					//fltarg = atof32(argv[1], nullptr);
-					for (int i = 0; i < dim(); ++i) 
+					for (int i = 0; i < dim(); ++i)
 					{
-						fltargs[i] = atof32(argv[1+i], nullptr);
+						fltargs[i] = atof32(argv[1 + i], nullptr);
 					}
 
 					return absmove(fltargs);
+				}
+
+				else if (strcmp(argv[0], "setzone") == 0)
+				{
+					set_zone_command(argv[1]);
 				}
 
 				else
@@ -56,6 +62,30 @@ namespace ralgo
 				}
 
 				return 0;
+			}
+
+			//format a,b:c,d:e,g
+			void set_zone_command(const char* cmd)
+			{
+				linalg::vec<Position, 2> pnts[8];
+
+				const char* ptr = cmd;
+
+				int i = 0;
+				float f;
+
+				while (*ptr)
+				{
+					pnts[i].x = atof32(ptr, (char**)&ptr);
+					ptr++; // skip comma
+
+					pnts[i].y = = atof32(ptr, (char**)&ptr);
+					ptr++; // skip semicolon
+
+					i++;
+				}
+
+				set_zone_protection(pnts);
 			}
 
 			// STOP
@@ -68,7 +98,7 @@ namespace ralgo
 			void stop()
 			{
 				int sts = try_operation_begin(1);
-				
+
 				if (sts == 0)
 					stop_impl();
 			}
