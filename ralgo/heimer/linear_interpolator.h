@@ -29,6 +29,9 @@ namespace ralgo
 			using parent = interpolation_group<Position, Speed>;
 			interpolation_coordinate_checker<Position> * coord_checker = nullptr;
 
+			linalg::vec<Position,2> zone_polygon[8];
+			plane_zone_checker<Position> polygon_checker;
+
 			Speed _speed = 0.1;
 			//float _accdcc = 0;
 			float _acc_val = 0.1;
@@ -58,7 +61,9 @@ namespace ralgo
 			    const char* name,
 			    igris::array_view<heimer::axis_driver<Position, Speed>*> axes) :
 				parent(name),
-				control_info_node(name, this, this, nullptr), _axes(axes)
+				control_info_node(name, this, this, nullptr), 
+				polygon_checker(zone_polygon),
+				_axes(axes)
 			{
 				//parent::set_controlled(axes);
 			}
@@ -122,6 +127,12 @@ namespace ralgo
 
 				return move(curpos, tgtpos);
 			}
+
+			void set_zone_protection(igris::array_view<linalg::vec<Position,2>> arr) override  
+			{
+				std::copy(arr.begin(), arr.end(), std::begin(zone_polygon));
+			}
+
 
 			int absmove(
 			    igris::array_view<Position> pos
