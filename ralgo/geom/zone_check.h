@@ -13,9 +13,9 @@ namespace ralgo
 		assert(std::size(psegm) >= 3);
 
 		int lastsign = 0;
-		for (int i = 0; i < std::size(psegm); ++i)
+		for (unsigned int i = 0; i < std::size(psegm); ++i)
 		{
-			int s = i == std::size(psegm) - 1 ? 0 : i+1;
+			unsigned int s = i == std::size(psegm) - 1 ? 0 : i+1;
 
 			auto& a = psegm[i];
 			auto& b = psegm[s];

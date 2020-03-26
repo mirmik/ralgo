@@ -72,14 +72,13 @@ namespace ralgo
 				const char* ptr = cmd;
 
 				int i = 0;
-				float f;
 
 				while (*ptr)
 				{
 					pnts[i].x = atof32(ptr, (char**)&ptr);
 					ptr++; // skip comma
 
-					pnts[i].y = = atof32(ptr, (char**)&ptr);
+					pnts[i].y = atof32(ptr, (char**)&ptr);
 					ptr++; // skip semicolon
 
 					i++;
@@ -87,6 +86,8 @@ namespace ralgo
 
 				set_zone_protection(pnts);
 			}
+
+			virtual void set_zone_protection(igris::array_view<linalg::vec<Position,2>> arr) = 0;
 
 			// STOP
 			virtual int hardstop() = 0;

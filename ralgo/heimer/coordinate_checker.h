@@ -21,7 +21,7 @@ namespace ralgo
 		public:
 			igris::array_view<linalg::vec<P,2>> polygon;
 
-			plane_zone_checker(igris::array_view<P> arr) :
+			plane_zone_checker(igris::array_view<linalg::vec<P,2>> arr) :
 				polygon(arr.data(), arr.size()/2) 
 			{}
 				
