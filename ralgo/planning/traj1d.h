@@ -5,6 +5,8 @@
 #include <ralgo/planning/phase.h>
 #include <ralgo/planning/speed_deformer.h>
 
+#include <iostream>
+
 namespace ralgo
 {
 
@@ -43,6 +45,12 @@ namespace ralgo
 			this->stim = stim;
 			this->ftim = ftim;
 
+			DPRINT(spos);
+			DPRINT(fpos);
+
+			DPRINT(stim);
+			DPRINT(ftim);
+
 			if (stim == ftim)
 				setted_speed = 0;
 			else
@@ -67,9 +75,6 @@ namespace ralgo
 
 			auto posmod = spddeform.posmod(time_unit);
 			auto spdmod = spddeform.spdmod(time_unit);
-
-			//DPRINT(posmod);
-		//	DPRINT(spdmod);
 
 			pos = fpos * posmod + spos * (1 - posmod);
 			spd = setted_speed * spdmod * time_multiplier;
@@ -117,6 +122,8 @@ namespace ralgo
 			float acc_part = acc_time / time;
 			float dcc_part = dcc_time / time;
 
+			std::cout << dcc_part << std::endl;
+
 			spddeform.reset2(acc_part, dcc_part);
 		}
 
@@ -138,6 +145,12 @@ namespace ralgo
 			//setted_speed = (float)(fpos - spos) / (ftim - stim);
 
 			spddeform.set_stop_pattern();
+		}
+
+		ssize_t print_to(nos::ostream& out) const 
+		{
+			return nos::fprint_to(out, "stim:{} ftim:{} spos:{} fpos:{} spd:{}", 
+				stim, ftim, spos, fpos, setted_speed);
 		}
 
 	};

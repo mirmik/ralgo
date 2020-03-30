@@ -1,8 +1,10 @@
 #ifndef RALGO_HEIMER_SPEED_PHASER_AXIS_H
 #define RALGO_HEIMER_SPEED_PHASER_AXIS_H
 
+#error "modernize with axis model"
+
 #include <ralgo/heimer/speed_phaser.h>
-#include <ralgo/heimer/axis_driver.h>
+#include <ralgo/heimer/axis_model.h>
 
 #include <ralgo/heimer/control.h>
 
@@ -11,10 +13,7 @@ namespace ralgo
 	namespace heimer
 	{
 		template < class Position, class IntPos, class Speed >
-		class speed_phaser_axis : 
-			public axis_driver<Position, Speed>, 
-			public control_served,
-			public control_info_node
+		class speed_phaser_axis : public axis_model<Position, Speed>
 		{
 			using parent = axis_driver<Position, Speed>;
 
@@ -26,17 +25,7 @@ namespace ralgo
 				: control_info_node(name, this, 0, this), _phaser(phaser)
 			{}
 
-			//Position current_position() override
-			//{
-			//	return _phaser->target_position();
-			//}
-
-			/*void set_current_position(Position pos) override
-			{
-				_phaser->set_current_position(pos);
-			}*/
-
-			void apply_speed(Speed spd)
+			void apply_speed(Speed spd) override
 			{
 				_phaser->set_speed(spd);
 			}
@@ -71,7 +60,7 @@ namespace ralgo
 				apply_control();
 			}
 
-			void apply_control()
+			void apply_control() override
 			{
 				compspd = parent::eval_compensated_speed();
 				apply_speed(compspd);
