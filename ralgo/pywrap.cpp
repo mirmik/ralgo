@@ -8,21 +8,21 @@
 #include <nos/print.h>
 #include <nos/fprint.h>
 
-#include <ralgo/linalg/htrans.h>
+#include <rabbit/space/htrans2.h>
 
 //#include <ralgo/regulator/pi.h>
 #include <ralgo/lintrans.h>
 #include <ralgo/planning/traj.h>
 
-#include <ralgo/cynematic/link.h>
-#include <ralgo/cynematic/chain.h>
+//#include <ralgo/cynematic/link.h>
+//#include <ralgo/cynematic/chain.h>
 
 #include <igris/math/deg.h>
 
 using namespace ralgo;
 using namespace linalg;
-using namespace linalg::ostream_overloads;
-using namespace ralgo::ostream_overloads;
+//using namespace linalg::ostream_overloads;
+//using namespace ralgo::ostream_overloads;
 namespace py = pybind11;
 
 #define DOUBLE4 double, double, double, double
@@ -41,7 +41,7 @@ PYBIND11_MODULE(libralgo, m)
 	py::arg("delta"));
 	*/
 
-	auto inout =
+	/*auto inout =
 	    py::class_<lintrans::inout<double>>(m, "inout")
 	    .def("__call__", &lintrans::inout<double>::operator())
 	    .def("print_internal", &lintrans::inout<double>::print_internal);
@@ -55,8 +55,8 @@ PYBIND11_MODULE(libralgo, m)
 	        .def("output", &lintrans::aperiodic<double, double>::output)
 	        .def("a", &lintrans::aperiodic<double, double>::a)
 	        .def("print_internal",
-	             &lintrans::aperiodic<double, double>::print_internal);
-	py::class_<lintrans::oscilator<double, double>>(m, "oscilator", inout_state)
+	             &lintrans::aperiodic<double, double>::print_internal);*/
+	/*py::class_<lintrans::oscilator<double, double>>(m, "oscilator", inout_state)
 	        .def(py::init<double, double, double>(), py::arg("a"), py::arg("b"),
 	             py::arg("delta"))
 	        .def("__call__", &lintrans::oscilator<double, double>::operator())
@@ -64,8 +64,8 @@ PYBIND11_MODULE(libralgo, m)
 	        .def("a", &lintrans::oscilator<double, double>::a)
 	        .def("b", &lintrans::oscilator<double, double>::b)
 	        .def("print_internal",
-	             &lintrans::oscilator<double, double>::print_internal);
-	py::class_<lintrans::pi<double, double>>(m, "pi", inout)
+	             &lintrans::oscilator<double, double>::print_internal);*/
+	/*py::class_<lintrans::pi<double, double>>(m, "pi", inout)
 	                                      .def(py::init<double, double, double>())
 	                                      .def("__call__", &lintrans::pi<double, double>::operator())
 	                                      .def("kp", &lintrans::pi<double, double>::kp)
@@ -88,9 +88,9 @@ PYBIND11_MODULE(libralgo, m)
 	             py::arg("x1"), py::arg("tacc"), py::arg("tlin"), py::arg("tdcc"))
 	        .def("inloctime_placed",
 	             &accdcc_by_time_trajectory<DOUBLE4>::inloctime_placed);
-
+*/
 	// LINALG
-	py::class_<linalg::vec<double,3>>(m, "vec3")
+/*	py::class_<linalg::vec<double,3>>(m, "vec3")
 		.def(py::init<DOUBLE3>())
 		.def(py::init<const vec<double,3>&>())
 		.def("__str__", [](const linalg::vec<double,3>& self){ return nos::format("{}", self); });
@@ -108,8 +108,8 @@ PYBIND11_MODULE(libralgo, m)
 		.def("__mul__", [](const linalg::quat<double>& a, const linalg::quat<double>& b){ return a * b; });
 
 	m.def("rotation_quat", (quat<double>(*)(const vec<double,3> &, double))&rotation_quat<double> );
-
-	// RALGO::LINALG
+*/
+/*	// RALGO::LINALG
 	py::class_<htrans<double>>(m, "htrans")
 	    .def(py::init<>())
 	    .def(py::init<const quat<double>&, const vec<double,3>&>())
@@ -133,7 +133,7 @@ PYBIND11_MODULE(libralgo, m)
 		.def(py::init<std::vector<cynematic::abstract_link<double>*>>())
 		.def("solve_inverse_cynematic", &cynematic::chain<double>::solve_inverse_cynematic)
 		.def("get", (htrans<double>(cynematic::chain<double>::*)(const std::vector<double> &coords))&cynematic::chain<double>::get);
-
+*/
 
 	// IGRIS
 	m.def("deg", (double(*)(double))&deg );
