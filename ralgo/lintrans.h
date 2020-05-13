@@ -125,7 +125,7 @@ namespace ralgo
 			{}
 		};
 
-		template <class V, class K = float>
+		/*template <class V, class K = float>
 		struct oscilator : public inout_state<V>
 		{
 			linalg::mat<V, 2, 2> A;
@@ -145,7 +145,7 @@ namespace ralgo
 			oscilator(K a, K b, K t)
 				:  A{{0, -a},{1, -b}}, B{0, 1}, x{0, 0}, _a(a), _b(b)
 			{
-				auto _A = linalg::exponent(A * t);
+				auto _A = ralgo::exponent(A * t);
 				auto I = linalg::mat<V, 2, 2>{linalg::identity};
 				auto _B = inverse(A) * ((_A - I) * B);
 				A = _A;
@@ -170,7 +170,7 @@ namespace ralgo
 				PRINT(A);
 				PRINT(B);
 			}
-		};
+		};*/
 
 		template <class T, class K = float> struct pi : public inout<T>
 		{
