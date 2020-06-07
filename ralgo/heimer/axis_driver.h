@@ -57,9 +57,9 @@ namespace ralgo
 			ralgo::traj1d<Position, Speed> * _current_trajectory = nullptr;
 
 		public:
-			ralgo::traj1d_line<Position, Speed> & linear_trajectory()
+			ralgo::traj1d_line<Position, Speed> * linear_trajectory()
 			{
-				return line_traj;
+				return &line_traj;
 			}
 
 			ralgo::traj1d<Position, Speed> * current_trajectory()

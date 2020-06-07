@@ -122,7 +122,7 @@ namespace ralgo
 			float acc_part = acc_time / time;
 			float dcc_part = dcc_time / time;
 
-			std::cout << dcc_part << std::endl;
+			//std::cout << dcc_part << std::endl;
 
 			spddeform.reset2(acc_part, dcc_part);
 		}

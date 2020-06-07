@@ -44,11 +44,6 @@ namespace ralgo
 				return parent->is_active() && !driver::is_extern_controlled() && !driver::in_operation();
 			}
 
-			V current_speed() override
-			{
-				return driver::feedspd;
-			}
-
 			int try_operation_begin(int priority) override
 			{
 				if (!parent->is_active()) return -1;
