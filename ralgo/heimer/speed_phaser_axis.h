@@ -1,7 +1,7 @@
 #ifndef RALGO_HEIMER_SPEED_PHASER_AXIS_H
 #define RALGO_HEIMER_SPEED_PHASER_AXIS_H
 
-#error "modernize with axis model"
+//#error "modernize with axis model"
 
 #include <ralgo/heimer/speed_phaser.h>
 #include <ralgo/heimer/axis_model.h>
@@ -15,17 +15,17 @@ namespace ralgo
 		template < class Position, class IntPos, class Speed >
 		class speed_phaser_axis : public axis_model<Position, Speed>
 		{
-			using parent = axis_driver<Position, Speed>;
+			using parent = axis_model<Position, Speed>;
 
 			speed_phaser<Position, IntPos, Speed> * _phaser = nullptr;
 			Speed compspd = 0;
 
 		public:
 			speed_phaser_axis(const char* name, speed_phaser<Position, IntPos, Speed>* phaser)
-				: control_info_node(name, this, 0, this), _phaser(phaser)
+				: axis_model<Position, Speed>(name), _phaser(phaser)
 			{}
 
-			void apply_speed(Speed spd) override
+			void apply_speed(Speed spd)
 			{
 				_phaser->set_speed(spd);
 			}
@@ -38,7 +38,7 @@ namespace ralgo
 			int try_operation_begin(int priority) override
 			{
 				// Вынести в класс axis_driver.
-				if (!is_active()) return -1;
+				if (!parent::is_active()) return -1;
 				if (parent::is_extern_controlled()) return -1;
 				if (parent::in_operation() && priority == 0) 
 				{
@@ -81,11 +81,6 @@ namespace ralgo
 				return compspd;
 			}
 
-			Speed current_speed()
-			{
-				return compspd;
-			}
-
 			void update_state()
 			{
 				parent::feedpos = _phaser->target_position();
@@ -95,7 +90,7 @@ namespace ralgo
 		private:
 			int try_take_external_control_impl(external_controller * controller) override 
 			{
-				if (is_active() == false) return -1;
+				if (parent::is_active() == false) return -1;
 				if (parent::in_operation()) return -1;
 				return 0;
 			}
@@ -109,11 +104,13 @@ namespace ralgo
 			void on_deactivate_handle() override {}
 			external_control_slot* as_controlled() override { return this; }
 
-			const char * name() { return mnemo(); }
+			const char * name() { return parent::mnemo(); }
 
 			bool can_operate() override 
 			{
-				return is_active() && !parent::is_extern_controlled() && !parent::in_operation();
+				return parent::is_active() 
+					&& !parent::is_extern_controlled() 
+					&& !parent::in_operation();
 			}
 		};
 	}

@@ -64,7 +64,7 @@ namespace ralgo
 				rabbit::screw2<double> dsenses[chain.pairs.size()];
 				//(void) senses;
 				double* spdarr = ctrspd_array();
-				memset(spdarr, 0, sizeof(spdarr));
+				memset(spdarr, 0, sizeof(double) * chain.pairs.size());
 
 				//Можно целевую позицию переводить в связный базис, а чувствительность
 				// брать по связному базису.
