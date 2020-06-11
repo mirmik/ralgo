@@ -69,24 +69,53 @@ void devlist()
 
 int devctr(int argc, char** argv)
 {
-	if (argc < 2) { nos::println("usage: devctr AXNAME CMD [ARGS ...]"); return 0; }
-
 	ralgo::heimer::control_info_node * it;
+	
+	if (argc < 2) 
+	{ 
+		nos::println("usage: devctr AXNAME CMD [ARGS ...]"); 
+		nos::println("CMD:");
+		nos::println("\tlist");
+		nos::println("\tactivate");
+		nos::println("\tdeactivate");
+		return 0;
+	}
+
+	if (strcmp(argv[1], "list") == 0) 
+	{
+		dlist_for_each_entry(it, &ralgo::heimer::control_info_node_list, lnk)
+		{
+			nos::println(it->mnemo());
+			if (it->srv) nos::fprintln("\tserved:(active: {})", it->srv->is_active());
+			if (it->ctr) nos::fprintln("\tslaves:({})", "list unimplemented");
+			if (it->slt) nos::fprintln("\tmaster:({})", "name unimplemented");
+		}
+		return 0;
+	}
+
+	if (argc < 3) 
+	{
+		nos::println("axname needed");
+	}
+
 	dlist_for_each_entry(it, &ralgo::heimer::control_info_node_list, lnk)
 	{
-		if (strcmp(argv[1], it->mnemo()) == 0) break;
+		if (strcmp(argv[2], it->mnemo()) == 0) break;
 	}
-	if (&it->lnk == &ralgo::heimer::control_info_node_list) { nos::println("dev not found"); }
+	if (&it->lnk == &ralgo::heimer::control_info_node_list) { 
+		nos::println("dev not found"); 
+		return 0;
+	}
 
 	if (it->srv)
 	{
-		if (strcmp(argv[2], "activate") == 0)
+		if (strcmp(argv[1], "activate") == 0)
 		{
 			int sts = it->srv->activate();
 			if (sts) { nos::println("activation fault"); return 0; }
 		}
 
-		if (strcmp(argv[2], "deactivate") == 0)
+		if (strcmp(argv[1], "deactivate") == 0)
 		{
 			int sts = it->srv->deactivate();
 			if (sts) { nos::println("deactivation fault"); return 0; }
@@ -100,5 +129,5 @@ igris::console_command ralgo::heimer::info_node_commands[] =
 {
 	igris::console_command{"devinfo", devinfo},
 	igris::console_command{"devlist", devlist},
-	igris::console_command{"devctr", devctr}
+	igris::console_command{"devctr", devctr, "activate/deactivate controller"}
 };

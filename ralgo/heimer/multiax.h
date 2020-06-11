@@ -21,7 +21,8 @@ namespace ralgo
 			char _name[10];
 
 		public:
-			virtual_multiax_axis() : control_info_node(_name, nullptr, nullptr, this) {}
+			virtual_multiax_axis() : control_info_node(_name, 
+				nullptr, nullptr, this) {}
 
 			virtual_multiax_axis(const char* axname, virtual_multiax<P, V>* parent, int index) :
 				virtual_multiax_axis()

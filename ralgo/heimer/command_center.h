@@ -44,7 +44,13 @@ namespace ralgo
 					return 0;
 				}
 
-				if (argc < 3) { nos::println("usage: axcmd AXNO CMD [ARGS ...]; axcmd --OPT"); return 0; }
+				if (argc < 3) 
+				{ 
+					nos::println("usage: axcmd AXNO CMD [ARGS ...]"); 
+					nos::println("usage: axcmd --feed");  
+					nos::println("usage: axcmd --list"); 
+					return 0; 
+				}
 
 				unsigned int axno = atoi32(argv[1], 10, nullptr);
 
