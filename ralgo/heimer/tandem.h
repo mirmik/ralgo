@@ -20,15 +20,14 @@ namespace ralgo
 
 			tandem_controller(
 			    const char * name,
-			    igris::array_view<heimer::axis_driver<P, V>*> _controlled_axes,
-			    igris::array_view<double> koeffs
+			    heimer::axis_driver<P, V>** _controlled_axes,
+			    double* koeffs
 			)
 				:
 				control_info_node(name, this, this, nullptr),
-				_controlled_axes(_controlled_axes.data())
+				_controlled_axes(_controlled_axes)
 				//	koeffs(koeffs)
 			{
-				assert(_controlled_axes.size() == N);
 				assert(koeffs[0] == 1);
 
 				for (int i = 0; i < N; ++i)

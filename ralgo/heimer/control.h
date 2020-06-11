@@ -13,7 +13,7 @@ namespace ralgo
 	
 		class external_control_slot;
 
-
+		// Тот, кто выполняет работу.
 		class control_served
 		{
 			bool _is_activate = false;
@@ -69,6 +69,7 @@ namespace ralgo
 		};
 
 
+		// Тот, кто контролирует.
 		class external_controller
 		{
 		public:
@@ -80,6 +81,7 @@ namespace ralgo
 		};
 
 
+		// Тот, кого контролируют.
 		class external_control_slot
 		{
 		public:

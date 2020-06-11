@@ -43,6 +43,7 @@ namespace ralgo
 
 		public:
 			stepctr(const char * name) : name(name) {}
+			stepctr() : name("") {}
 
 			IntPos current_step() { return curstep; }
 			void set_curstep(IntPos curstep) { this->curstep = curstep; }
