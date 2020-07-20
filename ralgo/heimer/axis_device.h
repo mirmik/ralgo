@@ -18,13 +18,17 @@ namespace ralgo
 			using Time = int64_t;
 
 		protected:
+			// геометрические пределы
 			bool _limited = false;
 			Position _forw = 0;
 			Position _back = 0;
 
+			// ограничение скорости и ускорения
 			Speed _speed_protector = 0;
 			Speed _accdcc_protector = 0;
 
+			// установка скорости и ускорения для 
+			// для линейного перемещения
 			Speed _speed = 0;
 			float _acc_val = 0;
 			float _dcc_val = 0;
