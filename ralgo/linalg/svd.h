@@ -5,7 +5,7 @@
 #include <ralgo/linalg/vecops.h>
 #include <ralgo/linalg/matops.h>
 #include <ralgo/util/math.h>
-#include <ralgo/fault.h>
+#include <ralgo/log.h>
 // Based on numerical recipes.
 //Attention Row Order.
 
@@ -13,8 +13,6 @@
 
 namespace ralgo
 {
-
-
 	template <class T, class MU, class MV, class V>
 	struct SVD
 	{
@@ -29,22 +27,13 @@ namespace ralgo
 		SVD(const MA & a, MU& u, MV& v, V& w) :
 			m(a.size1()), n(a.size2()), // берём размерность.
 			u(u), v(v), w(w)
-			//u(a), v(n, n), w(n)
 		{
-//			if (u.size1() != a.size1()
-//			        || u.size2() != a.size2()
-//			        || v.size1() != n
-//			        || v.size2() != n
-//			        || w.size() != n)
-//				ralgo::fault("incompatible matrices");
-
 			assert(u.size1() == (unsigned)m);
 			assert(u.size2() == (unsigned)n);
 			assert(v.size1() == (unsigned)n);
 			assert(v.size2() == (unsigned)n);
 			assert(w.size() == (unsigned)n);
 
-				//ralgo::vecops::copy(u, a); // Копируем данные.
 			ralgo::matops::copy(u, a); // Копируем данные.
 			ralgo::vecops::inplace::clean(v);
 			ralgo::vecops::inplace::clean(w);
@@ -57,28 +46,9 @@ namespace ralgo
 			tsh = 0.5 * sqrt(m + n + 1.) * w[0] * eps;
 		}
 
-		/*SVD(mroot<M> &a) : m(a.size1()), n(a.size2()), u(a), v(n, n), w(n)
-		{
-			eps = std::numeric_limits<type_t<M>>::epsilon();
-			decompose();
-			reorder();
-			tsh = 0.5 * sqrt(m + n + 1.) * w[0] * eps;
-		}*/
-
 		template<class A, class B> 
 		void solve(const A &b, B &x, T thresh = -1.);
-		//void solve(const mroot<M> &b, mroot<M> &x, type_t<M> thresh = -1.);
-		/*
-		int 			rank(type_t<M> thresh = -1.);
-		int 			nullity(type_t<M> thresh = -1.);
-		matrix_t<M> 	range(type_t<M> thresh = -1.);
-		matrix_t<M> 	nullspace(type_t<M> thresh = -1.);
-
-		type_t<M> inv_condition()
-		{
-			return (w[0] <= 0. || w[n - 1] <= 0.) ? 0. : w[n - 1] / w[0];
-		}
-		*/
+		
 		void decompose();
 		void reorder();
 
@@ -97,7 +67,7 @@ namespace ralgo
 		int i, j, jj;
 		T s;
 		if (b.size() != (unsigned)m || x.size() != (unsigned)n) ralgo::fault("SVD::solve bad sizes");
-		//vector_t<M> tmp(n);
+		
 		T tmp[n];
 		tsh = (thresh >= 0. ? thresh : 0.5 * sqrt(m + n + 1.) * w[0] * eps);
 		for (j = 0; j < n; j++)

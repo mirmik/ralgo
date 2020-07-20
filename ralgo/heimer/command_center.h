@@ -1,7 +1,7 @@
 #ifndef RALGO_HEIMER_COMMAND_CENTER_H
 #define RALGO_HEIMER_COMMAND_CENTER_H
 
-#include <igris/event/delegate.h>
+//#include <igris/event/delegate.h>
 
 #include <ralgo/heimer/axis_driver.h>
 #include <ralgo/heimer/interpolation_group.h>

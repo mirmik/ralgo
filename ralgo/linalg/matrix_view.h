@@ -12,7 +12,7 @@
 */
 
 #include <ralgo/linalg/vector_view.h>
-#include <ralgo/fault.h>
+#include <ralgo/log.h>
 
 namespace ralgo 
 {

@@ -33,14 +33,6 @@ namespace ralgo
 			this->pairs = pairs; 
 		}
 
-		/*void read_coords() 
-		{
-			for (auto& c : pairs)
-			{
-				c->read_coords();
-			}
-		}*/
-
 		void collect_chain(unit2d* finallink, unit2d* startlink = nullptr) 
 		{
 			unit2d* link = finallink;
@@ -69,28 +61,20 @@ namespace ralgo
 
 		void update_model_location() 
 		{
-		//	read_coords();
 			update_location();
 		}
 
-		void sensivity(rabbit::screw2<float>* senses, unit2d* basis) 
+		void sensivity(ralgo::screw2<float>* senses, unit2d* basis) 
 		{
-			rabbit::htrans2<float> trsf{};		
+			ralgo::htrans2<float> trsf{};		
 			auto outtrans = chain[chain.size()-1]->global_location;	
-
-			//PRINT(outtrans);
 
 			for (unsigned int i = 0; i < pairs.size(); ++i) 
 			{
-				rabbit::screw2<float> lsens = pairs[i]->sensivity();
-
-				//PRINT(lsens);
+				ralgo::screw2<float> lsens = pairs[i]->sensivity();
 
 				auto linktrans = pairs[i]->global_location;
 				trsf = linktrans.inverse() * outtrans;
-
-				//PRINT(linktrans);
-				//PRINT(trsf);
 
 				auto radius = trsf.translation();
 
@@ -108,13 +92,12 @@ namespace ralgo
 
 			if (basis != nullptr) 
 			{
-				rabbit::htrans2<float> btrsf = basis->global_location;
-				rabbit::htrans2<float> ctrsf = btrsf.inverse() * outtrans;
+				ralgo::htrans2<float> btrsf = basis->global_location;
+				ralgo::htrans2<float> ctrsf = btrsf.inverse() * outtrans;
 
 				for (unsigned int i = 0; i < pairs.size(); ++i) 
 				{
 					senses[i].lin = ctrsf.rotate(senses[i].lin);
-//					PRINT(senses[i]);
 				}
 			}
 		}
