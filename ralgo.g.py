@@ -4,30 +4,39 @@ licant.module("ralgo.include",
 	include_paths=["."])
 
 licant.module("ralgo.fault", "exception",
-	sources=["ralgo/fault-exception.cpp"])
+	sources=["ralgo/log/fault-exception.cpp"])
 
 licant.module("ralgo.fault", "abort",
-	sources=["ralgo/fault-abort.cpp"], 
+	sources=["ralgo/log/fault-abort.cpp"], 
 	default=True)
 
-licant.module("ralgo.info",
-	sources=["ralgo/info.cpp"])
+licant.module("ralgo.warn", "dprint",
+	sources=["ralgo/log/warn.cpp"], 
+	default=True)
+
+licant.module("ralgo.log",
+	mdepends=[
+	"ralgo.fault", 
+	"ralgo.warn"
+])
 
 licant.module("ralgo",
 	sources=[
 		"ralgo/madgwick.cpp",
 		"ralgo/signal/fft.cpp",
-		"ralgo/heimer/control.cpp",
-		"ralgo/heimer/command_center.cpp"
+		#"ralgo/heimer/control.cpp",
+		#"ralgo/heimer/command_center.cpp"
 	],
 	include_paths=["."],
 	mdepends=[
 		"ralgo.include",
-		"ralgo.info",
-		"ralgo.fault",
+		"ralgo.log",
 		"ralgo.disctime"
 	],
 )
+
+licant.module("ralgo.heimer",
+	sources=[])
 
 #licant.module("ralgo.virtdevs", 
 #	mdepends=["ralgo.include"],

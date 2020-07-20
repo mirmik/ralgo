@@ -1,4 +1,4 @@
-#include <ralgo/fault.h>
+#include <ralgo/log.h>
 #include <stdlib.h>
 
 namespace ralgo 

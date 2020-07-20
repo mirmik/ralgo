@@ -1,7 +1,7 @@
 #include <ralgo/info.h>
 #include <igris/dprint.h>
 
-void ralgo::warning(const char * str) 
+void ralgo::warn(const char * str) 
 {
 	dprln("WARN:", str);
 }

@@ -41,7 +41,14 @@ namespace ralgo
 			//float speed_multiplier = 1;
 			const char * name;
 
+			float _deltatime = 1;
+
 		public:
+			void set_deltatime(int32_t ticks_per_second)
+			{
+				_deltatime = 1.0 / ticks_per_second;
+			}
+
 			stepctr(const char * name) : name(name) {}
 			stepctr() : name("") {}
 
@@ -85,14 +92,14 @@ namespace ralgo
 					DPRINT(name);
 					DPRINT(phaser::int2ext_spd(spd));
 					assert(ABS(curstep) <= pulsewidth);
-					curstep = pulsewidth > 0 ? pulsewidth : -pulsewidth;	
+					curstep = pulsewidth > 0 ? pulsewidth : -pulsewidth;
 				}
 			}
 
 			void serve()
 			{
 				not_corrected_counter++;
-				if (not_corrected_counter > 10000) 
+				if (not_corrected_counter > 10000)
 				{
 					set_speed_internal_impl(0);
 					return;

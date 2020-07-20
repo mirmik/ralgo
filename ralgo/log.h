@@ -1,5 +1,5 @@
-#ifndef RALGO_LOG_H
-#define RALGO_LOG_H
+#ifndef RALGO_INFO_H
+#define RALGO_INFO_H
 
 namespace ralgo
 {

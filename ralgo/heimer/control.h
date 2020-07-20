@@ -1,153 +1,65 @@
-#ifndef RALGO_HEIMER_CONTROL_H
-#define RALGO_HEIMER_CONTROL_H
+#ifndef HEIMER_CONTROL2_H
+#define HEIMER_CONTROL2_H
 
 #include <igris/datastruct/dlist.h>
-#include <igris/util/bug.h>
-#include <igris/shell/conscmd.h>
 
-namespace ralgo
+#define HEIM_ERR_IN_OPERATE  (-1)
+#define HEIM_ERR_IS_BUSY     (-2)
+#define HEIM_ERR_IS_NOACTIVE (-3)
+#define HEIM_ERR_IS_CONTROL_FAULT (-4)
+#define HEIM_ERR_IS_ALARM (-5)
+
+#define HEIM_IS_ACTIVE      (1<<0)
+#define HEIM_ALARM          (1<<1)
+#define HEIM_MASTER         (1<<2)
+#define HEIM_SLAVE          (1<<3)
+
+namespace heimer
 {
-	namespace heimer
+	class control_node
 	{
-		extern dlist_head control_info_node_list;
-	
-		class external_control_slot;
+	protected:
+		const char * _mnemo;
+		uint16_t flags = 0;
 
-		// Тот, кто выполняет работу.
-		class control_served
-		{
-			bool _is_activate = false;
+	public:
+		constexpr 
+		control_node(const char * mnemo) : _mnemo(mnemo) {}
 
-		public:
-			virtual void serve_impl() = 0;
-			void serve() { if (_is_activate) serve_impl(); }
+		// обратное уведомления о событиях
+		virtual int interrupt(
+		    control_node * slave, // подчинённый, переславший сигнал
+		    control_node * source, // источник сигнала
+		    int code,
+		    int subcode)
+		{ return 0; }
 
-			int activate()
-			{
-				if (_is_activate)
-					return 0;
+		// итератор подчинённых устройств
+		virtual control_node * iterate (control_node * it)
+		{ return nullptr; }
 
-				if (try_activate_impl()) 
-				{
-					return -1;
-				}
+		// отобразить информацию об устройстве.
+		virtual void print_info()
+		{}
 
-				else
-				{
-					_is_activate = true;
-					on_activate_handle();
-					return 0;
-				}
-			}
+		// Вызывается при после успешной активации устройства
+		int activate();
+		int deactivate();
 
-			int deactivate()
-			{
-				if (!_is_activate)
-					return 0;
+	protected:
+		// вызывается при взятии внешнего управления нодом
+		virtual int on_take(
+		    control_node * master)
+		{ return 0; }
 
+		// вызывается при отпускании внешнего управления
+		virtual int on_release(
+		    control_node * master)
+		{ return 0; }
 
-				if (try_deactivate_impl()) 
-				{
-					return -1;
-				}
-				
-				else
-				{
-					_is_activate = false;
-					on_deactivate_handle();
-					return 0;
-				}
-			}
-
-			virtual int try_activate_impl() = 0;
-			virtual int try_deactivate_impl() = 0;
-
-			bool is_active() { return _is_activate; }
-
-			virtual void on_activate_handle() = 0;
-			virtual void on_deactivate_handle() = 0;
-		};
-
-
-		// Тот, кто контролирует.
-		class external_controller
-		{
-		public:
-			virtual void control_interrupt_from(external_control_slot * slot) = 0;
-			virtual external_control_slot* iterate(external_control_slot*) = 0;
-
-			int take_control();
-			int release_control();
-		};
-
-
-		// Тот, кого контролируют.
-		class external_control_slot
-		{
-		public:
-			external_controller* extctr = nullptr;
-
-			int try_take_external_control(external_controller * controller)
-			{
-				if (try_take_external_control_impl(controller))
-				{
-					return -1;
-				}
-				else
-				{
-					extctr = controller;
-					return 0;
-				}
-			}
-
-			int try_release_external_control(external_controller * controller)
-			{
-				if (try_release_external_control_impl(controller))
-				{
-					return -1;
-				}
-				else
-				{
-					extctr = nullptr;
-					return 0;
-				}
-			}
-
-			bool is_extern_controlled() { return (bool) extctr; }
-			external_controller* extcontroller() { return extctr; }
-
-			virtual int try_take_external_control_impl(external_controller * controller) = 0;
-			virtual int try_release_external_control_impl(external_controller * controller) = 0;
-
-			void external_control_interrupt() { extctr->control_interrupt_from(this); }
-		};
-
-
-		class control_info_node
-		{
-		public:
-			const char * _mnemo;
-			dlist_head lnk;
-
-			control_served * srv;
-			external_controller * ctr;
-			external_control_slot * slt;
-
-			control_info_node(const char* mnemo, control_served* srv, external_controller * ctr, external_control_slot * slt)
-				: _mnemo(mnemo),
-				  srv(srv),
-				  ctr(ctr),
-				  slt(slt)
-			{
-				dlist_add_prev(&lnk, &control_info_node_list);
-			}
-
-			const char* mnemo() { return _mnemo; }
-			virtual void print_info() { BUG(); }
-		};
-
-		extern igris::console_command info_node_commands[];
-	}
+		virtual int on_activate() {}
+		virtual int on_deactivate() {}
+	};
 }
 
 #endif
