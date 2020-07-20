@@ -57,8 +57,8 @@ namespace heimer
 		    control_node * master)
 		{ return 0; }
 
-		virtual int on_activate() {}
-		virtual int on_deactivate() {}
+		virtual int on_activate() { return 0; }
+		virtual int on_deactivate() { return 0; }
 	};
 }
 

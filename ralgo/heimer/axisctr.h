@@ -5,6 +5,7 @@
 #include <ralgo/heimer/axis.h>
 #include <ralgo/trajectory/traj1d.h>
 
+#include <igris/event/delegate.h>
 #include <igris/math.h>
 
 namespace heimer
@@ -12,6 +13,7 @@ namespace heimer
 	template <class P, class V>
 	class axisctr : public control_node
 	{
+	private:
 		struct dlist_head axes_list = DLIST_HEAD_INIT(axes_list);
 
 		P offset = 0;
@@ -28,12 +30,17 @@ namespace heimer
 
 		heimer::axis_node<P, V> * controlled;
 
-		ralgo::traj1d<P, V> *    curtraj = nullptr;
+		ralgo::traj1d<P, V> *    curtraj = &lintraj;
 		ralgo::traj1d_line<P, V> lintraj;
 
 		bool _limited = false;
 		P _forw;
 		P _back;
+
+		bool operation_finished_flag = true;
+
+	public:
+		igris::delegate<void, void*> operation_finish_signal;
 
 	public:
 		constexpr
@@ -68,6 +75,9 @@ namespace heimer
 		void set_offset(P offset)    { this->offset = offset; }
 
 		void serve();
+
+	private:
+		int _absmove_unsafe(P pos, P tgt);
 	};
 
 	template <class P, class V>
@@ -90,6 +100,67 @@ namespace heimer
 		P ndist = tgtpos - curpos;
 
 		return incmove_unsafe(ndist);
+	}
+
+	template <class P, class V>
+	int axisctr<P, V>::_absmove_unsafe(P curpos, P tgtpos)
+	{
+		auto dist = tgtpos - curpos;
+		int64_t curtim = ralgo::discrete_time();
+
+		V dist_mul_freq = (V)fabs(dist) * ralgo::discrete_time_frequency();
+		int64_t tgttim = curtim + (int64_t)(dist_mul_freq / spd);
+
+		if (curtim >= tgttim)
+		{
+			operation_finished_flag = true;
+			operation_finish_signal(this);
+			lintraj.set_point_hold(curpos);
+			curtraj = &lintraj;
+
+			return 0;
+		}
+
+		lintraj.reset(curpos, curtim, tgtpos, tgttim);
+		lintraj.set_speed_pattern(acc, dcc, spd);
+
+		operation_finished_flag = false;
+		curtraj = &lintraj;
+		return 0;
+	}
+
+	template <class P, class V>
+	int axisctr<P, V>::incmove_unsafe(P dist)
+	{
+		auto curpos = target_position();
+		return _absmove_unsafe(curpos, curpos + dist);
+	}
+
+	template <class P, class V>
+	int axisctr<P, V>::absmove_unsafe(P pos)
+	{
+		auto curpos = target_position();
+		return _absmove_unsafe(curpos, pos);
+	}
+
+	template <class P, class V>
+	void axisctr<P, V>::serve()
+	{
+		P ctrpos;
+		V ctrspd;
+
+		// Установить текущие целевые параметры.
+		int sts = curtraj->attime(ralgo::discrete_time(), ctrpos, ctrspd);
+		if (sts && !operation_finished_flag)
+		{
+			operation_finished_flag = true;
+			operation_finish_signal(this);
+			lintraj.set_point_hold(ctrpos);
+			curtraj = &lintraj;
+		}
+
+		controlled->ctrpos = ctrpos;
+		controlled->ctrspd = ctrspd;
 	}
 
 }

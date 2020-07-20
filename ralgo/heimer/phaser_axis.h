@@ -14,6 +14,7 @@ namespace heimer
 	public:
 		phaser<P,IntPos,V> * controlled = nullptr;
 		V compspd = 0;
+		float compkoeff = 0;
 
 	public:
 		constexpr 
@@ -28,6 +29,30 @@ namespace heimer
 		{
 			controlled->set_speed(spd);
 		}
+
+		void feedback() 
+		{
+			parent::feedpos = controlled->feedback_position();
+			parent::feedspd = controlled->feedback_speed();
+		}
+
+		void serve() 
+		{
+			// Счетчик меняется в прерывании, так что
+			// снимаем локальную копию.
+			P current = parent::feedpos;
+
+			// Ошибка по установленному значению.
+			P diff = parent::ctrpos - current;
+
+			// Скорость вычисляется как
+			// сумма уставной скорости на
+			compspd = parent::ctrspd + compkoeff * diff;
+			
+			controlled->set_speed(compspd);
+		}
+
+		void set_compkoeff(float val) { compkoeff = val; }
 
 		/*int try_operation_begin(int priority) override
 		{
