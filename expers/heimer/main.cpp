@@ -6,18 +6,18 @@
 
 void loop();
 
-heimer::phaser_emulator<float, int64_t, float> phs0;
-heimer::phaser_emulator<float, int64_t, float> phs1;
-heimer::phaser_emulator<float, int64_t, float> phs2;
-heimer::phaser_emulator<float, int64_t, float> phs3;
-heimer::phaser_emulator<float, int64_t, float> phs4;
+heimer::phaser_emulator<float, float> phs0;
+heimer::phaser_emulator<float, float> phs1;
+heimer::phaser_emulator<float, float> phs2;
+heimer::phaser_emulator<float, float> phs3;
+heimer::phaser_emulator<float, float> phs4;
 
-heimer::phaser_axis<float, int64_t, float> ax0("ax0", &phs0);
-heimer::phaser_axis<float, int64_t, float> ax1("ax1", &phs1);
+heimer::phaser_axis<float, float, float> ax0("ax0", &phs0);
+heimer::phaser_axis<float, float, float> ax1("ax1", &phs1);
 
-heimer::phaser_axis<float, int64_t, float> ax2("ax2", &phs2);
-heimer::phaser_axis<float, int64_t, float> ax3("ax3", &phs3);
-heimer::phaser_axis<float, int64_t, float> ax4("ax4", &phs4);
+heimer::phaser_axis<float, float, float> ax2("ax2", &phs2);
+heimer::phaser_axis<float, float, float> ax3("ax3", &phs3);
+heimer::phaser_axis<float, float, float> ax4("ax4", &phs4);
 
 heimer::tandem<float, float, 2> tand(
     "tand", "tand.x", "tand.y",
@@ -25,13 +25,28 @@ heimer::tandem<float, float, 2> tand(
 
 heimer::axisctr<float, float> axctr0("axctr0", &ax0);
 
+void _exit(void*) 
+{
+	exit(0);
+}
+
 int main(int argc, char* argv[])
 {
+	axctr0.operation_finish_signal = _exit;
 	axctr0.incmove(10);
 	while (1) loop();
 }
 
 void loop()
 {
+	ax0.feedback();
 
+	axctr0.serve();
+	ax0.serve();
+	phs0.serve();
+
+	DPRINT(phs0.feedback_position());
+	DPRINT(phs0.target_position());
+	DPRINT(axctr0.feedback_position());
+	DPRINT(axctr0.target_position());
 }

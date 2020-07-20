@@ -47,6 +47,7 @@ namespace heimer
 		{
 			return int2ext_pos(target_position_internal());
 		}
+
 		ExtPos feedback_position()
 		{
 			return int2ext_pos(feedback_position_internal());
@@ -58,16 +59,16 @@ namespace heimer
 		auto gain() { return _gain; }
 	};
 
-	template <class ExtPos, class IntPos, class Speed>
-	class phaser_emulator : public phaser<ExtPos, IntPos, Speed>
+	template <class ExtPos, class Speed>
+	class phaser_emulator : public phaser<ExtPos, ExtPos, Speed>
 	{
-		using parent = phaser<ExtPos, IntPos, Speed>;
+		using parent = phaser<ExtPos, ExtPos, Speed>;
 		double integrator = 0;
 
 		int64_t lasttime;
 
 	public:
-		phaser_emulator<ExtPos, IntPos, Speed>()
+		phaser_emulator<ExtPos, Speed>()
 		{
 			lasttime = ralgo::discrete_time();
 		}
@@ -76,8 +77,8 @@ namespace heimer
 		{
 			int64_t delta = ralgo::discrete_time() - lasttime;
 
-			integrator += parent::_setted_speed 
-				* ((double)delta / ralgo::discrete_time_frequency());
+			integrator += parent::_setted_speed * (double)delta
+				/ ralgo::discrete_time_frequency();
 			parent::_target_position = integrator;
 			parent::_feedback_position = integrator;
 

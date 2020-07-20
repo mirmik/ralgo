@@ -23,7 +23,7 @@ namespace ralgo
 	class traj1d_line : public traj1d<P,V>
 	{
 	public:
-		int64_t stim = 0;
+		int64_t stim = -1;
 		int64_t ftim = 0;
 
 		P spos = 0;
@@ -41,12 +41,6 @@ namespace ralgo
 
 			this->stim = stim;
 			this->ftim = ftim;
-
-			DPRINT(spos);
-			DPRINT(fpos);
-
-			DPRINT(stim);
-			DPRINT(ftim);
 
 			if (stim == ftim)
 				setted_speed = 0;
@@ -66,7 +60,6 @@ namespace ralgo
 			// Умножение на коэффициент времени перерасщитывает скорость
 			// взятую на дискретную единицу времени в скорость взятую
 			// на единицу времени рабочего пространства.  
-
 			float time_unit = (float)(time - stim) / (ftim - stim);
 
 			auto posmod = spddeform.posmod(time_unit);
@@ -88,18 +81,12 @@ namespace ralgo
 
 			if (acc + dcc > 1)
 			{
-				//dprln("warn: acc + dcc > 1");
-
 				acc = 0.5;
 				dcc = 0.5;
 			}
-			//dprln(acc, dcc);
 
 			spddeform.reset(
 			    acc, dcc
-
-			    //	acc,
-			    //	dcc);
 			);
 		}
 
@@ -117,8 +104,6 @@ namespace ralgo
 
 			float acc_part = acc_time / time;
 			float dcc_part = dcc_time / time;
-
-			//std::cout << dcc_part << std::endl;
 
 			spddeform.reset2(acc_part, dcc_part);
 		}
@@ -138,8 +123,17 @@ namespace ralgo
 			fpos = curpos + curspd * realdiff / 2;
 
 			setted_speed = curspd / ralgo::discrete_time_frequency();
-			//setted_speed = (float)(fpos - spos) / (ftim - stim);
+			spddeform.set_stop_pattern();
+		}
 
+		void set_point_hold(P pos) 
+		{
+			ftim = ralgo::discrete_time();
+			stim = ftim - 1;
+
+			spos = pos;
+			fpos = pos;
+			
 			spddeform.set_stop_pattern();
 		}
 
