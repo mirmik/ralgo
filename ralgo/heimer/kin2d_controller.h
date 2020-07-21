@@ -3,21 +3,19 @@
 
 #include <ralgo/kinematic/link2d.h>
 #include <ralgo/kinematic/chain2d.h>
-//#include <ralgo/planning/htrans2_mover.h>
 
 #include <ralgo/disctime.h>
 #include <ralgo/linalg/backpack.h>
-
 #include <ralgo/heimer/multiax.h>
 
 namespace heimer
 {
 	template <class P, class V>
-	class kinematic_chain2d_controller: public control_node
+	class kinematic_chain2d_controller : public control_node
 	{
 	public:
 		ralgo::kinematic_chain2d chain;
-		float compensation_koefficient;
+		float compensation_koefficient = 1;
 
 	public:
 		ralgo::htrans2<float> control_position()
@@ -36,11 +34,9 @@ namespace heimer
 			chain.collect_chain(finallink, startlink);
 		}
 
-		kinematic_chain2d_controller(virtual_axis_node<P, V>* arr, size_t sz)
-		{
-			compensation_koefficient = 1;
-			//10 / ralgo::discrete_time_frequency();
-		}
+		kinematic_chain2d_controller(const char * name) :
+			control_node(name)
+		{}
 
 		ralgo::htrans2<float> location()
 		{
@@ -108,7 +104,7 @@ namespace heimer
 		virtual
 		void apply_control() = 0;
 
-		void on_activate_handle() override
+		/*void on_activate_handle() override
 		{
 			restore_control_model();
 		}
@@ -127,7 +123,7 @@ namespace heimer
 			evaluate_links_speeds(pos, spd);
 			apply_control();
 			//}
-		}
+		}*/
 	};
 }
 

@@ -23,7 +23,13 @@ heimer::tandem<float, float, 2> tand(
     "tand", "tand.x", "tand.y",
     &ax0, &ax1, 0.5);
 
+heimer::xyalpha_chain2d_controller<float, float> xya(
+	"xya", "xya.x", "xya.y", "xya.a",
+	&ax2, &ax3, &ax4
+);
+
 heimer::axisctr<float, float> axctr0("axctr0", &ax0);
+heimer::axisctr<float, float> axctr1("axctr1", &xya.x_axis);
 
 void _exit(void*) 
 {
@@ -32,21 +38,34 @@ void _exit(void*)
 
 int main(int argc, char* argv[])
 {
-	axctr0.operation_finish_signal = _exit;
-	axctr0.incmove(10);
+	axctr1.operation_finish_signal = _exit;
+	axctr1.incmove(10);
 	while (1) loop();
 }
 
 void loop()
 {
 	ax0.feedback();
+	ax1.feedback();
+	ax2.feedback();
+	ax3.feedback();
+	ax4.feedback();
 
-	axctr0.serve();
-	ax0.serve();
-	phs0.serve();
+	tand.feedback();
+	xya.feedback();
 
-	DPRINT(phs0.feedback_position());
-	DPRINT(phs0.target_position());
-	DPRINT(axctr0.feedback_position());
-	DPRINT(axctr0.target_position());
+	axctr1.serve();
+	xya.serve();
+	ax2.serve();
+	ax3.serve();
+	ax4.serve();
+
+	phs2.serve();
+	phs3.serve();
+	phs4.serve();
+
+	DPRINT(xya.target_position());
+//	DPRINT(phs0.target_position());
+//	DPRINT(axctr0.feedback_position());
+//	DPRINT(axctr0.target_position());
 }
