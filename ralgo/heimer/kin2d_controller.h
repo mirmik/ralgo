@@ -110,20 +110,17 @@ namespace heimer
 		}
 
 		void on_deactivate_handle() override
-		{}
+		{}*/
 
-		void serve_impl() override
+		void serve()
 		{
-			//if (heimer::device::controller())
-			//{
 			ralgo::htrans2<float> pos{};
 			ralgo::screw2<float> spd{};
 
 			get_control_phase(ralgo::discrete_time(), pos, spd);
 			evaluate_links_speeds(pos, spd);
 			apply_control();
-			//}
-		}*/
+		}
 	};
 }
 
