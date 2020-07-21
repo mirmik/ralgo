@@ -53,7 +53,7 @@ namespace heimer
 				virtual_axis_node<P, V> a_axis;
 			};
 		};
-		ralgo::htrans2<float> curpos;
+		
 		P axposes[3];
 
 		//virtdevs::device* _deps[3];
@@ -61,20 +61,22 @@ namespace heimer
 	public:
 		xyalpha_chain2d_controller(
 			const char* name,
+			const char* xname,
+			const char* yname,
+			const char* aname,
 			axis_node<P,V> * x_controlled,
 			axis_node<P,V> * y_controlled,
 			axis_node<P,V> * a_controlled
 		) :
-			kin2d(ctraxes, 3),
-			control_node(name),
+			kin2d(name),
 
 			x_link( {1, 0}, 1),
 			y_link({0, 1}, 1),
 			a_link(1),
 
-			x_axis("x", this, 0),
-			y_axis("y", this, 1),
-			a_axis("a", this, 2)
+			x_axis(xname, this),
+			y_axis(yname, this),
+			a_axis(aname, this)
 		{
 			x_link.link(&y_link);
 			y_link.link(&a_link);
@@ -82,7 +84,9 @@ namespace heimer
 
 			kin2d::setup(axylinks, axypairs, &output_link);
 
-			x_axis = x_controlled;
+			this->x_controlled = x_controlled;
+			this->y_controlled = y_controlled;
+			this->a_controlled = a_controlled;
 		}
 
 		void relocate(
@@ -107,19 +111,21 @@ namespace heimer
 			ralgo::htrans2<float>& pos,
 			ralgo::screw2<float>& spd)
 		{
-			float xpos, ypos, apos, xspd, yspd, aspd;
+			P xpos, ypos, apos;
+			V xspd, yspd, aspd;
 
-			x_axis.evaluate_ctrvars();
-			y_axis.evaluate_ctrvars();
-			a_axis.evaluate_ctrvars();
+			//x_axis.evaluate_ctrvars();
+			//y_axis.evaluate_ctrvars();
+			//a_axis.evaluate_ctrvars();
 
 			xpos = x_axis.ctrpos;
-			xspd = x_axis.ctrspd;
 			ypos = y_axis.ctrpos;
-			yspd = y_axis.ctrspd;
 			apos = a_axis.ctrpos;
-			aspd = a_axis.ctrspd;
 
+			yspd = y_axis.ctrspd;
+			xspd = x_axis.ctrspd;
+			aspd = a_axis.ctrspd;
+			
 			pos = ralgo::htrans2<float> { apos, { xpos, ypos } };
 			spd = ralgo::screw2<float> { aspd, {xspd, yspd} };
 
@@ -131,9 +137,9 @@ namespace heimer
 		{
 			double xpos, ypos, apos;
 
-			xpos = x_controlled->current_position();
-			ypos = y_controlled->current_position();
-			apos = a_controlled->current_position();
+			xpos = x_controlled->feedback_position();
+			ypos = y_controlled->feedback_position();
+			apos = a_controlled->feedback_position();
 
 			x_link.set_coord(xpos);
 			y_link.set_coord(ypos);
@@ -144,9 +150,9 @@ namespace heimer
 
 			auto outpos_corrected = invnullpos * outpos;
 
-			x_axis.set_ctrphase(outpos_corrected.translation().x, 0);
-			y_axis.set_ctrphase(outpos_corrected.translation().y, 0);
-			a_axis.set_ctrphase(outpos_corrected.rotation(), 0);
+			x_axis.restore_control(outpos_corrected.translation().x, 0);
+			y_axis.restore_control(outpos_corrected.translation().y, 0);
+			a_axis.restore_control(outpos_corrected.rotation(), 0);
 		}
 
 		/*igris::array_view<axis_driver<float, float>*> controlled_axes() override
@@ -156,9 +162,9 @@ namespace heimer
 
 		void feedback()
 		{
-			double xpos = x_controlled->current_position();
-			double ypos = y_controlled->current_position();
-			double apos = a_controlled->current_position();
+			double xpos = x_controlled->feedback_position();
+			double ypos = y_controlled->feedback_position();
+			double apos = a_controlled->feedback_position();
 
 			x_link.set_coord(xpos);
 			y_link.set_coord(ypos);
@@ -194,14 +200,20 @@ namespace heimer
 			//_controlled_axes[1]->direct_control(_controlled_axes[1]->current_position() + ctrspd[1]*delta, ctrspd[1]);
 			//_controlled_axes[2]->direct_control(_controlled_axes[2]->current_position() + ctrspd[2]*delta, ctrspd[2]);
 
-			x_controlled->direct_control(x_controlled->current_position(), ctrspd[0]);
-			y_controlled->direct_control(y_controlled->current_position(), ctrspd[1]);
-			a_controlled->direct_control(a_controlled->current_position(), ctrspd[2]);
+			x_controlled->control(x_controlled->target_position(), ctrspd[0]);
+			y_controlled->control(y_controlled->target_position(), ctrspd[1]);
+			a_controlled->control(a_controlled->target_position(), ctrspd[2]);
+		}
+
+		void serve() 
+		{
+			//get_control_phase();
+			apply_control();
 		}
 
 		void print_info() override
 		{
-			nos::fprintln("current: {} {} {}", x_controlled->current_position(), y_controlled->current_position(), a_controlled->current_position());
+			/*nos::fprintln("current: {} {} {}", x_controlled->current_position(), y_controlled->current_position(), a_controlled->current_position());
 			nos::fprintln("outpos: {}", outpos);
 			nos::fprintln("control: {} {} {}", ctrpos[0], ctrpos[1], ctrpos[2]);
 			nos::fprintln("ctrspd: {} {} {}", ctrspd[0], ctrspd[1], ctrspd[2]);
@@ -216,7 +228,7 @@ namespace heimer
 			nos::println("link senses");
 			nos::fprintln("x_link: {}", x_link.sensivity());
 			nos::fprintln("y_link: {}", y_link.sensivity());
-			nos::fprintln("a_link: {}", a_link.sensivity());
+			nos::fprintln("a_link: {}", a_link.sensivity());*/
 		}
 
 		control_node* iterate(control_node* slt) override
