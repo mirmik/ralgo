@@ -27,8 +27,6 @@ namespace heimer
 
 		int64_t lasttime = 0;
 
-		ralgo::htrans2<float> outpos;
-
 	public:
 		ralgo::actuator2 x_link;
 		ralgo::actuator2 y_link;
@@ -41,6 +39,8 @@ namespace heimer
 
 		ralgo::htrans2<float> nullpos;
 		ralgo::htrans2<float> invnullpos;
+		
+		ralgo::htrans2<float> outpos;
 
 		union
 		{
@@ -53,30 +53,30 @@ namespace heimer
 				virtual_axis_node<P, V> a_axis;
 			};
 		};
-		
+
 		P axposes[3];
 
 		//virtdevs::device* _deps[3];
 
 	public:
 		xyalpha_chain2d_controller(
-			const char* name,
-			const char* xname,
-			const char* yname,
-			const char* aname,
-			axis_node<P,V> * x_controlled,
-			axis_node<P,V> * y_controlled,
-			axis_node<P,V> * a_controlled
+		    const char* name,
+		    const char* xname,
+		    const char* yname,
+		    const char* aname,
+		    axis_node<P, V> * x_controlled,
+		    axis_node<P, V> * y_controlled,
+		    axis_node<P, V> * a_controlled
 		) :
 			kin2d(name),
 
 			x_link( {1, 0}, 1),
-			y_link({0, 1}, 1),
-			a_link(1),
+		        y_link({0, 1}, 1),
+		        a_link(1),
 
-			x_axis(xname, this),
-			y_axis(yname, this),
-			a_axis(aname, this)
+		        x_axis(xname, this),
+		        y_axis(yname, this),
+		        a_axis(aname, this)
 		{
 			x_link.link(&y_link);
 			y_link.link(&a_link);
@@ -90,10 +90,10 @@ namespace heimer
 		}
 
 		void relocate(
-			ralgo::htrans2<float> x,
-			ralgo::htrans2<float> y,
-			ralgo::htrans2<float> a,
-			ralgo::htrans2<float> out)
+		    ralgo::htrans2<float> x,
+		    ralgo::htrans2<float> y,
+		    ralgo::htrans2<float> a,
+		    ralgo::htrans2<float> out)
 		{
 			x_link.relocate(x);
 			y_link.relocate(y);
@@ -107,9 +107,9 @@ namespace heimer
 		}*/
 
 		void get_control_phase(
-			int64_t time,
-			ralgo::htrans2<float>& pos,
-			ralgo::screw2<float>& spd)
+		    int64_t time,
+		    ralgo::htrans2<float>& pos,
+		    ralgo::screw2<float>& spd)
 		{
 			P xpos, ypos, apos;
 			V xspd, yspd, aspd;
@@ -125,7 +125,7 @@ namespace heimer
 			yspd = y_axis.ctrspd;
 			xspd = x_axis.ctrspd;
 			aspd = a_axis.ctrspd;
-			
+
 			pos = ralgo::htrans2<float> { apos, { xpos, ypos } };
 			spd = ralgo::screw2<float> { aspd, {xspd, yspd} };
 
@@ -203,12 +203,6 @@ namespace heimer
 			x_controlled->control(x_controlled->target_position(), ctrspd[0]);
 			y_controlled->control(y_controlled->target_position(), ctrspd[1]);
 			a_controlled->control(a_controlled->target_position(), ctrspd[2]);
-		}
-
-		void serve() 
-		{
-			//get_control_phase();
-			apply_control();
 		}
 
 		void print_info() override

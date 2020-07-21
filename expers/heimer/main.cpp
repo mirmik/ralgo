@@ -30,16 +30,30 @@ heimer::xyalpha_chain2d_controller<float, float> xya(
 
 heimer::axisctr<float, float> axctr0("axctr0", &ax0);
 heimer::axisctr<float, float> axctr1("axctr1", &xya.x_axis);
+heimer::axisctr<float, float> axctr2("axctr2", &xya.a_axis);
 
 void _exit(void*) 
 {
 	exit(0);
 }
 
+void init_xyalpha()
+{
+	xya.x_link.relocate({0, {0, 0}});
+	xya.y_link.relocate({0, {0, 0}});
+	xya.a_link.relocate({0, {0, 0}});
+	xya.output_link.relocate({0, { -58.5, 0}});
+
+	xya.nullpos = ralgo::htrans2<float>(0, { -58.5, 0});
+	xya.invnullpos = xya.nullpos.inverse();
+}
+
 int main(int argc, char* argv[])
 {
+	init_xyalpha();
 	axctr1.operation_finish_signal = _exit;
 	axctr1.incmove(10);
+	axctr2.incmove(10);
 	while (1) loop();
 }
 
@@ -55,6 +69,8 @@ void loop()
 	xya.feedback();
 
 	axctr1.serve();
+	axctr2.serve();
+
 	xya.serve();
 	ax2.serve();
 	ax3.serve();
@@ -64,8 +80,8 @@ void loop()
 	phs3.serve();
 	phs4.serve();
 
-	DPRINT(xya.target_position());
-//	DPRINT(phs0.target_position());
+//	PRINT();
+	nos::println(phs2.target_position(), phs3.target_position(), phs4.target_position());
 //	DPRINT(axctr0.feedback_position());
 //	DPRINT(axctr0.target_position());
 }
