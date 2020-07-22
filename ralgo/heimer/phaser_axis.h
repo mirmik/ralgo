@@ -104,7 +104,7 @@ namespace heimer
 			return 0;
 		}
 
-		int try_release_external_control_impl(external_contrte:
+		int try_release_external_control_impl(external_contrte:*/
 	/*	int try_take_external_control_impl(external_controller * controller) override
 		{
 			if (parent::is_active() == false) return -1;

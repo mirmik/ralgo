@@ -4,107 +4,105 @@
 #include <ralgo/heimer/control.h>
 #include <linalg/linalg.h>
 
-namespace ralgo
+namespace heimer
 {
-	namespace heimer
+	template<class Position, class Speed>
+	class linintctr_basic :
+		public control_node
 	{
-		template<class Position, class Speed>
-		class interpolation_group
+	public:
+		linintctr_basic(const char* name) :
+			control_node(name)
+		{}
+
+		virtual int incmove(Position * mov) = 0;
+		virtual int absmove(Position * pos) = 0;
+		//virtual int stop() = 0;
+
+		virtual int set_speed(Speed spd) = 0;
+		virtual int set_accdcc_value(float acc, float dcc) = 0;
+		virtual int dim() = 0;
+
+		virtual Speed speed() = 0;
+		virtual Speed acceleration() = 0;
+		virtual Speed deceleration() = 0;
+
+		//virtual void debug_print_traj() = 0;
+		//virtual void debug_print_state() = 0;
+
+		virtual int try_operation_begin(int priority) = 0;
+
+
+		int command(int argc, char** argv)
 		{
-			const char* _name;
+			float fltargs[dim()];
 
-		public:
-			interpolation_group(const char* name) : _name(name) {}
-
-			const char* name() { return _name; }
-
-			virtual int incmove(Position * mov) = 0;
-			virtual int absmove(Position * pos) = 0;
-			//virtual int stop() = 0;
-
-			virtual int set_speed(Speed spd) = 0;
-			virtual int set_accdcc_value(float acc, float dcc) = 0;
-			virtual int dim() = 0;
-
-			virtual Speed speed() = 0;
-			virtual Speed acceleration() = 0;
-			virtual Speed deceleration() = 0;
-
-			virtual void debug_print_traj() = 0;
-			virtual void debug_print_state() = 0;
-
-			virtual int try_operation_begin(int priority) = 0;
-
-
-			int command(int argc, char** argv)
+			if (strcmp(argv[0], "mov") == 0)
 			{
-				float fltargs[dim()];
-
-				if (strcmp(argv[0], "mov") == 0)
+				//fltarg = atof32(argv[1], nullptr);
+				for (int i = 0; i < dim(); ++i)
 				{
-					//fltarg = atof32(argv[1], nullptr);
-					for (int i = 0; i < dim(); ++i)
-					{
-						fltargs[i] = atof32(argv[1 + i], nullptr);
-					}
-
-					return absmove(fltargs);
+					fltargs[i] = atof32(argv[1 + i], nullptr);
 				}
 
-				else if (strcmp(argv[0], "setzone") == 0)
-				{
-					set_zone_command(argv[1]);
-				}
-
-				else
-				{
-					nos::println("warn: unresolved command");
-				}
-
-				return 0;
+				return absmove(fltargs);
 			}
 
-			//format a,b:c,d:e,g
-			void set_zone_command(const char* cmd)
+			else if (strcmp(argv[0], "setzone") == 0)
 			{
-				linalg::vec<Position, 2> pnts[8];
-
-				const char* ptr = cmd;
-
-				int i = 0;
-
-				while (*ptr)
-				{
-					pnts[i].x = atof32(ptr, (char**)&ptr);
-					ptr++; // skip comma
-
-					pnts[i].y = atof32(ptr, (char**)&ptr);
-					ptr++; // skip semicolon
-
-					i++;
-				}
-
-				set_zone_protection(pnts);
+				set_zone_command(argv[1]);
 			}
 
-			virtual void set_zone_protection(igris::array_view<linalg::vec<Position,2>> arr) = 0;
-
-			// STOP
-			virtual int hardstop() = 0;
-			virtual int stop_impl() = 0;
-
-			virtual bool can_operate() = 0;
-			virtual int print_feed() = 0;
-
-			void stop()
+			else
 			{
-				int sts = try_operation_begin(1);
-
-				if (sts == 0)
-					stop_impl();
+				nos::println("warn: unresolved command");
 			}
-		};
-	}
+
+			return 0;
+		}
+
+		//format a,b:c,d:e,g
+		void set_zone_command(const char* cmd)
+		{
+			linalg::vec<Position, 2> pnts[8];
+
+			const char* ptr = cmd;
+
+			int i = 0;
+
+			while (*ptr)
+			{
+				pnts[i].x = atof32(ptr, (char**)&ptr);
+				ptr++; // skip comma
+
+				pnts[i].y = atof32(ptr, (char**)&ptr);
+				ptr++; // skip semicolon
+
+				i++;
+			}
+
+			set_zone_protection(pnts);
+		}
+
+		virtual void set_zone_protection(
+			igris::array_view<linalg::vec<Position, 2>> arr) = 0;
+
+		// STOP
+		virtual int hardstop() = 0;
+		virtual int stop_impl() = 0;
+
+		virtual bool can_operate() = 0;
+		virtual int print_feed() = 0;
+
+		void stop()
+		{
+			int sts = try_operation_begin(1);
+
+			if (sts == 0)
+				stop_impl();
+		}
+	};
 }
+
 
 #endif

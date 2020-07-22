@@ -34,12 +34,12 @@ namespace heimer
 
 		IntPos target_position_internal()
 		{
-			igris::syslock lock;
+			igris::syslock_guard lock;
 			return _target_position;
 		}
 		IntPos feedback_position_internal()
 		{
-			igris::syslock lock;
+			igris::syslock_guard lock;
 			return _feedback_position;
 		}
 

@@ -10,12 +10,12 @@
 
 namespace heimer
 {
+	extern struct dlist_head axisctr_list;
+
 	template <class P, class V>
 	class axisctr : public control_node
 	{
 	private:
-		struct dlist_head axes_list = DLIST_HEAD_INIT(axes_list);
-
 		P offset = 0;
 
 		V spd = 1;
@@ -43,6 +43,9 @@ namespace heimer
 		igris::delegate<void, void*> operation_finish_signal;
 
 	public:
+		auto * current_trajectory() { return curtraj; }
+		auto * linear_trajectory() { return &lintraj; }
+
 		constexpr
 		axisctr(
 		    const char * mnemo,
@@ -59,6 +62,10 @@ namespace heimer
 		int incmove_unsafe(P dist);
 		int absmove_unsafe(P pos);
 
+		int stop();
+
+		void set_gain(V gain) { this->gain = gain; };
+
 		P feedback_position() { return controlled->feedpos; }
 		V feedback_speed()    { return controlled->feedspd; }
 
@@ -74,7 +81,19 @@ namespace heimer
 		void set_deceleration(V dcc) { this->dcc = dcc; }
 		void set_offset(P offset)    { this->offset = offset; }
 
+		void set_accdcc(V acc, V dcc)
+		{
+			this->acc = acc;
+			this->dcc = dcc;
+		}
+
 		void serve();
+		bool can_operate()
+		{
+			return
+			is_active() && 
+			(!curtraj->is_finished(ralgo::discrete_time()));
+		};
 
 	private:
 		int _absmove_unsafe(P pos, P tgt);
@@ -85,7 +104,7 @@ namespace heimer
 	{
 		dist = dist * gain;
 
-		if (flags && HEIM_IS_ACTIVE)
+		if (flags & HEIM_IS_ACTIVE)
 		{
 			ralgo::warn("axisctr: not active");
 			return -1;
