@@ -36,7 +36,9 @@ licant.module("ralgo",
 )
 
 licant.module("ralgo.heimer",
-	sources=[])
+	sources=[
+		"ralgo/heimer/control.cpp"
+	])
 
 #licant.module("ralgo.virtdevs", 
 #	mdepends=["ralgo.include"],

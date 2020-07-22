@@ -52,7 +52,7 @@ namespace heimer
 			controlled->set_speed(compspd);
 		}
 
-		void set_compkoeff(float val) { compkoeff = val; }
+		void set_compensate(float val) { compkoeff = val; }
 
 		/*int try_operation_begin(int priority) override
 		{
