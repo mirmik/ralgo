@@ -1,6 +1,7 @@
 #ifndef HEIMER_CONTROL2_H
 #define HEIMER_CONTROL2_H
 
+#include <igris/shell/conscmd.h>
 #include <igris/datastruct/dlist.h>
 
 #define HEIM_ERR_IN_OPERATE  (-1)
@@ -46,6 +47,11 @@ namespace heimer
 		int activate();
 		int deactivate();
 
+		bool is_active() 
+		{
+			return flags & HEIM_IS_ACTIVE;
+		}
+
 	protected:
 		// вызывается при взятии внешнего управления нодом
 		virtual int on_take(
@@ -60,6 +66,8 @@ namespace heimer
 		virtual int on_activate() { return 0; }
 		virtual int on_deactivate() { return 0; }
 	};
+
+	extern igris::console_command info_node_commands[];
 }
 
 #endif

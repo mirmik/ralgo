@@ -4,6 +4,9 @@
 #include <ralgo/heimer/tandem.h>
 #include <ralgo/heimer/xyalpha.h>
 
+#include <ralgo/heimer/interpolation_group.h>
+#include <ralgo/heimer/linintctr.h>
+
 void loop();
 
 heimer::phaser_emulator<float, float> phs0;
@@ -31,6 +34,10 @@ heimer::xyalpha_chain2d_controller<float, float> xya(
 heimer::axisctr<float, float> axctr0("axctr0", &ax0);
 heimer::axisctr<float, float> axctr1("axctr1", &xya.x_axis);
 heimer::axisctr<float, float> axctr2("axctr2", &xya.a_axis);
+
+heimer::axis_node<float, float> * lint_axes[] = 
+{ &ax0, &ax1 };
+heimer::linintctr<float, float, 2> lint("linint", lint_axes); 
 
 void _exit(void*) 
 {
