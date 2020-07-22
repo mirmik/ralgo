@@ -46,6 +46,8 @@ namespace heimer
 		// Вызывается при после успешной активации устройства
 		int activate();
 		int deactivate();
+		int take_control();
+		int release_control();
 
 		bool is_active() 
 		{

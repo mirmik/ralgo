@@ -7,15 +7,31 @@ int heimer::control_node::activate()
 	if (flags & HEIM_IS_ACTIVE)
 		return 0;
 
-	if (sts = take_control())
+	if ((sts = take_control()))
 		return sts;
 
-	if (activate && (sts = node->on_activate()))
+	if ((sts = on_activate()))
 	{
 		release_control();
 		return sts;
 	}
 
-	node->flags |= HEIM_IS_ACTIVE;
+	flags |= HEIM_IS_ACTIVE;
+	return 0;
+}
+
+int heimer::control_node::deactivate() 
+{
+	int sts;
+
+	if (!(flags & HEIM_IS_ACTIVE))
+		return 0;
+
+	if ((sts = on_deactivate())) 
+		return sts;
+
+	release_control(); 
+
+	flags &= ~HEIM_IS_ACTIVE;
 	return 0;
 }
