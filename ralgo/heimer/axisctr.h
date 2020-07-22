@@ -91,8 +91,8 @@ namespace heimer
 		bool can_operate()
 		{
 			return
-			is_active() && 
-			(!curtraj->is_finished(ralgo::discrete_time()));
+			    is_active() &&
+			    (!curtraj->is_finished(ralgo::discrete_time()));
 		};
 
 	private:
@@ -119,6 +119,28 @@ namespace heimer
 		P ndist = tgtpos - curpos;
 
 		return incmove_unsafe(ndist);
+	}
+
+	template <class P, class V>
+	int axisctr<P, V>::absmove(P tgtpos)
+	{
+		tgtpos = tgtpos * gain;
+
+		if (flags & HEIM_IS_ACTIVE)
+		{
+			ralgo::warn("axisctr: not active");
+			return -1;
+		}
+
+		//P curpos = target_position();
+		//P tgtpos = curpos + dist;
+
+		if (_limited)
+			tgtpos = igris::clamp(tgtpos, _back, _forw);
+
+		//P ndist = tgtpos - curpos;
+
+		return absmove_unsafe(tgtpos);
 	}
 
 	template <class P, class V>
@@ -151,6 +173,7 @@ namespace heimer
 	template <class P, class V>
 	int axisctr<P, V>::incmove_unsafe(P dist)
 	{
+		// TODO: Это должно работать с gain
 		auto curpos = target_position();
 		return _absmove_unsafe(curpos, curpos + dist);
 	}
@@ -158,6 +181,7 @@ namespace heimer
 	template <class P, class V>
 	int axisctr<P, V>::absmove_unsafe(P pos)
 	{
+		// TODO: Это должно работать с gain
 		auto curpos = target_position();
 		return _absmove_unsafe(curpos, pos);
 	}
@@ -182,6 +206,26 @@ namespace heimer
 		controlled->ctrspd = ctrspd;
 	}
 
+	template<class P, class V>
+	int axisctr<P, V>::stop()
+	{
+		if (flags & HEIM_IS_ACTIVE)
+		{
+			ralgo::warn("axisctr: not active");
+			return -1;
+		}
+
+		if (curtraj == nullptr)
+			return 0;
+
+		lintraj.set_stop_trajectory(
+		    feedback_position(),
+		    feedback_speed(),
+		    dcc);
+
+		curtraj = & lintraj;
+		return 0;
+	}
 }
 
 #endif

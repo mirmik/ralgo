@@ -57,7 +57,7 @@ namespace heimer
 		    const char* name,
 		    igris::array_view<heimer::axis_node<Position, Speed>*> axes
 		) :
-			control_node(name),
+			linintctr_basic<Position,Speed>(name),
 			polygon_checker(zone_polygon),
 			_axes(axes)
 		{
@@ -193,17 +193,23 @@ namespace heimer
 		{
 			for (int i = 0; i < Dim; ++i)
 			{
-				_axes[i]->direct_control(ctrpos[i], ctrspd[i]);
+				_axes[i]->control(ctrpos[i], ctrspd[i]);
 			}
 		}
 
-		void collect_gains()
+		/*void collect_gains()
 		{
 			for (unsigned int i = 0; i < _axes.size(); ++i)
 			{
 				_gains[i] = _axes[i]->gain();
 			}
-		}
+		}*/
+
+		void set_gains(igris::array_view<float> arr) 
+		{
+			for (int i = 0; i < arr.size(); ++i) 
+				_gains[i] = arr[i];
+		} 
 
 		void update_control_model()
 		{
