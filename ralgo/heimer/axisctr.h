@@ -4,6 +4,7 @@
 #include <ralgo/log.h>
 #include <ralgo/heimer/axis.h>
 #include <ralgo/trajectory/traj1d.h>
+#include <ralgo/heimer/alarm.h>
 
 #include <igris/event/delegate.h>
 #include <igris/math.h>
@@ -63,6 +64,7 @@ namespace heimer
 		int absmove_unsafe(P pos);
 
 		int stop();
+		void hardstop();
 
 		void set_gain(V gain) { this->gain = gain; };
 
@@ -104,7 +106,7 @@ namespace heimer
 	{
 		dist = dist * gain;
 
-		if (flags & HEIM_IS_ACTIVE)
+		if (!is_active())
 		{
 			ralgo::warn("axisctr: not active");
 			return -1;
@@ -192,6 +194,9 @@ namespace heimer
 		P ctrpos;
 		V ctrspd;
 
+		if (is_alarmed())
+			return;
+
 		// Установить текущие целевые параметры.
 		int sts = curtraj->attime(ralgo::discrete_time(), ctrpos, ctrspd);
 		if (sts && !operation_finished_flag)
@@ -209,7 +214,7 @@ namespace heimer
 	template<class P, class V>
 	int axisctr<P, V>::stop()
 	{
-		if (flags & HEIM_IS_ACTIVE)
+		if (!is_active())
 		{
 			ralgo::warn("axisctr: not active");
 			return -1;
@@ -225,6 +230,21 @@ namespace heimer
 
 		curtraj = & lintraj;
 		return 0;
+	}
+
+	template<class P, class V>
+	void axisctr<P, V>::hardstop()
+	{		
+		if (is_alarmed())
+			return;
+
+		lintraj.set_point_hold(
+		    feedback_position());
+
+		controlled->hardstop();
+		curtraj = & lintraj;
+
+		set_alarm(AlarmCode::HardStopInvoked);
 	}
 }
 

@@ -9,11 +9,11 @@ namespace heimer
 	class axis_node : public heimer::control_node
 	{
 	public:
-		P feedpos;
-		V feedspd;
+		P feedpos = 0;
+		V feedspd = 0;
 
-		P ctrpos;
-		V ctrspd;
+		P ctrpos = 0;
+		V ctrspd = 0;
 
 		constexpr 
 		axis_node(const char* mnemo) :
@@ -39,6 +39,12 @@ namespace heimer
 		{
 			ctrpos = pos;
 			ctrspd = spd;
+		}
+
+		virtual void hardstop() 
+		{
+			ctrpos = feedpos;
+			ctrspd = 0;
 		}
 	};
 }

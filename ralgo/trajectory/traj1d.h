@@ -115,7 +115,7 @@ namespace ralgo
 
 			stim = ralgo::discrete_time();
 			float realdiff = (fabs(curspd) / dccval);
-			ftim = stim + realdiff / 2 * ralgo::discrete_time_frequency();
+			ftim = stim + (int)(realdiff * ralgo::discrete_time_frequency() / 2);
 
 			assert(ftim >= stim);
 
