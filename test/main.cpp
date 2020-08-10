@@ -19,6 +19,7 @@ LT_END_SUITE(ralgo_test_suite)
 #include "matops.hpp"
 #include "backpack.h"
 #include "geom.hpp"
+#include "heimer.hpp"
 
 LT_BEGIN_AUTO_TEST_ENV()
     AUTORUN_TESTS()

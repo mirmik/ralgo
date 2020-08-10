@@ -1,0 +1,29 @@
+#ifndef RALGO_HEIMER_STUB_AXIS_H
+#define RALGO_HEIMER_STUB_AXIS_H
+
+#include <ralgo/heimer/axis.h>
+
+namespace heimer
+{
+	template <class P, class V>
+	class stub_axis : public axis_node<P,V>
+	{
+		using parent = axis_node<P,V>;
+
+	public:
+		stub_axis(const char * name) : parent(name) {}
+
+		void update_state() 
+		{
+			parent::feedpos = parent::ctrpos;
+			parent::feedspd = parent::ctrspd;
+		}
+
+		void serve() 
+		{
+
+		}
+	};
+}
+
+#endif

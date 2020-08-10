@@ -31,7 +31,8 @@ licant.module("ralgo",
 	mdepends=[
 		"ralgo.include",
 		"ralgo.log",
-		"ralgo.disctime"
+		"ralgo.disctime",
+		"ralgo.heimer",
 	],
 )
 
