@@ -23,7 +23,8 @@ namespace ralgo
 			defvec_t<R,V> ret;
 
 #if __cplusplus >= 201703L
-			if constexpr (has_reserve<defvec_t<R,V>>()) ret.reserve(u.size());
+			if constexpr (has_reserve<defvec_t<R,V>>()) 
+				ret.reserve(u.size());
 #endif
 
 			for (const auto& a : u) 

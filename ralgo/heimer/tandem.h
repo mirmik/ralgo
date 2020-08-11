@@ -6,7 +6,7 @@
 
 namespace heimer
 {
-	template <class P, class V, int N>
+	template <class P, class V>
 	class tandem : public control_node
 	{
 	public:
@@ -52,17 +52,17 @@ namespace heimer
 
 		void serve()
 		{
-			float mx = master_controlled->ctrpos;
-			float mv = master_controlled->ctrspd;
+			float mx = master.ctrpos;
+			float mv = master.ctrspd;
 
-			float sx = slave_controlled->ctrpos;
-			float sv = slave_controlled->ctrspd;
+			float sx = slave.ctrpos;
+			float sv = slave.ctrspd;
 
-			master.ctrpos = mx;
-			master.ctrspd = mv;
+			master_controlled->ctrpos = mx;
+			master_controlled->ctrspd = mv;
 
-			slave.ctrpos = sx + koeff * mx;
-			slave.ctrspd = sv + koeff * mv;
+			slave_controlled->ctrpos = sx + koeff * mx;
+			slave_controlled->ctrspd = sv + koeff * mv;
 		};
 
 		control_node * iterate(control_node * slt) override
