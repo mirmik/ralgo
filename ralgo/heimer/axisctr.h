@@ -47,6 +47,8 @@ namespace heimer
 		auto * current_trajectory() { return curtraj; }
 		auto * linear_trajectory() { return &lintraj; }
 
+		bool in_operate() { return !operation_finished_flag; }
+
 		constexpr
 		axisctr(
 		    const char * mnemo,
@@ -164,6 +166,7 @@ namespace heimer
 			return 0;
 		}
 
+		operation_finished_flag = false;
 		lintraj.reset(curpos, curtim, tgtpos, tgttim);
 		lintraj.set_speed_pattern(acc, dcc, spd);
 
@@ -199,6 +202,9 @@ namespace heimer
 
 		// Установить текущие целевые параметры.
 		int sts = curtraj->attime(ralgo::discrete_time(), ctrpos, ctrspd);
+		controlled->ctrpos = ctrpos;
+		controlled->ctrspd = ctrspd;
+	
 		if (sts && !operation_finished_flag)
 		{
 			operation_finished_flag = true;
@@ -206,9 +212,6 @@ namespace heimer
 			lintraj.set_point_hold(ctrpos);
 			curtraj = &lintraj;
 		}
-
-		controlled->ctrpos = ctrpos;
-		controlled->ctrspd = ctrspd;
 	}
 
 	template<class P, class V>
@@ -228,6 +231,7 @@ namespace heimer
 		    feedback_speed(),
 		    dcc);
 
+		operation_finished_flag = false;
 		curtraj = & lintraj;
 		return 0;
 	}

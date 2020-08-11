@@ -11,8 +11,9 @@ namespace ralgo
 	constexpr const double epsilon = std::numeric_limits<double>::epsilon();
 
 	// Достать тип значения из контейнера.
-	//template <typename V> struct value { using type = typename V::value_type; };
-	template <typename T> using value_t = typename T::value_type;
+	template <typename V> struct value { using type = typename V::value_type; };
+	template <typename T, int N> struct value<T[N]> { using type = T; };
+	template <typename V> using value_t = typename value<V>::type;
 
 	// Превести тип комплексного аргумента или вектора к соответствующему базовому скалярному типу.
 	template <typename T> struct scalar { using type = T; };

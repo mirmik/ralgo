@@ -13,7 +13,7 @@ namespace heimer
 	public:
 		stub_axis(const char * name) : parent(name) {}
 
-		void update_state() 
+		void feedback() 
 		{
 			parent::feedpos = parent::ctrpos;
 			parent::feedspd = parent::ctrspd;

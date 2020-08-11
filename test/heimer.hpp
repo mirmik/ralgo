@@ -1,6 +1,8 @@
 #include <ralgo/heimer/control.h>
 #include <ralgo/heimer/stub_axis.h>
 #include <ralgo/heimer/axisctr.h>
+#include <ralgo/heimer/tandem.h>
+#include <ralgo/heimer/linintctr.h>
 
 #include <igris/math.h>
 
@@ -175,7 +177,7 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_movement_test)
 
 	while(1) 
 	{
-		ax.update_state();
+		ax.feedback();
 		
 		axctr.serve();
 		ax.serve();
@@ -226,7 +228,7 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_movement_stop_test)
 
 	while(1) 
 	{
-		ax.update_state();
+		ax.feedback();
 		
 		axctr.serve();
 		ax.serve();
@@ -279,7 +281,7 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_movement_hardstop_test)
 
 	while(1) 
 	{
-		ax.update_state();
+		ax.feedback();
 		
 		axctr.serve();
 		ax.serve();
@@ -305,3 +307,104 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_movement_hardstop_test)
 	LT_CHECK_LT(ax.feedpos, 5);
 }
 LT_END_TEST(heimer_movement_hardstop_test)
+
+LT_BEGIN_TEST(ralgo_test_suite, heimer_tandem)
+{
+	int sts;
+
+	heimer::stub_axis<float, float> ax1("ax1");
+	heimer::stub_axis<float, float> ax2("ax2");
+	heimer::tandem<float, float> tand("tand", "tand.x", "tand.y", 
+		&ax1, &ax2, -0.5);
+
+	heimer::axisctr axctr1("master", &tand.master);
+	heimer::axisctr axctr2("slave", &tand.slave);
+
+	sts = ax1.activate();
+	LT_CHECK_EQ(sts, 0);
+	sts = ax2.activate();
+	LT_CHECK_EQ(sts, 0);
+	sts = tand.activate();
+	LT_CHECK_EQ(sts, 0);
+	sts = axctr1.activate();
+	LT_CHECK_EQ(sts, 0);
+	sts = axctr2.activate();
+	LT_CHECK_EQ(sts, 0);
+
+	axctr1.set_speed(10);
+	axctr2.set_speed(10);
+	axctr1.set_accdcc(10,10);
+	axctr2.set_accdcc(10,10);
+
+	sts = axctr1.incmove(10);
+	LT_CHECK_EQ(sts, 0);
+	sts = axctr2.incmove(10);
+	LT_CHECK_EQ(sts, 0);
+
+	while(1) 
+	{
+		ax1.feedback();
+		ax2.feedback();
+		tand.feedback();
+
+		axctr1.serve();
+		axctr2.serve();
+		tand.serve();
+		ax2.serve();
+		ax1.serve();
+
+		if (!axctr1.in_operate() && !axctr2.in_operate()) 
+			break;
+	}
+
+	LT_CHECK(igris::early(10, ax1.feedpos, 1e-3));
+	LT_CHECK(igris::early(5, ax2.feedpos, 1e-3));
+}
+LT_END_TEST(heimer_tandem)
+
+LT_BEGIN_TEST(ralgo_test_suite, heimer_linint)
+{
+	int sts;
+
+	heimer::stub_axis<float, float> ax1("ax1");
+	heimer::stub_axis<float, float> ax2("ax2");
+
+	std::vector<heimer::axis_node<float, float> *> intarr {&ax1, &ax2};
+	heimer::linintctr<float, float, 2> linint("int", {intarr.data(), 2});
+
+	sts=ax1.activate();;
+	LT_CHECK_EQ(sts, 0);
+	sts=ax2.activate();;
+	LT_CHECK_EQ(sts, 0);
+	sts=linint.activate();;
+	LT_CHECK_EQ(sts, 0);
+
+	linint.set_speed(10);
+	linint.set_accdcc(10, 10);
+
+	float target[2] = {10, 3};
+	sts=linint.incmove(target);
+	LT_CHECK_EQ(sts, 0);		
+
+	LT_CHECK_EQ(linint.in_operate(), true);		
+
+	while(1) 
+	{
+		ax1.feedback();
+		ax2.feedback();
+		linint.feedback();
+
+		linint.serve();
+		ax2.serve();
+		ax1.serve();
+
+		dprln(ax1.feedpos, ax2.feedpos);
+
+		if (!linint.in_operate()) 
+			break;
+	}
+
+	LT_CHECK(igris::early(10, ax1.feedpos, 1e-3));
+	LT_CHECK(igris::early(3, ax2.feedpos, 1e-3));
+}
+LT_END_TEST(heimer_linint)

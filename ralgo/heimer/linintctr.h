@@ -29,23 +29,23 @@ namespace heimer
 		linalg::vec<Position, 2> zone_polygon[8];
 		plane_zone_checker<Position> polygon_checker;
 
-		Speed _speed = 0.1;
+		Speed _speed = 1;
 		//float _accdcc = 0;
-		float _acc_val = 0.1;
-		float _dcc_val = 0.1;
+		Speed _acc_val = 1;
+		Speed _dcc_val = 1;
 
 		ralgo::trajNd<Dim, Position, Speed> * trajectory;
 		ralgo::trajNd_line<Dim, Position, Speed> lintraj;
 
 //			Speed compspd[Dim];
 
-		Position ctrpos[Dim];
-		Speed ctrspd[Dim];
+		Position ctrpos[Dim] = {};
+		Speed ctrspd[Dim] = {};
 
-		Position feedpos[Dim];
-		Speed feedspd[Dim];
+		Position feedpos[Dim] = {};
+		Speed feedspd[Dim] = {};
 
-		float _gains[Dim];
+		float _gains[Dim] = {};
 
 		float poskoeff = 0.01;
 		bool _in_operation = false;
@@ -53,15 +53,27 @@ namespace heimer
 		igris::array_view<heimer::axis_node<Position, Speed>*> _axes;
 
 	public:
+		bool in_operate() 
+		{
+			return _in_operation;
+		}
+
 		linintctr(
 		    const char* name,
 		    igris::array_view<heimer::axis_node<Position, Speed>*> axes
 		) :
+			linintctr(name, axes.data())
+		{}
+
+		linintctr(
+		    const char* name,
+		    heimer::axis_node<Position, Speed>** axes
+		) :
 			linintctr_basic<Position,Speed>(name),
 			polygon_checker(zone_polygon),
-			_axes(axes)
+			_axes(axes, Dim)
 		{
-			//parent::set_controlled(axes);
+			vecops::fill(_gains, float(1));
 		}
 
 		constexpr int dim() { return Dim; }
@@ -82,15 +94,25 @@ namespace heimer
 		    igris::array_view<Position> curpos,
 		    igris::array_view<Position> tgtpos)
 		{
+			if (!parent::is_active()) 
+			{
+				dprln(1);
+				return HEIM_ERR_IS_NOACTIVE;
+			}
+
 			auto dist = ralgo::vecops::distance(curpos, tgtpos);
+			DPRINT(dist);
 
 			int64_t time = (int64_t)(((Speed)fabs(dist)) / _speed * ralgo::discrete_time_frequency());
 			int64_t curtime = ralgo::discrete_time();
 			int64_t tgttim = curtime + time;
 
+			DPRINT(time);
+			DPRINT(curtime);
+			DPRINT(tgttim);
 			if (dist == 0 || curtime == tgttim)
 			{
-				//operation_finish(0);
+				dprln(2);
 				return 0;
 			}
 
@@ -100,6 +122,7 @@ namespace heimer
 			trajectory = &lintraj;
 			_in_operation = true;
 
+				dprln(3);
 			return 0;
 		}
 
@@ -109,11 +132,6 @@ namespace heimer
 		{
 			Position curpos[Dim];
 			Position tgtpos[Dim];
-
-			/*if (try_operation_begin(0))
-			{
-				return -1;
-			}*/
 
 			for (unsigned int i = 0; i < mov.size(); ++i)
 			{
@@ -138,11 +156,6 @@ namespace heimer
 		{
 			Position curpos[Dim];
 			Position tgtpos[Dim];
-
-			/*if (try_operation_begin(0))
-			{
-				return -1;
-			}*/
 
 			for (unsigned int i = 0; i < pos.size(); ++i)
 			{
@@ -170,7 +183,7 @@ namespace heimer
 		}
 
 		// Установить ускорение в собственных единицах 1/c^2.
-		int set_accdcc_value(float acc, float dcc)
+		int set_accdcc(float acc, float dcc)
 		{
 			_acc_val = acc;
 			_dcc_val = dcc;

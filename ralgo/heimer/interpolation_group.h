@@ -20,8 +20,10 @@ namespace heimer
 		//virtual int stop() = 0;
 
 		virtual int set_speed(Speed spd) = 0;
-		virtual int set_accdcc_value(float acc, float dcc) = 0;
+		virtual int set_accdcc(Speed acc, Speed dcc) = 0;
 		virtual int dim() = 0;
+
+		int set_accdcc(Speed acc) { return set_accdcc(acc,acc); }
 
 		virtual Speed speed() = 0;
 		virtual Speed acceleration() = 0;
