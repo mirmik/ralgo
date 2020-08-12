@@ -4,6 +4,8 @@
 #include <ralgo/heimer/tandem.h>
 #include <ralgo/heimer/linintctr.h>
 
+#include <ralgo/heimer/command_center.h>
+
 #include <igris/math.h>
 
 class test_control_node : public heimer::control_node
@@ -236,8 +238,6 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_movement_stop_test)
 		auto pos = ax.feedpos; 
 		auto spd = ax.feedspd;
 
-		//dprln(pos, spd);
-
 		if (state == 0 && igris::early(pos, 1, 0.2)) 
 		{
 			axctr.stop();
@@ -289,8 +289,6 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_movement_hardstop_test)
 		auto pos = ax.feedpos; 
 		auto spd = ax.feedspd;
 
-		//dprln(pos, spd);
-
 		if (state == 0 && igris::early(pos, 1, 0.2)) 
 		{
 			axctr.hardstop();
@@ -336,9 +334,9 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_tandem)
 	axctr1.set_accdcc(10,10);
 	axctr2.set_accdcc(10,10);
 
-	sts = axctr1.incmove(10);
+	sts = axctr1.incmove(8);
 	LT_CHECK_EQ(sts, 0);
-	sts = axctr2.incmove(10);
+	sts = axctr2.incmove(8);
 	LT_CHECK_EQ(sts, 0);
 
 	while(1) 
@@ -357,8 +355,8 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_tandem)
 			break;
 	}
 
-	LT_CHECK(igris::early(10, ax1.feedpos, 1e-3));
-	LT_CHECK(igris::early(5, ax2.feedpos, 1e-3));
+	LT_CHECK(igris::early(8, ax1.feedpos, 1e-3));
+	LT_CHECK(igris::early(4, ax2.feedpos, 1e-3));
 }
 LT_END_TEST(heimer_tandem)
 
@@ -380,13 +378,15 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_linint)
 	LT_CHECK_EQ(sts, 0);
 
 	linint.set_speed(10);
-	linint.set_accdcc(10, 10);
+	linint.set_accdcc(100000, 100000);
 
 	float target[2] = {10, 3};
 	sts=linint.incmove(target);
 	LT_CHECK_EQ(sts, 0);		
 
 	LT_CHECK_EQ(linint.in_operate(), true);		
+
+	int64_t t = ralgo::discrete_time();
 
 	while(1) 
 	{
@@ -398,13 +398,28 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_linint)
 		ax2.serve();
 		ax1.serve();
 
-		dprln(ax1.feedpos, ax2.feedpos);
-
 		if (!linint.in_operate()) 
 			break;
 	}
 
+	LT_CHECK(ralgo::discrete_time() - t <= 1045);
 	LT_CHECK(igris::early(10, ax1.feedpos, 1e-3));
 	LT_CHECK(igris::early(3, ax2.feedpos, 1e-3));
 }
 LT_END_TEST(heimer_linint)
+
+
+LT_BEGIN_TEST(ralgo_test_suite, heimer_control_panel) 
+{
+	heimer::stub_axis<float, float> ax1("ax1");
+	heimer::stub_axis<float, float> ax2("ax2");
+	heimer::axisctr axctr1("axctr1", &ax1);
+	heimer::axisctr axctr2("axctr2", &ax2);
+
+	igris::array_view<heimer::axisctr<float,float>*> arr;
+
+	heimer::command_center.attach_axes(arr);
+
+
+}
+LT_END_TEST(heimer_control_panel)

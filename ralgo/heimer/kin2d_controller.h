@@ -23,6 +23,10 @@ namespace heimer
 			return chain.out()->global_location;
 		}
 
+		// цепь автоматически собирает
+		// юниты и выделяет из них кинематические,
+		// и кладёт в 2 списка все юниты цепочки в один и
+		// кинематические в другой.
 		void setup(
 		    igris::array_view<ralgo::unit2d*> a,
 		    igris::array_view<ralgo::kinematic_unit2d*> b,
@@ -53,27 +57,22 @@ namespace heimer
 		}
 
 		void evaluate_links_speeds(
-			ralgo::htrans2<float> pos, 
-			ralgo::screw2<float> spd)
+		    ralgo::htrans2<float> pos,
+		    ralgo::screw2<float> spd)
 		{
-			//TRACE();
 			ralgo::screw2<float> senses[chain.pairs.size()];
 			ralgo::screw2<double> dsenses[chain.pairs.size()];
-			//(void) senses;
+
 			double* spdarr = ctrspd_array();
 			memset(spdarr, 0, sizeof(double) * chain.pairs.size());
 
-			//Можно целевую позицию переводить в связный базис, а чувствительность
-			// брать по связному базису.
-			// Тогда вычитание не понадобится.
-			// И перевод чувствительности в основной базис не нужен будет тоже.
-
-			chain.sensivity(senses, chain.chain[0]);
-			ralgo::screw2<float> target = //spd;
+			// Расчёт проводится в глобальном базисе.
+			chain.sensivity(senses, nullptr);
+			ralgo::screw2<float> target =
 			    spd + (pos - location()) * compensation_koefficient;
 
+			// переводим всё в doble (математика расчитана на double)
 			ralgo::screw2<double> dtarget = target;
-
 			for (unsigned int i = 0; i < chain.pairs.size(); ++i)
 			{
 				dsenses[i] = senses[i];
@@ -82,8 +81,11 @@ namespace heimer
 			// Поиск скоростей звеньев удовлетворяющих заданному
 			// управлению.
 			ralgo::svd_backpack<double, ralgo::screw2<double>>(
-			            spdarr, dtarget,
-			            dsenses, chain.pairs.size());
+			            spdarr,  // возвращаемый вектор скоростей 
+			            dtarget, // целевой вектор
+			            dsenses, // вектор чувствительностей
+			            chain.pairs.size() // размерность задачи
+			        );
 
 			// Результат возвращается через spdarr.
 		}
@@ -94,6 +96,8 @@ namespace heimer
 			compensation_koefficient = k;
 		}
 
+		// Расчитать модельный объект из
+		// конфигурации управляющих осей.
 		virtual
 		void get_control_phase(int64_t time,
 		                       ralgo::htrans2<float>& pos, ralgo::screw2<float>& spd) = 0;
@@ -104,18 +108,10 @@ namespace heimer
 		virtual
 		void apply_control() = 0;
 
-		/*void on_activate_handle() override
-		{
-			restore_control_model();
-		}
-
-		void on_deactivate_handle() override
-		{}*/
-
 		void serve()
 		{
-			ralgo::htrans2<float> pos{};
-			ralgo::screw2<float> spd{};
+			ralgo::htrans2<float> pos;
+			ralgo::screw2<float> spd;
 
 			get_control_phase(ralgo::discrete_time(), pos, spd);
 			evaluate_links_speeds(pos, spd);

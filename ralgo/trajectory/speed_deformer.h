@@ -18,6 +18,7 @@ namespace ralgo
 {
 	class speed_deformer
 	{
+	public:
 		float acc = 0;
 		float dcc = 0;
 		float f_time = 1;
@@ -30,8 +31,13 @@ namespace ralgo
 		float strt_dcc_pos = 0;
 
 	public:
+		bool is_finished(float t) 
+		{
+			return t >= f_time;
+		}
+
 		// Вариант движения с увеличением максимальной скорости.
-		void reset(float acc, float dcc, float sspd = 0, float fspd = 0)
+		void set_time_pattern(float acc, float dcc, float sspd = 0, float fspd = 0)
 		{
 			this->acc = acc;
 			this->dcc = dcc;
@@ -50,9 +56,15 @@ namespace ralgo
 			strt_dcc_pos = fini_acc_pos + real_spd * (f_time - acc - dcc);
 		}
 
+		[[deprecated]]
+		void reset(float acc, float dcc, float sspd = 0, float fspd = 0) 
+		{
+			set_time_pattern(acc, dcc, sspd, fspd);
+		}
+
 		// Второй вариант инициализации, когда вместо увеличения максимальной скорости
 		// расширяется время довода изделия.
-		void reset2(float acc, float dcc, float sspd = 0, float fspd = 0)
+		void set_speed_pattern(float acc, float dcc, float sspd = 0, float fspd = 0)
 		{
 			this->acc = acc;
 			this->dcc = dcc;
@@ -81,17 +93,22 @@ namespace ralgo
 				* (f_time - this->acc - this->dcc);
 		}
 
+		[[deprecated]]
+		void reset2(float acc, float dcc, float sspd = 0, float fspd = 0) 
+		{
+			set_speed_pattern(acc, dcc, sspd, fspd);
+		}
+
+		// Интеграл коэффициента деформации
 		float posmod(float t)
 		{
 			if (t >= f_time)
 			{
-				//dprln("pa");
 				return 1;
 			}
 
 			if (t < acc)
 			{
-				//dprln("pb");
 				return
 				    t * strt_spd
 				    + t * (t / acc * (real_spd - strt_spd) / 2);
@@ -99,7 +116,6 @@ namespace ralgo
 
 			if (t < f_time - dcc)
 			{
-				//dprln("pc");
 				return
 				    fini_acc_pos
 				    + real_spd * (t - acc);
@@ -107,7 +123,6 @@ namespace ralgo
 
 			else
 			{
-				//dprln("pd");
 				auto loct = t - f_time + dcc;
 				return strt_dcc_pos
 				       + (loct) * real_spd
@@ -115,6 +130,7 @@ namespace ralgo
 			}
 		}
 
+		// Коэффициент деформации
 		float spdmod(float t)
 		{
 			if (t >= f_time)
@@ -143,7 +159,7 @@ namespace ralgo
 		// Сбросить состояние.
 		void nullify()
 		{
-			strt_spd = fini_spd = 0;
+			strt_spd = fini_spd = real_spd = 0;
 			f_time = 1;
 		}
 

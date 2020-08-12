@@ -26,7 +26,7 @@ namespace heimer
 			{
 				for (unsigned int i = 0; i < axes.size(); ++i)
 				{
-					nos::fprintln("{}: {}", i, axes[i]->name());
+					nos::fprintln("{}: {}", i, axes[i]->mnemo());
 				}
 				return 0;
 			}
@@ -35,7 +35,7 @@ namespace heimer
 			{
 				for (unsigned int i = 0; i < axes.size(); ++i)
 				{
-					axes[i]->print_feed();
+					//axes[i]->print_feed();
 				}
 				return 0;
 			}

@@ -4,7 +4,6 @@
 #include <iterator>
 
 #include <igris/dtrace.h>
-
 #include <ralgo/linalg/vecops.h>
 
 #include <ralgo/heimer/interpolation_group.h>
@@ -73,7 +72,7 @@ namespace heimer
 			polygon_checker(zone_polygon),
 			_axes(axes, Dim)
 		{
-			vecops::fill(_gains, float(1));
+			ralgo::vecops::fill(_gains, float(1));
 		}
 
 		constexpr int dim() { return Dim; }
@@ -96,23 +95,17 @@ namespace heimer
 		{
 			if (!parent::is_active()) 
 			{
-				dprln(1);
 				return HEIM_ERR_IS_NOACTIVE;
 			}
 
 			auto dist = ralgo::vecops::distance(curpos, tgtpos);
-			DPRINT(dist);
-
+			
 			int64_t time = (int64_t)(((Speed)fabs(dist)) / _speed * ralgo::discrete_time_frequency());
 			int64_t curtime = ralgo::discrete_time();
 			int64_t tgttim = curtime + time;
 
-			DPRINT(time);
-			DPRINT(curtime);
-			DPRINT(tgttim);
 			if (dist == 0 || curtime == tgttim)
 			{
-				dprln(2);
 				return 0;
 			}
 
@@ -122,7 +115,6 @@ namespace heimer
 			trajectory = &lintraj;
 			_in_operation = true;
 
-				dprln(3);
 			return 0;
 		}
 
@@ -192,8 +184,8 @@ namespace heimer
 
 		void update_control_by_trajectory()
 		{
-			int is_finish = trajectory->attime(ralgo::discrete_time(), ctrpos, ctrspd,
-			                                   ralgo::discrete_time_frequency() /*time_multiplier*/);
+			int is_finish = trajectory->attime(
+				ralgo::discrete_time(), ctrpos, ctrspd);
 
 			//(void) is_finish;
 			if (is_finish)
