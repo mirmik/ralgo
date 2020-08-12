@@ -66,22 +66,28 @@ namespace ralgo
 
 		void sensivity(ralgo::screw2<float>* senses, unit2d* basis) 
 		{
-			ralgo::htrans2<float> trsf{};		
 			auto outtrans = chain[chain.size()-1]->global_location;	
 
 			for (unsigned int i = 0; i < pairs.size(); ++i) 
 			{
 				ralgo::screw2<float> lsens = pairs[i]->sensivity();
 
+				// Для каждого звена расчитываем преобразование
+				// от выходному звену. 
 				auto linktrans = pairs[i]->global_location;
-				trsf = linktrans.inverse() * outtrans;
+				auto trsf = linktrans.inverse() * outtrans;
+				auto itrsf = trsf.inverse();
 
+				// NOTE: радиус берётся именно по прямому преобразованию,
+				// а не по обратному, потому что обратное 
+				// выполняет трансляцию и поворот в другом порядке.
 				auto radius = trsf.translation();
 
+				// Приводим вектор чувствительности
+				// к выходному звену. 
 				float wsens = lsens.rotation();
 				auto vsens = linalg::cross(wsens, radius) + lsens.translation();
 
-				auto itrsf = trsf.inverse();
 
 				senses[i] = 
 				{
@@ -101,55 +107,6 @@ namespace ralgo
 				}
 			}
 		}
-
-
-/*					"""Вернуть массив тензоров производных положения выходного
-		звена по вектору координат в виде [(w_i, v_i) ...]"""
-
-		trsf = pyservoce.nulltrans()
-		senses = []
-
-		outtrans = self.chain[0].global_location
-
-		"""Два разных алгоритма получения масива тензоров чувствительности.
-		Первый - проход по цепи с аккумулированием тензора трансформации.
-		Второй - по глобальным объектам трансформации
-
-		Возможно следует использовать второй и сразу же перегонять в btrsf вместо outtrans"""
-
-			for link in self.kinematic_pairs:
-				lsenses = link.senses()
-				
-				linktrans = link.output.global_location
-				trsf = linktrans.inverse() * outtrans
-			
-				radius = trsf.translation()
-			
-				for sens in reversed(lsenses):
-					
-					wsens = sens[0]
-					vsens = wsens.cross(radius) + sens[1]
-				
-					itrsf = trsf.inverse()
-				
-					senses.append((
-						itrsf(wsens), 
-						itrsf(vsens)
-					))
-
-		"""Для удобства интерпретации удобно перегнать выход в интуитивный базис."""
-		if basis is not None:
-			btrsf = basis.global_location
-			#trsf =  btrsf * outtrans.inverse()
-			#trsf =  outtrans * btrsf.inverse() #ok
-			trsf =  btrsf.inverse() * outtrans #ok
-			#trsf =  outtrans.inverse() * btrsf
-			#trsf =  trsf.inverse()
-
-			senses = [ (trsf(w), trsf(v)) for w, v in senses ]
-
-		return list(reversed(senses))
-*/	
 	};
 }
 

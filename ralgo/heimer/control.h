@@ -6,7 +6,7 @@
 
 namespace heimer
 {
-	enum ControlError
+	enum ControlError : int16_t
 	{
 		HEIM_ERR_IN_OPERATE       = -1,
 		HEIM_ERR_IS_BUSY          = -2,
@@ -16,7 +16,7 @@ namespace heimer
 
 	};
 
-	enum ControlFlags
+	enum ControlFlags : uint16_t
 	{
 		HEIM_IS_ACTIVE     = (1 << 0),
 		HEIM_IS_CONTROLLED = (1 << 4),
@@ -70,6 +70,8 @@ namespace heimer
 		{
 			return flags & HEIM_IS_ALARM;
 		}
+
+		const char* mnemo() { return _mnemo; }
 
 	protected:
 		// вызывается при взятии внешнего управления нодом

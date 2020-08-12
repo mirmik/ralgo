@@ -38,7 +38,8 @@ licant.module("ralgo",
 
 licant.module("ralgo.heimer",
 	sources=[
-		"ralgo/heimer/control.cpp"
+		"ralgo/heimer/control.cpp",
+		"ralgo/heimer/command_center.cpp"
 	])
 
 #licant.module("ralgo.virtdevs", 

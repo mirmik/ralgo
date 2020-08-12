@@ -2,8 +2,8 @@
 #define HEIMER_AXISCTR_H
 
 #include <ralgo/log.h>
-#include <ralgo/heimer/axis.h>
 #include <ralgo/trajectory/traj1d.h>
+#include <ralgo/heimer/axis.h>
 #include <ralgo/heimer/alarm.h>
 
 #include <igris/event/delegate.h>
@@ -153,10 +153,10 @@ namespace heimer
 		auto dist = tgtpos - curpos;
 		int64_t curtim = ralgo::discrete_time();
 
-		V dist_mul_freq = (V)fabs(dist) * ralgo::discrete_time_frequency();
-		int64_t tgttim = curtim + (int64_t)(dist_mul_freq / spd);
+		//V dist_mul_freq = (V)fabs(dist) * ralgo::discrete_time_frequency();
+		//int64_t tgttim = curtim + (int64_t)(dist_mul_freq / spd);
 
-		if (curtim >= tgttim)
+		if (dist == 0)
 		{
 			operation_finished_flag = true;
 			operation_finish_signal(this);
@@ -167,8 +167,18 @@ namespace heimer
 		}
 
 		operation_finished_flag = false;
-		lintraj.reset(curpos, curtim, tgtpos, tgttim);
-		lintraj.set_speed_pattern(acc, dcc, spd);
+
+		ralgo::traj1d_nominal_speed_params<P,V> nm_params =
+		{
+			.stim = curtim,
+			.spos = curpos,
+			.fpos = tgtpos,
+			.speed = spd,
+			.acc = acc,
+			.dcc = dcc,
+		};
+
+		lintraj.init_nominal_speed_mode(&nm_params);
 
 		operation_finished_flag = false;
 		curtraj = &lintraj;
@@ -204,7 +214,7 @@ namespace heimer
 		int sts = curtraj->attime(ralgo::discrete_time(), ctrpos, ctrspd);
 		controlled->ctrpos = ctrpos;
 		controlled->ctrspd = ctrspd;
-	
+
 		if (sts && !operation_finished_flag)
 		{
 			operation_finished_flag = true;
@@ -238,7 +248,7 @@ namespace heimer
 
 	template<class P, class V>
 	void axisctr<P, V>::hardstop()
-	{		
+	{
 		if (is_alarmed())
 			return;
 

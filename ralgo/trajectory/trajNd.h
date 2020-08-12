@@ -20,8 +20,7 @@ namespace ralgo
 		virtual int attime(
 		    int64_t time,
 		    igris::array_view<P> pos,
-		    igris::array_view<V> spd,
-		    int64_t time_multiplier
+		    igris::array_view<V> spd
 		) = 0;
 		
 		virtual bool is_finished(int64_t time) 
@@ -95,8 +94,7 @@ namespace ralgo
 
 		int attime(int64_t time, 
 			igris::array_view<P> pos, 
-			igris::array_view<V> spd,
-			int64_t time_multiplier) override
+			igris::array_view<V> spd) override
 		{
 			// Умножение на коэффициент времени перерасщитывает скорость
 			// взятую на дискретную единицу времени в скорость взятую
@@ -108,11 +106,10 @@ namespace ralgo
 
 			for (unsigned int i = 0; i < Dim; ++i) {
 				pos[i] = fpos[i] * posmod + spos[i] * (1 - posmod);
-				spd[i] = setted_speed[i] * spdmod * time_multiplier;
+				spd[i] = setted_speed[i] * spdmod * ralgo::discrete_time_frequency();
 			}
 
-			if (posmod >= 1) return 1;
-			else return 0;
+			return spddeform.is_finished(time_unit) ? 1 : 0;
 		}
 
 		void set_speed_pattern(float acc, float dcc, float speed) 
@@ -133,7 +130,7 @@ namespace ralgo
 
 			//ralgo::speed_deformer::acc_dcc_balance(acc_part, dcc_part);
 
-			spddeform.reset2(acc_part, dcc_part);
+			spddeform.set_speed_pattern(acc_part, dcc_part);
 		}
 
 		void set_stop_trajectory(igris::array_view<P> curpos, igris::array_view<V> curspd, V dccval) 
