@@ -7,6 +7,7 @@
 #include <igris/dtrace.h>
 #include <igris/dprint.h>
 #include <ralgo/heimer/phaser.h>
+#include <ralgo/heimer/interrupt_args.h>
 
 namespace heimer
 {
@@ -36,19 +37,24 @@ namespace heimer
 		volatile double virtual_pos = 0;
 		volatile double control_pos = 0;
 
-		//float speed_multiplier = 1;
-		const char * name;
-
 		float _deltatime = 1;
 
 	public:
+		stepctr(const char * name) : parent(name) {}
+
+		void print_info() override
+		{
+			parent::print_info();
+			nos::println("_deltatime:", _deltatime);
+			nos::println("pulsewidth(gear):", pulsewidth);
+			nos::println("curstep:", (double)curstep);
+			nos::println("steps_total:", steps_total);
+		}
+
 		void set_deltatime(int32_t ticks_per_second)
 		{
 			_deltatime = 1.0 / ticks_per_second;
 		}
-
-		stepctr(const char * name) : name(name) {}
-		stepctr() : name("") {}
 
 		IntPos current_step() { return curstep; }
 		void set_curstep(IntPos curstep) { this->curstep = curstep; }
@@ -83,13 +89,11 @@ namespace heimer
 
 			if ( ABS(curstep) > pulsewidth )
 			{
-			/*	DPRINT(pulsewidth);
-				DPRINT(curstep);
-				DPRINT(phaser::_deltatime);
-				DPRINT(spd);
-				DPRINT(name);
-				DPRINT(phaser::int2ext_spd(spd));*/
-				assert(ABS(curstep) <= pulsewidth);
+				if (ABS(curstep) > pulsewidth) 
+				{
+					interrupt_args_message msg("ABS(curstep) > pulsewidth");
+					parent::throw_interrupt(&msg);					
+				}
 				curstep = pulsewidth > 0 ? pulsewidth : -pulsewidth;
 			}
 		}
@@ -127,7 +131,9 @@ namespace heimer
 					control_pos -= pulsewidth;
 				}
 			}
+
 			parent::_target_position = virtual_pos;
+			parent::_feedback_position = virtual_pos;
 		}
 	};
 

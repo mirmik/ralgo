@@ -75,6 +75,20 @@ namespace heimer
 
 			return nullptr;
 		}
+
+		int on_activate() override 
+		{
+			master.flags |= HEIM_IS_ACTIVE;
+			slave.flags |= HEIM_IS_ACTIVE;
+			return 0;
+		}
+
+		int on_deactivate() override 
+		{
+			master.flags &= ~HEIM_IS_ACTIVE;
+			slave.flags &= ~HEIM_IS_ACTIVE;
+			return 0;
+		}
 	};
 }
 

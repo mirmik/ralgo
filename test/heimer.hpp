@@ -7,6 +7,7 @@
 #include <ralgo/heimer/command_center.h>
 
 #include <igris/math.h>
+#include <igris/datastruct/argvc.h>
 
 class test_control_node : public heimer::control_node
 {
@@ -79,6 +80,7 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_control_test)
 	sts = b.activate();
 	LT_CHECK(sts == 0);
 	LT_CHECK(a.is_active() == true);
+	LT_CHECK(a.is_controlled() == true);
 	LT_CHECK(b.is_active() == true);
 
 	sts = a.deactivate();
@@ -203,6 +205,55 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_movement_test)
 	LT_CHECK(igris::early(maxpos, 5.0));
 }
 LT_END_TEST(heimer_movement_test)
+
+LT_BEGIN_TEST(ralgo_test_suite, heimer_absmovement_test)
+{
+	int sts;
+
+	heimer::stub_axis<float, float> ax("ax");
+	heimer::axisctr axctr("axctr", &ax);
+
+	sts = ax.activate();
+	LT_CHECK_EQ(sts, 0);
+
+	sts = axctr.activate();
+	LT_CHECK_EQ(sts, 0);
+
+	axctr.set_accdcc(10, 10);
+	axctr.set_speed(10);
+
+	float target = 5;
+	axctr.absmove(target);
+
+	float minspd, minpos = std::numeric_limits<float>::max();
+	float maxspd, maxpos = std::numeric_limits<float>::min();
+
+	while(1) 
+	{
+		ax.feedback();
+		
+		axctr.serve();
+		ax.serve();
+
+		auto pos = ax.feedpos; 
+		auto spd = ax.feedspd;
+
+		if (maxspd < spd) maxspd = spd;
+		if (maxpos < pos) maxpos = pos;
+
+		if (minspd > spd) minspd = spd;
+		if (minpos > pos) minpos = pos;
+
+		if (igris::early(pos, target)) 
+		{
+			break;
+		}
+	}
+
+	LT_CHECK(igris::early(maxpos, 5.0));
+}
+LT_END_TEST(heimer_absmovement_test)
+
 
 LT_BEGIN_TEST(ralgo_test_suite, heimer_movement_stop_test)
 {
@@ -416,10 +467,52 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_control_panel)
 	heimer::axisctr axctr1("axctr1", &ax1);
 	heimer::axisctr axctr2("axctr2", &ax2);
 
-	igris::array_view<heimer::axisctr<float,float>*> arr;
+	heimer::axisctr<float,float>* arr[] = { &axctr1, &axctr2 };
 
 	heimer::command_center.attach_axes(arr);
 
+	ax1.activate();
+	ax2.activate();
+	axctr1.activate();
+	axctr2.activate();
 
+	LT_CHECK_EQ(ax1.is_active(), true);
+	LT_CHECK_EQ(ax2.is_active(), true);
+	LT_CHECK_EQ(axctr1.is_active(), true);
+	LT_CHECK_EQ(axctr2.is_active(), true);
+
+	int argc;
+	char*argv [10];
+
+	std::string str;
+
+	str = std::string("axcmd 0 setspd 10");
+	argc = argvc_internal_split_n(str.data(), str.size(), argv, 10);
+	heimer::command_center.axcmd(argc, argv);
+
+	str = std::string("axcmd 0 setacc 10");
+	argc = argvc_internal_split_n(str.data(), str.size(), argv, 10);
+	heimer::command_center.axcmd(argc, argv);
+
+	str = std::string("axcmd 0 incmov 10");
+	argc = argvc_internal_split_n(str.data(), str.size(), argv, 10);
+	heimer::command_center.axcmd(argc, argv);
+
+	while(1) 
+	{
+		ax1.feedback();
+		ax2.feedback();
+
+		axctr1.serve();
+		axctr2.serve();
+		ax2.serve();
+		ax1.serve();
+
+		if (!axctr1.in_operate()) 
+			break;
+	}
+
+	dprln(ax1.ctrpos);
+	LT_CHECK(igris::early(10, ax1.ctrpos));
 }
 LT_END_TEST(heimer_control_panel)

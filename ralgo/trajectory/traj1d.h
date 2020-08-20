@@ -201,6 +201,8 @@ namespace ralgo
 			spos = pos;
 			fpos = pos;
 
+			setted_speed = 0;
+
 			spddeform.set_stop_pattern();
 		}
 

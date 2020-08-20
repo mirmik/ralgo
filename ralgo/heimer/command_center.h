@@ -64,7 +64,7 @@ namespace heimer
 			{
 				for (unsigned int i = 0; i < igroups.size(); ++i)
 				{
-					nos::fprintln("{}: {}", i, igroups[i]->name());
+					nos::fprintln("{}: {}", i, igroups[i]->mnemo());
 				}
 				return 0;
 			}
@@ -79,13 +79,181 @@ namespace heimer
 			return 0;
 		}
 
+		control_node * find_node_by_name(const char * name)
+		{
+			control_node * node;
+			dlist_for_each_entry(
+			    node,
+			    &control_node_list,
+			    control_node_list_lnk)
+			{
+				if (strcmp(node->mnemo(), name) == 0)
+				{
+					return node;
+				}
+			}
+
+			return NULL;
+		}
+
+		int ctrcmd(int argc, char** argv)
+		{
+			if (argc == 1 || strcmp(argv[1], "--help") == 0)
+			{
+				goto __usage__;
+			}
+
+			if (strcmp(argv[1], "--list") == 0)
+			{
+				control_node * node;
+				dlist_for_each_entry(
+				    node,
+				    &control_node_list,
+				    control_node_list_lnk)
+				{
+					nos::fprintln(
+					    "{:10}  sts:{:3}  ctr:{:10}",
+					    node->mnemo(),
+					    node->is_active() ? "on" : "off",
+					    node->controller ? node->controller->mnemo() : "none"
+					);
+				}
+				return 0;
+			}
+
+			if (strcmp(argv[2], "on") == 0)
+			{
+				if (argc != 3)
+				{
+					nos::println("wrong count of args");
+					return -1;
+				}
+
+				const char * name = argv[1];
+				control_node * node = find_node_by_name(argv[1]);
+				if (node == NULL)
+				{
+					nos::println("wrongname");
+					return -1;
+				}
+
+				if (node->is_active())
+				{
+					nos::println(name, ":", "currently active");
+					return 0;
+				}
+
+				int sts = node->activate();
+				if (sts)
+				{
+					nos::println("activation error");
+					return -1;
+				}
+
+				if (node->is_active())
+				{
+					nos::println(name, "activation ... green");
+				}
+				else
+				{
+					nos::println(name, "activation ... fault");
+					return -1;
+				}
+				return 0;
+			}
+
+			if (strcmp(argv[2], "off") == 0)
+			{
+				if (argc != 3)
+				{
+					nos::println("wrong count of args");
+					return -1;
+				}
+
+				const char * name = argv[1];
+				control_node * node = find_node_by_name(argv[1]);
+				if (node == NULL)
+				{
+					nos::println("wrongname");
+					return -1;
+				}
+
+				int sts = node->deactivate();
+				if (sts)
+				{
+					nos::println("deactivation error");
+					return -1;
+				}
+
+				if (!node->is_active())
+				{
+					nos::println(name, "deactivation ... green");
+				}
+				else
+				{
+					nos::println(name, "deactivation ... fault");
+				}
+
+				return 0;
+			}
+
+			if (strcmp(argv[2], "status") == 0)
+			{
+				if (argc != 3)
+				{
+					nos::println("wrong count of args");
+					return -1;
+				}
+
+				//const char * name = argv[2];
+				control_node * node = find_node_by_name(argv[1]);
+				if (node == NULL)
+				{
+					nos::println("wrongname");
+					return -1;
+				}
+
+				nos::println("\tis_active:", node->is_active());
+				nos::println("\tis_controlled:", node->is_controlled());
+			}
+
+			if (strcmp(argv[2], "info") == 0)
+			{
+				if (argc != 3)
+				{
+					nos::println("wrong count of args");
+					return -1;
+				}
+
+				//const char * name = argv[2];
+				control_node * node = find_node_by_name(argv[1]);
+				if (node == NULL)
+				{
+					nos::println("wrongname");
+					return -1;
+				}
+
+				node->print_info();
+				return 0;
+			}
+
+		__usage__:
+			nos::println("Usage:");
+			nos::println("\tctr --list");
+			nos::println("\tctr NODENAME on");
+			nos::println("\tctr NODENAME off");
+			nos::println("\tctr NODENAME status");
+			nos::println("\tctr NODENAME info");
+
+			return -1;
+		}
 
 		int feed(int argc, char** argv)
 		{
 			for (unsigned int i = 0; i < axes.size(); ++i)
 			{
 				nos::print(i, ":");
-				axes[i]->print_feed();
+				//axes[i]->print_feed();
 			}
 
 			for (unsigned int i = 0; i < igroups.size(); ++i)
@@ -100,6 +268,7 @@ namespace heimer
 
 	int axcmd(int argc, char** argv);
 	int igcmd(int argc, char** argv);
+	int ctrcmd(int argc, char** argv);
 
 	extern heimer::command_center_cls<float, float> command_center;
 	extern igris::console_command command_center_cmdtable[];

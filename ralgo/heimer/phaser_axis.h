@@ -25,6 +25,11 @@ namespace heimer
 			: axis_node<P,V>(name), controlled(phaser)
 		{}
 
+		void print_info() override 
+		{
+			parent::print_info();
+		}
+
 		void apply_speed(V spd)
 		{
 			controlled->set_speed(spd);
@@ -34,6 +39,13 @@ namespace heimer
 		{
 			parent::feedpos = controlled->feedback_position();
 			parent::feedspd = controlled->feedback_speed();
+		}
+
+		control_node * iterate(control_node * it) 
+		{
+			if (it == nullptr)
+				return controlled;
+			return nullptr;
 		}
 
 		void serve() 

@@ -4,8 +4,14 @@
 #include <igris/shell/conscmd.h>
 #include <igris/datastruct/dlist.h>
 
+#include <ralgo/heimer/interrupt_args.h>
+
+#include <nos/print.h>
+
 namespace heimer
 {
+	extern dlist_head control_node_list;
+
 	enum ControlError : int16_t
 	{
 		HEIM_ERR_IN_OPERATE       = -1,
@@ -13,7 +19,7 @@ namespace heimer
 		HEIM_ERR_IS_NOACTIVE      = -3,
 		HEIM_ERR_IS_CONTROL_FAULT = -4,
 		HEIM_ERR_IS_ALARM         = -5,
-
+		HEIM_ERR_IS_PARTED        = -6,
 	};
 
 	enum ControlFlags : uint16_t
@@ -27,16 +33,23 @@ namespace heimer
 
 	class control_node
 	{
-	protected:
+	public:
+		dlist_head control_node_list_lnk =
+		    DLIST_HEAD_INIT(control_node_list_lnk);
+
+		control_node * controller = nullptr;
 		const char * _mnemo;
 		uint16_t flags = 0;
 		int alarm_code = 0;
 
 	public:
 		constexpr
-		control_node(const char * mnemo) : _mnemo(mnemo) {}
+		control_node(const char * mnemo) : _mnemo(mnemo)
+		{
+			dlist_add(&control_node_list_lnk, &control_node_list);
+		}
 
-		void set_alarm(int errcode) 
+		void set_alarm(int errcode)
 		{
 			flags |= HEIM_IS_ALARM;
 			this->alarm_code = errcode;
@@ -45,10 +58,6 @@ namespace heimer
 		// итератор подчинённых устройств
 		virtual control_node * iterate (control_node * it)
 		{ return nullptr; }
-
-		// отобразить информацию об устройстве.
-		virtual void print_info()
-		{}
 
 		// Вызывается при после успешной активации устройства
 		int activate();
@@ -73,6 +82,12 @@ namespace heimer
 
 		const char* mnemo() { return _mnemo; }
 
+		virtual 
+		void print_info()
+		{
+			nos::println("info");
+		}
+		
 	protected:
 		// вызывается при взятии внешнего управления нодом
 		virtual int on_external_take(
@@ -88,11 +103,19 @@ namespace heimer
 		virtual int on_deactivate() { return 0; }
 
 		// обратное уведомления о событиях
-		virtual int on_interrupt(
+		virtual void on_interrupt(
 		    control_node * slave, // источник, переславший сигнал
 		    control_node * source, // изначальный источник сигнала
-		    void * data)
-		{ return 0; }
+		    interrupt_args * data)
+		{}
+
+		// обратное уведомления о событиях
+		void on_interrupt_common(
+		    control_node * slave, // источник, переславший сигнал
+		    control_node * source, // изначальный источник сигнала
+		    interrupt_args * data);
+
+		void throw_interrupt(interrupt_args* interrupt);
 	};
 
 	extern igris::console_command info_node_commands[];
