@@ -16,7 +16,11 @@ namespace heimer
 	template <class P, class V>
 	class axisctr : public control_node
 	{
+	public:
+		bool debug_mode = false;
+
 	private:
+
 		P offset = 0;
 
 		V spd = 1;
@@ -99,6 +103,39 @@ namespace heimer
 			    (!curtraj->is_finished(ralgo::discrete_time()));
 		};
 
+		int command(int argc, char** argv);
+
+		control_node* iterate(control_node* it) override
+		{
+			if (it == NULL)
+				return controlled;
+			return NULL;
+		}
+
+		void print_info() override
+		{
+			P ctrpos;
+			V ctrspd;
+
+			nos::println(lintraj);
+			int sts = curtraj->attime(ralgo::discrete_time(), ctrpos, ctrspd);
+
+			nos::println(sts);
+			nos::println("ctrpos: ", ctrpos);
+			nos::println("ctrspd: ", ctrspd);
+			nos::println("feedpos: ", controlled->feedpos);
+			nos::println("feedspd: ", controlled->feedspd);
+		}
+
+		void on_interrupt(
+			control_node * slave,
+		    control_node * source,
+		    interrupt_args * args) override
+		{
+			nos::println("axisctr:interrupt:", args->what());
+			hardstop();
+		}
+
 	private:
 		int _absmove_unsafe(P pos, P tgt);
 	};
@@ -130,19 +167,14 @@ namespace heimer
 	{
 		tgtpos = tgtpos * gain;
 
-		if (flags & HEIM_IS_ACTIVE)
+		if (!is_active())
 		{
 			ralgo::warn("axisctr: not active");
 			return -1;
 		}
 
-		//P curpos = target_position();
-		//P tgtpos = curpos + dist;
-
 		if (_limited)
 			tgtpos = igris::clamp(tgtpos, _back, _forw);
-
-		//P ndist = tgtpos - curpos;
 
 		return absmove_unsafe(tgtpos);
 	}
@@ -168,7 +200,7 @@ namespace heimer
 
 		operation_finished_flag = false;
 
-		ralgo::traj1d_nominal_speed_params<P,V> nm_params =
+		ralgo::traj1d_nominal_speed_params<P, V> nm_params =
 		{
 			.stim = curtim,
 			.spos = curpos,
@@ -179,6 +211,9 @@ namespace heimer
 		};
 
 		lintraj.init_nominal_speed_mode(&nm_params);
+
+		if (debug_mode)
+			nos::println(lintraj);
 
 		operation_finished_flag = false;
 		curtraj = &lintraj;
@@ -207,8 +242,10 @@ namespace heimer
 		P ctrpos;
 		V ctrspd;
 
-		if (is_alarmed())
+		if (is_alarmed() || !is_active()) 
+		{
 			return;
+		}
 
 		// Установить текущие целевые параметры.
 		int sts = curtraj->attime(ralgo::discrete_time(), ctrpos, ctrspd);
@@ -217,6 +254,7 @@ namespace heimer
 
 		if (sts && !operation_finished_flag)
 		{
+			nos::println("axisctr: finish signal");
 			operation_finished_flag = true;
 			operation_finish_signal(this);
 			lintraj.set_point_hold(ctrpos);
@@ -258,7 +296,54 @@ namespace heimer
 		controlled->hardstop();
 		curtraj = & lintraj;
 
-		set_alarm(AlarmCode::HardStopInvoked);
+		controlled->ctrspd = 0;
+		controlled->ctrpos = controlled->feedpos;
+		//set_alarm(AlarmCode::HardStopInvoked);
+	}
+
+	template<class P, class V>
+	int axisctr<P, V>::command(int argc, char** argv)
+	{
+		float fltarg;
+
+		if (strcmp(argv[0], "mov") == 0)
+		{
+			fltarg = atof32(argv[1], nullptr);
+			return absmove(fltarg);
+		}
+
+		else if (strcmp(argv[0], "incmov") == 0)
+		{
+			fltarg = atof32(argv[1], nullptr);
+			return incmove(fltarg);
+		}
+
+		else if (strcmp(argv[0], "setspd") == 0)
+		{
+			fltarg = atof32(argv[1], nullptr);
+			set_speed(fltarg);
+			return 0;
+		}
+
+		else if (strcmp(argv[0], "setacc") == 0)
+		{
+			fltarg = atof32(argv[1], nullptr);
+			set_accdcc(fltarg, fltarg);
+			return 0;
+		}
+
+		else if (strcmp(argv[0], "feed") == 0)
+		{
+			//print_feed();
+			return 0;
+		}
+
+		else
+		{
+			nos::println("warn: unresolved command");
+		}
+
+		return 0;
 	}
 }
 

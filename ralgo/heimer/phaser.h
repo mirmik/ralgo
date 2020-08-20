@@ -5,10 +5,12 @@
 #include <ralgo/disctime.h>
 #include <ralgo/heimer/control.h>
 
+#include <nos/print.h>
+
 namespace heimer
 {
 	template <class ExtPos, class IntPos, class Speed>
-	class phaser
+	class phaser : public control_node
 	{
 	protected:
 		volatile IntPos _feedback_position = 0;
@@ -18,6 +20,8 @@ namespace heimer
 		float _setted_speed = 0;
 
 	public:
+		phaser(const char * name) : control_node(name) {}
+
 		ExtPos int2ext_pos(IntPos intpos) { return intpos / _gain; }
 		IntPos ext2int_pos(ExtPos extpos) { return extpos * _gain; }
 
@@ -31,6 +35,15 @@ namespace heimer
 		void set_speed(Speed spd) { set_speed_internal(ext2int_spd(spd)); }
 		Speed setted_speed() { return int2ext_spd(setted_speed_internal()); }
 		Speed feedback_speed() { return setted_speed(); }
+
+		void print_info() override
+		{
+			nos::println("ctrpos:", target_position());
+			nos::println("feedpos:", feedback_position());
+			nos::println("ctrspd:", setted_speed());
+			nos::println("feedspd:", feedback_speed());
+			nos::println("gain:", (int64_t)_gain);
+		}
 
 		IntPos target_position_internal()
 		{

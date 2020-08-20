@@ -20,6 +20,14 @@ namespace heimer
 			control_node(mnemo)
 		{}
 
+		void print_info() override 
+		{
+			nos::println("ctrpos:", ctrpos);
+			nos::println("ctrspd:", ctrspd);
+			nos::println("feedpos:", feedpos);
+			nos::println("feedspd:", feedspd);
+		}
+
 		P feedback_position() { return feedpos; }
 		P feedback_speed() { return feedspd; }
 

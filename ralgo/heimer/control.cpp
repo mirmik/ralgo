@@ -1,5 +1,8 @@
 #include <ralgo/heimer/control.h>
 
+dlist_head heimer::control_node_list =
+    DLIST_HEAD_INIT(control_node_list);
+
 int heimer::control_node::activate()
 {
 	int sts;
@@ -20,7 +23,7 @@ int heimer::control_node::activate()
 	return 0;
 }
 
-int heimer::control_node::deactivate() 
+int heimer::control_node::deactivate()
 {
 	int sts;
 
@@ -30,10 +33,10 @@ int heimer::control_node::deactivate()
 	if (!(flags & HEIM_IS_ACTIVE))
 		return 0;
 
-	if ((sts = on_deactivate())) 
+	if ((sts = on_deactivate()))
 		return sts;
 
-	release_control(); 
+	release_control();
 
 	flags &= ~HEIM_IS_ACTIVE;
 	return 0;
@@ -46,7 +49,7 @@ int heimer::control_node::take_control()
 	control_node* it = nullptr;
 	while ((it = iterate(it)))
 	{
-		if (it->is_active() == false) 
+		if (it->is_active() == false)
 		{
 			sts = HEIM_ERR_IS_CONTROL_FAULT;
 			break;
@@ -55,6 +58,7 @@ int heimer::control_node::take_control()
 		sts = it->on_external_take(this);
 		if (sts) break;
 		it->flags |= HEIM_IS_CONTROLLED;
+		it->controller = this;
 	}
 
 	if (sts) release_control();
@@ -69,13 +73,30 @@ int heimer::control_node::release_control()
 	control_node* it = nullptr;
 	while ((it = iterate(it)))
 	{
-		if (it->is_active()) 
+		if (it->is_active())
 		{
 			sts = it->on_external_release(this);
 			it->flags &= ~HEIM_IS_CONTROLLED;
+			it->controller = nullptr;
 			(void) sts;
 		}
 	}
 
 	return 0;
+}
+
+void heimer::control_node::on_interrupt_common(
+    control_node * slave, // источник, переславший сигнал
+    control_node * source, // изначальный источник сигнала
+    interrupt_args* interrupt)
+{
+	on_interrupt(slave, source, interrupt);
+
+	if (controller)
+		controller->on_interrupt_common(this, source, interrupt);
+}
+
+void heimer::control_node::throw_interrupt(interrupt_args* interrupt)
+{
+	on_interrupt_common(this, this, interrupt);
 }
