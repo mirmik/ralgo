@@ -114,15 +114,20 @@ namespace heimer
 
 		void print_info() override
 		{
-			P ctrpos;
-			V ctrspd;
+			int sts;
+			P ctrpos = 0;
+			V ctrspd = 0;
 
 			nos::println(lintraj);
-			int sts = curtraj->attime(ralgo::discrete_time(), ctrpos, ctrspd);
+
+			if (curtraj)
+				sts = curtraj->attime(ralgo::discrete_time(), ctrpos, ctrspd);
 
 			nos::println(sts);
-			nos::println("ctrpos: ", ctrpos);
-			nos::println("ctrspd: ", ctrspd);
+			nos::println("phasepos: ", ctrpos);
+			nos::println("phasespd: ", ctrspd);
+			nos::println("ctrpos: ", controlled->ctrpos);
+			nos::println("ctrspd: ", controlled->ctrspd);
 			nos::println("feedpos: ", controlled->feedpos);
 			nos::println("feedspd: ", controlled->feedspd);
 		}
@@ -254,7 +259,7 @@ namespace heimer
 
 		if (sts && !operation_finished_flag)
 		{
-			nos::println("axisctr: finish signal");
+			nos::println("axisctr:", mnemo(), "finish signal");
 			operation_finished_flag = true;
 			operation_finish_signal(this);
 			lintraj.set_point_hold(ctrpos);
@@ -334,9 +339,17 @@ namespace heimer
 
 		else if (strcmp(argv[0], "feed") == 0)
 		{
-			//print_feed();
+			print_info();
 			return 0;
 		}
+
+		else if (strcmp(argv[0], "name") == 0)
+		{
+			nos::println("name:", this->mnemo());
+			nos::println("controlled:", this->controlled->mnemo());
+			return 0;
+		}
+
 
 		else
 		{

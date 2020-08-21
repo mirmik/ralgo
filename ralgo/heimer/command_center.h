@@ -215,6 +215,8 @@ namespace heimer
 
 				nos::println("\tis_active:", node->is_active());
 				nos::println("\tis_controlled:", node->is_controlled());
+				nos::println("\tis_alarmed:", node->is_alarmed());
+				return 0;
 			}
 
 			if (strcmp(argv[2], "info") == 0)

@@ -23,15 +23,15 @@ namespace heimer
 		    const char * mnemo,
 		    const char * master_mnemo,
 		    const char * slave_mnemo,
-		    axis_node<P, V> * master,
-		    axis_node<P, V> * slave,
+		    axis_node<P, V> * _master,
+		    axis_node<P, V> * _slave,
 		    float             koeff
 		) :
 			control_node(mnemo),
 			master(master_mnemo, this),
 			slave(slave_mnemo, this),
-			master_controlled(master),
-			slave_controlled(slave),
+			master_controlled(_master),
+			slave_controlled(_slave),
 			koeff(koeff)
 		{}
 
@@ -52,6 +52,9 @@ namespace heimer
 
 		void serve()
 		{
+			if (!is_active())
+				return;
+
 			float mx = master.ctrpos;
 			float mv = master.ctrspd;
 
@@ -88,6 +91,29 @@ namespace heimer
 			master.flags &= ~HEIM_IS_ACTIVE;
 			slave.flags &= ~HEIM_IS_ACTIVE;
 			return 0;
+		}
+
+		void print_info() override
+		{
+			nos::println("mu: feedpos:", master_controlled->feedpos);
+			nos::println("mu: feedspd:", master_controlled->feedspd);
+			nos::println("mu: ctrpos:", master_controlled->ctrpos);
+			nos::println("mu: ctrspd:", master_controlled->ctrspd);
+		
+			nos::println("su: feedpos:", slave_controlled->feedpos);
+			nos::println("su: feedspd:", slave_controlled->feedspd);
+			nos::println("su: ctrpos:", slave_controlled->ctrpos);
+			nos::println("su: ctrspd:", slave_controlled->ctrspd);
+		
+			nos::println("mc: feedpos:", master.feedpos);
+			nos::println("mc: feedspd:", master.feedspd);
+			nos::println("mc: ctrpos:", master.ctrpos);
+			nos::println("mc: ctrspd:", master.ctrspd);
+		
+			nos::println("sc: feedpos:", slave.feedpos);
+			nos::println("sc: feedspd:", slave.feedspd);
+			nos::println("sc: ctrpos:", slave.ctrpos);
+			nos::println("sc: ctrspd:", slave.ctrspd);
 		}
 	};
 }
