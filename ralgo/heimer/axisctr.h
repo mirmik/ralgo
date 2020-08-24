@@ -80,19 +80,19 @@ namespace heimer
 		P target_position() { return controlled->ctrpos; }
 		V target_speed()    { return controlled->ctrspd; }
 
-		V setted_speed()        { return spd; }
-		V setted_acceleration() { return acc; }
-		V setted_deceleration() { return dcc; }
+		V setted_speed()        { return spd / gain; }
+		V setted_acceleration() { return acc / gain; }
+		V setted_deceleration() { return dcc / gain; }
 
-		void set_speed(V spd)        { this->spd = spd; }
-		void set_acceleration(V acc) { this->acc = acc; }
-		void set_deceleration(V dcc) { this->dcc = dcc; }
+		void set_speed(V spd)        { this->spd = spd * gain; }
+		void set_acceleration(V acc) { this->acc = acc * gain; }
+		void set_deceleration(V dcc) { this->dcc = dcc * gain; }
 		void set_offset(P offset)    { this->offset = offset; }
 
 		void set_accdcc(V acc, V dcc)
 		{
-			this->acc = acc;
-			this->dcc = dcc;
+			this->acc = acc * gain;
+			this->dcc = dcc * gain;
 		}
 
 		void serve();
