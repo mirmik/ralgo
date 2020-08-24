@@ -2,8 +2,8 @@
 #define HEIMER_XYALPHA_COORDINATE_CONTROLLER_H
 
 /*
-    Данный контроллер реализует управление 
-    кинематической цепью из двух ортагональных актуаторов и 
+    Данный контроллер реализует управление
+    кинематической цепью из двух ортагональных актуаторов и
     поворотного звена, перенося управляющие оси в точку выходного
     звена
 
@@ -11,22 +11,22 @@
                        ^ y
              alpha     |
           x----O-----| |
-                     | | 
-                     |   
-                     |  
+                     | |
+                     |
+                     |
                      |
                     ---
         ================= ---> x
-    
+
     Виртуальные оси:
-    
+
           ^ y
-          |   
+          |
           |
     alpha x----O-----|
-          ---->      |  
-              x      |   
-                     |  
+          ---->      |
+              x      |
+                     |
                      |
                     ---
         =================
@@ -70,7 +70,7 @@ namespace heimer
 
         ralgo::htrans2<float> nullpos;
         ralgo::htrans2<float> invnullpos;
-        
+
         ralgo::htrans2<float> outpos;
 
         union
@@ -97,9 +97,9 @@ namespace heimer
             axis_node<P, V> * y_controlled,
             axis_node<P, V> * a_controlled
         ) :
-                kin2d(name),
+            kin2d(name),
 
-                x_link( {1, 0}, 1),
+            x_link( {1, 0}, 1),
                 y_link({0, 1}, 1),
                 a_link(1),
 
@@ -200,8 +200,6 @@ namespace heimer
             x_axis.feedspd = x_axis.ctrspd;
             y_axis.feedspd = y_axis.ctrspd;
             a_axis.feedspd = a_axis.ctrspd;
-
-            chain.update_location();
         }
 
         double * ctrspd_array() override { return ctrspd; }
@@ -252,6 +250,23 @@ namespace heimer
             else
                 return nullptr;
         }
+
+        int on_activate() override
+        {
+            x_axis.flags |= HEIM_IS_ACTIVE;
+            y_axis.flags |= HEIM_IS_ACTIVE;
+            a_axis.flags |= HEIM_IS_ACTIVE;
+            return 0;
+        }
+
+        int on_deactivate() override
+        {
+            x_axis.flags &= ~HEIM_IS_ACTIVE;
+            y_axis.flags &= ~HEIM_IS_ACTIVE;
+            a_axis.flags &= ~HEIM_IS_ACTIVE;
+            return 0;
+        }
+
     };
 }
 
