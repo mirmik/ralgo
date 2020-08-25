@@ -66,37 +66,6 @@ namespace heimer
 
 		void set_compensate(float val) { compkoeff = val; }
 
-		/*int try_operation_begin(int priority) override
-		{
-			// Вынести в класс axis_driver.
-			if (!parent::is_active()) return -1;
-			if (parent::is_extern_controlled()) return -1;
-			if (parent::in_operation() && priority == 0)
-			{
-				parent::stop();
-				return -1;
-			}
-			return 0;
-		}*/
-
-		/*void operation_finish(int priority) override
-		{
-		}*/
-
-
-		/*void serve_impl()
-		{
-			parent::evaluate_ctrvars();
-
-			apply_control();
-		}*/
-
-		/*void apply_control() override
-		{
-			compspd = parent::eval_compensated_speed();
-			apply_speed(compspd);
-		}*/
-
 		V compensated_speed()
 		{
 			return compspd;
@@ -107,56 +76,6 @@ namespace heimer
 			parent::feedpos = controlled->target_position();
 			parent::feedspd = controlled->feedback_speed();
 		}
-
-	private:
-	/*	int try_take_external_control_impl(external_controller * controller) override
-		{
-			if (parent::is_active() == false) return -1;
-			if (parent::in_operation()) return -1;
-			return 0;
-		}
-
-		int try_release_external_control_impl(external_contrte:*/
-	/*	int try_take_external_control_impl(external_controller * controller) override
-		{
-			if (parent::is_active() == false) return -1;
-			if (parent::in_operation()) return -1;
-			return 0;
-		}
-
-		int try_release_external_control_impl(external_controller * controller) override
-		{
-			return 0;
-		}
-
-		void on_activate_handle() override {}
-		void on_deactivate_handle() override {}
-		external_control_slot* as_controlled() override { return this; }
-
-		const char * name() { return parent::mnemo(); }
-
-		bool can_operate() override
-		{
-			return parent::is_active()
-			       && !parent::is_extern_controlled()
-			       && !parent::in_operation();
-		}oller * controller) override
-		{
-			return 0;
-		}
-
-		void on_activate_handle() override {}
-		void on_deactivate_handle() override {}
-		external_control_slot* as_controlled() override { return this; }
-
-		const char * name() { return parent::mnemo(); }
-
-		bool can_operate() override
-		{
-			return parent::is_active()
-			       && !parent::is_extern_controlled()
-			       && !parent::in_operation();
-		}*/
 	};
 }
 
