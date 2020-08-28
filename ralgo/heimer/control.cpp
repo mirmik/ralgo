@@ -1,4 +1,5 @@
 #include <ralgo/heimer/control.h>
+#include <igris/sync/syslock.h>
 
 dlist_head heimer::control_node_list =
     DLIST_HEAD_INIT(control_node_list);

@@ -65,7 +65,7 @@ namespace heimer
 		{ return nullptr; }
 
 		// Итератор контроллирующих устройств
-		virtual control_node * contollers_iterate (control_node * it)
+		virtual control_node * controllers_iterate (control_node * it)
 		{ 
 			if (it == nullptr) return controller;
 			else return nullptr; 
@@ -85,6 +85,11 @@ namespace heimer
 		bool is_controlled()
 		{
 			return flags & HEIM_IS_CONTROLLED;
+		}
+
+		bool is_multicontrolled()
+		{
+			return flags & HEIM_IS_MULTICONTROLLED;
 		}
 
 		bool is_alarmed()
@@ -120,11 +125,16 @@ namespace heimer
 		virtual int on_deactivate() { return 0; }
 
 		// обратное уведомления о событиях
-		virtual void on_interrupt(
+		// если возвращает истину, распространение сообщения
+		// на контроллеры предупреждается
+		virtual bool on_interrupt(
 		    control_node * slave, // источник, переславший сигнал
 		    control_node * source, // изначальный источник сигнала
 		    interrupt_args * data)
-		{}
+		{
+			// передать прерывание выше
+			return false;
+		}
 
 		// обратное уведомления о событиях
 		void on_interrupt_common(
@@ -134,7 +144,9 @@ namespace heimer
 
 		void throw_interrupt(
 			interrupt_args* interrupt, 
-			bool lock = true);
+			bool lock = true // локировать исполнение на 
+			                 // время обработки перываний
+		);
 
 		static control_node * vector_iterate(
 			control_node** bit, 

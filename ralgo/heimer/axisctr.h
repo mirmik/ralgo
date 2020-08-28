@@ -132,13 +132,16 @@ namespace heimer
 			nos::println("feedspd: ", controlled->feedspd);
 		}
 
-		void on_interrupt(
+		bool on_interrupt(
 			control_node * slave,
 		    control_node * source,
 		    interrupt_args * args) override
 		{
 			nos::println("axisctr:interrupt:", args->what());
 			hardstop();
+
+			// локируем, так как это объект высшего уровня
+			return true;
 		}
 
 	private:
