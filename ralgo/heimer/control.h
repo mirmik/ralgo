@@ -118,8 +118,8 @@ namespace heimer
 		void throw_interrupt(interrupt_args* interrupt);
 
 		static control_node * vector_iterate(
-			control_node* bit, 
-			control_node* eit,
+			control_node** bit, 
+			control_node** eit,
 			control_node* it);
 	};
 
