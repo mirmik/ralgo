@@ -49,7 +49,10 @@ int heimer::control_node::take_control()
 	control_node* it = nullptr;
 	while ((it = iterate(it)))
 	{
-		if (it->is_active() == false)
+		if (
+		    it->is_active() == false
+		    ||
+		    (!it->is_multicontrolled() && it->is_controlled()))
 		{
 			sts = HEIM_ERR_IS_CONTROL_FAULT;
 			break;
@@ -75,10 +78,20 @@ int heimer::control_node::release_control()
 	{
 		if (it->is_active())
 		{
-			sts = it->on_external_release(this);
-			it->flags &= ~HEIM_IS_CONTROLLED;
-			it->controller = nullptr;
-			(void) sts;
+			if (!it->is_multicontrolled())
+			{
+				sts = it->on_external_release(this);
+				it->flags &= ~HEIM_IS_CONTROLLED;
+				it->controller = nullptr;
+				(void) sts;
+			}
+			else 
+			{
+				sts = it->on_external_release(this);
+				if (controllers_iterate(nullptr) == nullptr)
+					it->flags &= ~HEIM_IS_CONTROLLED;
+				(void) sts;
+			}
 		}
 	}
 
@@ -90,27 +103,38 @@ void heimer::control_node::on_interrupt_common(
     control_node * source, // изначальный источник сигнала
     interrupt_args* interrupt)
 {
-	on_interrupt(slave, source, interrupt);
+	bool prevent = on_interrupt(slave, source, interrupt);
+	if (prevent)
+		return;
 
-	if (controller)
-		controller->on_interrupt_common(this, source, interrupt);
+	control_node * it = nullptr;
+	while ((it = controllers_iterate(it)))
+	{
+		it->on_interrupt_common(this, source, interrupt);
+	}
 }
 
-void heimer::control_node::throw_interrupt(interrupt_args* interrupt)
+void heimer::control_node::throw_interrupt(interrupt_args* interrupt, bool lock)
 {
+	if (lock)
+		igris::system_lock();
+
 	on_interrupt_common(this, this, interrupt);
+	
+	if (lock)
+		igris::system_unlock();
 }
 
-heimer::control_node * 
+heimer::control_node *
 heimer::control_node::vector_iterate(
-	heimer::control_node ** bit, 
-	heimer::control_node ** eit, 
-	heimer::control_node * curit) 
+    heimer::control_node ** bit,
+    heimer::control_node ** eit,
+    heimer::control_node * curit)
 {
 	heimer::control_node ** it = bit;
-	for (; it != eit; ++it) 
+	for (; it != eit; ++it)
 	{
-		if (*it == curit) 
+		if (*it == curit)
 		{
 			++it;
 			if (it == eit)

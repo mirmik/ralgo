@@ -27,8 +27,9 @@ namespace heimer
 		HEIM_IS_ACTIVE     = (1 << 0),
 		HEIM_IS_CONTROLLED = (1 << 4),
 		HEIM_IS_ALARM      = (1 << 1),
-		HEIM_MASTER        = (1 << 2),
-		HEIM_SLAVE         = (1 << 3)
+//		HEIM_MASTER        = (1 << 2),
+//		HEIM_SLAVE         = (1 << 3)
+		HEIM_IS_MULTICONTROLLED = (1 << 5)
 	};
 
 	class control_node
@@ -37,7 +38,11 @@ namespace heimer
 		dlist_head control_node_list_lnk =
 		    DLIST_HEAD_INIT(control_node_list_lnk);
 
+		// контроллер, взявший управление над объектом
+		// или последний контроллер, бравший управление 
+		// в multicontroller mode
 		control_node * controller = nullptr;
+		
 		const char * _mnemo;
 		uint16_t flags = 0;
 		int alarm_code = 0;
@@ -59,6 +64,13 @@ namespace heimer
 		virtual control_node * iterate (control_node * it)
 		{ return nullptr; }
 
+		// Итератор контроллирующих устройств
+		virtual control_node * contollers_iterate (control_node * it)
+		{ 
+			if (it == nullptr) return controller;
+			else return nullptr; 
+		}
+
 		// Вызывается при после успешной активации устройства
 		int activate();
 		int deactivate();
@@ -78,6 +90,11 @@ namespace heimer
 		bool is_alarmed()
 		{
 			return flags & HEIM_IS_ALARM;
+		}
+
+		void set_multicontrolled_mode() 
+		{
+			flags |= HEIM_IS_MULTICONTROLLED;
 		}
 
 		const char* mnemo() { return _mnemo; }
@@ -115,7 +132,9 @@ namespace heimer
 		    control_node * source, // изначальный источник сигнала
 		    interrupt_args * data);
 
-		void throw_interrupt(interrupt_args* interrupt);
+		void throw_interrupt(
+			interrupt_args* interrupt, 
+			bool lock = true);
 
 		static control_node * vector_iterate(
 			control_node** bit, 
