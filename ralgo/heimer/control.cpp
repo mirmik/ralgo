@@ -100,3 +100,21 @@ void heimer::control_node::throw_interrupt(interrupt_args* interrupt)
 {
 	on_interrupt_common(this, this, interrupt);
 }
+
+heimer::control_node * 
+heimer::control_node::vector_iterate(
+	heimer::control_node * bit, 
+	heimer::control_node * eit, 
+	heimer::control_node * curit) 
+{
+	bool in = curit >= bit && curit < eit;
+	if (!in)
+		return nullptr;
+
+	++curit;
+
+	if (curit == eit)
+		return nullptr;
+
+	return curit;
+}

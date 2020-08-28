@@ -116,6 +116,11 @@ namespace heimer
 		    interrupt_args * data);
 
 		void throw_interrupt(interrupt_args* interrupt);
+
+		static control_node * vector_iterate(
+			control_node* bit, 
+			control_node* eit,
+			control_node* it);
 	};
 
 	extern igris::console_command info_node_commands[];
