@@ -38,6 +38,7 @@ licant.module("ralgo",
 
 licant.module("ralgo.heimer",
 	sources=[
+		"ralgo/heimer/protect.cpp",
 		"ralgo/heimer/control.cpp",
 		"ralgo/heimer/command_center.cpp"
 	])

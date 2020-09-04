@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <igris/math.h>
 #include <igris/sync/syslock.h>
+#include <igris/util/numconvert.h>
 #include <igris/dtrace.h>
 #include <igris/dprint.h>
 #include <ralgo/heimer/phaser.h>
@@ -11,11 +12,6 @@
 
 namespace heimer
 {
-	// Предыдущая версия содержала перевод шага интегрирования
-	// в целочисленное пространство ширины width.
-	// Идея была неплоха, но плохо отлаживалась.
-	// TODO: Вернуться после отладки данной версии,
-	// Поскольку это может оптимизировать быстродействие.
 	template < class Position, class IntPos, class Speed >
 	class stepctr : public phaser<Position, IntPos, Speed>
 	{
@@ -23,24 +19,89 @@ namespace heimer
 		using parent = phaser<Position, IntPos, Speed>;
 		using parent::ext2int_pos;
 
+		// Количество физических шагов
 		int64_t steps_total = 0;
 
+		// количество импульсов в текущем шаге
+		// (дискретный аналог скорости)
 		volatile double curstep = 0;
 
-		IntPos pulsewidth = 0;
-		IntPos pulsewidth_triggered = 0;
+		IntPos update_position = 0;
+
+		IntPos pulsewidth = 0; // electronic gear rate
+		IntPos pulsewidth_triggered = 0; // служебная переменная хранит значение для триггера шмидта
 		IntPos accum = 0;
+
+		bool limited = false;
+		IntPos blim = 0;
+		IntPos flim = 0;
 
 		int not_corrected_counter = 0;
 
 		float triglevel = 0.7;
-		volatile double virtual_pos = 0;
-		volatile double control_pos = 0;
+		volatile double virtual_pos = 0; // позиция без учета electronic gear
+		volatile double control_pos = 0; // реально установленная позиция
+		// Позиции имеют тип double, чтобы корректно
+		// обрабатывать движение на малых скоростях
 
 		float _deltatime = 1;
 
 	public:
 		stepctr(const char * name) : parent(name) {}
+
+		virtual bool on_interrupt(
+		    control_node * slave,
+		    control_node * source,
+		    interrupt_args * data)
+		{
+			return false; // пробросить выше
+		}
+
+		int internal_command(int argc, char** argv)  override
+		{
+			if (strcmp(argv[0], "setintlim") == 0)
+			{
+				if (argc < 3)
+					return -1;
+
+				system_lock();
+				limited = 1;
+				blim = atoi64(argv[1], 10, nullptr);
+				flim = atoi64(argv[2], 10, nullptr);
+				system_unlock();
+
+				return 0;
+			}
+
+			if (strcmp(argv[0], "setintpos") == 0)
+			{
+				if (argc < 2)
+					return -1;
+
+				set_internal_position(atoi(argv[1]));
+				return 0;
+			}
+
+			else if (strcmp(argv[0], "setgain") == 0)
+			{
+				if (argc < 2)
+					return -1;
+
+				parent::set_gain(atof(argv[1]));
+				return 0;
+			}
+
+			else if (strcmp(argv[0], "setgear") == 0)
+			{
+				if (argc < 2)
+					return -1;
+
+				set_gear(atof(argv[1]));
+				return 0;
+			}
+
+			return -1;
+		}
 
 		void print_info() override
 		{
@@ -49,6 +110,11 @@ namespace heimer
 			nos::println("pulsewidth(gear):", pulsewidth);
 			nos::println("curstep:", (double)curstep);
 			nos::println("steps_total:", steps_total);
+			nos::println("virtpos:", (IntPos)virtual_pos);
+			nos::println("ctrlpos:", (IntPos)control_pos);
+			nos::println("limited:", limited);
+			nos::println("blim:", blim);
+			nos::println("flim:", flim);
 		}
 
 		void set_deltatime(int32_t ticks_per_second)
@@ -65,14 +131,36 @@ namespace heimer
 		//Position current_position () { return virtual_pos; }
 		void set_current_position(Position pos)
 		{
-			virtual_pos = ext2int_pos(pos);
-			control_pos = ext2int_pos(pos);
+			set_internal_position(ext2int_pos(pos));
+		}
+
+		void invoke_update() override
+		{
+			control_update_interrupt_args args;
+
+			system_lock();
+			parent::update_needed = false;
+			virtual_pos = update_position;
+			control_pos = update_position;
+			parent::_target_position = virtual_pos;
+			parent::_feedback_position = virtual_pos;
+
+			parent::throw_interrupt(&args);
+			system_unlock();
+		}
+
+		void set_internal_position(IntPos arg)
+		{
+			update_position = arg;
+			parent::update_needed = true;
 		}
 
 		void set_gear(Position gear)
 		{
+			system_lock();
 			pulsewidth = gear;
 			pulsewidth_triggered = gear * triglevel;
+			system_unlock();
 		}
 
 		auto gear() { return pulsewidth; }
@@ -80,30 +168,18 @@ namespace heimer
 		virtual void inc() = 0;
 		virtual void dec() = 0;
 
-		void set_speed_internal_impl(Speed spd) override
+		void set_speed_internal_impl(Speed spd) override;
+
+		void serve_impl() override
 		{
-			not_corrected_counter = 0;
+			if (curstep == 0) 
+				return;
 
-			igris::syslock lock();
-			curstep = spd * _deltatime;
-
-			if ( ABS(curstep) > pulsewidth )
-			{
-				if (ABS(curstep) > pulsewidth) 
-				{
-					interrupt_args_message msg("ABS(curstep) > pulsewidth");
-					parent::throw_interrupt(&msg);					
-				}
-				curstep = pulsewidth > 0 ? pulsewidth : -pulsewidth;
-			}
-		}
-
-		void serve()
-		{
 			not_corrected_counter++;
 			if (not_corrected_counter > 10000)
 			{
-				set_speed_internal_impl(0);
+				//set_speed_internal_impl(0);
+				curstep = 0;
 				return;
 			}
 
@@ -156,5 +232,43 @@ namespace heimer
 	};
 }
 
+#include <ralgo/heimer/phaser_axis.h>
+
+template< class Position, class IntPos, class Speed>
+void heimer::stepctr<Position, IntPos, Speed>::
+set_speed_internal_impl(Speed spd)
+{
+	not_corrected_counter = 0;
+
+	igris::syslock lock();
+	curstep = spd * _deltatime;
+
+	if (
+	    limited &&
+	    (
+	        (virtual_pos > (flim + pulsewidth) && curstep > 0) ||
+	        (virtual_pos < (blim - pulsewidth) && curstep < 0)
+	    )
+	)
+	{
+		dprln("stroke internal limits", parent::mnemo());
+		
+		curstep = 0;
+
+		force_stop_interrupt_args msg("stroke_internal_limits");
+		parent::throw_interrupt(&msg);
+	}
+
+	if ( ABS(curstep) > pulsewidth )
+	{
+		if (ABS(curstep) > pulsewidth)
+		{
+			dprln("ABS(curstep) > pulsewidth", parent::mnemo());
+			force_stop_interrupt_args msg("ABS(curstep) > pulsewidth");
+			parent::throw_interrupt(&msg);
+		}
+		curstep = pulsewidth > 0 ? pulsewidth : -pulsewidth;
+	}
+}
 
 #endif

@@ -77,6 +77,9 @@ namespace heimer
 		int take_control();
 		int release_control();
 
+		void serve();
+		virtual void serve_impl() = 0;
+
 		bool is_active()
 		{
 			return flags & HEIM_IS_ACTIVE;
@@ -109,6 +112,20 @@ namespace heimer
 		{
 			nos::println("info");
 		}
+
+		virtual 
+		int internal_command(int argc, char** argv) 
+		{
+			return -1;
+		}
+
+		void rethrow_interrupt(
+		    control_node * slave, // источник, переславший сигнал
+		    control_node * source, // изначальный источник сигнала
+		    interrupt_args * data) 
+		{
+			on_interrupt_common(slave, source, data);
+		}
 		
 	protected:
 		// вызывается при взятии внешнего управления нодом
@@ -130,11 +147,7 @@ namespace heimer
 		virtual bool on_interrupt(
 		    control_node * slave, // источник, переславший сигнал
 		    control_node * source, // изначальный источник сигнала
-		    interrupt_args * data)
-		{
-			// передать прерывание выше
-			return false;
-		}
+		    interrupt_args * data) = 0;
 
 		// обратное уведомления о событиях
 		void on_interrupt_common(
@@ -143,9 +156,7 @@ namespace heimer
 		    interrupt_args * data);
 
 		void throw_interrupt(
-			interrupt_args* interrupt, 
-			bool lock = true // локировать исполнение на 
-			                 // время обработки перываний
+			interrupt_args* interrupt
 		);
 
 		static control_node * vector_iterate(

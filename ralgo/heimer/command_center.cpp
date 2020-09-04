@@ -1,4 +1,5 @@
 #include <ralgo/heimer/command_center.h>
+#include <ralgo/heimer/protect.h>
 
 heimer::command_center_cls<float,float> heimer::command_center;
 
@@ -29,5 +30,6 @@ igris::console_command heimer::command_center_cmdtable[] = {
 	igris::console_command{"ax", axcmd}, 
 	igris::console_command{"ig", igcmd},  
 	igris::console_command{"ctr", ctrcmd},
-	igris::console_command{"feed", feed} 
+	igris::console_command{"feed", feed},
+	igris::console_command{"setprotect", set_global_protection_command} 
 };

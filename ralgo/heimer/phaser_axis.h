@@ -15,6 +15,7 @@ namespace heimer
 		phaser<P,IntPos,V> * controlled = nullptr;
 		V compspd = 0;
 		float compkoeff = 0;
+		P diff;
 
 	public:
 		constexpr 
@@ -27,6 +28,9 @@ namespace heimer
 
 		void print_info() override 
 		{
+			nos::println("compkoeff:", compkoeff);
+			nos::println("compspd:", compspd);
+			nos::println("diff * 1000:", diff * 1000);
 			parent::print_info();
 		}
 
@@ -48,14 +52,25 @@ namespace heimer
 			return nullptr;
 		}
 
-		void serve() 
+		void serve_impl() override
 		{
-			// Счетчик меняется в прерывании, так что
-			// снимаем локальную копию.
-			P current = parent::feedpos;
-
 			// Ошибка по установленному значению.
-			P diff = parent::ctrpos - current;
+			if (controlled->update_needed) 
+			{
+				controlled->invoke_update();
+			}
+
+			diff = parent::position_error();
+
+			if (diff > 1) 
+			{
+				dprln(parent::mnemo());
+				DPRINT(diff);
+				DPRINT(parent::ctrpos);
+				DPRINT(parent::feedpos);
+
+				controlled->print_info();
+			}
 
 			// Скорость вычисляется как
 			// сумма уставной скорости на
@@ -75,6 +90,12 @@ namespace heimer
 		{
 			parent::feedpos = controlled->target_position();
 			parent::feedspd = controlled->feedback_speed();
+		}
+
+		P request_feedback_position() override
+		{
+			// Должна обновляться управляющим устройством
+			return controlled->target_position();
 		}
 	};
 }

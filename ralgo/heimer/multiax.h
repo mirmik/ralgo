@@ -12,16 +12,22 @@ namespace heimer
 
 	public:
 		virtual_axis_node(
-			const char * mnemo, 
-			control_node * parent
+		    const char * mnemo,
+		    control_node * parent
 		) :
-			axis_node<P,V>(mnemo),
+			axis_node<P, V>(mnemo),
 			parent(parent)
 		{}
 
-		int on_activate() override 
+		int on_activate() override
 		{
 			return HEIM_ERR_IS_PARTED;
+		}
+
+		P request_feedback_position() override
+		{
+			// Должна обновляться управляющим устройством
+			return heimer::axis_node<P, V>::feedpos;
 		}
 	};
 }

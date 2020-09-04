@@ -20,7 +20,11 @@ namespace heimer
 		float _setted_speed = 0;
 
 	public:
+		bool update_needed = false;
+		
 		phaser(const char * name) : control_node(name) {}
+
+		virtual void invoke_update() = 0;
 
 		ExtPos int2ext_pos(IntPos intpos) { return intpos / _gain; }
 		IntPos ext2int_pos(ExtPos extpos) { return extpos * _gain; }
@@ -66,9 +70,12 @@ namespace heimer
 			return int2ext_pos(feedback_position_internal());
 		}
 
-		virtual void serve() = 0;
-
-		void set_gain(float gain) { _gain = gain; }
+		void set_gain(float gain)
+		{
+			system_lock();
+			_gain = gain;
+			system_unlock();
+		}
 		auto gain() { return _gain; }
 	};
 
@@ -86,12 +93,12 @@ namespace heimer
 			lasttime = ralgo::discrete_time();
 		}
 
-		void serve() override
+		void serve_impl() override
 		{
 			int64_t delta = ralgo::discrete_time() - lasttime;
 
 			integrator += parent::_setted_speed * (double)delta
-				/ ralgo::discrete_time_frequency();
+			              / ralgo::discrete_time_frequency();
 			parent::_target_position = integrator;
 			parent::_feedback_position = integrator;
 

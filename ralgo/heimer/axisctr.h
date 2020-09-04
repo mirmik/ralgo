@@ -4,7 +4,7 @@
 #include <ralgo/log.h>
 #include <ralgo/trajectory/traj1d.h>
 #include <ralgo/heimer/axis.h>
-#include <ralgo/heimer/alarm.h>
+#include <ralgo/heimer/protect.h>
 
 #include <igris/event/delegate.h>
 #include <igris/math.h>
@@ -66,6 +66,13 @@ namespace heimer
 		int incmove(P dist);
 		int absmove(P pos);
 
+		void set_limits(P a, P b) 
+		{
+			_back = a;
+			_forw = b;
+			_limited = true;
+		}
+
 		int incmove_unsafe(P dist);
 		int absmove_unsafe(P pos);
 
@@ -95,7 +102,7 @@ namespace heimer
 			this->dcc = dcc * gain;
 		}
 
-		void serve();
+		void serve_impl() override;
 		bool can_operate()
 		{
 			return
@@ -129,7 +136,16 @@ namespace heimer
 			nos::println("ctrpos: ", controlled->ctrpos);
 			nos::println("ctrspd: ", controlled->ctrspd);
 			nos::println("feedpos: ", controlled->feedpos);
-			nos::println("feedspd: ", controlled->feedspd);
+			nos::println("limited: ", _limited);
+			nos::println("flim: ", _forw);
+			nos::println("blim: ", _back);
+			nos::println("gain: ", gain);
+			nos::println("spd: ", spd);
+			nos::println("acc: ", acc);
+			nos::println("dcc: ", dcc);
+			nos::println("maxspd: ", maxspd);
+			nos::println("maxacc: ", maxacc);
+			nos::println("maxdcc: ", maxdcc);
 		}
 
 		bool on_interrupt(
@@ -137,8 +153,15 @@ namespace heimer
 		    control_node * source,
 		    interrupt_args * args) override
 		{
-			nos::println("axisctr:interrupt:", args->what());
-			hardstop();
+			if (args->code() == HEIMER_INTERRUPT_TYPE_CONTROL_UPDATE)
+			{
+				stop();
+			}
+
+			else 
+			{
+				hardstop();
+			}
 
 			// локируем, так как это объект высшего уровня
 			return true;
@@ -153,17 +176,11 @@ namespace heimer
 	{
 		dist = dist * gain;
 
-		if (!is_active())
-		{
-			ralgo::warn("axisctr: not active");
-			return -1;
-		}
-
 		P curpos = target_position();
 		P tgtpos = curpos + dist;
 
 		if (_limited)
-			tgtpos = igris::clamp(tgtpos, _back, _forw);
+			tgtpos = igris::clamp(tgtpos, _back * gain, _forw * gain);
 
 		P ndist = tgtpos - curpos;
 
@@ -175,14 +192,8 @@ namespace heimer
 	{
 		tgtpos = tgtpos * gain;
 
-		if (!is_active())
-		{
-			ralgo::warn("axisctr: not active");
-			return -1;
-		}
-
 		if (_limited)
-			tgtpos = igris::clamp(tgtpos, _back, _forw);
+			tgtpos = igris::clamp(tgtpos, _back * gain, _forw * gain);
 
 		return absmove_unsafe(tgtpos);
 	}
@@ -193,8 +204,17 @@ namespace heimer
 		auto dist = tgtpos - curpos;
 		int64_t curtim = ralgo::discrete_time();
 
-		//V dist_mul_freq = (V)fabs(dist) * ralgo::discrete_time_frequency();
-		//int64_t tgttim = curtim + (int64_t)(dist_mul_freq / spd);
+		if (heimer::global_protection) 
+		{
+			ralgo::warn("cannot start: global protection is setted");
+			return -1;
+		}
+
+		if (!is_active())
+		{
+			ralgo::warn("axisctr: not active");
+			return -1;
+		}
 
 		if (dist == 0)
 		{
@@ -245,13 +265,14 @@ namespace heimer
 	}
 
 	template <class P, class V>
-	void axisctr<P, V>::serve()
+	void axisctr<P, V>::serve_impl()
 	{
 		P ctrpos;
 		V ctrspd;
 
-		if (is_alarmed() || !is_active()) 
+		if (is_alarmed()) 
 		{
+			ralgo::warn("axisctr is_alarmed");
 			return;
 		}
 
@@ -262,7 +283,8 @@ namespace heimer
 
 		if (sts && !operation_finished_flag)
 		{
-			nos::println("axisctr:", mnemo(), "finish signal");
+			if (debug_mode)
+				nos::println("axisctr:", mnemo(), "finish signal");
 			operation_finished_flag = true;
 			operation_finish_signal(this);
 			lintraj.set_point_hold(ctrpos);
@@ -295,18 +317,14 @@ namespace heimer
 	template<class P, class V>
 	void axisctr<P, V>::hardstop()
 	{
-		if (is_alarmed())
-			return;
-
 		lintraj.set_point_hold(
 		    feedback_position());
 
-		controlled->hardstop();
-		curtraj = & lintraj;
-
 		controlled->ctrspd = 0;
 		controlled->ctrpos = controlled->feedpos;
-		//set_alarm(AlarmCode::HardStopInvoked);
+
+		controlled->hardstop();
+		curtraj = & lintraj;
 	}
 
 	template<class P, class V>
@@ -317,13 +335,21 @@ namespace heimer
 		if (strcmp(argv[0], "mov") == 0)
 		{
 			fltarg = atof32(argv[1], nullptr);
-			return absmove(fltarg);
+			int ret = absmove(fltarg);
+			return ret;
 		}
 
 		else if (strcmp(argv[0], "incmov") == 0)
 		{
 			fltarg = atof32(argv[1], nullptr);
-			return incmove(fltarg);
+			int ret = incmove(fltarg);
+			return ret;
+		}
+
+		else if (strcmp(argv[0], "stop") == 0)
+		{
+			int ret = stop();
+			return ret;
 		}
 
 		else if (strcmp(argv[0], "setspd") == 0)
@@ -340,11 +366,46 @@ namespace heimer
 			return 0;
 		}
 
+		else if (strcmp(argv[0], "setgain") == 0)
+		{
+			fltarg = atof32(argv[1], nullptr);
+			set_gain(fltarg);
+			return 0;
+		}
+
+		else if (strcmp(argv[0], "setlim") == 0)
+		{
+			if (argc != 3) 
+			{
+				nos::println("setlim:wrong args count");
+				return -1;
+			}
+
+			P a = atof32(argv[1], nullptr);
+			P b = atof32(argv[2], nullptr);
+		
+			if (a > b) 
+				return -1;  
+
+			set_limits(a, b);
+			return 0;
+		}
+
 		else if (strcmp(argv[0], "feed") == 0)
 		{
 			print_info();
 			return 0;
 		}
+
+		else if (strcmp(argv[0], "pos") == 0)
+		{
+			char buf[128];
+			nos::format_buffer(buf, "{}\n", 
+				feedback_position() / gain);
+			printf("%s", buf);
+			return 0;
+		}
+
 
 		else if (strcmp(argv[0], "name") == 0)
 		{
@@ -352,7 +413,6 @@ namespace heimer
 			nos::println("controlled:", this->controlled->mnemo());
 			return 0;
 		}
-
 
 		else
 		{
