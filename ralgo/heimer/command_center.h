@@ -98,6 +98,9 @@ namespace heimer
 
 		int ctrcmd(int argc, char** argv)
 		{
+			control_node * node;
+			const char * name;
+
 			if (argc == 1 || strcmp(argv[1], "--help") == 0)
 			{
 				goto __usage__;
@@ -121,19 +124,20 @@ namespace heimer
 				return 0;
 			}
 
+			name = argv[1];
+			node = find_node_by_name(argv[1]);
+			if (node == NULL)
+			{
+				nos::println("wrong node name");
+				return -1;
+			}
+
+
 			if (strcmp(argv[2], "on") == 0)
 			{
 				if (argc != 3)
 				{
 					nos::println("wrong count of args");
-					return -1;
-				}
-
-				const char * name = argv[1];
-				control_node * node = find_node_by_name(argv[1]);
-				if (node == NULL)
-				{
-					nos::println("wrongname");
 					return -1;
 				}
 
@@ -170,14 +174,6 @@ namespace heimer
 					return -1;
 				}
 
-				const char * name = argv[1];
-				control_node * node = find_node_by_name(argv[1]);
-				if (node == NULL)
-				{
-					nos::println("wrongname");
-					return -1;
-				}
-
 				int sts = node->deactivate();
 				if (sts)
 				{
@@ -205,14 +201,6 @@ namespace heimer
 					return -1;
 				}
 
-				//const char * name = argv[2];
-				control_node * node = find_node_by_name(argv[1]);
-				if (node == NULL)
-				{
-					nos::println("wrongname");
-					return -1;
-				}
-
 				nos::println("\tis_active:", node->is_active());
 				nos::println("\tis_controlled:", node->is_controlled());
 				nos::println("\tis_alarmed:", node->is_alarmed());
@@ -227,19 +215,14 @@ namespace heimer
 					return -1;
 				}
 
-				//const char * name = argv[2];
-				control_node * node = find_node_by_name(argv[1]);
-				if (node == NULL)
-				{
-					nos::println("wrongname");
-					return -1;
-				}
-
 				node->print_info();
 				return 0;
 			}
 
-		__usage__:
+			if (node->internal_command(argc - 2, argv + 2) == 0)
+				return 0;
+
+__usage__:
 			nos::println("Usage:");
 			nos::println("\tctr --list");
 			nos::println("\tctr NODENAME on");

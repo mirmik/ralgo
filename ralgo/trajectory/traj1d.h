@@ -98,6 +98,9 @@ namespace ralgo
 			P dist = args->fpos - args->spos;
 			float time = std::fabs(dist) / setted_speed;
 
+			if (dist < 0)
+				setted_speed = -setted_speed;
+
 			spos = args->spos;
 			fpos = args->fpos;
 			

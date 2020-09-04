@@ -115,15 +115,9 @@ void heimer::control_node::on_interrupt_common(
 	}
 }
 
-void heimer::control_node::throw_interrupt(interrupt_args* interrupt, bool lock)
+void heimer::control_node::throw_interrupt(interrupt_args* interrupt)
 {
-	if (lock)
-		igris::system_lock();
-
 	on_interrupt_common(this, this, interrupt);
-	
-	if (lock)
-		igris::system_unlock();
 }
 
 heimer::control_node *
@@ -145,4 +139,12 @@ heimer::control_node::vector_iterate(
 	}
 
 	return nullptr;
+}
+
+void heimer::control_node::serve() 
+{
+	if (!is_active())
+		return;
+
+	serve_impl();
 }

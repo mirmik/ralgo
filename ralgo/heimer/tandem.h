@@ -50,11 +50,8 @@ namespace heimer
 			slave.feedspd = sv - koeff * mv;
 		};
 
-		void serve()
+		void serve_impl() override
 		{
-			if (!is_active())
-				return;
-
 			float mx = master.ctrpos;
 			float mv = master.ctrspd;
 
@@ -114,6 +111,22 @@ namespace heimer
 			nos::println("sc: feedspd:", slave.feedspd);
 			nos::println("sc: ctrpos:", slave.ctrpos);
 			nos::println("sc: ctrspd:", slave.ctrspd);
+		}
+
+		virtual bool on_interrupt(
+			control_node * slave_node,
+			control_node * source,
+			interrupt_args * data)
+		{
+			if (data->code() == HEIMER_INTERRUPT_TYPE_CONTROL_UPDATE)
+			{
+				feedback();
+			}
+
+			master.rethrow_interrupt(slave_node, source, data);
+			slave.rethrow_interrupt(slave_node, source, data);
+			
+			return false; // пробросить выше
 		}
 	};
 }

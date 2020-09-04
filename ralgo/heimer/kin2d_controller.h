@@ -108,7 +108,7 @@ namespace heimer
 		virtual
 		void apply_control() = 0;
 
-		void serve()
+		void serve_impl() override
 		{
 			ralgo::htrans2<float> pos;
 			ralgo::screw2<float> spd;

@@ -230,7 +230,7 @@ namespace heimer
 			}
 		}
 
-		void serve()
+		void serve_impl() override
 		{
 			if (trajectory)
 				update_control_by_trajectory();
@@ -353,6 +353,21 @@ namespace heimer
 		{
 			return parent::is_active() 
 				&& !in_operation();
+		}
+
+
+		virtual bool on_interrupt(
+			control_node * slave,
+			control_node * source,
+			interrupt_args * data)
+		{
+			if (data->code() == HEIMER_INTERRUPT_TYPE_CONTROL_UPDATE)
+			{
+				feedback();
+				stop_impl();
+			}
+
+			return false; // пробросить выше
 		}
 	};
 }
