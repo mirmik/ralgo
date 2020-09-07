@@ -64,12 +64,14 @@ namespace heimer
 
 			if (diff > 1) 
 			{
-				dprln(parent::mnemo());
-				DPRINT(diff);
-				DPRINT(parent::ctrpos);
-				DPRINT(parent::feedpos);
+				controlled->set_speed(0);	
+				
+				char str[56];
+				sprintf(str, "position deviation error : mnemo:%s", parent::mnemo());
+				ralgo::warn(str);
 
-				controlled->print_info();
+				force_stop_interrupt_args msg("position deviation error");
+				parent::throw_interrupt(&msg);	
 			}
 
 			// Скорость вычисляется как

@@ -10,6 +10,8 @@
 #include <ralgo/heimer/phaser.h>
 #include <ralgo/heimer/interrupt_args.h>
 
+#include <ralgo/log.h>
+
 namespace heimer
 {
 	template < class Position, class IntPos, class Speed >
@@ -172,7 +174,7 @@ namespace heimer
 
 		void serve_impl() override
 		{
-			if (curstep == 0) 
+			if (curstep == 0)
 				return;
 
 			not_corrected_counter++;
@@ -251,9 +253,11 @@ set_speed_internal_impl(Speed spd)
 	    )
 	)
 	{
-		dprln("stroke internal limits", parent::mnemo());
-		
 		curstep = 0;
+
+		char str[56];
+		sprintf(str, "stroke internal limits : mnemo:%s", parent::mnemo());
+		ralgo::warn(str);
 
 		force_stop_interrupt_args msg("stroke_internal_limits");
 		parent::throw_interrupt(&msg);
@@ -261,13 +265,14 @@ set_speed_internal_impl(Speed spd)
 
 	if ( ABS(curstep) > pulsewidth )
 	{
-		if (ABS(curstep) > pulsewidth)
-		{
-			dprln("ABS(curstep) > pulsewidth", parent::mnemo());
-			force_stop_interrupt_args msg("ABS(curstep) > pulsewidth");
-			parent::throw_interrupt(&msg);
-		}
-		curstep = pulsewidth > 0 ? pulsewidth : -pulsewidth;
+		curstep = 0;
+
+		char str[56];
+		sprintf(str, "impulse channel overrun : mnemo:%s", parent::mnemo());
+		ralgo::warn(str);
+
+		force_stop_interrupt_args msg("ABS(curstep) > pulsewidth");
+		parent::throw_interrupt(&msg);
 	}
 }
 
