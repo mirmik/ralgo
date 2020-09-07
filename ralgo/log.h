@@ -3,9 +3,20 @@
 
 namespace ralgo
 {
+	enum LogLevel 
+	{
+		RALGO_DEBUG,
+		RALGO_INFO,
+		RALGO_WARN,
+		RALGO_FAULT,
+	};
+
+	void log(LogLevel lvl, const char *);
+
+	void debug(const char *);
 	void info(const char *);
 	void warn(const char *);
 	void fault(const char *);
-} // namespace ralgo
+} 
 
 #endif

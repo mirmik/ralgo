@@ -209,9 +209,9 @@ namespace heimer
 			int64_t time = ralgo::discrete_time();
 			lasttime = time;
 
-			x_controlled->control(x_controlled->target_position(), ctrspd[0]);
-			y_controlled->control(y_controlled->target_position(), ctrspd[1]);
-			a_controlled->control(a_controlled->target_position(), ctrspd[2]);
+			x_controlled->control(x_controlled->feedback_position(), ctrspd[0]);
+			y_controlled->control(y_controlled->feedback_position(), ctrspd[1]);
+			a_controlled->control(a_controlled->feedback_position(), ctrspd[2]);
 		}
 
 		void print_info() override

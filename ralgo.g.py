@@ -3,27 +3,16 @@ import licant
 licant.module("ralgo.include",
 	include_paths=["."])
 
-licant.module("ralgo.fault", "exception",
-	sources=["ralgo/log/fault-exception.cpp"])
-
-licant.module("ralgo.fault", "abort",
-	sources=["ralgo/log/fault-abort.cpp"], 
-	default=True)
-
-licant.module("ralgo.warn", "dprint",
-	sources=["ralgo/log/warn.cpp"], 
-	default=True)
-
-licant.module("ralgo.log",
-	mdepends=[
-	"ralgo.fault", 
-	"ralgo.warn"
-])
+licant.module("ralgo.log", "console",
+	sources=["ralgo/log/log-console.cpp"],
+	default=True
+)
 
 licant.module("ralgo",
 	sources=[
 		"ralgo/madgwick.cpp",
 		"ralgo/signal/fft.cpp",
+		"ralgo/log/log.cpp",
 		#"ralgo/heimer/control.cpp",
 		#"ralgo/heimer/command_center.cpp"
 	],
