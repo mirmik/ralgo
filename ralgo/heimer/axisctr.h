@@ -27,6 +27,7 @@ namespace heimer
 		V acc = 1;
 		V dcc = 1;
 
+		//notused
 		V maxspd = 1;
 		V maxacc = 1;
 		V maxdcc = 1;
@@ -46,6 +47,9 @@ namespace heimer
 
 	public:
 		igris::delegate<void, void*> operation_finish_signal;
+		igris::delegate<void, void*> operation_start_signal;
+
+		igris::delegate<bool, P, P, char*> move_protector;
 
 	public:
 		auto * current_trajectory() { return curtraj; }
@@ -81,11 +85,11 @@ namespace heimer
 
 		void set_gain(V gain) { this->gain = gain; };
 
-		P feedback_position() { return controlled->feedpos; }
-		V feedback_speed()    { return controlled->feedspd; }
+		P feedback_position() { return controlled->feedpos / gain; }
+		V feedback_speed()    { return controlled->feedspd / gain; }
 
-		P target_position() { return controlled->ctrpos; }
-		V target_speed()    { return controlled->ctrspd; }
+		P target_position() { return controlled->ctrpos / gain; }
+		V target_speed()    { return controlled->ctrspd / gain; }
 
 		V setted_speed()        { return spd / gain; }
 		V setted_acceleration() { return acc / gain; }
@@ -176,7 +180,7 @@ namespace heimer
 	{
 		dist = dist * gain;
 
-		P curpos = target_position();
+		P curpos = controlled->ctrpos;
 		P tgtpos = curpos + dist;
 
 		if (_limited)
@@ -206,14 +210,24 @@ namespace heimer
 
 		if (heimer::global_protection) 
 		{
-			ralgo::warn("cannot start: global protection is setted");
+			ralgo::warn(mnemo(), ": cannot start: global protection is setted");
 			return -1;
 		}
 
 		if (!is_active())
 		{
-			ralgo::warn("axisctr: not active");
+			ralgo::warn(mnemo(), ": not active");
 			return -1;
+		}
+
+		if (move_protector.armed()) 
+		{
+			char msg[64];
+			if (move_protector(curpos, tgtpos, msg)) 
+			{
+				ralgo::warn(mnemo(), ": ", msg);
+				return -1;
+			}
 		}
 
 		if (dist == 0)
@@ -244,6 +258,7 @@ namespace heimer
 			nos::println(lintraj);
 
 		operation_finished_flag = false;
+		operation_start_signal(this);
 		curtraj = &lintraj;
 		return 0;
 	}
@@ -252,7 +267,7 @@ namespace heimer
 	int axisctr<P, V>::incmove_unsafe(P dist)
 	{
 		// TODO: Это должно работать с gain
-		auto curpos = target_position();
+		auto curpos = controlled->ctrpos;
 		return _absmove_unsafe(curpos, curpos + dist);
 	}
 
@@ -260,7 +275,7 @@ namespace heimer
 	int axisctr<P, V>::absmove_unsafe(P pos)
 	{
 		// TODO: Это должно работать с gain
-		auto curpos = target_position();
+		auto curpos = controlled->ctrpos;
 		return _absmove_unsafe(curpos, pos);
 	}
 
@@ -305,8 +320,8 @@ namespace heimer
 			return 0;
 
 		lintraj.set_stop_trajectory(
-		    feedback_position(),
-		    feedback_speed(),
+		    controlled->feedpos,
+		    controlled->feedspd,
 		    dcc);
 
 		operation_finished_flag = false;
@@ -317,8 +332,7 @@ namespace heimer
 	template<class P, class V>
 	void axisctr<P, V>::hardstop()
 	{
-		lintraj.set_point_hold(
-		    feedback_position());
+		lintraj.set_point_hold(controlled->feedpos);
 
 		controlled->ctrspd = 0;
 		controlled->ctrpos = controlled->feedpos;
@@ -400,8 +414,7 @@ namespace heimer
 		else if (strcmp(argv[0], "pos") == 0)
 		{
 			char buf[128];
-			nos::format_buffer(buf, "{}\n", 
-				feedback_position() / gain);
+			nos::format_buffer(buf, "{}\n", feedback_position());
 			printf("%s", buf);
 			return 0;
 		}

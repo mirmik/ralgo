@@ -11,12 +11,12 @@ namespace ralgo
 		RALGO_FAULT,
 	};
 
-	void log(LogLevel lvl, const char *);
+	void log(LogLevel lvl, const char *, const char * = nullptr, const char * = nullptr);
 
-	void debug(const char *);
-	void info(const char *);
-	void warn(const char *);
-	void fault(const char *);
+	void debug(const char *, const char * = nullptr, const char * = nullptr);
+	void info(const char *, const char * = nullptr, const char * = nullptr);
+	void warn(const char *, const char * = nullptr, const char * = nullptr);
+	void fault(const char *, const char * = nullptr, const char * = nullptr);
 } 
 
 #endif

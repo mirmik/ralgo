@@ -3,6 +3,7 @@
 
 #include <ralgo/heimer/axisctr.h>
 #include <ralgo/heimer/linintctr.h>
+#include <ctype.h>
 
 namespace heimer
 {
@@ -20,6 +21,28 @@ namespace heimer
 		void attach_axes(igris::array_view<axisctr<P, V>*> axes) { this->axes = axes; }
 		void attach_igroups(igris::array_view<linintctr_basic<P, V>*> igroups) { this->igroups = igroups; }
 
+		axisctr<P,V> * find_axis(const char * name)
+		{
+			if (isdigit(*name))
+			{
+				unsigned int axno = atoi32(name, 10, nullptr);
+				if (axno < axes.size())
+					return axes[axno];
+			}
+
+			else
+			{
+				for (auto * ax : axes)
+				{
+					if (strcmp(name, ax->mnemo()) == 0)
+						return ax;
+				}
+			}
+
+			nos::println("undefined axis"); 
+			return nullptr; 				
+		}
+
 		int axcmd(int argc, char** argv)
 		{
 			if (strcmp(argv[1], "--list") == 0)
@@ -27,15 +50,6 @@ namespace heimer
 				for (unsigned int i = 0; i < axes.size(); ++i)
 				{
 					nos::fprintln("{}: {}", i, axes[i]->mnemo());
-				}
-				return 0;
-			}
-
-			if (strcmp(argv[1], "--feed") == 0)
-			{
-				for (unsigned int i = 0; i < axes.size(); ++i)
-				{
-					//axes[i]->print_feed();
 				}
 				return 0;
 			}
@@ -48,11 +62,14 @@ namespace heimer
 				return 0;
 			}
 
-			unsigned int axno = atoi32(argv[1], 10, nullptr);
+			axisctr<P,V> * ax = find_axis(argv[1]);
+			if (!ax)
+			{
+				nos::println("undefined axisctr");
+				return -1;
+			}
 
-			if (axno >= axes.size()) { nos::println("undefined axis"); return 0; }
-
-			axes[axno]->command(argc - 2, argv + 2);
+			ax->command(argc - 2, argv + 2);
 			return 0;
 
 
@@ -232,23 +249,6 @@ __usage__:
 
 			return -1;
 		}
-
-		int feed(int argc, char** argv)
-		{
-			for (unsigned int i = 0; i < axes.size(); ++i)
-			{
-				nos::print(i, ":");
-				//axes[i]->print_feed();
-			}
-
-			for (unsigned int i = 0; i < igroups.size(); ++i)
-			{
-				nos::print(i, ":");
-				igroups[i]->print_feed();
-			}
-			return 0;
-		}
-
 	};
 
 	int axcmd(int argc, char** argv);

@@ -3,7 +3,19 @@
 #include <string.h>
 #include <unistd.h>
 
-void ralgo::log(ralgo::LogLevel lvl, const char * data) 
+void ralgo::log(ralgo::LogLevel lvl, 
+	const char * a,
+	const char * b,
+	const char * c
+) 
 {
-	write(STDOUT_FILENO, data, strlen(data));
+	write(STDOUT_FILENO, a, strlen(a));
+	
+	if (b)
+		write(STDOUT_FILENO, b, strlen(b));
+	
+	if (c)
+		write(STDOUT_FILENO, c, strlen(c));
+	
+	write(STDOUT_FILENO, "\r\n", 2);
 }
