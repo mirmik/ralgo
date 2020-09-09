@@ -29,11 +29,10 @@ namespace heimer
 		virtual Speed acceleration() = 0;
 		virtual Speed deceleration() = 0;
 
+		virtual void set_gains(igris::array_view<float> arr) = 0;
+
 		//virtual void debug_print_traj() = 0;
 		//virtual void debug_print_state() = 0;
-
-		virtual int try_operation_begin(int priority) = 0;
-
 
 		int command(int argc, char** argv)
 		{
@@ -41,7 +40,12 @@ namespace heimer
 
 			if (strcmp(argv[0], "mov") == 0)
 			{
-				//fltarg = atof32(argv[1], nullptr);
+				if (argc != dim() + 1) 
+				{
+					nos::println("wrong args count");
+					return -1;
+				}
+
 				for (int i = 0; i < dim(); ++i)
 				{
 					fltargs[i] = atof32(argv[1 + i], nullptr);
@@ -50,9 +54,31 @@ namespace heimer
 				return absmove(fltargs);
 			}
 
+			else if (strcmp(argv[0], "setgain") == 0)
+			{
+				if (argc != dim() + 1) 
+				{
+					nos::println("wrong args count");
+					return -1;
+				}
+
+				for (int i = 0; i < dim(); ++i)
+				{
+					fltargs[i] = atof32(argv[1 + i], nullptr);
+				}
+
+				set_gains({fltargs, (size_t)dim()});
+				return 0;
+			}
+
 			else if (strcmp(argv[0], "setzone") == 0)
 			{
 				set_zone_command(argv[1]);
+			}
+
+			else if (strcmp(argv[0], "feed") == 0)
+			{
+				print_info();
 			}
 
 			else
@@ -94,14 +120,11 @@ namespace heimer
 		virtual int stop_impl() = 0;
 
 		virtual bool can_operate() = 0;
-		virtual int print_feed() = 0;
+		virtual void print_info() = 0;
 
 		void stop()
 		{
-			int sts = try_operation_begin(1);
-
-			if (sts == 0)
-				stop_impl();
+			stop_impl();
 		}
 	};
 }

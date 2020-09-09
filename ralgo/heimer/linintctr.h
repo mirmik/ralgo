@@ -52,7 +52,7 @@ namespace heimer
 		igris::array_view<heimer::axis_node<Position, Speed>*> _axes;
 
 	public:
-		bool in_operate() 
+		bool in_operate()
 		{
 			return _in_operation;
 		}
@@ -68,7 +68,7 @@ namespace heimer
 		    const char* name,
 		    heimer::axis_node<Position, Speed>** axes
 		) :
-			linintctr_basic<Position,Speed>(name),
+			linintctr_basic<Position, Speed>(name),
 			polygon_checker(zone_polygon),
 			_axes(axes, Dim)
 		{
@@ -93,13 +93,13 @@ namespace heimer
 		    igris::array_view<Position> curpos,
 		    igris::array_view<Position> tgtpos)
 		{
-			if (!parent::is_active()) 
+			if (!parent::is_active())
 			{
 				return HEIM_ERR_IS_NOACTIVE;
 			}
 
 			auto dist = ralgo::vecops::distance(curpos, tgtpos);
-			
+
 			int64_t time = (int64_t)(((Speed)fabs(dist)) / _speed * ralgo::discrete_time_frequency());
 			int64_t curtime = ralgo::discrete_time();
 			int64_t tgttim = curtime + time;
@@ -185,7 +185,7 @@ namespace heimer
 		void update_control_by_trajectory()
 		{
 			int is_finish = trajectory->attime(
-				ralgo::discrete_time(), ctrpos, ctrspd);
+			                    ralgo::discrete_time(), ctrpos, ctrspd);
 
 			//(void) is_finish;
 			if (is_finish)
@@ -202,23 +202,10 @@ namespace heimer
 			}
 		}
 
-		/*void collect_gains()
+		void set_gains(igris::array_view<float> arr) override
 		{
-			for (unsigned int i = 0; i < _axes.size(); ++i)
-			{
-				_gains[i] = _axes[i]->gain();
-			}
-		}*/
-
-		void set_gains(igris::array_view<float> arr) 
-		{
-			for (int i = 0; i < arr.size(); ++i) 
+			for (unsigned int i = 0; i < arr.size(); ++i)
 				_gains[i] = arr[i];
-		} 
-
-		void update_control_model()
-		{
-			feedback();
 		}
 
 		void feedback()
@@ -238,43 +225,17 @@ namespace heimer
 			apply_phase();
 		}
 
-		int print_feed()
+		void print_info() override
 		{
 			for (int i = 0; i < Dim; ++i)
 			{
 				nos::fprintln("\tfeed:(pos:{},spd:{})", feedpos[i], feedspd[i]);
 			}
-			return 0;
 		}
 
 		Speed speed() { return _speed; }
 		Speed acceleration() { return _acc_val; }
 		Speed deceleration() { return _dcc_val; }
-
-		void debug_print_traj()
-		{
-			for (int i = 0; i < Dim; i++)
-			{
-				DPRINT(i);
-				DPRINT(lintraj.spos[i]);
-				DPRINT(lintraj.fpos[i]);
-			}
-		}
-
-		void debug_print_state()
-		{
-			for (int i = 0; i < Dim; i++)
-			{
-				DPRINT(i);
-				DPRINT(ctrpos[i]);
-				DPRINT(ctrspd[i]);
-			}
-		}
-
-		/*void control_interrupt_from(external_control_slot * slot)  override
-		{
-			BUG();
-		}*/
 
 		control_node* iterate(control_node * slt) override
 		{
@@ -292,19 +253,9 @@ namespace heimer
 			return nullptr;
 		}
 
-		bool is_extern_controlled() { return false; }
+		//bool is_extern_controlled() { return false; }
 		bool in_operation() { return _in_operation; }
 
-		int try_operation_begin(int priority) override
-		{
-			if (!parent::is_active()) return -1;
-			if (in_operation() && priority == 0)
-			{
-				parent::stop();
-				return -1;
-			}
-			return 0;
-		}
 		/*
 		void on_activate_handle() override { update_control_model(); }
 		void on_deactivate_handle() override {  }
@@ -324,7 +275,7 @@ namespace heimer
 		void operation_finish(int priority)
 		{
 		}
-		
+
 		int stop_impl() override
 		{
 			if (trajectory == nullptr)
@@ -338,28 +289,18 @@ namespace heimer
 			trajectory = & lintraj;
 			return 0;
 		}
-		/*
-				int try_activate_impl() override
-				{
-					return take_control();
-				}
 
-				int try_deactivate_impl() override
-				{
-					return release_control();
-				}
-*/
 		bool can_operate() override
 		{
-			return parent::is_active() 
-				&& !in_operation();
+			return parent::is_active()
+			       && !in_operation();
 		}
 
 
 		virtual bool on_interrupt(
-			control_node * slave,
-			control_node * source,
-			interrupt_args * data)
+		    control_node * slave,
+		    control_node * source,
+		    interrupt_args * data)
 		{
 			if (data->code() == HEIMER_INTERRUPT_TYPE_CONTROL_UPDATE)
 			{

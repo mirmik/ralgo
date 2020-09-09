@@ -216,22 +216,7 @@ namespace heimer
 
 		void print_info() override
 		{
-			/*nos::fprintln("current: {} {} {}", x_controlled->current_position(), y_controlled->current_position(), a_controlled->current_position());
-			nos::fprintln("outpos: {}", outpos);
-			nos::fprintln("control: {} {} {}", ctrpos[0], ctrpos[1], ctrpos[2]);
-			nos::fprintln("ctrspd: {} {} {}", ctrspd[0], ctrspd[1], ctrspd[2]);
-			nos::fprintln("links: {} {} {}", x_link.coord, y_link.coord, a_link.coord);
-
-			nos::println("link poses");
-			nos::fprintln("x_link: {} {}", x_link.global_location, x_link.output.global_location);
-			nos::fprintln("y_link: {} {}", y_link.global_location, y_link.output.global_location);
-			nos::fprintln("a_link: {} {}", a_link.global_location, a_link.output.global_location);
-			nos::fprintln("o_link: {}", output_link.global_location);
-
-			nos::println("link senses");
-			nos::fprintln("x_link: {}", x_link.sensivity());
-			nos::fprintln("y_link: {}", y_link.sensivity());
-			nos::fprintln("a_link: {}", a_link.sensivity());*/
+			nos::println("not implemented");
 		}
 
 		control_node* iterate(control_node* slt) override
