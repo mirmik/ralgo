@@ -46,8 +46,8 @@ namespace heimer
 		bool operation_finished_flag = true;
 
 	public:
-		igris::delegate<void, void*> operation_finish_signal;
-		igris::delegate<void, void*> operation_start_signal;
+		igris::delegate<void, axisctr*> operation_finish_signal;
+		igris::delegate<void, axisctr*> operation_start_signal;
 
 		igris::delegate<bool, P, P, char*> move_protector;
 
@@ -337,6 +337,8 @@ namespace heimer
 		controlled->ctrspd = 0;
 		controlled->ctrpos = controlled->feedpos;
 
+		operation_finish_signal(this);
+		operation_finished_flag = true;
 		controlled->hardstop();
 		curtraj = & lintraj;
 	}

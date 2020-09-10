@@ -45,7 +45,7 @@ namespace heimer
 
 		int axcmd(int argc, char** argv)
 		{
-			if (strcmp(argv[1], "--list") == 0)
+			if (strcmp(argv[1], "list") == 0)
 			{
 				for (unsigned int i = 0; i < axes.size(); ++i)
 				{
@@ -56,9 +56,8 @@ namespace heimer
 
 			if (argc < 3)
 			{
-				nos::println("usage: axcmd AXNO CMD [ARGS ...]");
-				nos::println("usage: axcmd --feed");
-				nos::println("usage: axcmd --list");
+				nos::println("usage: ax AXNO CMD [ARGS ...]");
+				nos::println("usage: ax list");
 				return 0;
 			}
 
@@ -77,7 +76,7 @@ namespace heimer
 
 		int igcmd(int argc, char** argv)
 		{
-			if (strcmp(argv[1], "--list") == 0)
+			if (strcmp(argv[1], "list") == 0)
 			{
 				for (unsigned int i = 0; i < igroups.size(); ++i)
 				{
@@ -86,7 +85,7 @@ namespace heimer
 				return 0;
 			}
 
-			if (argc < 3) { nos::println("usage: igcmd AXNO CMD [ARGS ...]; igcmd --list"); return 0; }
+			if (argc < 3) { nos::println("usage: ig AXNO CMD [ARGS ...]; igcmd --list"); return 0; }
 
 			unsigned int igno = atoi32(argv[1],  10, nullptr);
 
@@ -123,7 +122,7 @@ namespace heimer
 				goto __usage__;
 			}
 
-			if (strcmp(argv[1], "--list") == 0)
+			if (strcmp(argv[1], "list") == 0)
 			{
 				control_node * node;
 				dlist_for_each_entry(
@@ -241,7 +240,7 @@ namespace heimer
 
 __usage__:
 			nos::println("Usage:");
-			nos::println("\tctr --list");
+			nos::println("\tctr list");
 			nos::println("\tctr NODENAME on");
 			nos::println("\tctr NODENAME off");
 			nos::println("\tctr NODENAME status");
