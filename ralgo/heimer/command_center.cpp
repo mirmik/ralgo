@@ -19,9 +19,6 @@ int heimer::ctrcmd(int argc, char** argv)
 }
 
 igris::console_command heimer::command_center_cmdtable[] = { 
-	{"axcmd", axcmd}, 
-	{"igcmd", igcmd},
-	{"ctrcmd", ctrcmd},
 	{"ax", axcmd}, 
 	{"ig", igcmd},  
 	{"ctr", ctrcmd},
