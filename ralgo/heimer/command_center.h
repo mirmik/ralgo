@@ -21,7 +21,7 @@ namespace heimer
 		void attach_axes(igris::array_view<axisctr<P, V>*> axes) { this->axes = axes; }
 		void attach_igroups(igris::array_view<linintctr_basic<P, V>*> igroups) { this->igroups = igroups; }
 
-		axisctr<P,V> * find_axis(const char * name)
+		axisctr<P, V> * find_axis(const char * name)
 		{
 			if (isdigit(*name))
 			{
@@ -39,12 +39,20 @@ namespace heimer
 				}
 			}
 
-			nos::println("undefined axis"); 
-			return nullptr; 				
+			nos::println("undefined axis");
+			return nullptr;
 		}
 
 		int axcmd(int argc, char** argv)
 		{
+			const char * usage = "usage: ax AXNO CMD [ARGS ...]; ax list";
+
+			if (argc < 2)
+			{
+				nos::println(usage);
+				return 0;
+			}
+
 			if (strcmp(argv[1], "list") == 0)
 			{
 				for (unsigned int i = 0; i < axes.size(); ++i)
@@ -56,12 +64,11 @@ namespace heimer
 
 			if (argc < 3)
 			{
-				nos::println("usage: ax AXNO CMD [ARGS ...]");
-				nos::println("usage: ax list");
+				nos::println(usage);
 				return 0;
 			}
 
-			axisctr<P,V> * ax = find_axis(argv[1]);
+			axisctr<P, V> * ax = find_axis(argv[1]);
 			if (!ax)
 			{
 				nos::println("undefined axisctr");
@@ -76,6 +83,14 @@ namespace heimer
 
 		int igcmd(int argc, char** argv)
 		{
+			const char * usage = "usage: ig AXNO CMD [ARGS ...]; igcmd --list";
+
+			if (argc < 2)
+			{
+				nos::println(usage);
+				return 0;
+			}
+
 			if (strcmp(argv[1], "list") == 0)
 			{
 				for (unsigned int i = 0; i < igroups.size(); ++i)
@@ -85,7 +100,11 @@ namespace heimer
 				return 0;
 			}
 
-			if (argc < 3) { nos::println("usage: ig AXNO CMD [ARGS ...]; igcmd --list"); return 0; }
+			if (argc < 3)
+			{
+				nos::println(usage);
+				return 0;
+			}
 
 			unsigned int igno = atoi32(argv[1],  10, nullptr);
 

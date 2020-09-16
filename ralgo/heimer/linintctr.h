@@ -93,10 +93,24 @@ namespace heimer
 		    igris::array_view<Position> curpos,
 		    igris::array_view<Position> tgtpos)
 		{
+			if (heimer::global_protection)
+			{
+				ralgo::warn(parent::mnemo(), 
+					": cannot start: global protection is setted");
+				return -1;
+			}
+
 			if (!parent::is_active())
 			{
-				return HEIM_ERR_IS_NOACTIVE;
+				ralgo::warn(parent::mnemo(), 
+					": not active");
+				return -1;
 			}
+
+			//if (!parent::is_active())
+			//{
+			//	return HEIM_ERR_IS_NOACTIVE;
+			//}
 
 			auto dist = ralgo::vecops::distance(curpos, tgtpos);
 
@@ -217,6 +231,17 @@ namespace heimer
 			}
 		}
 
+		void update_from_controlled()
+		{
+			for (int i = 0; i < Dim; ++i)
+			{
+				feedpos[i] = _axes[i]->feedpos;
+				feedspd[i] = _axes[i]->feedspd;
+				ctrpos[i] = _axes[i]->ctrpos;
+				ctrspd[i] = _axes[i]->ctrspd;
+			}
+		}
+
 		void serve_impl() override
 		{
 			if (trajectory)
@@ -252,9 +277,6 @@ namespace heimer
 
 			return nullptr;
 		}
-
-		//bool is_extern_controlled() { return false; }
-		bool in_operation() { return _in_operation; }
 
 		/*
 		void on_activate_handle() override { update_control_model(); }
@@ -293,18 +315,18 @@ namespace heimer
 		bool can_operate() override
 		{
 			return parent::is_active()
-			       && !in_operation();
+			       && !in_operate();
 		}
 
 
-		virtual bool on_interrupt(
+		bool on_interrupt(
 		    control_node * slave,
 		    control_node * source,
-		    interrupt_args * data)
+		    interrupt_args * data) override
 		{
 			if (data->code() == HEIMER_INTERRUPT_TYPE_CONTROL_UPDATE)
 			{
-				feedback();
+				update_from_controlled();
 				stop_impl();
 			}
 
