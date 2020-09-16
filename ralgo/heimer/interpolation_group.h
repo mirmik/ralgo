@@ -23,7 +23,7 @@ namespace heimer
 		virtual int set_accdcc(Speed acc, Speed dcc) = 0;
 		virtual int dim() = 0;
 
-		int set_accdcc(Speed acc) { return set_accdcc(acc,acc); }
+		int set_accdcc(Speed acc) { return set_accdcc(acc, acc); }
 
 		virtual Speed speed() = 0;
 		virtual Speed acceleration() = 0;
@@ -31,16 +31,13 @@ namespace heimer
 
 		virtual void set_gains(igris::array_view<float> arr) = 0;
 
-		//virtual void debug_print_traj() = 0;
-		//virtual void debug_print_state() = 0;
-
 		int command(int argc, char** argv)
 		{
 			float fltargs[dim()];
 
 			if (strcmp(argv[0], "mov") == 0)
 			{
-				if (argc != dim() + 1) 
+				if (argc != dim() + 1)
 				{
 					nos::println("wrong args count");
 					return -1;
@@ -54,9 +51,25 @@ namespace heimer
 				return absmove(fltargs);
 			}
 
+			if (strcmp(argv[0], "incmov") == 0)
+			{
+				if (argc != dim() + 1)
+				{
+					nos::println("wrong args count");
+					return -1;
+				}
+
+				for (int i = 0; i < dim(); ++i)
+				{
+					fltargs[i] = atof32(argv[1 + i], nullptr);
+				}
+
+				return incmove(fltargs);
+			}
+
 			else if (strcmp(argv[0], "setgain") == 0)
 			{
-				if (argc != dim() + 1) 
+				if (argc != dim() + 1)
 				{
 					nos::println("wrong args count");
 					return -1;
@@ -71,6 +84,20 @@ namespace heimer
 				return 0;
 			}
 
+			else if (strcmp(argv[0], "setspd") == 0)
+			{
+				auto fltarg = atof32(argv[1], nullptr);
+				set_speed(fltarg);
+				return 0;
+			}
+
+			else if (strcmp(argv[0], "setacc") == 0)
+			{
+				auto fltarg = atof32(argv[1], nullptr);
+				set_accdcc(fltarg, fltarg);
+				return 0;
+			}
+
 			else if (strcmp(argv[0], "setzone") == 0)
 			{
 				set_zone_command(argv[1]);
@@ -79,6 +106,11 @@ namespace heimer
 			else if (strcmp(argv[0], "feed") == 0)
 			{
 				print_info();
+			}
+
+			else if (strcmp(argv[0], "stop") == 0)
+			{
+				stop();
 			}
 
 			else
@@ -113,7 +145,7 @@ namespace heimer
 		}
 
 		virtual void set_zone_protection(
-			igris::array_view<linalg::vec<Position, 2>> arr) = 0;
+		    igris::array_view<linalg::vec<Position, 2>> arr) = 0;
 
 		// STOP
 		virtual int hardstop() = 0;
