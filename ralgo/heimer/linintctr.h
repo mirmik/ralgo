@@ -23,10 +23,9 @@ namespace heimer
 		// Линейная интерполяция в декартовой метрике.
 
 		//using parent = interpolation_group<Position, Speed>;
-		interpolation_coordinate_checker<Position> * coord_checker = nullptr;
 
-		linalg::vec<Position, 2> zone_polygon[8];
-		plane_zone_checker<Position> polygon_checker;
+		//linalg::vec<Position, 2> zone_polygon[8];
+		//plane_zone_checker<Position> polygon_checker;
 
 		Speed _speed = 1;
 		//float _accdcc = 0;
@@ -69,18 +68,13 @@ namespace heimer
 		    heimer::axis_node<Position, Speed>** axes
 		) :
 			linintctr_basic<Position, Speed>(name),
-			polygon_checker(zone_polygon),
+			//polygon_checker(zone_polygon),
 			_axes(axes, Dim)
 		{
 			ralgo::vecops::fill(_gains, float(1));
 		}
 
 		constexpr int dim() { return Dim; }
-
-		void set_task_checker(interpolation_coordinate_checker<Position> * coord_checker)
-		{
-			this->coord_checker = coord_checker;
-		}
 
 		axis_node<float, float> * get_axis(int index)
 		{
@@ -95,16 +89,26 @@ namespace heimer
 		{
 			if (heimer::global_protection)
 			{
-				ralgo::warn(parent::mnemo(), 
-					": cannot start: global protection is setted");
+				ralgo::warn(parent::mnemo(),
+				            ": cannot start: global protection is setted");
 				return -1;
 			}
 
 			if (!parent::is_active())
 			{
-				ralgo::warn(parent::mnemo(), 
-					": not active");
+				ralgo::warn(parent::mnemo(),
+				            ": not active");
 				return -1;
+			}
+
+			if (parent::coord_checker)
+			{
+				char msg[64];
+				if (parent::coord_checker->check(this, tgtpos.data(), tgtpos.size(), msg))
+				{
+					ralgo::warn(parent::mnemo(), ": ", msg);
+					return -1;
+				}
 			}
 
 			//if (!parent::is_active())
@@ -148,13 +152,12 @@ namespace heimer
 			return move(curpos, tgtpos);
 		}
 
-		void set_zone_protection(
+/*		void set_zone_protection(
 		    igris::array_view<linalg::vec<Position, 2>> arr
 		)
 		{
 			std::copy(arr.begin(), arr.end(), std::begin(zone_polygon));
-		}
-
+		}*/
 
 		int absmove(
 		    igris::array_view<Position> pos

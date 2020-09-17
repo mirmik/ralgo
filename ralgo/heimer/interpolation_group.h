@@ -1,6 +1,7 @@
 #ifndef RALGO_HEIMER_INTERPOLATION_GROUP_H
 #define RALGO_HEIMER_INTERPOLATION_GROUP_H
 
+#include <ralgo/heimer/coordinate_checker.h>
 #include <ralgo/heimer/control.h>
 #include <linalg/linalg.h>
 
@@ -14,6 +15,8 @@ namespace heimer
 		linintctr_basic(const char* name) :
 			control_node(name)
 		{}
+
+		coordinate_checker<Position> * coord_checker = nullptr;
 
 		virtual int incmove(Position * mov) = 0;
 		virtual int absmove(Position * pos) = 0;
@@ -98,10 +101,10 @@ namespace heimer
 				return 0;
 			}
 
-			else if (strcmp(argv[0], "setzone") == 0)
-			{
-				set_zone_command(argv[1]);
-			}
+//			else if (strcmp(argv[0], "setzone") == 0)
+//			{
+//				set_zone_command(argv[1]);
+//			}
 
 			else if (strcmp(argv[0], "feed") == 0)
 			{
@@ -113,6 +116,20 @@ namespace heimer
 				stop();
 			}
 
+			else if (strcmp(argv[0], "mprotect") == 0)
+			{
+				if (coord_checker != nullptr) 
+				{
+					return coord_checker->command(argc-1, argv+1);
+				}
+
+				else 
+				{
+					nos::println("mprotection is not binded\r\n");
+					return 0;
+				}
+			}
+
 			else
 			{
 				nos::println("warn: unresolved command");
@@ -122,7 +139,7 @@ namespace heimer
 		}
 
 		//format a,b:c,d:e,g
-		void set_zone_command(const char* cmd)
+/*		void set_zone_command(const char* cmd)
 		{
 			linalg::vec<Position, 2> pnts[8];
 
@@ -142,10 +159,10 @@ namespace heimer
 			}
 
 			set_zone_protection(pnts);
-		}
+		}*/
 
-		virtual void set_zone_protection(
-		    igris::array_view<linalg::vec<Position, 2>> arr) = 0;
+//		virtual void set_zone_protection(
+//		    igris::array_view<linalg::vec<Position, 2>> arr) = 0;
 
 		// STOP
 		virtual int hardstop() = 0;
