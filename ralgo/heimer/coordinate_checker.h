@@ -8,25 +8,90 @@
 namespace heimer
 {
 	template <class P>
-	class interpolation_coordinate_checker
+	class coordinate_checker 
 	{
-		virtual bool is_valid(igris::array_view<P> arr) = 0;
+	public:
+		virtual bool check(control_node * dev, P * val, int dim, char * msgbuf) = 0;
+		virtual int command(int argc, char ** argv) = 0;
 	};
 
 	template <class P>
-	class plane_zone_checker : public interpolation_coordinate_checker<P>
+	class plane_zone_checker : public coordinate_checker<P>
 	{
 	public:
-		igris::array_view<linalg::vec<P, 2>> polygon;
+		linalg::vec<P, 2> * arr;		
+		int arrcap;
+		int arrsize;
 
-		plane_zone_checker(igris::array_view<linalg::vec<P, 2>> arr) :
-			polygon(arr.data(), arr.size() / 2)
-		{}
-
-		bool is_valid(igris::array_view<P> pnt)
+		plane_zone_checker(igris::array_view<linalg::vec<P, 2>> arr)
 		{
-			linalg::vec<P, 2> t(pnt[0], pnt[1]);
-			return ralgo::point2_in_polygon(polygon, t);
+			this->arr = arr.data();
+			this->arrcap = arr.size();
+			this->arrsize = 0;
+		}
+
+		bool check(control_node * dev, P * val, int dim, char* msgbuf) override
+		{
+			assert(dim == 2);
+
+			linalg::vec<P, 2> t(val[0], val[1]);
+			bool in = ralgo::point2_in_polygon(
+				igris::array_view<linalg::vec<P, 2>>
+					{arr, (size_t)arrsize}, t);
+
+			if (in) 
+			{
+				return 0;
+			}
+
+			else 
+			{
+				strcpy(msgbuf, "target is not in permitted polygon");
+				return -1;
+			}
+		}
+
+		int command(int argc, char ** argv) override 
+		{
+			if (argc == 0) 
+			{
+				nos::println("table cappasity:", arrcap);
+				nos::println("table size:", arrsize);
+
+				for (int i = 0; i < arrsize; ++i) 
+				{
+					nos::println(i, ":", arr[i]);
+				}
+
+				return 0;
+			}
+
+			if (strcmp(argv[0], "clean") == 0) 
+			{
+				arrsize = 0;
+				return 0;
+			}
+
+			if (strcmp(argv[0], "add") == 0)
+			{
+				if (argc != 3) 
+				{
+					nos::println("wrong pnt length");
+				}
+
+				if (arrsize == arrcap) {
+					nos::println("table is full");
+					return -1;
+				}
+
+				float a = atof32(argv[1], nullptr);
+				float b = atof32(argv[2], nullptr);
+
+				arr[arrsize++] = {a,b};
+				return 0;
+			}
+
+			return -1;
 		}
 	};
 }
