@@ -6,4 +6,3 @@
 [linalg](https://github.com/mirmik/linalg)(branch:v3)  
 [malgo](https://github.com/mirmik/malgo)  
 [nos](https://github.com/mirmik/nos)  
-[gxx](https://github.com/mirmik/gxx)  
