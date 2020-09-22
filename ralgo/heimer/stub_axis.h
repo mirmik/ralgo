@@ -19,6 +19,12 @@ namespace heimer
 			parent::feedspd = parent::ctrspd;
 		}
 
+		P request_feedback_position() override
+		{
+			// Должна обновляться управляющим устройством
+			return axis_node<P, V>::feedpos;
+		}
+
 		void serve() 
 		{
 
