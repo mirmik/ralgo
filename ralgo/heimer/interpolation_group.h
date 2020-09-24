@@ -1,6 +1,8 @@
 #ifndef RALGO_HEIMER_INTERPOLATION_GROUP_H
 #define RALGO_HEIMER_INTERPOLATION_GROUP_H
 
+#include <igris/binreader.h>
+
 #include <ralgo/heimer/coordinate_checker.h>
 #include <ralgo/heimer/control.h>
 #include <linalg/linalg.h>
@@ -20,6 +22,8 @@ namespace heimer
 
 		virtual int incmove(Position * mov) = 0;
 		virtual int absmove(Position * pos) = 0;
+		virtual int parted_absmove(
+			int* axnums, Position * pos, int len) = 0;
 		//virtual int stop() = 0;
 
 		virtual int set_speed(Speed spd) = 0;
@@ -36,8 +40,39 @@ namespace heimer
 
 		int command(int argc, char** argv)
 		{
+			int sts;
 			float fltargs[dim()];
 
+			// parted absolute move
+			if (strcmp(argv[0], "pmov") == 0)
+			{
+				int axnums[dim()];
+
+				if (argc > dim() + 1)
+				{
+					nos::println("wrong args count");
+					return -1;
+				}
+
+				for (int i = 0; i < argc - 1; ++i)
+				{
+					igris::binreader reader(argv[1 + i]);
+					
+					sts = reader.read_ascii_decimal_integer(&axnums[i]);
+					if (sts)
+						return -1;
+
+					reader.skip(1);
+				
+					sts = reader.read_ascii_decimal_float(&fltargs[i]);
+					if (sts)
+						return -1;
+				}
+
+				return parted_absmove(axnums, fltargs, argc - 1);
+			}
+
+			// absolute move
 			if (strcmp(argv[0], "mov") == 0)
 			{
 				if (argc != dim() + 1)
@@ -101,11 +136,6 @@ namespace heimer
 				return 0;
 			}
 
-//			else if (strcmp(argv[0], "setzone") == 0)
-//			{
-//				set_zone_command(argv[1]);
-//			}
-
 			else if (strcmp(argv[0], "feed") == 0)
 			{
 				print_info();
@@ -138,33 +168,6 @@ namespace heimer
 			return 0;
 		}
 
-		//format a,b:c,d:e,g
-/*		void set_zone_command(const char* cmd)
-		{
-			linalg::vec<Position, 2> pnts[8];
-
-			const char* ptr = cmd;
-
-			int i = 0;
-
-			while (*ptr)
-			{
-				pnts[i].x = atof32(ptr, (char**)&ptr);
-				ptr++; // skip comma
-
-				pnts[i].y = atof32(ptr, (char**)&ptr);
-				ptr++; // skip semicolon
-
-				i++;
-			}
-
-			set_zone_protection(pnts);
-		}*/
-
-//		virtual void set_zone_protection(
-//		    igris::array_view<linalg::vec<Position, 2>> arr) = 0;
-
-		// STOP
 		virtual int hardstop() = 0;
 		virtual int stop_impl() = 0;
 
