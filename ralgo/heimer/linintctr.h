@@ -152,13 +152,6 @@ namespace heimer
 			return move(curpos, tgtpos);
 		}
 
-/*		void set_zone_protection(
-		    igris::array_view<linalg::vec<Position, 2>> arr
-		)
-		{
-			std::copy(arr.begin(), arr.end(), std::begin(zone_polygon));
-		}*/
-
 		int absmove(
 		    igris::array_view<Position> pos
 		)
@@ -168,7 +161,7 @@ namespace heimer
 
 			for (unsigned int i = 0; i < pos.size(); ++i)
 			{
-				curpos[i] = get_axis(i)->target_position();
+				curpos[i] = get_axis(i)->ctrpos;
 				tgtpos[i] = pos[i] * _gains[i];
 			}
 
@@ -183,6 +176,23 @@ namespace heimer
 		int absmove(Position * pos)
 		{
 			return absmove({pos, Dim});
+		}
+
+		int parted_absmove(int * axno, Position * pos, int len)
+		{
+			Position tgt[Dim];
+			
+			for (int i = 0; i < Dim; ++i) 
+			{
+				tgt[i] = get_axis(i)->ctrpos;
+			}
+
+			for (int i = 0; i < len; ++i) 
+			{
+				tgt[axno[i]] = pos[i];
+			}
+
+			return absmove({tgt, Dim});
 		}
 
 		int set_speed(Speed speed)
@@ -281,14 +291,7 @@ namespace heimer
 			return nullptr;
 		}
 
-		/*
-		void on_activate_handle() override { update_control_model(); }
-		void on_deactivate_handle() override {  }
-		*/
 	public:
-		//void after_take_control_handle() override {}
-		//igris::array_view<controlled*> controlled_devices() override { return _controlled_device; }
-
 		int hardstop() override
 		{
 			trajectory = nullptr;
