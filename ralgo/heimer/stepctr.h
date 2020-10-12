@@ -51,10 +51,10 @@ namespace heimer
 	public:
 		stepctr(const char * name) : parent(name) {}
 
-		virtual bool on_interrupt(
+		bool on_interrupt(
 		    control_node * slave,
 		    control_node * source,
-		    interrupt_args * data)
+		    interrupt_args * data) override
 		{
 			return false; // пробросить выше
 		}
@@ -148,6 +148,7 @@ namespace heimer
 			parent::_feedback_position = virtual_pos;
 
 			parent::throw_interrupt(&args);
+
 			system_unlock();
 		}
 

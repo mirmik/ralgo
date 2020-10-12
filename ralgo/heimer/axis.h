@@ -75,6 +75,8 @@ namespace heimer
 
 				feedpos = request_feedback_position();
 				ctrpos = feedpos + error;
+
+				//dprln("UPDATE", mnemo(), feedpos, ctrpos);
 			}
 
 			return false; // пробросить выше
