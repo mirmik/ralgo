@@ -312,12 +312,14 @@ namespace heimer
 	{
 		if (!is_active())
 		{
-			ralgo::warn("axisctr: not active");
+			ralgo::warn(mnemo(), ": not active");
 			return -1;
 		}
 
 		if (curtraj == nullptr)
 			return 0;
+
+		//dprln("STOP", mnemo(), controlled->feedpos);
 
 		lintraj.set_stop_trajectory(
 		    controlled->feedpos,

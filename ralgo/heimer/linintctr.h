@@ -19,6 +19,7 @@ namespace heimer
 		public linintctr_basic<Position, Speed>
 	{
 		using parent = linintctr_basic<Position, Speed>;
+		bool operation_finished_flag = true;
 
 		// Линейная интерполяция в декартовой метрике.
 
@@ -132,6 +133,8 @@ namespace heimer
 
 			trajectory = &lintraj;
 			_in_operation = true;
+			operation_finished_flag = false;
+			parent::operation_start_signal(this);
 
 			return 0;
 		}
@@ -181,13 +184,13 @@ namespace heimer
 		int parted_absmove(int * axno, Position * pos, int len)
 		{
 			Position tgt[Dim];
-			
-			for (int i = 0; i < Dim; ++i) 
+
+			for (int i = 0; i < Dim; ++i)
 			{
 				tgt[i] = get_axis(i)->ctrpos;
 			}
 
-			for (int i = 0; i < len; ++i) 
+			for (int i = 0; i < len; ++i)
 			{
 				tgt[axno[i]] = pos[i];
 			}
@@ -209,7 +212,7 @@ namespace heimer
 			return 0;
 		}
 
-		void update_control_by_trajectory()
+		int update_control_by_trajectory()
 		{
 			int is_finish = trajectory->attime(
 			                    ralgo::discrete_time(), ctrpos, ctrspd);
@@ -219,6 +222,8 @@ namespace heimer
 			{
 				_in_operation = false;
 			}
+
+			return is_finish;
 		}
 
 		void apply_phase()
@@ -257,8 +262,20 @@ namespace heimer
 
 		void serve_impl() override
 		{
+			int sts;
+
 			if (trajectory)
-				update_control_by_trajectory();
+			{
+				sts = update_control_by_trajectory();
+
+				if (sts && !operation_finished_flag)
+				{
+					operation_finished_flag = true;
+					parent::operation_finish_signal(this);
+					//lintraj.set_point_hold(ctrpos);
+					//curtraj = &lintraj;
+				}
+			}
 
 			apply_phase();
 		}

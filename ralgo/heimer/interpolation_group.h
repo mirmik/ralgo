@@ -20,6 +20,9 @@ namespace heimer
 
 		coordinate_checker<Position> * coord_checker = nullptr;
 
+		igris::delegate<void, linintctr_basic*> operation_finish_signal;
+		igris::delegate<void, linintctr_basic*> operation_start_signal;
+
 		virtual int incmove(Position * mov) = 0;
 		virtual int absmove(Position * pos) = 0;
 		virtual int parted_absmove(
