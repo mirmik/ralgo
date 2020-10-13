@@ -4,6 +4,9 @@
 #include <ralgo/heimer/phaser.h>
 #include <ralgo/heimer/axis.h>
 
+#include<hal/irq.h>
+#include <util/cpu_delay.h>
+
 namespace heimer
 {
 	template <class P, class IntPos, class V>
@@ -72,6 +75,16 @@ namespace heimer
 			// Скорость вычисляется как
 			// сумма уставной скорости на
 			compspd = parent::ctrspd + compkoeff * diff;
+
+			if (isnan(compspd)) 
+			{
+				irqs_disable();
+				cpu_delay(100000);
+				DPRINT(compkoeff);
+				DPRINT(parent::ctrspd);
+				DPRINT(diff);
+			}
+			assert(!isnan(compspd));
 
 			controlled->set_speed(compspd);
 		}
