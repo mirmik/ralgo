@@ -47,6 +47,7 @@ namespace heimer
 
 		void control(P pos, V spd)
 		{
+			assert(!isnan(ctrspd));
 			ctrpos = pos;
 			ctrspd = spd;
 		}

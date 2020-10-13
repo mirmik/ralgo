@@ -1,7 +1,10 @@
 #ifndef RALGO_SPEED_DEFORMATION_H
 #define RALGO_SPEED_DEFORMATION_H
 
+#include <hal/irq.h>
+
 #include <math.h>
+#include <assert.h>
 
 /**
 	Деформаторы скорости для траекторных проходов.
@@ -135,23 +138,43 @@ namespace ralgo
 		{
 			if (t >= f_time)
 			{
+				assert(!isnan(fini_spd));
 				return fini_spd;
 			}
 
 			if (t < acc)
 			{
 				float k = t / acc;
+				assert(!isnan(k));
+				assert(!isnan(strt_spd));
+				assert(!isnan(real_spd));
 				return strt_spd * (1 - k) + real_spd * k;
 			}
 
 			else if (t < f_time - dcc)
 			{
+				assert(!isnan(real_spd));
 				return real_spd;
 			}
 
 			else
 			{
 				float k = (f_time - t) / dcc;
+				
+				if (isnan(k)) 
+				{
+					irqs_disable();
+					DPRINT(f_time);
+					DPRINT(dcc);
+					DPRINT(t); 
+				}
+
+				assert(dcc != 0);
+				assert(!isnan(f_time));
+				assert(!isnan(t));
+				assert(!isnan(k));
+				assert(!isnan(strt_spd));
+				assert(!isnan(real_spd));
 				return fini_spd * (1 - k) + real_spd * k;
 			}
 		}

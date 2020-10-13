@@ -131,7 +131,7 @@ namespace ralgo
 			// Умножение на коэффициент времени перерасщитывает скорость
 			// взятую на дискретную единицу времени в скорость взятую
 			// на единицу времени рабочего пространства.
-			float time_unit = (float)(time - stim) / (ftim - stim);
+			float time_unit = ftim == stim ? 0 : (float)(time - stim) / (ftim - stim);
 
 			auto posmod = spddeform.posmod(time_unit);
 			auto spdmod = spddeform.spdmod(time_unit);

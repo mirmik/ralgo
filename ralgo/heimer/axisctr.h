@@ -296,6 +296,8 @@ namespace heimer
 		controlled->ctrpos = ctrpos;
 		controlled->ctrspd = ctrspd;
 
+		assert(!isnan(ctrspd));
+
 		if (sts && !operation_finished_flag)
 		{
 			if (debug_mode)
@@ -321,10 +323,21 @@ namespace heimer
 
 		//dprln("STOP", mnemo(), controlled->feedpos);
 
+		if (controlled->feedspd == 0) 
+		{
+			lintraj.set_point_hold(controlled->feedpos);
+			curtraj = &lintraj;	
+			operation_finished_flag = false;
+			operation_finish_signal(this);
+			return 0;	
+		}
+
 		lintraj.set_stop_trajectory(
 		    controlled->feedpos,
 		    controlled->feedspd,
 		    dcc);
+
+		//nos::println(lintraj);
 
 		operation_finished_flag = false;
 		curtraj = & lintraj;

@@ -41,12 +41,13 @@ namespace heimer
 		int not_corrected_counter = 0;
 
 		float triglevel = 0.7;
+		float _deltatime = 1;
+
+	private:
 		volatile double virtual_pos = 0; // позиция без учета electronic gear
 		volatile double control_pos = 0; // реально установленная позиция
 		// Позиции имеют тип double, чтобы корректно
 		// обрабатывать движение на малых скоростях
-
-		float _deltatime = 1;
 
 	public:
 		stepctr(const char * name) : parent(name) {}
@@ -125,7 +126,7 @@ namespace heimer
 		}
 
 		IntPos current_step() { return curstep; }
-		void set_curstep(IntPos curstep) { this->curstep = curstep; }
+		//void set_curstep(IntPos curstep) { this->curstep = curstep; }
 
 		int step_counter() { return steps_total; }
 
@@ -187,6 +188,7 @@ namespace heimer
 			}
 
 			virtual_pos += curstep;
+
 			int64_t diffpos = virtual_pos - control_pos;
 
 			bool positive = diffpos > 0;
@@ -243,18 +245,22 @@ set_speed_internal_impl(Speed spd)
 {
 	not_corrected_counter = 0;
 
-	igris::syslock lock();
-	curstep = spd * _deltatime;
+	assert(!isnan(spd));
 
+	system_lock();
+	auto vpos = virtual_pos;
+	system_unlock();
+	decltype(curstep) cstep = spd * _deltatime;
+	
 	if (
 	    limited &&
 	    (
-	        (virtual_pos > (flim + pulsewidth) && curstep > 0) ||
-	        (virtual_pos < (blim - pulsewidth) && curstep < 0)
+	        (vpos > (flim + pulsewidth) && cstep > 0) ||
+	        (vpos < (blim - pulsewidth) && cstep < 0)
 	    )
 	)
 	{
-		curstep = 0;
+		cstep = 0;
 
 		char str[56];
 		sprintf(str, "stroke internal limits : mnemo:%s", parent::mnemo());
@@ -264,9 +270,9 @@ set_speed_internal_impl(Speed spd)
 		parent::throw_interrupt(&msg);
 	}
 
-	if ( ABS(curstep) > pulsewidth )
+	if ( ABS(cstep) > pulsewidth )
 	{
-		curstep = 0;
+		cstep = 0;
 
 		char str[56];
 		sprintf(str, "impulse channel overrun : mnemo:%s", parent::mnemo());
@@ -275,6 +281,10 @@ set_speed_internal_impl(Speed spd)
 		force_stop_interrupt_args msg("ABS(curstep) > pulsewidth");
 		parent::throw_interrupt(&msg);
 	}
+
+	system_lock();
+	curstep = cstep;
+	system_unlock();
 }
 
 #endif
