@@ -148,7 +148,7 @@ namespace ralgo
 			pos = fpos * posmod + spos * (1 - posmod);
 			spd = setted_speed * spdmod * ralgo::discrete_time_frequency();
 
-			return spddeform.is_finished(time_unit) ? 1 : 0;
+			return (spddeform.is_finished(time_unit) || stim == ftim) ? 1 : 0;
 		}
 
 		/*void set_time_pattern(int64_t acctime, int64_t dcctime, float nominal_speed)

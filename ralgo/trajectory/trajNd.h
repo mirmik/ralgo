@@ -119,7 +119,7 @@ namespace ralgo
 				spd[i] = setted_speed[i] * spdmod * ralgo::discrete_time_frequency();
 			}
 
-			return spddeform.is_finished(time_unit) || stim == ftim ? 1 : 0;
+			return (spddeform.is_finished(time_unit) || stim == ftim) ? 1 : 0;
 		}
 
 		void set_speed_pattern(float acc, float dcc, float speed) 
