@@ -107,12 +107,12 @@ namespace heimer
 		}
 
 		void serve_impl() override;
-		bool can_operate()
+		/*bool can_operate()
 		{
 			return
 			    is_active() &&
 			    (!curtraj->is_finished(ralgo::discrete_time()));
-		};
+		};*/
 
 		int command(int argc, char** argv);
 
@@ -240,8 +240,6 @@ namespace heimer
 			return 0;
 		}
 
-		operation_finished_flag = false;
-
 		ralgo::traj1d_nominal_speed_params<P, V> nm_params =
 		{
 			.stim = curtim,
@@ -327,7 +325,7 @@ namespace heimer
 		{
 			lintraj.set_point_hold(controlled->feedpos);
 			curtraj = &lintraj;	
-			operation_finished_flag = false;
+			operation_finished_flag = true;
 			operation_finish_signal(this);
 			return 0;	
 		}
