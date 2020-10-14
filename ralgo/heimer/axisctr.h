@@ -254,7 +254,7 @@ namespace heimer
 
 		if (debug_mode)
 			nos::println(lintraj);
-
+			
 		operation_finished_flag = false;
 		operation_start_signal(this);
 		curtraj = &lintraj;
@@ -298,7 +298,7 @@ namespace heimer
 
 		if (sts && !operation_finished_flag)
 		{
-			if (debug_mode)
+			if (debug_mode || 1)
 				nos::println("axisctr:", mnemo(), "finish signal");
 			operation_finished_flag = true;
 			operation_finish_signal(this);
