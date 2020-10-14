@@ -100,7 +100,17 @@ namespace ralgo
 			// взятую на дискретную единицу времени в скорость взятую
 			// на единицу времени рабочего пространства.  
 
-			float time_unit = ((float)(time - stim)) / ((float)(ftim - stim));
+			float time_unit = ftim == stim ? 0 : (float)(time - stim) / (float)(ftim - stim);
+
+			if (isnan(time_unit)) 
+			{
+				DPRINT(time);
+				DPRINT(stim);
+				DPRINT(ftim);
+			}
+
+			assert(!isnan(time_unit));
+
 			auto posmod = spddeform.posmod(time_unit);
 			auto spdmod = spddeform.spdmod(time_unit);
 
@@ -109,7 +119,7 @@ namespace ralgo
 				spd[i] = setted_speed[i] * spdmod * ralgo::discrete_time_frequency();
 			}
 
-			return spddeform.is_finished(time_unit) ? 1 : 0;
+			return spddeform.is_finished(time_unit) || stim == ftim ? 1 : 0;
 		}
 
 		void set_speed_pattern(float acc, float dcc, float speed) 

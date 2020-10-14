@@ -335,12 +335,11 @@ namespace heimer
 			return 0;
 		}
 
-		bool can_operate() override
+		/*bool can_operate() override
 		{
 			return parent::is_active()
 			       && !in_operate();
-		}
-
+		}*/
 
 		bool on_interrupt(
 		    control_node * slave,
