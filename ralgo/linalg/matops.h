@@ -35,7 +35,7 @@ namespace ralgo
 		template <class M, class VI, class VEI>
 		void copy_from_rows(M& tgt, VI srcit, VEI eit) 
 		{
-			size_t n = std::size(srcit);
+			size_t n = std::size(*srcit);
 			size_t m = std::distance(srcit, eit);
 
 			for (unsigned int i = 0; i < m; ++i) 
@@ -54,7 +54,7 @@ namespace ralgo
 		template <class M, class VI, class VEI>
 		void copy_from_cols(M& tgt, VI srcit, VEI eit) 
 		{
-			size_t m = std::size(srcit);
+			size_t m = std::size(*srcit);
 			size_t n = std::distance(srcit, eit);
 
 			for (unsigned int j = 0; j < n; ++j) 
