@@ -1,8 +1,6 @@
 #ifndef RALGO_SPEED_DEFORMATION_H
 #define RALGO_SPEED_DEFORMATION_H
 
-#include <hal/irq.h>
-
 #include <math.h>
 #include <assert.h>
 
@@ -161,14 +159,6 @@ namespace ralgo
 			{
 				float k = (f_time - t) / dcc;
 				
-				if (isnan(k)) 
-				{
-					irqs_disable();
-					DPRINT(f_time);
-					DPRINT(dcc);
-					DPRINT(t); 
-				}
-
 				assert(dcc != 0);
 				assert(!isnan(f_time));
 				assert(!isnan(t));
