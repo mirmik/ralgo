@@ -10,9 +10,28 @@ namespace heimer
 	template <class P>
 	class coordinate_checker 
 	{
+		coordinate_checker * next = nullptr;
+
 	public:
-		virtual bool check(control_node * dev, P * val, int dim, char * msgbuf) = 0;
-		virtual int command(int argc, char ** argv) = 0;
+		bool check(control_node * dev, P * val, int dim, char * msgbuf) 
+		{
+			if (check_impl(dev, val, dim, msgbuf)) 
+			{
+				return true;
+			}
+
+			if (next) 
+			{
+				return next->check(dev, val, dim, msgbuf);
+			}
+
+			return false;
+		}
+
+		virtual bool check_impl(control_node * dev, P * val, int dim, char * msgbuf) = 0;
+		virtual int command(int argc, char ** argv) { return -1; }
+
+		void link_next(coordinate_checker * next) { this->next = next; }
 	};
 
 	template <class P>
@@ -30,7 +49,11 @@ namespace heimer
 			this->arrsize = 0;
 		}
 
-		bool check(control_node * dev, P * val, int dim, char* msgbuf) override
+		bool check_impl(
+			control_node * dev, 
+			P * val, 
+			int dim, 
+			char* msgbuf) override
 		{
 			assert(dim == 2);
 

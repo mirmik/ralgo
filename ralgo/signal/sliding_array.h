@@ -7,6 +7,8 @@
 #include <igris/dprint.h>
 #include <igris/container/array_view.h>
 
+#include <algorithm>
+
 // Массив для реализации алгоритмов скользящего окна.
 //
 // Описание алгоритма.

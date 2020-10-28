@@ -2,22 +2,23 @@
 #include <ralgo/trajectory/speed_deformer.h>
 
 #include <igris/math.h>
+#include <main.h>
 
 LT_BEGIN_TEST(ralgo_test_suite, traj_speed_deformer)
 {
 	ralgo::speed_deformer deform;
 	deform.set_time_pattern(0.2, 0.2);
-	LT_CHECK(igris::early(deform.real_spd, 1.25));
-	LT_CHECK(igris::early(deform.f_time, 1));
-	LT_CHECK_EQ(deform.posmod(1), 1);
-	LT_CHECK_EQ(deform.spdmod(0.5), deform.real_spd);
+	CHECK(igris::early(deform.real_spd, 1.25));
+	CHECK(igris::early(deform.f_time, 1));
+	CHECK_EQ(deform.posmod(1), 1);
+	CHECK_EQ(deform.spdmod(0.5), deform.real_spd);
 
 	deform.set_speed_pattern(0.2,0.2);
-	LT_CHECK(igris::early(deform.real_spd, 1));
-	LT_CHECK(igris::early(deform.f_time, 1.2));
-	LT_CHECK_EQ(deform.posmod(deform.f_time), 1);
-	LT_CHECK_LT(deform.posmod(1), 1);
-	LT_CHECK_EQ(deform.spdmod(0.5), 1);
+	CHECK(igris::early(deform.real_spd, 1));
+	CHECK(igris::early(deform.f_time, 1.2));
+	CHECK_EQ(deform.posmod(deform.f_time), 1);
+	CHECK_LT(deform.posmod(1), 1);
+	CHECK_EQ(deform.spdmod(0.5), 1);
 }
 LT_END_TEST(traj_speed_deformer)
 
@@ -41,36 +42,36 @@ LT_BEGIN_TEST(ralgo_test_suite, traj_traj1_nominal_speed)
 	float pos, spd;
 
 	sts = traj.attime(1000, pos, spd);
-	LT_CHECK_EQ(sts, 0);
-	LT_CHECK_EQ(pos, 10);
-	LT_CHECK_EQ(spd, 0);
+	CHECK_EQ(sts, 0);
+	CHECK_EQ(pos, 10);
+	CHECK_EQ(spd, 0);
 
 	sts = traj.attime(1500, pos, spd);
-	LT_CHECK_EQ(sts, 0);
-	LT_CHECK(igris::early(spd, 0.5));
+	CHECK_EQ(sts, 0);
+	CHECK(igris::early(spd, 0.5));
 
 	sts = traj.attime(2000, pos, spd);
-	LT_CHECK_EQ(sts, 0);
-	LT_CHECK(igris::early(spd, 1));
+	CHECK_EQ(sts, 0);
+	CHECK(igris::early(spd, 1));
 	
 	sts = traj.attime(4000, pos, spd);
-	LT_CHECK_EQ(sts, 0);
-	LT_CHECK(igris::early(spd, 1));
+	CHECK_EQ(sts, 0);
+	CHECK(igris::early(spd, 1));
 	
 	sts = traj.attime(11999, pos, spd);
-	LT_CHECK_EQ(sts, 0);
-	LT_CHECK(igris::early(spd, 0, 1e-2));
-	LT_CHECK(igris::early(pos, 20, 1e-2));
+	CHECK_EQ(sts, 0);
+	CHECK(igris::early(spd, 0, 1e-2));
+	CHECK(igris::early(pos, 20, 1e-2));
 
 	sts = traj.attime(12000, pos, spd);
-	LT_CHECK_EQ(sts, 1);
-	LT_CHECK(igris::early(spd, 0));
-	LT_CHECK(igris::early(pos, 20));
+	CHECK_EQ(sts, 1);
+	CHECK(igris::early(spd, 0));
+	CHECK(igris::early(pos, 20));
 
 	sts = traj.attime(20000, pos, spd);
-	LT_CHECK_EQ(sts, 1);
-	LT_CHECK(igris::early(spd, 0));
-	LT_CHECK(igris::early(pos, 20));
+	CHECK_EQ(sts, 1);
+	CHECK(igris::early(spd, 0));
+	CHECK(igris::early(pos, 20));
 }
 LT_END_TEST(traj_traj1_nominal_speed)
 
@@ -94,19 +95,19 @@ LT_BEGIN_TEST(ralgo_test_suite, traj_traj1_timestamp)
 	float pos, spd;
 
 	sts = traj.attime(1000, pos, spd);
-	LT_CHECK_EQ(sts, 0);
-	LT_CHECK(igris::early(spd, 0));
-	LT_CHECK(igris::early(pos, 10));	
+	CHECK_EQ(sts, 0);
+	CHECK(igris::early(spd, 0));
+	CHECK(igris::early(pos, 10));	
 
 	sts = traj.attime(10000, pos, spd);
-	LT_CHECK_EQ(sts, 1);
-	LT_CHECK(igris::early(spd, 0));
-	LT_CHECK(igris::early(pos, 20));	
+	CHECK_EQ(sts, 1);
+	CHECK(igris::early(spd, 0));
+	CHECK(igris::early(pos, 20));	
 
 	sts = traj.attime(9999, pos, spd);
-	LT_CHECK_EQ(sts, 0);
-	LT_CHECK(igris::early(spd, 0, 1e-2));
-	LT_CHECK(igris::early(pos, 20, 1e-2));	
+	CHECK_EQ(sts, 0);
+	CHECK(igris::early(spd, 0, 1e-2));
+	CHECK(igris::early(pos, 20, 1e-2));	
 }
 LT_END_TEST(traj_traj1_timestamp)
 
@@ -131,11 +132,10 @@ LT_BEGIN_TEST(ralgo_test_suite, traj_traj1_nominal_speed_mmm)
 	float pos, spd;
 
 	sts = traj.attime(1000, pos, spd);
-	LT_CHECK_EQ(sts, 0);
-	LT_CHECK_EQ(pos, 10);
-	LT_CHECK_EQ(spd, 0);
+	CHECK_EQ(sts, 0);
+	CHECK_EQ(pos, 10);
+	CHECK_EQ(spd, 0);
 
 	sts = traj.attime(2000, pos, spd);
-	dprln(pos, spd);
 }
 LT_END_TEST(traj_traj1_nominal_speed_mmm)

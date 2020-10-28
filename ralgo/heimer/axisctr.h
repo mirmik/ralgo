@@ -16,9 +16,6 @@ namespace heimer
 	template <class P, class V>
 	class axisctr : public control_node
 	{
-	public:
-		bool debug_mode = false;
-
 	private:
 
 		P offset = 0;
@@ -251,9 +248,6 @@ namespace heimer
 		};
 
 		lintraj.init_nominal_speed_mode(&nm_params);
-
-		if (debug_mode)
-			nos::println(lintraj);
 			
 		operation_finished_flag = false;
 		operation_start_signal(this);
@@ -298,8 +292,6 @@ namespace heimer
 
 		if (sts && !operation_finished_flag)
 		{
-			if (debug_mode || 1)
-				nos::println("axisctr:", mnemo(), "finish signal");
 			operation_finished_flag = true;
 			operation_finish_signal(this);
 			lintraj.set_point_hold(ctrpos);
@@ -318,8 +310,6 @@ namespace heimer
 
 		if (curtraj == nullptr)
 			return 0;
-
-		//dprln("STOP", mnemo(), controlled->feedpos);
 
 		if (controlled->feedspd == 0) 
 		{

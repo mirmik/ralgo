@@ -9,6 +9,8 @@
 #include <igris/math.h>
 #include <igris/datastruct/argvc.h>
 
+#include <main.h>
+
 class test_control_node : public heimer::control_node
 {
 	std::vector<heimer::control_node*> ctrs;
@@ -20,6 +22,12 @@ public:
 	    std::vector<heimer::control_node*> vec) :
 		heimer::control_node(name),
 		ctrs(vec) {}
+
+	void serve_impl() override {}
+	bool on_interrupt(heimer::control_node*, heimer::control_node*, heimer::interrupt_args*) override 
+	{
+		return true;
+	}
 
 	heimer::control_node* iterate(heimer::control_node* it) override
 	{
@@ -60,115 +68,117 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_control_test)
 	test_control_node c("c", {&b, &d1, &d2, &d3});
 
 	sts = b.activate();
-	LT_CHECK(sts != 0);
-	LT_CHECK(a.is_active() == false);
-	LT_CHECK(b.is_active() == false);
+	CHECK(sts != 0);
+	CHECK(a.is_active() == false);
+	CHECK(b.is_active() == false);
 
 	sts = a.activate();
-	LT_CHECK(sts == 0);
-	LT_CHECK(a.is_active() == true);
-	LT_CHECK(b.is_active() == false);
+	CHECK(sts == 0);
+	CHECK(a.is_active() == true);
+	CHECK(b.is_active() == false);
 
 	sts = a.deactivate();
-	LT_CHECK(sts == 0);
-	LT_CHECK(a.is_active() == false);
-	LT_CHECK(b.is_active() == false);
+	CHECK(sts == 0);
+	CHECK(a.is_active() == false);
+	CHECK(b.is_active() == false);
 
 	sts = a.activate();
-	LT_CHECK(sts == 0);
+	CHECK(sts == 0);
 
 	sts = b.activate();
-	LT_CHECK(sts == 0);
-	LT_CHECK(a.is_active() == true);
-	LT_CHECK(a.is_controlled() == true);
-	LT_CHECK(b.is_active() == true);
+	CHECK(sts == 0);
+	CHECK(a.is_active() == true);
+	CHECK(a.is_controlled() == true);
+	CHECK(b.is_active() == true);
 
 	sts = a.deactivate();
-	LT_CHECK(sts != 0);
-	LT_CHECK(a.is_active() == true);
-	LT_CHECK(b.is_active() == true);
+	CHECK(sts != 0);
+	CHECK(a.is_active() == true);
+	CHECK(b.is_active() == true);
 
 	sts = d1.activate();
-	LT_CHECK_EQ(sts, 0);
+	CHECK_EQ(sts, 0);
 
 	sts = c.activate();
-	LT_CHECK_EQ(sts, -4);
-	LT_CHECK(a.is_active() == true);
-	LT_CHECK(b.is_active() == true);
-	LT_CHECK(c.is_active() == false);
-	LT_CHECK(d1.is_active() == true);
-	LT_CHECK(d2.is_active() == false);
-	LT_CHECK(d3.is_active() == false);
+	CHECK_EQ(sts, -4);
+	CHECK(a.is_active() == true);
+	CHECK(b.is_active() == true);
+	CHECK(c.is_active() == false);
+	CHECK(d1.is_active() == true);
+	CHECK(d2.is_active() == false);
+	CHECK(d3.is_active() == false);
 
 	sts = d2.activate();
 	sts = d3.activate();
 
 	sts = c.activate();
-	LT_CHECK_EQ(sts, 0);
-	LT_CHECK(a.is_active() == true);
-	LT_CHECK(b.is_active() == true);
-	LT_CHECK(c.is_active() == true);
-	LT_CHECK(d1.is_active() == true);
-	LT_CHECK(d2.is_active() == true);
-	LT_CHECK(d3.is_active() == true);
+	CHECK_EQ(sts, 0);
+	CHECK(a.is_active() == true);
+	CHECK(b.is_active() == true);
+	CHECK(c.is_active() == true);
+	CHECK(d1.is_active() == true);
+	CHECK(d2.is_active() == true);
+	CHECK(d3.is_active() == true);
 
 	sts = d1.deactivate();
-	LT_CHECK_EQ(sts, -2);
+	CHECK_EQ(sts, -2);
 
 	sts = a.deactivate();
-	LT_CHECK_EQ(sts, -2);
+	CHECK_EQ(sts, -2);
 
-	LT_CHECK_EQ(a.is_controlled(), true);
-	LT_CHECK_EQ(b.is_controlled(), true);
-	LT_CHECK_EQ(c.is_controlled(), false);
-	LT_CHECK_EQ(d1.is_controlled(), true);
-	LT_CHECK_EQ(d2.is_controlled(), true);
-	LT_CHECK_EQ(d3.is_controlled(), true);
+	CHECK_EQ(a.is_controlled(), true);
+	CHECK_EQ(b.is_controlled(), true);
+	CHECK_EQ(c.is_controlled(), false);
+	CHECK_EQ(d1.is_controlled(), true);
+	CHECK_EQ(d2.is_controlled(), true);
+	CHECK_EQ(d3.is_controlled(), true);
 
 	c.deactivate();
-	LT_CHECK_EQ(a.is_controlled(), true);
-	LT_CHECK_EQ(b.is_controlled(), false);
-	LT_CHECK_EQ(c.is_controlled(), false);
-	LT_CHECK_EQ(d1.is_controlled(), false);
-	LT_CHECK_EQ(d2.is_controlled(), false);
-	LT_CHECK_EQ(d3.is_controlled(), false);
+	CHECK_EQ(a.is_controlled(), true);
+	CHECK_EQ(b.is_controlled(), false);
+	CHECK_EQ(c.is_controlled(), false);
+	CHECK_EQ(d1.is_controlled(), false);
+	CHECK_EQ(d2.is_controlled(), false);
+	CHECK_EQ(d3.is_controlled(), false);
 
 	b.deactivate();
-	LT_CHECK_EQ(a.is_controlled(), false);
-	LT_CHECK_EQ(b.is_controlled(), false);
-	LT_CHECK_EQ(c.is_controlled(), false);
-	LT_CHECK_EQ(d1.is_controlled(), false);
-	LT_CHECK_EQ(d2.is_controlled(), false);
-	LT_CHECK_EQ(d3.is_controlled(), false);
+	CHECK_EQ(a.is_controlled(), false);
+	CHECK_EQ(b.is_controlled(), false);
+	CHECK_EQ(c.is_controlled(), false);
+	CHECK_EQ(d1.is_controlled(), false);
+	CHECK_EQ(d2.is_controlled(), false);
+	CHECK_EQ(d3.is_controlled(), false);
 
 	sts = a.deactivate();
-	LT_CHECK_EQ(sts, 0);
-	LT_CHECK_EQ(a.is_active(), false);
+	CHECK_EQ(sts, 0);
+	CHECK_EQ(a.is_active(), false);
 	sts = a.deactivate();	
-	LT_CHECK_EQ(sts, 0);
-	LT_CHECK_EQ(a.is_active(), false);
+	CHECK_EQ(sts, 0);
+	CHECK_EQ(a.is_active(), false);
 
 	sts = a.activate();
-	LT_CHECK_EQ(sts, 0);
-	LT_CHECK_EQ(a.is_active(), true);
+	CHECK_EQ(sts, 0);
+	CHECK_EQ(a.is_active(), true);
 	sts = a.activate();	
-	LT_CHECK_EQ(sts, 0);
-	LT_CHECK_EQ(a.is_active(), true);
+	CHECK_EQ(sts, 0);
+	CHECK_EQ(a.is_active(), true);
 }
 LT_END_TEST(heimer_control_test)
 
-LT_BEGIN_TEST(ralgo_test_suite, heimer_movement_test)
+TEST_CASE("heimer_movement_test" * doctest::timeout(2))
 {
 	int sts;
 
 	heimer::stub_axis<float, float> ax("ax");
 	heimer::axisctr axctr("axctr", &ax);
 
+	heimer::set_global_protection(false);
+
 	sts = ax.activate();
-	LT_CHECK_EQ(sts, 0);
+	CHECK_EQ(sts, 0);
 
 	sts = axctr.activate();
-	LT_CHECK_EQ(sts, 0);
+	CHECK_EQ(sts, 0);
 
 	axctr.set_accdcc(10, 10);
 	axctr.set_speed(4);
@@ -201,10 +211,9 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_movement_test)
 		}
 	}
 
-	LT_CHECK(igris::early(maxspd, 4.0));
-	LT_CHECK(igris::early(maxpos, 5.0));
+	CHECK(igris::early(maxspd, 4.0));
+	CHECK(igris::early(maxpos, 5.0));
 }
-LT_END_TEST(heimer_movement_test)
 
 LT_BEGIN_TEST(ralgo_test_suite, heimer_absmovement_test)
 {
@@ -214,10 +223,10 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_absmovement_test)
 	heimer::axisctr axctr("axctr", &ax);
 
 	sts = ax.activate();
-	LT_CHECK_EQ(sts, 0);
+	CHECK_EQ(sts, 0);
 
 	sts = axctr.activate();
-	LT_CHECK_EQ(sts, 0);
+	CHECK_EQ(sts, 0);
 
 	axctr.set_accdcc(10, 10);
 	axctr.set_speed(10);
@@ -250,7 +259,7 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_absmovement_test)
 		}
 	}
 
-	LT_CHECK(igris::early(maxpos, 5.0));
+	CHECK(igris::early(maxpos, 5.0));
 }
 LT_END_TEST(heimer_absmovement_test)
 
@@ -263,10 +272,10 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_movement_stop_test)
 	heimer::axisctr axctr("axctr", &ax);
 
 	sts = ax.activate();
-	LT_CHECK_EQ(sts, 0);
+	CHECK_EQ(sts, 0);
 
 	sts = axctr.activate();
-	LT_CHECK_EQ(sts, 0);
+	CHECK_EQ(sts, 0);
 
 	axctr.set_accdcc(10, 10);
 	axctr.set_speed(4);
@@ -302,7 +311,7 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_movement_stop_test)
 		}
 	}
 
-	LT_CHECK_LT(ax.feedpos, 5);
+	CHECK_LT(ax.feedpos, 5);
 }
 LT_END_TEST(heimer_movement_stop_test)
 
@@ -314,10 +323,10 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_movement_hardstop_test)
 	heimer::axisctr axctr("axctr", &ax);
 
 	sts = ax.activate();
-	LT_CHECK_EQ(sts, 0);
+	CHECK_EQ(sts, 0);
 
 	sts = axctr.activate();
-	LT_CHECK_EQ(sts, 0);
+	CHECK_EQ(sts, 0);
 
 	axctr.set_accdcc(10, 10);
 	axctr.set_speed(4);
@@ -353,7 +362,7 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_movement_hardstop_test)
 		}
 	}
 
-	LT_CHECK_LT(ax.feedpos, 5);
+	CHECK_LT(ax.feedpos, 5);
 }
 LT_END_TEST(heimer_movement_hardstop_test)
 
@@ -370,15 +379,15 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_tandem)
 	heimer::axisctr axctr2("slave", &tand.slave);
 
 	sts = ax1.activate();
-	LT_CHECK_EQ(sts, 0);
+	CHECK_EQ(sts, 0);
 	sts = ax2.activate();
-	LT_CHECK_EQ(sts, 0);
+	CHECK_EQ(sts, 0);
 	sts = tand.activate();
-	LT_CHECK_EQ(sts, 0);
+	CHECK_EQ(sts, 0);
 	sts = axctr1.activate();
-	LT_CHECK_EQ(sts, 0);
+	CHECK_EQ(sts, 0);
 	sts = axctr2.activate();
-	LT_CHECK_EQ(sts, 0);
+	CHECK_EQ(sts, 0);
 
 	axctr1.set_speed(10);
 	axctr2.set_speed(10);
@@ -386,9 +395,9 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_tandem)
 	axctr2.set_accdcc(10,10);
 
 	sts = axctr1.incmove(8);
-	LT_CHECK_EQ(sts, 0);
+	CHECK_EQ(sts, 0);
 	sts = axctr2.incmove(8);
-	LT_CHECK_EQ(sts, 0);
+	CHECK_EQ(sts, 0);
 
 	while(1) 
 	{
@@ -406,8 +415,8 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_tandem)
 			break;
 	}
 
-	LT_CHECK(igris::early(8, ax1.feedpos, 1e-3));
-	LT_CHECK(igris::early(4, ax2.feedpos, 1e-3));
+	CHECK(igris::early(8, ax1.feedpos, 1e-3));
+	CHECK(igris::early(4, ax2.feedpos, 1e-3));
 }
 LT_END_TEST(heimer_tandem)
 
@@ -422,20 +431,20 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_linint)
 	heimer::linintctr<float, float, 2> linint("int", {intarr.data(), 2});
 
 	sts=ax1.activate();;
-	LT_CHECK_EQ(sts, 0);
+	CHECK_EQ(sts, 0);
 	sts=ax2.activate();;
-	LT_CHECK_EQ(sts, 0);
+	CHECK_EQ(sts, 0);
 	sts=linint.activate();;
-	LT_CHECK_EQ(sts, 0);
+	CHECK_EQ(sts, 0);
 
 	linint.set_speed(10);
 	linint.set_accdcc(100000, 100000);
 
 	float target[2] = {10, 3};
 	sts=linint.incmove(target);
-	LT_CHECK_EQ(sts, 0);		
+	CHECK_EQ(sts, 0);		
 
-	LT_CHECK_EQ(linint.in_operate(), true);		
+	CHECK_EQ(linint.in_operate(), true);		
 
 	int64_t t = ralgo::discrete_time();
 
@@ -453,14 +462,14 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_linint)
 			break;
 	}
 
-	LT_CHECK(ralgo::discrete_time() - t <= 1045);
-	LT_CHECK(igris::early(10, ax1.feedpos, 1e-3));
-	LT_CHECK(igris::early(3, ax2.feedpos, 1e-3));
+	CHECK(ralgo::discrete_time() - t <= 1045);
+	CHECK(igris::early(10, ax1.feedpos, 1e-3));
+	CHECK(igris::early(3, ax2.feedpos, 1e-3));
 }
 LT_END_TEST(heimer_linint)
 
 
-LT_BEGIN_TEST(ralgo_test_suite, heimer_control_panel) 
+TEST_CASE("heimer_control_panel") 
 {
 	heimer::stub_axis<float, float> ax1("ax1");
 	heimer::stub_axis<float, float> ax2("ax2");
@@ -476,10 +485,10 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_control_panel)
 	axctr1.activate();
 	axctr2.activate();
 
-	LT_CHECK_EQ(ax1.is_active(), true);
-	LT_CHECK_EQ(ax2.is_active(), true);
-	LT_CHECK_EQ(axctr1.is_active(), true);
-	LT_CHECK_EQ(axctr2.is_active(), true);
+	CHECK_EQ(ax1.is_active(), true);
+	CHECK_EQ(ax2.is_active(), true);
+	CHECK_EQ(axctr1.is_active(), true);
+	CHECK_EQ(axctr2.is_active(), true);
 
 	int argc;
 	char*argv [10];
@@ -512,7 +521,5 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_control_panel)
 			break;
 	}
 
-	dprln(ax1.ctrpos);
-	LT_CHECK(igris::early(10, ax1.ctrpos));
+	CHECK(igris::early(10, ax1.ctrpos));
 }
-LT_END_TEST(heimer_control_panel)
