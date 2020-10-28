@@ -1,4 +1,5 @@
 #include <ralgo/linalg/backpack.h>
+#include <main.h>
 
 using namespace ralgo;
 
@@ -15,8 +16,8 @@ LT_BEGIN_TEST(ralgo_test_suite, backpack)
 
 	svd_backpack(res, tgt, mat);
 
-	LT_CHECK(abs(res[0] - 1) < EPSILON);
-	LT_CHECK(abs(res[1] - 1) < EPSILON);
-	LT_CHECK(abs(res[2] - 1) < EPSILON);
+	CHECK(abs(res[0] - 1) < EPSILON);
+	CHECK(abs(res[1] - 1) < EPSILON);
+	CHECK(abs(res[2] - 1) < EPSILON);
 }
 LT_END_TEST(backpack)
