@@ -105,7 +105,7 @@ namespace ralgo
 		ralgo::vector_view<T> result(coords, count_of_vectors);
 
 		// Размер вектора целей.
-		auto tsize = target.size();
+		auto tsize = std::size(target);
 
 		T matdata[tsize * count_of_vectors];
 		ralgo::matrix_view<T> mat(matdata, tsize, count_of_vectors);
