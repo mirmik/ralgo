@@ -15,8 +15,8 @@ namespace ralgo
 		auto m = a.size1();
 		auto n = a.size2();
 
-		assert(x.size() == n);
-		assert(m == b.size());
+		assert(std::size(x) == n);
+		assert(m == std::size(b));
 
 		double u[m * n];
 		double v[n * n];

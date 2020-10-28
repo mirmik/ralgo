@@ -66,7 +66,7 @@ namespace ralgo
 	{
 		int i, j, jj;
 		T s;
-		if (b.size() != (unsigned)m || x.size() != (unsigned)n) ralgo::fault("SVD::solve bad sizes");
+		if (std::size(b) != (unsigned)m || x.size() != (unsigned)n) ralgo::fault("SVD::solve bad sizes");
 		
 		T tmp[n];
 		tsh = (thresh >= 0. ? thresh : 0.5 * sqrt(m + n + 1.) * w[0] * eps);
