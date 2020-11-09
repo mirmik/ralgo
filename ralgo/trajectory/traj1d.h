@@ -5,6 +5,8 @@
 #include <ralgo/disctime.h>
 #include <nos/fprint.h>
 
+#include <igris/dprint.h>
+
 #define HEIMER_TRAJ1D_CONTINUE 0
 #define HEIMER_TRAJ1D_FINISHED 1
 
