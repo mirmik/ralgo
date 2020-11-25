@@ -8,6 +8,7 @@
 
 #include <igris/event/delegate.h>
 #include <igris/math.h>
+#include <igris/util/numconvert.h>
 
 namespace heimer
 {
