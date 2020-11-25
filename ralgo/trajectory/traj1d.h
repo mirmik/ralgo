@@ -133,13 +133,6 @@ namespace ralgo
 			// на единицу времени рабочего пространства.
 			float time_unit = ftim == stim ? 0 : (float)(time - stim) / (float)(ftim - stim);
 
-			if (isnan(time_unit)) 
-			{
-				DPRINT(time);
-				DPRINT(stim);
-				DPRINT(ftim);
-			}
-
 			assert(!isnan(time_unit));
 
 			auto posmod = spddeform.posmod(time_unit);
