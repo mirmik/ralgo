@@ -41,14 +41,14 @@ namespace ralgo
 			eps = std::numeric_limits<T>::epsilon();
 
 			decompose();
-			
+
 			reorder();
 			tsh = 0.5 * sqrt(m + n + 1.) * w[0] * eps;
 		}
 
-		template<class A, class B> 
+		template<class A, class B>
 		void solve(const A &b, B &x, T thresh = -1.);
-		
+
 		void decompose();
 		void reorder();
 
@@ -59,7 +59,7 @@ namespace ralgo
 			        (absb == 0.0 ? 0.0 : absb * sqrt(1.0 + ralgo::sqr(absa / absb))));
 		}
 	};
-	
+
 	template<class T, class MU, class MV, class V>
 	template<class A, class B>
 	void SVD<T, MU, MV, V>::solve(const A &b, B &x, T thresh)
@@ -67,7 +67,7 @@ namespace ralgo
 		int i, j, jj;
 		T s;
 		if (std::size(b) != (unsigned)m || x.size() != (unsigned)n) ralgo::fault("SVD::solve bad sizes");
-		
+
 		T tmp[n];
 		tsh = (thresh >= 0. ? thresh : 0.5 * sqrt(m + n + 1.) * w[0] * eps);
 		for (j = 0; j < n; j++)
@@ -87,72 +87,72 @@ namespace ralgo
 			x[j] = s;
 		}
 	}
-/*
-	template <typename M>
-	void SVD<M>::solve(const mroot<M> &b, mroot<M> &x, type_t<M> thresh)
-	{
-		int i, j, p = b.ncols();
-		if (b.nrows() != m || x.nrows() != n || x.ncols() != p)
-			throw("SVD::solve bad sizes");
-		vector_t<M> xx(n), bcol(m);
-		for (j = 0; j < p; j++)
+	/*
+		template <typename M>
+		void SVD<M>::solve(const mroot<M> &b, mroot<M> &x, type_t<M> thresh)
 		{
-			for (i = 0; i < m; i++) bcol[i] = b[i][j];
-			solve(bcol, xx, thresh);
-			for (i = 0; i < n; i++) x[i][j] = xx[i];
-		}
-	}
-
-	template <typename M>
-	int SVD<M>::rank(type_t<M> thresh)
-	{
-		int j, nr = 0;
-		tsh = (thresh >= 0. ? thresh : 0.5 * sqrt(m + n + 1.) * w[0] * eps);
-		for (j = 0; j < n; j++) if (w[j] > tsh) nr++;
-		return nr;
-	}
-
-	template <typename M>
-	int SVD<M>::nullity(type_t<M> thresh)
-	{
-		int j, nn = 0;
-		tsh = (thresh >= 0. ? thresh : 0.5 * sqrt(m + n + 1.) * w[0] * eps);
-		for (j = 0; j < n; j++) if (w[j] <= tsh) nn++;
-		return nn;
-	}
-
-	template <typename M>
-	matrix_t<M> SVD<M>::range(type_t<M> thresh)
-	{
-		int i, j, nr = 0;
-		matrix_t<M> rnge(m, rank(thresh));
-		for (j = 0; j < n; j++)
-		{
-			if (w[j] > tsh)
+			int i, j, p = b.ncols();
+			if (b.nrows() != m || x.nrows() != n || x.ncols() != p)
+				throw("SVD::solve bad sizes");
+			vector_t<M> xx(n), bcol(m);
+			for (j = 0; j < p; j++)
 			{
-				for (i = 0; i < m; i++) rnge[i][nr] = u[i][j];
-				nr++;
+				for (i = 0; i < m; i++) bcol[i] = b[i][j];
+				solve(bcol, xx, thresh);
+				for (i = 0; i < n; i++) x[i][j] = xx[i];
 			}
 		}
-		return rnge;
-	}
 
-	template <typename M>
-	matrix_t<M> SVD<M>::nullspace(type_t<M> thresh)
-	{
-		int j, jj, nn = 0;
-		matrix_t<M> nullsp(n, nullity(thresh));
-		for (j = 0; j < n; j++)
+		template <typename M>
+		int SVD<M>::rank(type_t<M> thresh)
 		{
-			if (w[j] <= tsh)
-			{
-				for (jj = 0; jj < n; jj++) nullsp[jj][nn] = v[jj][j];
-				nn++;
-			}
+			int j, nr = 0;
+			tsh = (thresh >= 0. ? thresh : 0.5 * sqrt(m + n + 1.) * w[0] * eps);
+			for (j = 0; j < n; j++) if (w[j] > tsh) nr++;
+			return nr;
 		}
-		return nullsp;
-	}
-	*/
+
+		template <typename M>
+		int SVD<M>::nullity(type_t<M> thresh)
+		{
+			int j, nn = 0;
+			tsh = (thresh >= 0. ? thresh : 0.5 * sqrt(m + n + 1.) * w[0] * eps);
+			for (j = 0; j < n; j++) if (w[j] <= tsh) nn++;
+			return nn;
+		}
+
+		template <typename M>
+		matrix_t<M> SVD<M>::range(type_t<M> thresh)
+		{
+			int i, j, nr = 0;
+			matrix_t<M> rnge(m, rank(thresh));
+			for (j = 0; j < n; j++)
+			{
+				if (w[j] > tsh)
+				{
+					for (i = 0; i < m; i++) rnge[i][nr] = u[i][j];
+					nr++;
+				}
+			}
+			return rnge;
+		}
+
+		template <typename M>
+		matrix_t<M> SVD<M>::nullspace(type_t<M> thresh)
+		{
+			int j, jj, nn = 0;
+			matrix_t<M> nullsp(n, nullity(thresh));
+			for (j = 0; j < n; j++)
+			{
+				if (w[j] <= tsh)
+				{
+					for (jj = 0; jj < n; jj++) nullsp[jj][nn] = v[jj][j];
+					nn++;
+				}
+			}
+			return nullsp;
+		}
+		*/
 	template <class T, class MU, class MV, class V>
 	void SVD<T, MU, MV, V>::decompose()
 	{
@@ -308,7 +308,7 @@ namespace ralgo
 					}
 					break;
 				}
-				if (its == 29) 
+				if (its == 29)
 					ralgo::fault("no convergence in 30 svdcmp iterations");
 				x = w[l];
 				nm = k - 1;
@@ -367,15 +367,19 @@ namespace ralgo
 	}
 
 	template <class T, class MU, class MV, class V>
-	void SVD<T,MU,MV,V>::reorder()
+	void SVD<T, MU, MV, V>::reorder()
 	{
 		int i, j, k, s, inc = 1;
 		T sw;
 		//vector_t<M> su(m), sv(n);
 		T su[m];
 		T sv[n];
-		do { inc *= 3; inc++; }
+		do
+		{
+			inc *= 3; inc++;
+		}
 		while (inc <= n);
+
 		do
 		{
 			inc /= 3;
@@ -400,6 +404,7 @@ namespace ralgo
 			}
 		}
 		while (inc > 1);
+
 		for (k = 0; k < n; k++)
 		{
 			s = 0;
