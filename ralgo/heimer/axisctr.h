@@ -37,6 +37,7 @@ namespace heimer
 		ralgo::traj1d<P, V> *    curtraj = &lintraj;
 		ralgo::traj1d_line<P, V> lintraj;
 
+		bool _reversed = false;
 		bool _limited = false;
 		P _forw;
 		P _back;
@@ -75,6 +76,11 @@ namespace heimer
 			_limited = true;
 		}
 
+		void set_reverse(bool reverse) 
+		{
+			_reversed = reverse;
+		}
+
 		int incmove_unsafe(P dist);
 		int absmove_unsafe(P pos);
 
@@ -85,6 +91,11 @@ namespace heimer
 
 		P feedback_position() { return controlled->feedpos / gain; }
 		V feedback_speed()    { return controlled->feedspd / gain; }
+
+		P telemetry_position() { 
+			auto feedpos = feedback_position();
+			return _reversed ? -feedpos : feedpos;
+		}
 
 		P target_position() { return controlled->ctrpos / gain; }
 		V target_speed()    { return controlled->ctrspd / gain; }
@@ -176,6 +187,7 @@ namespace heimer
 	template <class P, class V>
 	int axisctr<P, V>::incmove(P dist)
 	{
+		dist = _reversed ? -dist : dist; 
 		dist = dist * gain;
 
 		P curpos = controlled->ctrpos;
@@ -192,6 +204,7 @@ namespace heimer
 	template <class P, class V>
 	int axisctr<P, V>::absmove(P tgtpos)
 	{
+		tgtpos = _reversed ? -tgtpos : tgtpos;
 		tgtpos = tgtpos * gain;
 
 		if (_limited)
@@ -390,6 +403,14 @@ namespace heimer
 		{
 			fltarg = atof32(argv[1], nullptr);
 			set_gain(fltarg);
+			return 0;
+		}
+
+		else if (strcmp(argv[0], "setreverse") == 0)
+		{
+			int arg = atoi32(argv[1], 10, nullptr);
+			nos::println("setreverse", mnemo(), arg);
+			set_reverse(arg);
 			return 0;
 		}
 
