@@ -1,6 +1,7 @@
 #ifndef HEIMER_AXIS_H
 #define HEIMER_AXIS_H
 
+#include <math.h>
 #include <ralgo/heimer/control.h>
 #include <assert.h>
 

@@ -11,8 +11,8 @@ namespace ralgo
 	class trajNd
 	{
 	protected:
-		// Время в дискретных единицах времени. 
-		// (см. ralgo::discrete_time_frequency) 
+		// Время в дискретных единицах времени.
+		// (см. ralgo::discrete_time_frequency)
 		int64_t stim;
 		int64_t ftim;
 
@@ -22,8 +22,8 @@ namespace ralgo
 		    igris::array_view<P> pos,
 		    igris::array_view<V> spd
 		) = 0;
-		
-		virtual bool is_finished(int64_t time) 
+
+		virtual bool is_finished(int64_t time)
 		{
 			return time > ftim;
 		}
@@ -44,12 +44,12 @@ namespace ralgo
 	public:
 		ralgo::speed_deformer spddeform;
 
-		void set_start_position(int i, P pos) 
+		void set_start_position(int i, P pos)
 		{
 			spos[i] = pos;
 		}
 
-		void set_finish_position_inc(int i, P inc) 
+		void set_finish_position_inc(int i, P inc)
 		{
 			fpos[i] = spos[i] + inc;
 		}
@@ -92,17 +92,17 @@ namespace ralgo
 			return 0;
 		}
 
-		int attime(int64_t time, 
-			igris::array_view<P> pos, 
-			igris::array_view<V> spd) override
+		int attime(int64_t time,
+		           igris::array_view<P> pos,
+		           igris::array_view<V> spd) override
 		{
 			// Умножение на коэффициент времени перерасщитывает скорость
 			// взятую на дискретную единицу времени в скорость взятую
-			// на единицу времени рабочего пространства.  
+			// на единицу времени рабочего пространства.
 
 			float time_unit = ftim == stim ? 0 : (float)(time - stim) / (float)(ftim - stim);
 
-			if (isnan(time_unit)) 
+			if (isnan(time_unit))
 			{
 				DPRINT(time);
 				DPRINT(stim);
@@ -114,7 +114,8 @@ namespace ralgo
 			auto posmod = spddeform.posmod(time_unit);
 			auto spdmod = spddeform.spdmod(time_unit);
 
-			for (unsigned int i = 0; i < Dim; ++i) {
+			for (unsigned int i = 0; i < Dim; ++i)
+			{
 				pos[i] = fpos[i] * posmod + spos[i] * (1 - posmod);
 				spd[i] = setted_speed[i] * spdmod * ralgo::discrete_time_frequency();
 			}
@@ -122,11 +123,11 @@ namespace ralgo
 			return (spddeform.is_finished(time_unit) || stim == ftim) ? 1 : 0;
 		}
 
-		void set_speed_pattern(float acc, float dcc, float speed) 
+		void set_speed_pattern(float acc, float dcc, float speed)
 		{
 			// Чтобы расчитать интервал времени разгона, необходимо
 			// соотнести значение ускорения и скорости.
-			// Здесь acc - тангенс угла, 
+			// Здесь acc - тангенс угла,
 			// setted_speed - установленная скорость в дискреных единицах
 			// тогда setted_speed / acc = acc_time в дискретных единицах
 
@@ -143,7 +144,7 @@ namespace ralgo
 			spddeform.set_speed_pattern(acc_part, dcc_part);
 		}
 
-		void set_stop_trajectory(igris::array_view<P> curpos, igris::array_view<V> curspd, V dccval) 
+		void set_stop_trajectory(igris::array_view<P> curpos, igris::array_view<V> curspd, V dccval)
 		{
 			// скоростной деформатор работает с точным выведением в позицию, и изменяет время,
 			// поэтому подменяем время в два раза, чтобы соответствовать равнозамедленному паттерну.
@@ -155,16 +156,30 @@ namespace ralgo
 			assert(ftim >= stim);
 
 			std::copy(std::begin(curpos), std::end(curpos), std::begin(this->spos));
-			for (unsigned int i = 0; i < Dim ; ++i) 
+			for (unsigned int i = 0; i < Dim ; ++i)
 				fpos[i] = spos[i] + curspd[i] * realdiff / 2;
 
-			for (unsigned int i = 0; i < Dim ; ++i) 
+			for (unsigned int i = 0; i < Dim ; ++i)
 				setted_speed[i] = curspd[i] / ralgo::discrete_time_frequency();
-			
+
 			spddeform.set_stop_pattern();
 		}
 
-		ssize_t print_to(nos::ostream& os) const 
+		void set_point_hold(igris::array_view<P> curpos)
+		{
+			ftim = ralgo::discrete_time();
+			stim = ftim - 1;
+
+			std::copy(std::begin(curpos), std::end(curpos), std::begin(this->spos));
+			std::copy(std::begin(curpos), std::end(curpos), std::begin(this->fpos));
+			
+			ralgo::vecops::fill(setted_speed, 0);
+
+			spddeform.set_stop_pattern();
+		}
+
+
+		ssize_t print_to(nos::ostream& os) const
 		{
 			return nos::fprint_to(os, "({},{},{})", spos, fpos, setted_speed);
 		}
