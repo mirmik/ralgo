@@ -53,11 +53,6 @@ namespace heimer
 		igris::array_view<heimer::axis_node<Position, Speed>*> _axes;
 
 	public:
-		igris::delegate<void, linintctr*> operation_finish_signal;
-
-		//реализовать вызов.
-		igris::delegate<void, linintctr*> operation_start_signal;
-
 		bool in_operate()
 		{
 			return _in_operation;
@@ -326,7 +321,7 @@ namespace heimer
 				_axes[i]->ctrpos = _axes[i]->feedpos;
 			}
 
-			operation_finish_signal(this);
+			parent::operation_finish_signal(this);
 			operation_finished_flag = true;
 			
 			for (unsigned int i = 0; i < _axes.size(); ++i)
