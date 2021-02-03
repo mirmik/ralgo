@@ -45,7 +45,22 @@ namespace heimer
 
 		int axcmd(int argc, char** argv)
 		{
-			const char * usage = "usage: ax AXNO CMD [ARGS ...]; ax list";
+
+			const char * usage = 
+"usage: ax AXNO CMD [ARGS ...]\r\n"
+"CMD:\r\n"
+"mov         - incremental move\r\n"
+"incmov      - absolute move\r\n"
+"stop        - stop current operation\r\n"
+"setspd      - set speed value\r\n"
+"setacc      - set acceleration/deceleration values\r\n"
+"setgain     - set gain for input commands\r\n"
+"setreverse  - set reverse for input commands\r\n"
+"setlim      - set forward/backward limits\r\n"
+"feed        - print current feedback information (?)\r\n"
+"pos         - print current position\r\n"
+"name        - print axis name"
+;
 
 			if (argc < 2)
 			{
@@ -153,7 +168,9 @@ namespace heimer
 					    "{:10}  sts:{:3}  ctr:{:10}",
 					    node->mnemo(),
 					    node->is_active() ? "on" : "off",
-					    node->controller ? node->controller->mnemo() : "none"
+					    node->last_controller() 
+					    	? node->last_controller()->mnemo() 
+					    	: "none"
 					);
 				}
 				return 0;

@@ -37,17 +37,23 @@ namespace heimer
 	public:
 		dlist_head control_node_list_lnk =
 		    DLIST_HEAD_INIT(control_node_list_lnk);
-
-		// контроллер, взявший управление над объектом
-		// или последний контроллер, бравший управление 
-		// в multicontroller mode
-		control_node * controller = nullptr;
-		
-		const char * _mnemo;
 		uint16_t flags = 0;
+
+	private:
+		const char * _mnemo;
 		int alarm_code = 0;
 
+		// контроллер, взявший управление над объектом
+		// или последний контроллер, бравший управление
+		// в multicontroller mode
+		control_node * controller = nullptr;
+
 	public:
+		const control_node * last_controller()
+		{
+			return controller;
+		}
+
 		constexpr
 		control_node(const char * mnemo) : _mnemo(mnemo)
 		{
@@ -66,9 +72,9 @@ namespace heimer
 
 		// Итератор контроллирующих устройств
 		virtual control_node * controllers_iterate (control_node * it)
-		{ 
+		{
 			if (it == nullptr) return controller;
-			else return nullptr; 
+			else return nullptr;
 		}
 
 		// Вызывается при после успешной активации устройства
@@ -100,21 +106,24 @@ namespace heimer
 			return flags & HEIM_IS_ALARM;
 		}
 
-		void set_multicontrolled_mode() 
+		void set_multicontrolled_mode()
 		{
 			flags |= HEIM_IS_MULTICONTROLLED;
 		}
 
-		const char* mnemo() { return _mnemo; }
+		const char* mnemo() const
+		{
+			return _mnemo;
+		}
 
-		virtual 
+		virtual
 		void print_info()
 		{
 			nos::println("info");
 		}
 
-		virtual 
-		int internal_command(int argc, char** argv) 
+		virtual
+		int internal_command(int argc, char** argv)
 		{
 			return -1;
 		}
@@ -122,11 +131,11 @@ namespace heimer
 		void rethrow_interrupt(
 		    control_node * slave, // источник, переславший сигнал
 		    control_node * source, // изначальный источник сигнала
-		    interrupt_args * data) 
+		    interrupt_args * data)
 		{
 			on_interrupt_common(slave, source, data);
 		}
-		
+
 	protected:
 		// вызывается при взятии внешнего управления нодом
 		virtual int on_external_take(
@@ -156,13 +165,13 @@ namespace heimer
 		    interrupt_args * data);
 
 		void throw_interrupt(
-			interrupt_args* interrupt
+		    interrupt_args* interrupt
 		);
 
 		static control_node * vector_iterate(
-			control_node** bit, 
-			control_node** eit,
-			control_node* it);
+		    control_node** bit,
+		    control_node** eit,
+		    control_node* it);
 	};
 
 	extern igris::console_command info_node_commands[];

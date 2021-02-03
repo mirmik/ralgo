@@ -45,6 +45,7 @@ namespace heimer
 		Speed feedspd[Dim] = {};
 
 		float _gains[Dim] = {};
+		int8_t _reverse[Dim] = {};
 
 		float poskoeff = 0.01;
 		bool _in_operation = false;
@@ -52,6 +53,11 @@ namespace heimer
 		igris::array_view<heimer::axis_node<Position, Speed>*> _axes;
 
 	public:
+		igris::delegate<void, linintctr*> operation_finish_signal;
+
+		//реализовать вызов.
+		igris::delegate<void, linintctr*> operation_start_signal;
+
 		bool in_operate()
 		{
 			return _in_operation;
@@ -72,19 +78,18 @@ namespace heimer
 			//polygon_checker(zone_polygon),
 			_axes(axes, Dim)
 		{
-			ralgo::vecops::fill(_gains, float(1));
+			ralgo::vecops::fill(_gains, 1.f);
+			ralgo::vecops::fill(_reverse, 0);
 		}
 
 		constexpr int dim() { return Dim; }
 
 		axis_node<float, float> * get_axis(int index)
 		{
-			//	return static_cast<axis_device<Position, Speed>*>(
-			//		parent::controlled()[index]);
 			return _axes[index];
 		}
 
-		int move(
+		int _move(
 		    igris::array_view<Position> curpos,
 		    igris::array_view<Position> tgtpos)
 		{
@@ -111,11 +116,6 @@ namespace heimer
 					return -1;
 				}
 			}
-
-			//if (!parent::is_active())
-			//{
-			//	return HEIM_ERR_IS_NOACTIVE;
-			//}
 
 			auto dist = ralgo::vecops::distance(curpos, tgtpos);
 
@@ -152,7 +152,7 @@ namespace heimer
 				tgtpos[i] = curpos[i] + mov[i] * _gains[i];
 			}
 
-			return move(curpos, tgtpos);
+			return _move(curpos, tgtpos);
 		}
 
 		int absmove(
@@ -168,7 +168,7 @@ namespace heimer
 				tgtpos[i] = pos[i] * _gains[i];
 			}
 
-			return move(curpos, tgtpos);
+			return _move(curpos, tgtpos);
 		}
 
 		int incmove(Position * mov)
@@ -311,15 +311,37 @@ namespace heimer
 	public:
 		int hardstop() override
 		{
-			trajectory = nullptr;
-			operation_finish(1);
+			Position curpos[Dim];
+		
+			for (unsigned int i = 0; i < Dim; ++i)
+			{
+				curpos[i] = get_axis(i)->target_position();
+			}
+		
+			lintraj.set_point_hold(curpos);
+
+			for (unsigned int i = 0; i < _axes.size(); ++i)
+			{
+				_axes[i]->ctrspd = 0;
+				_axes[i]->ctrpos = _axes[i]->feedpos;
+			}
+
+			operation_finish_signal(this);
+			operation_finished_flag = true;
+			
+			for (unsigned int i = 0; i < _axes.size(); ++i)
+			{
+				_axes[i]->hardstop();
+			}
+			
+			trajectory = & lintraj;
 
 			return 0;
 		}
 
-		void operation_finish(int priority)
-		{
-		}
+		//void operation_finish(int priority)
+		//{
+		//}
 
 		int stop_impl() override
 		{
@@ -350,6 +372,11 @@ namespace heimer
 			{
 				update_from_controlled();
 				stop_impl();
+			}
+
+			else
+			{
+				hardstop();
 			}
 
 			return false; // пробросить выше

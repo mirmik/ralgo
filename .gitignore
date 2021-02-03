@@ -144,3 +144,7 @@ dist
 .eval
 .evalcache
 .evalfile
+
+runtests
+
+test/runtests
