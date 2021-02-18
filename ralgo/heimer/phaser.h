@@ -13,10 +13,13 @@ namespace heimer
 	class phaser : public control_node
 	{
 	protected:
+		// Положение, занимаемое изделием по каналу обратной связи или копия target_position, если обратного канала нет.
 		volatile IntPos _feedback_position = 0;
-		volatile IntPos _target_position = 0;
-		float _gain = 1;
 
+		// Положение, которое должно занять изделие исходя из отосланных сигналов
+		volatile IntPos _target_position = 0; 
+		
+		float _gain = 1;
 		float _setted_speed = 0;
 
 	public:

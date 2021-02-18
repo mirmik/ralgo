@@ -18,6 +18,8 @@ namespace heimer
 			control_node(name)
 		{}
 
+		bool enable_full_spattern = false;
+
 		coordinate_checker<Position> * coord_checker = nullptr;
 
 		igris::delegate<void, linintctr_basic*> operation_finish_signal;

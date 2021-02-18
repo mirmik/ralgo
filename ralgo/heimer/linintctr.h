@@ -124,7 +124,8 @@ namespace heimer
 			}
 
 			lintraj.reset(curpos, curtime, tgtpos, tgttim);
-			lintraj.set_speed_pattern(_acc_val, _dcc_val, _speed);
+			lintraj.set_speed_pattern(_acc_val, _dcc_val, _speed, 
+				parent::enable_full_spattern);
 
 			trajectory = &lintraj;
 			_in_operation = true;

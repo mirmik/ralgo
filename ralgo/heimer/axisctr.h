@@ -39,6 +39,7 @@ namespace heimer
 
 		bool _reversed = false;
 		bool _limited = false;
+
 		P _forw;
 		P _back;
 
@@ -49,6 +50,8 @@ namespace heimer
 		igris::delegate<void, axisctr*> operation_start_signal;
 
 		igris::delegate<bool, P, P, char*> move_protector;
+
+		bool enable_full_spattern = false;
 
 	public:
 		auto * current_trajectory() { return curtraj; }
@@ -69,14 +72,14 @@ namespace heimer
 		int incmove(P dist);
 		int absmove(P pos);
 
-		void set_limits(P a, P b) 
+		void set_limits(P a, P b)
 		{
 			_back = a;
 			_forw = b;
 			_limited = true;
 		}
 
-		void set_reverse(bool reverse) 
+		void set_reverse(bool reverse)
 		{
 			_reversed = reverse;
 		}
@@ -92,7 +95,8 @@ namespace heimer
 		P feedback_position() { return controlled->feedpos / gain; }
 		V feedback_speed()    { return controlled->feedspd / gain; }
 
-		P telemetry_position() { 
+		P telemetry_position()
+		{
 			auto feedpos = feedback_position();
 			return _reversed ? -feedpos : feedpos;
 		}
@@ -162,7 +166,7 @@ namespace heimer
 		}
 
 		bool on_interrupt(
-			control_node * slave,
+		    control_node * slave,
 		    control_node * source,
 		    interrupt_args * args) override
 		{
@@ -171,7 +175,7 @@ namespace heimer
 				stop();
 			}
 
-			else 
+			else
 			{
 				hardstop();
 			}
@@ -187,7 +191,7 @@ namespace heimer
 	template <class P, class V>
 	int axisctr<P, V>::incmove(P dist)
 	{
-		dist = _reversed ? -dist : dist; 
+		dist = _reversed ? -dist : dist;
 		dist = dist * gain;
 
 		P curpos = controlled->ctrpos;
@@ -219,7 +223,7 @@ namespace heimer
 		auto dist = tgtpos - curpos;
 		int64_t curtim = ralgo::discrete_time();
 
-		if (heimer::global_protection) 
+		if (heimer::global_protection)
 		{
 			ralgo::warn(mnemo(), ": cannot start: global protection is setted");
 			return -1;
@@ -231,10 +235,10 @@ namespace heimer
 			return -1;
 		}
 
-		if (move_protector.armed()) 
+		if (move_protector.armed())
 		{
 			char msg[64];
-			if (move_protector(curpos, tgtpos, msg)) 
+			if (move_protector(curpos, tgtpos, msg))
 			{
 				ralgo::warn(mnemo(), ": ", msg);
 				return -1;
@@ -259,10 +263,11 @@ namespace heimer
 			.speed = spd,
 			.acc = acc,
 			.dcc = dcc,
+			.full_spattern = enable_full_spattern
 		};
 
 		lintraj.init_nominal_speed_mode(&nm_params);
-			
+
 		operation_finished_flag = false;
 		operation_start_signal(this);
 		curtraj = &lintraj;
@@ -291,7 +296,7 @@ namespace heimer
 		P ctrpos;
 		V ctrspd;
 
-		if (is_alarmed()) 
+		if (is_alarmed())
 		{
 			ralgo::warn("axisctr is_alarmed");
 			return;
@@ -325,13 +330,13 @@ namespace heimer
 		if (curtraj == nullptr)
 			return 0;
 
-		if (controlled->feedspd == 0) 
+		if (controlled->feedspd == 0)
 		{
 			lintraj.set_point_hold(controlled->feedpos);
-			curtraj = &lintraj;	
+			curtraj = &lintraj;
 			operation_finished_flag = true;
 			operation_finish_signal(this);
-			return 0;	
+			return 0;
 		}
 
 		lintraj.set_stop_trajectory(
@@ -416,7 +421,7 @@ namespace heimer
 
 		else if (strcmp(argv[0], "setlim") == 0)
 		{
-			if (argc != 3) 
+			if (argc != 3)
 			{
 				nos::println("setlim:wrong args count");
 				return -1;
@@ -424,9 +429,9 @@ namespace heimer
 
 			P a = atof32(argv[1], nullptr);
 			P b = atof32(argv[2], nullptr);
-		
-			if (a > b) 
-				return -1;  
+
+			if (a > b)
+				return -1;
 
 			set_limits(a, b);
 			return 0;

@@ -215,6 +215,59 @@ TEST_CASE("heimer_movement_test" * doctest::timeout(2))
 	CHECK(igris::early(maxpos, 5.0));
 }
 
+TEST_CASE("heimer_movement_test_with_spattern" * doctest::timeout(2))
+{
+	int sts;
+
+	heimer::stub_axis<float, float> ax("ax");
+	heimer::axisctr axctr("axctr", &ax);
+	axctr.enable_full_spattern = true;
+
+	heimer::set_global_protection(false);
+
+	sts = ax.activate();
+	CHECK_EQ(sts, 0);
+
+	sts = axctr.activate();
+	CHECK_EQ(sts, 0);
+
+	axctr.set_accdcc(10, 10);
+	axctr.set_speed(4);
+
+	float target = 5;
+	axctr.incmove(target);
+
+	float minspd, minpos = std::numeric_limits<float>::max();
+	float maxspd, maxpos = std::numeric_limits<float>::min();
+
+	CHECK(axctr.linear_trajectory()->spddeform.full_spattern);
+
+	while(1) 
+	{
+		ax.feedback();
+		
+		axctr.serve();
+		ax.serve();
+
+		auto pos = ax.feedpos; 
+		auto spd = ax.feedspd;
+
+		if (maxspd < spd) maxspd = spd;
+		if (maxpos < pos) maxpos = pos;
+
+		if (minspd > spd) minspd = spd;
+		if (minpos > pos) minpos = pos;
+
+		if (igris::early(pos, target)) 
+		{
+			break;
+		}
+	}
+
+	CHECK(igris::early(maxspd, 4.0));
+	CHECK(igris::early(maxpos, 5.0));
+}
+
 LT_BEGIN_TEST(ralgo_test_suite, heimer_absmovement_test)
 {
 	int sts;
