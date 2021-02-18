@@ -10,6 +10,10 @@
 #define HEIMER_TRAJ1D_CONTINUE 0
 #define HEIMER_TRAJ1D_FINISHED 1
 
+// TODO:
+// 		Есть подозрение, что деление на discrete_time_frequency 
+//      можно упразднить.
+
 namespace ralgo
 {
 	template <class P, class V>
@@ -22,6 +26,8 @@ namespace ralgo
 		V speed;
 		V acc;
 		V dcc;
+
+		bool full_spattern = false;
 	};
 
 	template <class P, class V>
@@ -119,7 +125,9 @@ namespace ralgo
 
 			// Учёт возможного треугольного паттерна осуществляется
 			// здесь:
-			spddeform.set_speed_pattern(acc_part, dcc_part);	
+			spddeform.set_speed_pattern(
+				acc_part, dcc_part, 0, 0, 
+				args->full_spattern);	
 		}
 
 
@@ -133,6 +141,14 @@ namespace ralgo
 			// Умножение на коэффициент времени перерасщитывает скорость
 			// взятую на дискретную единицу времени в скорость взятую
 			// на единицу времени рабочего пространства.
+
+			/*  
+			    u = t / (t_fini - t_strt)
+			    P(t) = posmod(u)
+				x = x[0] + v*t*P(t) = x[0] + (x[1]-x[0])*P(t)
+				v = V * spdmod(u)
+			*/
+
 			float time_unit = ftim == stim ? 0 : (float)(time - stim) / (float)(ftim - stim);
 
 			assert(!isnan(time_unit));
@@ -145,42 +161,6 @@ namespace ralgo
 
 			return (spddeform.is_finished(time_unit) || stim == ftim) ? 1 : 0;
 		}
-
-		/*void set_time_pattern(int64_t acctime, int64_t dcctime, float nominal_speed)
-		{
-			float koeff = setted_speed / nominal_speed;
-
-			float acc = acctime * koeff / (ftim - stim);
-			float dcc = dcctime * koeff / (ftim - stim);
-
-			if (acc + dcc > 1)
-			{
-				acc = 0.5;
-				dcc = 0.5;
-			}
-
-			spddeform.set_time_pattern(
-			    acc, dcc
-			);
-		}*/
-
-		/*void set_accdcc_pattern(float acc, float dcc)
-		{
-			// Чтобы расчитать интервал времени разгона, необходимо
-			// соотнести значение ускорения и скорости.
-			// Здесь acc - тангенс угла,
-			// setted_speed - установленная скорость в дискреных единицах
-			// тогда setted_speed / acc = acc_time в дискретных единицах
-			float time = ftim - stim;
-
-			float acc_time = setted_speed / acc * ralgo::discrete_time_frequency();
-			float dcc_time = setted_speed / dcc * ralgo::discrete_time_frequency();
-
-			float acc_part = acc_time / time;
-			float dcc_part = dcc_time / time;
-
-			spddeform.set_speed_pattern(acc_part, dcc_part);
-		}*/
 
 		void set_stop_trajectory(P curpos, V curspd, V dccval)
 		{

@@ -8,15 +8,15 @@ LT_BEGIN_TEST(ralgo_test_suite, traj_speed_deformer)
 {
 	ralgo::speed_deformer deform;
 	deform.set_time_pattern(0.2, 0.2);
-	CHECK(igris::early(deform.real_spd, 1.25));
-	CHECK(igris::early(deform.f_time, 1));
+	CHECK(igris::early(deform.v1, 1.25));
+	CHECK(igris::early(deform.t3, 1));
 	CHECK_EQ(deform.posmod(1), 1);
-	CHECK_EQ(deform.spdmod(0.5), deform.real_spd);
+	CHECK_EQ(deform.spdmod(0.5), deform.v1);
 
 	deform.set_speed_pattern(0.2,0.2);
-	CHECK(igris::early(deform.real_spd, 1));
-	CHECK(igris::early(deform.f_time, 1.2));
-	CHECK_EQ(deform.posmod(deform.f_time), 1);
+	CHECK(igris::early(deform.v1, 1));
+	CHECK(igris::early(deform.t3, 1.2));
+	CHECK_EQ(deform.posmod(deform.t3), 1);
 	CHECK_LT(deform.posmod(1), 1);
 	CHECK_EQ(deform.spdmod(0.5), 1);
 }
@@ -136,6 +136,23 @@ LT_BEGIN_TEST(ralgo_test_suite, traj_traj1_nominal_speed_mmm)
 	CHECK_EQ(pos, 10);
 	CHECK_EQ(spd, 0);
 
-	sts = traj.attime(2000, pos, spd);
+	sts = traj.attime(4000, pos, spd);
+	CHECK_EQ(sts, 1);
+	CHECK_EQ(pos, 11);
+	CHECK_EQ(spd, 0);
+}
+LT_END_TEST(traj_traj1_nominal_speed_mmm)
+
+LT_BEGIN_TEST(ralgo_test_suite, traj_traj1_speed_deformer)
+{
+	ralgo::speed_deformer deform;
+
+	deform.set_speed_pattern(0.25, 0.25, 0, 0, true);
+	CHECK(igris::early(deform.x0h, 0.25/12));	
+	CHECK(igris::early(deform.posmod(0.125), 
+		2*(0.125*0.125*0.125)/3/(0.25*0.25)));	
+	CHECK(igris::early(deform.spdmod(0.125), 
+		2*(0.125*0.125)/(0.25*0.25)));	
+
 }
 LT_END_TEST(traj_traj1_nominal_speed_mmm)

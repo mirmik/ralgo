@@ -123,7 +123,8 @@ namespace ralgo
 			return (spddeform.is_finished(time_unit) || stim == ftim) ? 1 : 0;
 		}
 
-		void set_speed_pattern(float acc, float dcc, float speed)
+		void set_speed_pattern(float acc, float dcc, 
+			float speed, bool full_spattern = false)
 		{
 			// Чтобы расчитать интервал времени разгона, необходимо
 			// соотнести значение ускорения и скорости.
@@ -141,7 +142,7 @@ namespace ralgo
 
 			//ralgo::speed_deformer::acc_dcc_balance(acc_part, dcc_part);
 
-			spddeform.set_speed_pattern(acc_part, dcc_part);
+			spddeform.set_speed_pattern(acc_part, dcc_part, 0, 0, full_spattern);
 		}
 
 		void set_stop_trajectory(igris::array_view<P> curpos, igris::array_view<V> curspd, V dccval)
