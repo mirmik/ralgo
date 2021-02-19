@@ -20,6 +20,7 @@ application("runtests",
 	sources = [
 		"main.cpp",
 		"heimer.cpp",
+		"heimer2.cpp",
 		"traj.cpp",
 		"geom.cpp",
 		"matops.cpp",

@@ -65,6 +65,14 @@ namespace heimer
 			linintctr(name, axes.data())
 		{}
 
+		void current_point(Position * ptr) 
+		{
+			for (int i = 0; i < Dim; ++i) 
+			{
+				*ptr++ = feedpos[i];
+			}
+		}
+
 		linintctr(
 		    const char* name,
 		    heimer::axis_node<Position, Speed>** axes

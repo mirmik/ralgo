@@ -47,6 +47,12 @@ namespace heimer
 			feedspd = spd;
 		}
 
+		void set_current_phase(P pos, V spd) 
+		{
+			ctrpos = feedpos = pos;
+			ctrspd = feedspd = spd;
+		}
+
 		void control(P pos, V spd)
 		{
 			assert(!isnan(ctrspd));

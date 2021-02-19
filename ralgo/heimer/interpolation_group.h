@@ -35,6 +35,8 @@ namespace heimer
 		virtual int set_accdcc(Speed acc, Speed dcc) = 0;
 		virtual int dim() = 0;
 
+		virtual void current_point(Position*) = 0;
+
 		int set_accdcc(Speed acc) { return set_accdcc(acc, acc); }
 
 		virtual Speed speed() = 0;
