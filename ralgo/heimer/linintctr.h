@@ -33,7 +33,7 @@ namespace heimer
 		Speed _acc_val = 1;
 		Speed _dcc_val = 1;
 
-		ralgo::trajNd<Dim, Position, Speed> * trajectory;
+		ralgo::trajNd<Dim, Position, Speed> * trajectory = nullptr;
 		ralgo::trajNd_line<Dim, Position, Speed> lintraj;
 
 //			Speed compspd[Dim];
