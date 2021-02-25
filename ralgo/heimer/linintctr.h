@@ -18,31 +18,17 @@ namespace heimer
 	class linintctr :
 		public linintctr_basic<Position, Speed>
 	{
+		// Линейная интерполяция в декартовой метрике.
+
 		using parent = linintctr_basic<Position, Speed>;
 		bool operation_finished_flag = true;
 
-		// Линейная интерполяция в декартовой метрике.
-
-		//using parent = interpolation_group<Position, Speed>;
-
-		//linalg::vec<Position, 2> zone_polygon[8];
-		//plane_zone_checker<Position> polygon_checker;
-
 		Speed _speed = 1;
-		//float _accdcc = 0;
 		Speed _acc_val = 1;
 		Speed _dcc_val = 1;
 
-		ralgo::trajNd<Dim, Position, Speed> * trajectory = nullptr;
+		ralgo::trajNd<Dim, Position, Speed> * curtraj = nullptr;
 		ralgo::trajNd_line<Dim, Position, Speed> lintraj;
-
-//			Speed compspd[Dim];
-
-		Position ctrpos[Dim] = {};
-		Speed ctrspd[Dim] = {};
-
-		Position feedpos[Dim] = {};
-		Speed feedspd[Dim] = {};
 
 		float _gains[Dim] = {};
 		int8_t _reverse[Dim] = {};
@@ -65,11 +51,11 @@ namespace heimer
 			linintctr(name, axes.data())
 		{}
 
-		void current_point(Position * ptr) 
+		void current_point(Position * ptr)
 		{
-			for (int i = 0; i < Dim; ++i) 
+			for (int i = 0; i < Dim; ++i)
 			{
-				*ptr++ = feedpos[i];
+				*ptr++ = _axes[i]->feedpos;
 			}
 		}
 
@@ -78,7 +64,6 @@ namespace heimer
 		    heimer::axis_node<Position, Speed>** axes
 		) :
 			linintctr_basic<Position, Speed>(name),
-			//polygon_checker(zone_polygon),
 			_axes(axes, Dim)
 		{
 			ralgo::vecops::fill(_gains, 1.f);
@@ -120,9 +105,15 @@ namespace heimer
 				}
 			}
 
+			float speed_multiplier = evaluate_speed_multiplier(curpos, tgtpos);
+			float gained_speed = speed_multiplier * _speed;
+			float gained_acc_val = speed_multiplier * _acc_val;
+			float gained_dcc_val = speed_multiplier * _dcc_val;
+
 			auto dist = ralgo::vecops::distance(curpos, tgtpos);
 
-			int64_t time = (int64_t)(((Speed)fabs(dist)) / _speed * ralgo::discrete_time_frequency());
+			int64_t time = (int64_t)(((Speed)fabs(dist)) / gained_speed 
+				* ralgo::discrete_time_frequency());
 			int64_t curtime = ralgo::discrete_time();
 			int64_t tgttim = curtime + time;
 
@@ -131,16 +122,44 @@ namespace heimer
 				return 0;
 			}
 
-			lintraj.reset(curpos, curtime, tgtpos, tgttim);
-			lintraj.set_speed_pattern(_acc_val, _dcc_val, _speed, 
-				parent::enable_full_spattern);
+			DPRINT(speed_multiplier);
+			DPRINT(gained_speed);
+			DPRINT(gained_acc_val);
+			DPRINT(gained_dcc_val);
 
-			trajectory = &lintraj;
+			lintraj.reset(curpos, curtime, tgtpos, tgttim);
+			lintraj.set_speed_pattern(
+				gained_acc_val, 
+				gained_dcc_val, 
+				gained_speed,
+			    parent::enable_full_spattern);
+
+			curtraj = &lintraj;
 			_in_operation = true;
 			operation_finished_flag = false;
 			parent::operation_start_signal(this);
 
 			return 0;
+		}
+
+		float evaluate_speed_multiplier(
+			igris::array_view<Position> curpos, 
+			igris::array_view<Position> tgtpos) 
+		{
+			Position interval_with_gain[Dim];
+			Position interval_without_gain[Dim];
+
+			for (unsigned int i = 0; i < Dim; ++i)
+			{
+				interval_with_gain[i] = tgtpos[i] - curpos[i];
+				interval_without_gain[i] = interval_with_gain[i] / _gains[i];
+			}
+
+			float interval_without_gain_length = ralgo::vecops::length(interval_without_gain);
+			float interval_with_gain_length = ralgo::vecops::length(interval_with_gain);
+
+			float speed_multiplier = interval_with_gain_length / interval_without_gain_length; 
+			return speed_multiplier;
 		}
 
 		int incmove(
@@ -149,7 +168,7 @@ namespace heimer
 		{
 			Position curpos[Dim];
 			Position tgtpos[Dim];
-
+			
 			for (unsigned int i = 0; i < mov.size(); ++i)
 			{
 				curpos[i] = get_axis(i)->target_position();
@@ -165,7 +184,7 @@ namespace heimer
 		{
 			Position curpos[Dim];
 			Position tgtpos[Dim];
-
+			
 			for (unsigned int i = 0; i < pos.size(); ++i)
 			{
 				curpos[i] = get_axis(i)->ctrpos;
@@ -187,19 +206,21 @@ namespace heimer
 
 		int parted_absmove(int * axno, Position * pos, int len)
 		{
-			Position tgt[Dim];
-
-			for (int i = 0; i < Dim; ++i)
+			Position curpos[Dim];
+			Position tgtpos[Dim];
+			
+			for (unsigned int i = 0; i < Dim; ++i)
 			{
-				tgt[i] = get_axis(i)->ctrpos;
+				curpos[i] = get_axis(i)->ctrpos;
+				tgtpos[i] = curpos[i];
 			}
 
 			for (int i = 0; i < len; ++i)
 			{
-				tgt[axno[i]] = pos[i];
+				tgtpos[axno[i]] = pos[i] * _gains[axno[i]];
 			}
 
-			return absmove({tgt, Dim});
+			return _move(curpos, tgtpos);
 		}
 
 		int set_speed(Speed speed)
@@ -218,10 +239,14 @@ namespace heimer
 
 		int update_control_by_trajectory()
 		{
-			int is_finish = trajectory->attime(
+			Position ctrpos[Dim];
+			Speed ctrspd[Dim];
+
+			int is_finish = curtraj->attime(
 			                    ralgo::discrete_time(), ctrpos, ctrspd);
 
-			//(void) is_finish;
+			apply_phase(ctrpos, ctrspd);
+
 			if (is_finish)
 			{
 				_in_operation = false;
@@ -230,7 +255,7 @@ namespace heimer
 			return is_finish;
 		}
 
-		void apply_phase()
+		void apply_phase(Position * ctrpos, Speed * ctrspd)
 		{
 			for (int i = 0; i < Dim; ++i)
 			{
@@ -244,16 +269,16 @@ namespace heimer
 				_gains[i] = arr[i];
 		}
 
-		void feedback()
+		/*void feedback()
 		{
 			for (int i = 0; i < Dim; ++i)
 			{
 				feedpos[i] = _axes[i]->feedpos;
 				feedspd[i] = _axes[i]->feedspd;
 			}
-		}
+		}*/
 
-		void update_from_controlled()
+		/*void update_from_controlled()
 		{
 			for (int i = 0; i < Dim; ++i)
 			{
@@ -262,13 +287,13 @@ namespace heimer
 				ctrpos[i] = _axes[i]->ctrpos;
 				ctrspd[i] = _axes[i]->ctrspd;
 			}
-		}
+		}*/
 
 		void serve_impl() override
 		{
 			int sts;
 
-			if (trajectory)
+			if (curtraj)
 			{
 				sts = update_control_by_trajectory();
 
@@ -281,15 +306,16 @@ namespace heimer
 				}
 			}
 
-			apply_phase();
+			//apply_phase();
 		}
 
 		void print_info() override
 		{
-			for (int i = 0; i < Dim; ++i)
-			{
-				nos::fprintln("\tfeed:(pos:{},spd:{})", feedpos[i], feedspd[i]);
-			}
+			nos::println("TODO");
+			//for (int i = 0; i < Dim; ++i)
+			//{
+			//	nos::fprintln("\tfeed:(pos:{},spd:{})", feedpos[i], feedspd[i]);
+			//}
 		}
 
 		Speed speed() { return _speed; }
@@ -316,12 +342,12 @@ namespace heimer
 		int hardstop() override
 		{
 			Position curpos[Dim];
-		
+
 			for (unsigned int i = 0; i < Dim; ++i)
 			{
 				curpos[i] = get_axis(i)->target_position();
 			}
-		
+
 			lintraj.set_point_hold(curpos);
 
 			for (unsigned int i = 0; i < _axes.size(); ++i)
@@ -332,13 +358,13 @@ namespace heimer
 
 			parent::operation_finish_signal(this);
 			operation_finished_flag = true;
-			
+
 			for (unsigned int i = 0; i < _axes.size(); ++i)
 			{
 				_axes[i]->hardstop();
 			}
-			
-			trajectory = & lintraj;
+
+			curtraj = & lintraj;
 
 			return 0;
 		}
@@ -347,17 +373,47 @@ namespace heimer
 		//{
 		//}
 
+		void collect_feedpos(Position * feedpos) 
+		{
+			for(int i = 0; i< Dim; i++)
+				feedpos[i] = _axes[i]->feedpos;
+		}
+
+		void collect_feedspd(Position * feedspd) 
+		{
+			for(int i = 0; i< Dim; i++)
+				feedspd[i] = _axes[i]->feedspd;
+		}
+
 		int stop_impl() override
 		{
-			if (trajectory == nullptr)
+			Position feedpos[Dim];
+			Speed feedspd[Dim];
+
+			collect_feedpos(feedpos);
+			collect_feedspd(feedspd);
+
+			if (curtraj == nullptr)
 				return 0;
+
+			/*if (controlled->feedspd == 0)
+			{
+				lintraj.set_point_hold(controlled->feedpos);
+				curtraj = &lintraj;
+				operation_finished_flag = true;
+				operation_finish_signal(this);
+				return 0;
+			}*/
 
 			lintraj.set_stop_trajectory(
 			    feedpos,
 			    feedspd,
 			    _dcc_val);
 
-			trajectory = & lintraj;
+			operation_finished_flag = false;
+			curtraj = & lintraj;
+
+			curtraj = & lintraj;
 			return 0;
 		}
 
@@ -374,7 +430,7 @@ namespace heimer
 		{
 			if (data->code() == HEIMER_INTERRUPT_TYPE_CONTROL_UPDATE)
 			{
-				update_from_controlled();
+				//update_from_controlled();
 				stop_impl();
 			}
 
