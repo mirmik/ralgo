@@ -505,7 +505,7 @@ LT_BEGIN_TEST(ralgo_test_suite, heimer_linint)
 	{
 		ax1.feedback();
 		ax2.feedback();
-		linint.feedback();
+		//linint.feedback(); // nostate
 
 		linint.serve();
 		ax2.serve();

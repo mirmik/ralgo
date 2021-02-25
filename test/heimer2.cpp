@@ -99,8 +99,8 @@ LT_BEGIN_TEST(ralgo_test_suite, polygon_difference_checker)
 	ig1.set_speed(10);
 	ig1.set_accdcc(10000, 10000);
 
-	ig0.feedback();
-	ig1.feedback();
+	//ig0.feedback(); //nostate
+	//ig1.feedback(); //nostate
 
 	linalg::vec<float,2> v;
 	ig0.current_point((float*)&v);

@@ -126,7 +126,7 @@ namespace ralgo
 
 		// Вычислить длину вектора по евклидовой метрике.
 		template <typename V>
-		auto norm(const V& vec) -> typename V::value_type
+		double norm(const V& vec)
 		{
 			double res = 0;
 
@@ -135,7 +135,7 @@ namespace ralgo
 			return sqrt(res);
 		}
 		template <typename V>
-		auto length(const V& vec) -> typename V::value_type
+		double length(const V& vec)
 		{
 			return norm(vec);
 		}
