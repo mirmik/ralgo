@@ -269,26 +269,6 @@ namespace heimer
 				_gains[i] = arr[i];
 		}
 
-		/*void feedback()
-		{
-			for (int i = 0; i < Dim; ++i)
-			{
-				feedpos[i] = _axes[i]->feedpos;
-				feedspd[i] = _axes[i]->feedspd;
-			}
-		}*/
-
-		/*void update_from_controlled()
-		{
-			for (int i = 0; i < Dim; ++i)
-			{
-				feedpos[i] = _axes[i]->feedpos;
-				feedspd[i] = _axes[i]->feedspd;
-				ctrpos[i] = _axes[i]->ctrpos;
-				ctrspd[i] = _axes[i]->ctrspd;
-			}
-		}*/
-
 		void serve_impl() override
 		{
 			int sts;
@@ -301,21 +281,13 @@ namespace heimer
 				{
 					operation_finished_flag = true;
 					parent::operation_finish_signal(this);
-					//lintraj.set_point_hold(ctrpos);
-					//curtraj = &lintraj;
 				}
 			}
-
-			//apply_phase();
 		}
 
 		void print_info() override
 		{
 			nos::println("TODO");
-			//for (int i = 0; i < Dim; ++i)
-			//{
-			//	nos::fprintln("\tfeed:(pos:{},spd:{})", feedpos[i], feedspd[i]);
-			//}
 		}
 
 		Speed speed() { return _speed; }
@@ -369,10 +341,6 @@ namespace heimer
 			return 0;
 		}
 
-		//void operation_finish(int priority)
-		//{
-		//}
-
 		void collect_feedpos(Position * feedpos) 
 		{
 			for(int i = 0; i< Dim; i++)
@@ -396,15 +364,6 @@ namespace heimer
 			if (curtraj == nullptr)
 				return 0;
 
-			/*if (controlled->feedspd == 0)
-			{
-				lintraj.set_point_hold(controlled->feedpos);
-				curtraj = &lintraj;
-				operation_finished_flag = true;
-				operation_finish_signal(this);
-				return 0;
-			}*/
-
 			lintraj.set_stop_trajectory(
 			    feedpos,
 			    feedspd,
@@ -416,12 +375,6 @@ namespace heimer
 			curtraj = & lintraj;
 			return 0;
 		}
-
-		/*bool can_operate() override
-		{
-			return parent::is_active()
-			       && !in_operate();
-		}*/
 
 		bool on_interrupt(
 		    control_node * slave,
