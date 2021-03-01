@@ -37,7 +37,7 @@ namespace heimer
 		ralgo::traj1d<P, V> *    curtraj = &lintraj;
 		ralgo::traj1d_line<P, V> lintraj;
 
-		bool _reversed = false;
+		//bool _reversed = false;
 		bool _limited = false;
 
 		P _forw;
@@ -74,15 +74,19 @@ namespace heimer
 
 		void set_limits(P a, P b)
 		{
-			_back = a;
-			_forw = b;
+			_back = a * gain;
+			_forw = b * gain;
+
+			if (gain < 0) 
+				std::swap(_back, _forw);
+
 			_limited = true;
 		}
 
-		void set_reverse(bool reverse)
+		/*void set_reverse(bool reverse)
 		{
 			_reversed = reverse;
-		}
+		}*/
 
 		int incmove_unsafe(P dist);
 		int absmove_unsafe(P pos);
@@ -93,30 +97,29 @@ namespace heimer
 		void set_gain(V gain) { this->gain = gain; };
 
 		P feedback_position() { return controlled->feedpos / gain; }
-		V feedback_speed()    { return controlled->feedspd / gain; }
+		V feedback_speed()    { return controlled->feedspd / fabs(gain); }
 
 		P telemetry_position()
 		{
-			auto feedpos = feedback_position();
-			return _reversed ? -feedpos : feedpos;
+			return feedback_position();
 		}
 
 		P target_position() { return controlled->ctrpos / gain; }
-		V target_speed()    { return controlled->ctrspd / gain; }
+		V target_speed()    { return controlled->ctrspd / fabs(gain); }
 
-		V setted_speed()        { return spd / gain; }
-		V setted_acceleration() { return acc / gain; }
-		V setted_deceleration() { return dcc / gain; }
+		V setted_speed()        { return spd / fabs(gain); }
+		V setted_acceleration() { return acc / fabs(gain); }
+		V setted_deceleration() { return dcc / fabs(gain); }
 
-		void set_speed(V spd)        { this->spd = spd * gain; }
-		void set_acceleration(V acc) { this->acc = acc * gain; }
-		void set_deceleration(V dcc) { this->dcc = dcc * gain; }
+		void set_speed(V spd)        { this->spd = spd * fabs(gain); }
+		void set_acceleration(V acc) { this->acc = acc * fabs(gain); }
+		void set_deceleration(V dcc) { this->dcc = dcc * fabs(gain); }
 		void set_offset(P offset)    { this->offset = offset; }
 
 		void set_accdcc(V acc, V dcc)
 		{
-			this->acc = acc * gain;
-			this->dcc = dcc * gain;
+			this->acc = acc * fabs(gain);
+			this->dcc = dcc * fabs(gain);
 		}
 
 		void serve_impl() override;
@@ -191,14 +194,15 @@ namespace heimer
 	template <class P, class V>
 	int axisctr<P, V>::incmove(P dist)
 	{
-		dist = _reversed ? -dist : dist;
 		dist = dist * gain;
 
 		P curpos = controlled->ctrpos;
 		P tgtpos = curpos + dist;
 
 		if (_limited)
-			tgtpos = igris::clamp(tgtpos, _back * gain, _forw * gain);
+			tgtpos = igris::clamp(tgtpos, 
+				                  _back, 
+				                  _forw);
 
 		P ndist = tgtpos - curpos;
 
@@ -208,11 +212,12 @@ namespace heimer
 	template <class P, class V>
 	int axisctr<P, V>::absmove(P tgtpos)
 	{
-		tgtpos = _reversed ? -tgtpos : tgtpos;
 		tgtpos = tgtpos * gain;
 
 		if (_limited)
-			tgtpos = igris::clamp(tgtpos, _back * gain, _forw * gain);
+			tgtpos = igris::clamp(tgtpos, 
+				                  _back, 
+				                  _forw);
 
 		return absmove_unsafe(tgtpos);
 	}
@@ -277,7 +282,6 @@ namespace heimer
 	template <class P, class V>
 	int axisctr<P, V>::incmove_unsafe(P dist)
 	{
-		// TODO: Это должно работать с gain
 		auto curpos = controlled->ctrpos;
 		return _absmove_unsafe(curpos, curpos + dist);
 	}
@@ -285,7 +289,6 @@ namespace heimer
 	template <class P, class V>
 	int axisctr<P, V>::absmove_unsafe(P pos)
 	{
-		// TODO: Это должно работать с gain
 		auto curpos = controlled->ctrpos;
 		return _absmove_unsafe(curpos, pos);
 	}
@@ -408,14 +411,6 @@ namespace heimer
 		{
 			fltarg = atof32(argv[1], nullptr);
 			set_gain(fltarg);
-			return 0;
-		}
-
-		else if (strcmp(argv[0], "setreverse") == 0)
-		{
-			int arg = atoi32(argv[1], 10, nullptr);
-			nos::println("setreverse", mnemo(), arg);
-			set_reverse(arg);
 			return 0;
 		}
 

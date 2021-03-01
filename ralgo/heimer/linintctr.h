@@ -269,6 +269,12 @@ namespace heimer
 				_gains[i] = arr[i];
 		}
 
+		void set_reverses(igris::array_view<int> arr) override
+		{
+			for (unsigned int i = 0; i < arr.size(); ++i)
+				_reverse[i] = arr[i];
+		}
+
 		void serve_impl() override
 		{
 			int sts;
