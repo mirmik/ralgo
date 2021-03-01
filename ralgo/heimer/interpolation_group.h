@@ -44,6 +44,7 @@ namespace heimer
 		virtual Speed deceleration() = 0;
 
 		virtual void set_gains(igris::array_view<float> arr) = 0;
+		virtual void set_reverses(igris::array_view<int> arr) = 0;
 
 		int command(int argc, char** argv)
 		{
