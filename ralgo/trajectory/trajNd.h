@@ -2,8 +2,7 @@
 #define RALGO_PLANNING_TRAJ_ND_H
 
 #include <nos/fprint.h>
-#include <ralgo/planning/phase.h>
-#include <ralgo/planning/speed_deformer.h>
+#include <ralgo/trajectory/speed_deformer.h>
 
 namespace ralgo
 {
@@ -123,8 +122,8 @@ namespace ralgo
 			return (spddeform.is_finished(time_unit) || stim == ftim) ? 1 : 0;
 		}
 
-		void set_speed_pattern(float acc, float dcc, 
-			float speed, bool full_spattern = false)
+		void set_speed_pattern(float acc, float dcc,
+		                       float speed, bool full_spattern = false)
 		{
 			// Чтобы расчитать интервал времени разгона, необходимо
 			// соотнести значение ускорения и скорости.
@@ -154,14 +153,23 @@ namespace ralgo
 			float realdiff = ralgo::vecops::length(curspd) / dccval;
 			ftim = stim + realdiff / 2 * ralgo::discrete_time_frequency();
 
-			assert(ftim >= stim);
-
 			std::copy(std::begin(curpos), std::end(curpos), std::begin(this->spos));
-			for (unsigned int i = 0; i < Dim ; ++i)
-				fpos[i] = spos[i] + curspd[i] * realdiff / 2;
+			if (ftim > stim)
+			{
+				for (unsigned int i = 0; i < Dim ; ++i)
+					fpos[i] = spos[i] + curspd[i] * realdiff / 2;
 
-			for (unsigned int i = 0; i < Dim ; ++i)
-				setted_speed[i] = curspd[i] / ralgo::discrete_time_frequency();
+				for (unsigned int i = 0; i < Dim ; ++i)
+					setted_speed[i] = curspd[i] / ralgo::discrete_time_frequency();
+			}
+			else
+			{
+				ftim = stim + 1; //prevent zero division
+				for (unsigned int i = 0; i < Dim ; ++i)
+					fpos[i] = spos[i];
+
+				ralgo::vecops::fill(setted_speed, 0);
+			}
 
 			spddeform.set_stop_pattern();
 		}
@@ -173,7 +181,7 @@ namespace ralgo
 
 			std::copy(std::begin(curpos), std::end(curpos), std::begin(this->spos));
 			std::copy(std::begin(curpos), std::end(curpos), std::begin(this->fpos));
-			
+
 			ralgo::vecops::fill(setted_speed, 0);
 
 			spddeform.set_stop_pattern();

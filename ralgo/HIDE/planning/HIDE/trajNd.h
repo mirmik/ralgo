@@ -145,7 +145,8 @@ namespace ralgo
 			float realdiff = ralgo::vecops::length(curspd) / dccval;
 			ftim = stim + realdiff / 2 * ralgo::discrete_time_frequency();
 
-			assert(ftim >= stim);
+			//assert(ftim >= stim);
+			if (ftim < stim) { ftim = stim + 1; }
 
 			std::copy(std::begin(curpos), std::end(curpos), std::begin(this->spos));
 			for (unsigned int i = 0; i < Dim ; ++i) 

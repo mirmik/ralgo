@@ -177,15 +177,10 @@ namespace heimer
 		}
 
 		virtual int hardstop() = 0;
-		virtual int stop_impl() = 0;
+		virtual int stop() = 0;
 
 		//virtual bool can_operate() = 0;
 		virtual void print_info() = 0;
-
-		void stop()
-		{
-			stop_impl();
-		}
 	};
 }
 

@@ -27,6 +27,8 @@ namespace heimer
 		Speed _acc_val = 1;
 		Speed _dcc_val = 1;
 
+		//float _speed_multiplier = 1;
+
 		ralgo::trajNd<Dim, Position, Speed> * curtraj = nullptr;
 		ralgo::trajNd_line<Dim, Position, Speed> lintraj;
 
@@ -122,11 +124,6 @@ namespace heimer
 				return 0;
 			}
 
-			DPRINT(speed_multiplier);
-			DPRINT(gained_speed);
-			DPRINT(gained_acc_val);
-			DPRINT(gained_dcc_val);
-
 			lintraj.reset(curpos, curtime, tgtpos, tgttim);
 			lintraj.set_speed_pattern(
 				gained_acc_val, 
@@ -161,6 +158,24 @@ namespace heimer
 			float speed_multiplier = interval_with_gain_length / interval_without_gain_length; 
 			return speed_multiplier;
 		}
+
+		float evaluate_speed_multiplier_by_curspd(
+			igris::array_view<Position> curspd) 
+		{
+			Speed without_gain[Dim];
+
+			for (unsigned int i = 0; i < Dim; ++i)
+			{
+				without_gain[i] = curspd[i] / _gains[i];
+			}
+
+			float without_gain_length = ralgo::vecops::length(without_gain);
+			float with_gain_length = ralgo::vecops::length(curspd);
+
+			float speed_multiplier = with_gain_length / without_gain_length; 
+			return speed_multiplier;
+		}
+
 
 		int incmove(
 		    igris::array_view<Position> mov
@@ -359,7 +374,7 @@ namespace heimer
 				feedspd[i] = _axes[i]->feedspd;
 		}
 
-		int stop_impl() override
+		int stop() override
 		{
 			Position feedpos[Dim];
 			Speed feedspd[Dim];
@@ -370,15 +385,16 @@ namespace heimer
 			if (curtraj == nullptr)
 				return 0;
 
+			float speed_multiplier = 
+				evaluate_speed_multiplier_by_curspd(feedspd); 
 			lintraj.set_stop_trajectory(
 			    feedpos,
 			    feedspd,
-			    _dcc_val);
+			    _dcc_val * speed_multiplier);
 
 			operation_finished_flag = false;
 			curtraj = & lintraj;
 
-			curtraj = & lintraj;
 			return 0;
 		}
 
@@ -390,7 +406,7 @@ namespace heimer
 			if (data->code() == HEIMER_INTERRUPT_TYPE_CONTROL_UPDATE)
 			{
 				//update_from_controlled();
-				stop_impl();
+				stop();
 			}
 
 			else
