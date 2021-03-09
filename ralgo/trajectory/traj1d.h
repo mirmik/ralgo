@@ -11,7 +11,7 @@
 #define HEIMER_TRAJ1D_FINISHED 1
 
 // TODO:
-// 		Есть подозрение, что деление на discrete_time_frequency 
+// 		Есть подозрение, что деление на discrete_time_frequency
 //      можно упразднить.
 
 namespace ralgo
@@ -66,7 +66,7 @@ namespace ralgo
 		ralgo::speed_deformer spddeform;
 
 		void init_timestamp_mode(
-			struct traj1d_timestamp_params<P,V> * args)
+		    struct traj1d_timestamp_params<P, V> * args)
 		{
 			spos = args->spos;
 			fpos = args->fpos;
@@ -78,8 +78,8 @@ namespace ralgo
 				setted_speed = 0;
 			else
 			{
-				setted_speed = 
-					(float)(fpos - spos) / (ftim - stim);
+				setted_speed =
+				    (float)(fpos - spos) / (ftim - stim);
 			}
 
 			float acc_part = (float)args->acctime / (float)(ftim - stim);
@@ -97,11 +97,11 @@ namespace ralgo
 		}
 
 		void init_nominal_speed_mode(
-		    struct traj1d_nominal_speed_params<P,V> * args
+		    struct traj1d_nominal_speed_params<P, V> * args
 		)
 		{
-			setted_speed = args->speed / 
-				ralgo::discrete_time_frequency();
+			setted_speed = args->speed /
+			               ralgo::discrete_time_frequency();
 
 			P dist = args->fpos - args->spos;
 			float time = std::fabs(dist) / setted_speed;
@@ -111,14 +111,14 @@ namespace ralgo
 
 			spos = args->spos;
 			fpos = args->fpos;
-			
+
 			stim = args->stim;
 			ftim = stim + (int64_t)time;
 
 			float acc_time = args->speed / args->acc
-				* ralgo::discrete_time_frequency();
+			                 * ralgo::discrete_time_frequency();
 			float dcc_time = args->speed / args->dcc
-				* ralgo::discrete_time_frequency();
+			                 * ralgo::discrete_time_frequency();
 
 			float acc_part = acc_time / time;
 			float dcc_part = dcc_time / time;
@@ -126,8 +126,8 @@ namespace ralgo
 			// Учёт возможного треугольного паттерна осуществляется
 			// здесь:
 			spddeform.set_speed_pattern(
-				acc_part, dcc_part, 0, 0, 
-				args->full_spattern);	
+			    acc_part, dcc_part, 0, 0,
+			    args->full_spattern);
 		}
 
 
@@ -142,7 +142,7 @@ namespace ralgo
 			// взятую на дискретную единицу времени в скорость взятую
 			// на единицу времени рабочего пространства.
 
-			/*  
+			/*
 			    u = t / (t_fini - t_strt)
 			    P(t) = posmod(u)
 				x = x[0] + v*t*P(t) = x[0] + (x[1]-x[0])*P(t)
@@ -171,12 +171,19 @@ namespace ralgo
 			float realdiff = (fabs(curspd) / dccval);
 			ftim = stim + (int)(realdiff * ralgo::discrete_time_frequency() / 2);
 
-			assert(ftim >= stim);
-
 			spos = curpos;
-			fpos = curpos + curspd * realdiff / 2;
 
-			setted_speed = curspd / ralgo::discrete_time_frequency();
+			if (ftim > stim)
+			{
+				fpos = curpos + curspd * realdiff / 2;
+				setted_speed = curspd / ralgo::discrete_time_frequency();
+			}
+			else 
+			{
+				fpos = spos;
+				setted_speed = 0;
+			}
+
 			spddeform.set_stop_pattern();
 		}
 

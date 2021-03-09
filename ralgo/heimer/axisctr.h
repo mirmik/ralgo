@@ -347,8 +347,6 @@ namespace heimer
 		    controlled->feedspd,
 		    dcc);
 
-		//nos::println(lintraj);
-
 		operation_finished_flag = false;
 		curtraj = & lintraj;
 		return 0;
@@ -372,6 +370,8 @@ namespace heimer
 	int axisctr<P, V>::command(int argc, char** argv)
 	{
 		float fltarg;
+
+		//dprln("axctr command", mnemo(), argv[0]);
 
 		if (strcmp(argv[0], "mov") == 0)
 		{

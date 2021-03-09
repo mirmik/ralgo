@@ -136,13 +136,20 @@ namespace ralgo
 			float realdiff = (fabs(curspd) / dccval);
 			ftim = stim + realdiff / 2 * ralgo::discrete_time_frequency();
 
-			assert(ftim >= stim);
+			if (ftim > stim) 
+			{
+				spos = curpos;
+				fpos = curpos + curspd * realdiff / 2;
+				setted_speed = curspd / ralgo::discrete_time_frequency();
+			}
 
-			spos = curpos;
-			fpos = curpos + curspd * realdiff / 2;
-
-			setted_speed = curspd / ralgo::discrete_time_frequency();
-			//setted_speed = (float)(fpos - spos) / (ftim - stim);
+			else 
+			{
+				ftim = stim + 1; // prevent null division
+				spos = curpos;
+				fpos = curpos;
+				setted_speed = 0;
+			}
 
 			spddeform.set_stop_pattern();
 		}
