@@ -180,6 +180,7 @@ namespace ralgo
 			}
 			else 
 			{
+				ftim = stim + 1;
 				fpos = spos;
 				setted_speed = 0;
 			}
