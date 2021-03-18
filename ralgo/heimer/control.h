@@ -116,6 +116,11 @@ namespace heimer
 			return _mnemo;
 		}
 
+		void set_mnemo(const char* str)
+		{
+			_mnemo = str;
+		}
+
 		virtual
 		void print_info()
 		{
