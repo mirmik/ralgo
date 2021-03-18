@@ -110,15 +110,20 @@ namespace heimer
 		heimer::linintctr_basic<P, V> * positive;
 		heimer::linintctr_basic<P, V> * negative;
 
+		float inverse_0, inverse_1;
+
 	public:
 		polygon_difference_checker(
 		    heimer::linintctr_basic<P, V> * positive,
 		    heimer::linintctr_basic<P, V> * negative,
-		    igris::array_view<linalg::vec<P, 2>> arr)
+		    igris::array_view<linalg::vec<P, 2>> arr,
+		    bool inverse_0=false, bool inverse_1=false)
 			:
 			plane_zone_checker<P>(arr),
 			positive(positive),
-			negative(negative)
+			negative(negative),
+			inverse_0(inverse_0 ? -1 : 1),
+			inverse_1(inverse_1 ? -1 : 1)
 		{
 			assert(positive != negative);
 		}
@@ -139,14 +144,21 @@ namespace heimer
 			positive->current_point((P*) &pos_point);
 			negative->current_point((P*) &neg_point);
 
+			auto posgains = positive->gains();
+			auto neggains = negative->gains();
+
 			if (positive == dev)
 			{
-				t -= neg_point;
+				linalg::vec<P, 2> oposite = {neg_point[0] / neggains[0], neg_point[1] / neggains[1]};
+				t = {t[0] / posgains[0], t[1] / posgains[1]};
+				t -= linalg::vec<P, 2>(oposite[0] * inverse_0, oposite[1] * inverse_1);
 			}
 			else
 			if (negative == dev) 
 			{
-				t -= pos_point;
+				linalg::vec<P, 2> oposite = {pos_point[0] / posgains[0], pos_point[1] / posgains[1]};
+				t = {t[0] / neggains[0], t[1] / neggains[1]};
+				t -= linalg::vec<P, 2>(oposite[0] * inverse_0, oposite[1] * inverse_1);
 			}
 
 			//auto pnt = pos_point - neg_point;
