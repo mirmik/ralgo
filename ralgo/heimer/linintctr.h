@@ -278,6 +278,8 @@ namespace heimer
 			}
 		}
 
+		float * gains() override { return _gains; }
+
 		void set_gains(igris::array_view<float> arr) override
 		{
 			for (unsigned int i = 0; i < arr.size(); ++i)
