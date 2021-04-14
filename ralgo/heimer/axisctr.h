@@ -250,7 +250,7 @@ namespace heimer
 			}
 		}
 
-		if (dist == 0)
+		if (dist == 0 || spd == 0)
 		{
 			operation_finished_flag = true;
 			operation_finish_signal(this);
