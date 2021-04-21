@@ -11,7 +11,7 @@ licant.module("ralgo.log", "console",
 licant.module("ralgo",
 	sources=[
 		"ralgo/madgwick.cpp",
-		"ralgo/signal/fft.cpp",
+		#"ralgo/signal/fft.cpp",
 		"ralgo/log/log.cpp",
 		#"ralgo/heimer/control.cpp",
 		#"ralgo/heimer/command_center.cpp"
@@ -39,3 +39,6 @@ licant.module("ralgo.heimer",
 
 licant.module("ralgo.disctime", "chrono-millis",
 	sources = ["ralgo/disctime-chrono-millis.cpp"], default=True)
+
+licant.module("ralgo.disctime", "manual",
+	sources = [])
