@@ -22,16 +22,27 @@ namespace ralgo
         const linalg::vec<float,4> quat() { return linalg::vec<float,4>(q1,q2,q3,q0); };
         
         void reset();
+        void reset(float _q0,float _q1,float _q2,float _q3) 
+        { q0 = _q0; q1 = _q1; q2 = _q2; q3 = _q3; }
+
+        void reset(const linalg::vec<float,4> & q) 
+        { q0 = q.w; q1 = q.x; q2 = q.y; q3 = q.z; }
 
         void setKoeff(float sampleFreq, float beta);
 
+        void update_magnetic_reference_direction(float umx, float umy, float umz);
         void update(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz);
-//        void update(float gx, float gy, float gz, float ax, float ay, float az);
-//        void update(float gx, float gy, float gz);
+        void update(float gx, float gy, float gz, float ax, float ay, float az);
+        void update(float gx, float gy, float gz);
 
 //        void update(linalg::vec<float,3> g, linalg::vec<float,3> a, linalg::vec<float,3> m);
 //        void update(linalg::vec<float,3> g, linalg::vec<float,3> a);
 //        void update(linalg::vec<float,3> g);
+
+
+        void apply(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz);
+        void apply(float gx, float gy, float gz, float ax, float ay, float az);
+        void apply(float gx, float gy, float gz);
 
 /*        float getPitchRad();
         float getRollRad();
