@@ -8,7 +8,7 @@ double deg(double x) { return x / 180. * M_PI; }
 TEST_CASE("madgwick")
 {
 	ralgo::madgwick madgwick;
-	madgwick.setKoeff(100, 0.005);
+	madgwick.setKoeff(100, 10);
 
 	madgwick.reset(linalg::rotation_quat<float>({0., 0., 1.}, 0));
 	madgwick.update(0, 0, 0, 0, 0, -1, 1, 0, 0);
@@ -41,7 +41,7 @@ TEST_CASE("madgwick")
 
 
 	nos::println("A");
-	for (int i = 0; i < 100000; ++i)
+	for (int i = 0; i < 100; ++i)
 	{
 		madgwick.update(
 		    0, 0, 0,
@@ -55,7 +55,7 @@ TEST_CASE("madgwick")
 
 
 	nos::println("B");
-	for (int i = 0; i < 100000; ++i)
+	for (int i = 0; i < 100; ++i)
 	{
 		madgwick.update(
 		    0, 0, 0,
@@ -68,7 +68,7 @@ TEST_CASE("madgwick")
 	CHECK_EQ(madgwick.quat()[2], doctest::Approx(0).epsilon(0.001));
 
 	nos::println("C");
-		for (int i = 0; i < 100000; ++i)
+	for (int i = 0; i < 100; ++i)
 	{
 		madgwick.update(
 		    0, 0, 0,
@@ -81,8 +81,8 @@ TEST_CASE("madgwick")
 	CHECK_EQ(madgwick.quat()[2], doctest::Approx(0.70710).epsilon(0.001));
 
 
-	nos::println("C");
-	for (int i = 0; i < 100000; ++i)
+	nos::println("D");
+	for (int i = 0; i < 100; ++i)
 	{
 		madgwick.update(
 		    0, 0, 0,

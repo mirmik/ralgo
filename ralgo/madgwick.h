@@ -19,7 +19,8 @@ namespace ralgo
     public:
         madgwick();
 
-        const linalg::vec<float,4> quat() { return linalg::vec<float,4>(q1,q2,q3,q0); };
+        linalg::vec<float,4> quat()
+        { return linalg::vec<float,4>(q1,q2,q3,q0); };
         
         void reset();
         void reset(float _q0,float _q1,float _q2,float _q3) 
