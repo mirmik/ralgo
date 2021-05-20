@@ -20,6 +20,7 @@ namespace ralgo
         madgwick();
 
         const linalg::vec<float,4>& quat() { return q; };
+        linalg::vec<float,4> quat_copy() { return q; };
         
         void reset();
 
@@ -40,19 +41,20 @@ namespace ralgo
         void ZYZ(float *z, float *y, float *z2);
         void ZYZ_u(float *z, float *y, float *z2);
 
+        float magnetic_reference_x() { return _magnetic_reference_x; }
+        float magnetic_reference_y() { return _magnetic_reference_y; }
+
     private:
         static float invSqrt(float x);
 
-        volatile float beta;                // algorithm gain
-        volatile float sampleFreq;
-        volatile float invSampleFreq;
+        float beta;                // algorithm gain
+        float sampleFreq;
+        float invSampleFreq;
 
-        linalg::vec<float,4> q;
+        float _magnetic_reference_x;
+        float _magnetic_reference_y;
 
-        //volatile float q0 = 1.0f;
-        //volatile float q1 = 0.0f;
-        //volatile float q2 = 0.0f;
-        //volatile float q3 = 0.0f;
+        linalg::vec<float,4> q = {0,0,0,1};
     };
 }
 

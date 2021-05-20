@@ -8,16 +8,10 @@
 #include <nos/print.h>
 #include <nos/fprint.h>
 
-#include <rabbit/space/htrans2.h>
-
-//#include <ralgo/regulator/pi.h>
-#include <ralgo/lintrans.h>
-#include <ralgo/planning/traj.h>
-
-//#include <ralgo/cynematic/link.h>
-//#include <ralgo/cynematic/chain.h>
-
 #include <igris/math/deg.h>
+#include <linalg/linalg.h>
+
+#include <ralgo/madgwick.h>
 
 using namespace ralgo;
 using namespace linalg;
@@ -27,6 +21,9 @@ namespace py = pybind11;
 
 #define DOUBLE4 double, double, double, double
 #define DOUBLE3 double, double, double
+
+#define FLOAT4 float, float, float, float
+#define FLOAT3 float, float, float
 
 PYBIND11_MODULE(libralgo, m)
 {
@@ -90,11 +87,48 @@ PYBIND11_MODULE(libralgo, m)
 	             &accdcc_by_time_trajectory<DOUBLE4>::inloctime_placed);
 */
 	// LINALG
-/*	py::class_<linalg::vec<double,3>>(m, "vec3")
+	py::class_<linalg::vec<double,3>>(m, "vec3")
 		.def(py::init<DOUBLE3>())
 		.def(py::init<const vec<double,3>&>())
 		.def("__str__", [](const linalg::vec<double,3>& self){ return nos::format("{}", self); });
 
+	py::class_<linalg::vec<double,4>>(m, "vec4")
+		.def(py::init<DOUBLE4>())
+		.def(py::init<const vec<double,4>&>())
+		.def("__str__", [](const linalg::vec<double,4>& self){ return nos::format("{}", self); });
+
+	py::class_<linalg::vec<float,3>>(m, "vec3f")
+		.def(py::init<FLOAT3>())
+		.def(py::init<const vec<float,3>&>())
+		.def("__str__", [](const linalg::vec<float,3>& self){ return nos::format("{}", self); });
+
+	py::class_<linalg::vec<float,4>>(m, "vec4f")
+		.def(py::init<FLOAT4>())
+		.def(py::init<const vec<float,4>&>())
+		.def_readwrite("x", &linalg::vec<float,4>::x)
+		.def_readwrite("y", &linalg::vec<float,4>::y)
+		.def_readwrite("z", &linalg::vec<float,4>::z)
+		.def_readwrite("w", &linalg::vec<float,4>::w)
+		.def("__str__", [](const linalg::vec<float,4>& self){ return nos::format("{}", self); });
+
+	py::class_<ralgo::madgwick>(m, "madgwick")
+		.def(py::init<>())
+		.def("update", (void(madgwick::*)(float,float,float,float,float,float,float,float,float))&madgwick::update)
+		.def("update", (void(madgwick::*)(float,float,float,float,float,float))&madgwick::update)
+		.def("update", (void(madgwick::*)(float,float,float))&madgwick::update)
+		.def("quat", (linalg::vec<float,4>(madgwick::*)())&madgwick::quat_copy) 
+		.def("reset", &madgwick::reset)
+		.def("setKoeff", &madgwick::setKoeff)
+        .def("getPitchRad", &madgwick::getPitchRad)
+        .def("getRollRad", &madgwick::getRollRad)
+        .def("getYawRad", &madgwick::getYawRad)
+        .def("getPitchDeg", &madgwick::getPitchDeg)
+        .def("getRollDeg", &madgwick::getRollDeg)
+        .def("getYawDeg", &madgwick::getYawDeg)
+        .def("magnetic_reference_x", &madgwick::magnetic_reference_x)
+        .def("magnetic_reference_y", &madgwick::magnetic_reference_y)
+	;
+/*
 	py::class_<linalg::mat<double,3,3>>(m, "mat33")
 		.def(py::init<const mat<double,3,3>&>())
 		.def("__str__", [](const linalg::mat<double,3,3>& self){ return nos::format("{}", self); });

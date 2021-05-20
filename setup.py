@@ -11,13 +11,13 @@ import licant
 licant.include("nos", local_tunel=("build/nos", "nos.g.py"))
 licant.include("igris", local_tunel=("build/igris", "igris.g.py"))
 licant.include("linalg", local_tunel=("build/linalg", "linalg.g.py"))
-licant.include("malgo", local_tunel=("build/malgo", "malgo.g.py"))
+#licant.include("malgo", local_tunel=("build/malgo", "malgo.g.py"))
 licant.include("ralgo", "ralgo.g.py")
 
 licant.cxx_objects("ralgo-objects", 
 	mdepends = [
 		"ralgo",
-		"malgo",
+#		"malgo",
 		"nos",
 		"igris",
 		"nos.current_ostream"
@@ -44,7 +44,7 @@ class bdist_wheel(bdist_wheel_):
 
 ralgo_lib = Extension("ralgo.libralgo",
 	sources = ["ralgo/pywrap.cpp"] + ralgoopts["sources"],
-	extra_compile_args=['-fPIC', '-std=c++14'],
+	extra_compile_args=['-fPIC', '-std=c++17'],
 	extra_link_args=['-Wl,-rpath,$ORIGIN/libs'],
 	include_dirs = ralgoopts["include_paths"],
 	libraries = [],
