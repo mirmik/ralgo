@@ -43,7 +43,10 @@ namespace ralgo
 //---------------------------------------------------------------------------------------------------
 // AHRS algorithm update
 
-    void madgwick::update(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz)
+    void madgwick::update(
+        float gx, float gy, float gz, 
+        float ax, float ay, float az, 
+        float mx, float my, float mz)
     {
         float recipNorm;
 
@@ -122,13 +125,13 @@ namespace ralgo
         
 
         module = s0 * s0 + s1 * s1 + s2 * s2 + s3 * s3;
-        if (module != 0.f)
+        if (module > 1)
             recipNorm = invSqrt(module); // normalise step magnitude 
         s0 *= recipNorm;
         s1 *= recipNorm;
         s2 *= recipNorm;
         s3 *= recipNorm;
-
+        
         // Apply feedback step
         qDot1 -= beta * s0;
         qDot2 -= beta * s1;
