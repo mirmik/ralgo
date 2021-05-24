@@ -19,7 +19,7 @@ namespace ralgo
 		void init(int _yaw_total, int _pitch_total, float * _points_array)
 		{
 			yaw_total = _yaw_total;
-			pitch_total = _pitch_total;
+			pitch_total = _pitch_total + 2;
 			points_array = _points_array;
 		}
 
@@ -31,6 +31,12 @@ namespace ralgo
 
 		float pitch_by_index(int p)
 		{
+			if (p == 0)
+				return { 0, -M_PI / 2 };
+
+			if (p == yaw_total + pitch_total + 1)
+				return { 0, M_PI / 2 };
+
 			float k = (p + 1) / (pitch_total + 2); // обход без endpoint
 			return (-M_PI / 2) * (1.f - k) + (M_PI/2) * k;
 		}
@@ -51,7 +57,13 @@ namespace ralgo
 
 		int index_by_angles(linalg::vec<float, 2> vec)
 		{
+			float x = vec[0];
+			float y = vec[1];
 
+			int yidx = x / yaw_step + 0.5;
+			int pidx = y / pitch_step + 0.5;
+
+ 
 		}
 
 	}
