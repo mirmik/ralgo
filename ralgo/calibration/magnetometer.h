@@ -121,6 +121,8 @@ namespace ralgo
 			for (int i = 0; i < total; ++i) 
 			{
 				acc += points_array[i];
+				if (points_array[i]==linalg::vec<float, 3>{0,0,0})
+					total--;
 			}	
 			acc /= total;
 
