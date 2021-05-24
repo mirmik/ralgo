@@ -5,21 +5,23 @@
 
 namespace ralgo
 {
-	class magnetometer_calibration
+	class spherical_cloud_collector 
 	{
+		float linalg::vec<float, 3> 
+
 		int yaw_total;
 		int pitch_total; // Количество уровней без учёта вершин.
 
 		float yaw_step;
 		float pitch_step;
 
-		float * points_array; // (size : yaw_total + pitch_total + 2)
+		linalg::vec<float, 3> * points_array; // (size : yaw_total + pitch_total + 2)
 
 	public:
-		void init(int _yaw_total, int _pitch_total, float * _points_array)
+		void init(int _yaw_total, int _pitch_total, linalg::vec<float,3> * _points_array)
 		{
 			yaw_total = _yaw_total;
-			pitch_total = _pitch_total + 2;
+			pitch_total = _pitch_total;
 			points_array = _points_array;
 		}
 
@@ -66,6 +68,11 @@ namespace ralgo
  
 		}
 
+
+	};
+
+	class magnetometer_calibration
+	{
 	}
 }
 
