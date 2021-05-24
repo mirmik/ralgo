@@ -92,10 +92,43 @@ namespace ralgo
 			return 1 + (pidx - 1) * yaw_total + yidx;
 		}
 
+		linalg::vec<float,2> decart_to_spherical(linalg::vec<float,3> pnt) 
+		{
+			auto npnt = normalize(pnt);
 
+			auto p = acosf(npnt[2]);
+			auto y = atan2f(npnt[1], npnt[0]);
+
+			return { y, p };
+		}
+
+		int bucket_for_decart_point(linalg::vec<float,3> pnt) 
+		{
+			return index_by_angles(decart_to_spherical(pnt));
+		}
+
+		void put_to_bucket(linalg::vec<float,3> pnt) 
+		{
+			int bucket = bucket_for_decart_point(pnt);
+			points_array[bucket] = pnt;
+		}
+
+		linalg::vec<float, 3> center() 
+		{
+			int total = 2 + (pitch_total-2) * yaw_total;
+
+			linalg::vec<float, 3> acc { 0, 0, 0 };
+			for (int i = 0; i < total; ++i) 
+			{
+				acc += points_array[i];
+			}	
+			acc /= total;
+
+			return acc;
+		}
 	};
 
-	class magnetometer_calibration
+	class magnetometer_calibrator
 	{
 	};
 }
