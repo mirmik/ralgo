@@ -19,14 +19,15 @@ tests_c = [
 application("runtests",
 	sources = [
 		"main.cpp",
-		"heimer.cpp",
-		"heimer2.cpp",
+		#"heimer.cpp",
+		#"heimer2.cpp",
 		"traj.cpp",
 		"geom.cpp",
 		"matops.cpp",
 		"backpack.cpp",
 		"sliding_array.cpp",
-		"vecops.cpp"
+		"vecops.cpp",
+		"magnetometer.cpp"
 	],
 
 	ld_flags = "-L/usr/local/lib/",
