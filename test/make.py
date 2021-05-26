@@ -27,7 +27,8 @@ application("runtests",
 		"backpack.cpp",
 		"sliding_array.cpp",
 		"vecops.cpp",
-		"magnetometer.cpp"
+		"magnetometer.cpp",
+		"wishfeed.cpp"
 	],
 
 	ld_flags = "-L/usr/local/lib/",
