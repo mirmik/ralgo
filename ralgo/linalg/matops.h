@@ -26,49 +26,74 @@ namespace ralgo
 			assert(a.size2() == b.size2());
 
 			for (unsigned int i = 0; i < m; ++i)
-				for (unsigned int j = 0; j < n; ++j) 
+				for (unsigned int j = 0; j < n; ++j)
 				{
 					a(i, j) = b(i, j);
 				}
 		}
 
 		template <class M, class VI, class VEI>
-		void copy_from_rows(M& tgt, VI srcit, VEI eit) 
+		void copy_from_rows(M& tgt, VI srcit, VEI eit)
 		{
 			size_t n = std::size(*srcit);
 			size_t m = std::distance(srcit, eit);
 
-			for (unsigned int i = 0; i < m; ++i) 
+			for (unsigned int i = 0; i < m; ++i)
 			{
-				auto& v = *srcit;  
-				for (unsigned int j = 0; j < n; ++j) 
+				auto& v = *srcit;
+				for (unsigned int j = 0; j < n; ++j)
 				{
-					tgt(i,j) = v[j];
-				}
-				srcit++;
-			}
-		}		
-		template <class M, class VV> void copy_from_rows(M& tgt, const VV& vecs) 
-		{ copy_from_rows(tgt, std::cbegin(vecs), std::cend(vecs)); }
-
-		template <class M, class VI, class VEI>
-		void copy_from_cols(M& tgt, VI srcit, VEI eit) 
-		{
-			size_t m = std::size(*srcit);
-			size_t n = std::distance(srcit, eit);
-
-			for (unsigned int j = 0; j < n; ++j) 
-			{
-				auto& v = *srcit;  
-				for (unsigned int i = 0; i < m; ++i) 
-				{
-					tgt(i,j) = v[i];
+					tgt(i, j) = v[j];
 				}
 				srcit++;
 			}
 		}
-		template <class M, class VV> void copy_from_cols(M& tgt, const VV& vecs) 
+		template <class M, class VV> void copy_from_rows(M& tgt, const VV& vecs)
+		{ copy_from_rows(tgt, std::cbegin(vecs), std::cend(vecs)); }
+
+		template <class M, class VI, class VEI>
+		void copy_from_cols(M& tgt, VI srcit, VEI eit)
+		{
+			size_t m = std::size(*srcit);
+			size_t n = std::distance(srcit, eit);
+
+			for (unsigned int j = 0; j < n; ++j)
+			{
+				auto& v = *srcit;
+				for (unsigned int i = 0; i < m; ++i)
+				{
+					tgt(i, j) = v[i];
+				}
+				srcit++;
+			}
+		}
+		template <class M, class VV> void copy_from_cols(M& tgt, const VV& vecs)
 		{ copy_from_cols(tgt, std::cbegin(vecs), std::cend(vecs)); }
+
+
+		template <class A, class B, class C>
+		void multiply(const A& a, const B& b, C& c)
+		{
+			// m must be equal a.rows() and c.rows();
+			// p must be equal a.cols() and b.rows();
+			// n must be equal b.cols() and c.cols();
+
+			int m = a.rows();
+			int p = a.cols();
+			int n = b.cols();
+
+			for (int i = 0; i < m; ++i)
+			{
+				for (int j = 0; j < n; ++i)
+				{
+					typename C::value_type acc = 0;
+					for (int k = 0; k < p; ++k) 
+					{
+						acc += a.at(i, k) * b.at(k, j);
+					} 
+				}
+			}
+		}
 	}
 }
 
