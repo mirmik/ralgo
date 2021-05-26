@@ -36,7 +36,7 @@ namespace heimer
 			type spd;
 			type acc;
 
-			__phase operator -(const __phase_with_acc & oth) const {
+			__phase_with_acc operator -(const __phase_with_acc & oth) const {
 				return { pos - oth.pos, spd - oth.spd, acc - oth.acc };
 			}
 		};
