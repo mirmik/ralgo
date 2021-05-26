@@ -130,7 +130,7 @@ namespace ralgo
 
 
         module = s0 * s0 + s1 * s1 + s2 * s2 + s3 * s3;
-        if (module < 1)
+        if (module > 1)
         {
             recipNorm = invSqrt(module);
             s0 *= recipNorm;
