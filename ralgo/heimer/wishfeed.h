@@ -12,26 +12,44 @@ namespace heimer
 	class wishfeed
 	{
 		char _name[SIGNAL_NAME_MAXSIZE];
-		int _dim;
+		int _size;
 
 		real _wish[MAXIMUM_WISHFEED_SIGNAL_SIZE];
 		real _feed[MAXIMUM_WISHFEED_SIGNAL_SIZE];
 
 	public:
-		wishfeed(const char * name, int dim) : _wish{}, _feed{}
+		wishfeed(){}
+
+		wishfeed(const char * name, int size) : _wish{}, _feed{}
 		{
-			_dim = dim;
-			set_name(name, strlen(name));
+			_size = size;
+			set_name(name);
 		}
 
-		real * wish(real * wish)
+		void set_name(const char * name) 
+		{
+			strncpy(_name, name, SIGNAL_NAME_MAXSIZE);
+		}
+
+		void set_size(int size) 
+		{
+			_size = size;
+		}
+
+		std::string_view name()  
+		{
+			int len = strnlen(_name, SIGNAL_NAME_MAXSIZE);
+			return std::string_view(_name, len);
+		}
+
+		real * wish()
 		{
 			return _wish;
 		}
 
-		real * feed(const phase & feed)
+		real * feed()
 		{
-			return feed;
+			return _feed;
 		}
 
 		template <class T>
