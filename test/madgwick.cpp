@@ -32,15 +32,10 @@ TEST_CASE("madgwick")
 
 	madgwick.reset(linalg::rotation_quat<float>({0., 0., 1.}, deg(90)));
 	madgwick.apply(0, 0, 0, 0, 0, -1, 0, 0, 0);
-	nos::println(madgwick.quat());
-
+	
 	madgwick.reset(linalg::rotation_quat<float>({0., 0., 1.}, deg(90)));
 	madgwick.apply(0, 0, 0, 0, 0, -1);
-	nos::println(madgwick.quat());
-
-
-
-	nos::println("A");
+	
 	for (int i = 0; i < 100; ++i)
 	{
 		madgwick.update(
@@ -49,12 +44,9 @@ TEST_CASE("madgwick")
 		    0, 1, 0
 		);
 	}
-	nos::println(madgwick.quat());
 	CHECK_EQ(madgwick.quat()[3], doctest::Approx(0.70710).epsilon(0.001));
 	CHECK_EQ(madgwick.quat()[2], doctest::Approx(0.70710).epsilon(0.001));
 
-
-	nos::println("B");
 	for (int i = 0; i < 100; ++i)
 	{
 		madgwick.update(
@@ -63,11 +55,9 @@ TEST_CASE("madgwick")
 		    1, 0, 0
 		);
 	}
-	nos::println(madgwick.quat());
 	CHECK_EQ(madgwick.quat()[3], doctest::Approx(1).epsilon(0.001));
 	CHECK_EQ(madgwick.quat()[2], doctest::Approx(0).epsilon(0.001));
 
-	nos::println("C");
 	for (int i = 0; i < 100; ++i)
 	{
 		madgwick.update(
@@ -76,12 +66,9 @@ TEST_CASE("madgwick")
 		    0, -1, 0
 		);
 	}
-	nos::println(madgwick.quat());
 	CHECK_EQ(madgwick.quat()[3], doctest::Approx(0.70710).epsilon(0.001));
 	CHECK_EQ(madgwick.quat()[2], doctest::Approx(0.70710).epsilon(0.001));
 
-
-	nos::println("D");
 	for (int i = 0; i < 100; ++i)
 	{
 		madgwick.update(
@@ -90,7 +77,6 @@ TEST_CASE("madgwick")
 		    -1, 0, 0
 		);
 	}
-	nos::println(madgwick.quat());
 	CHECK_EQ(madgwick.quat()[3], doctest::Approx(0).epsilon(0.001));
 	CHECK_EQ(madgwick.quat()[2], doctest::Approx(1).epsilon(0.001));
 
