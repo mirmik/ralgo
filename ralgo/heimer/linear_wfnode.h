@@ -45,45 +45,40 @@ namespace heimer
 			ralgo::matops::square_matrix_inverse(matrix, lr_transform);
 		}
 
-		void serve_feed()
+		void do_wish_transform(
+			real * signal_buffer,
+			real * result_buffer,
+			int sigcount,
+			int sigdim
+		) override
 		{
-			process(
-			    left_signals(),
-			    right_signals(),
-			    &wishfeed::feed,
-			    lr_transform_buffer);
-		}
-
-		void serve_wish()
-		{
-			process(
-			    right_signals(),
-			    left_signals(),
-			    &wishfeed::wish,
-			    rl_transform_buffer);
-		}
-
-		void process(
-			igris::array_view<wishfeed *> inbuf, 
-			igris::array_view<wishfeed *> outbuf, 
-			getter_ptr getter, 
-			real * transform_buffer
-		)
-		{
-			int dim = inbuf[0]->size();
-			int sigs = inbuf.size();
-
-			real signal_buffer[sigs * dim];
-			real result_buffer[sigs * dim];
-
-			auto sigmat = signals_as_matrix(inbuf, getter, signal_buffer);
-
-			ralgo::matrix_view<real> result(result_buffer, 0, 0);
-			ralgo::matrix_view<real> transform { transform_buffer, sigs, sigs };
+			ralgo::matrix_view_co<real> sigmat(signal_buffer, sigcount, sigdim);
+			ralgo::matrix_view_co<real> result(result_buffer, 0, 0);
+			ralgo::matrix_view_co<real> transform { rl_transform_buffer, sigcount, sigcount };
+			
+			PRINT(sigmat);
+			PRINT(result);
+			PRINT(transform);
 
 			ralgo::matops::multiply(transform, sigmat, result);
+		}
 
-			set_signals(result, getter, outbuf);
+		void do_feed_transform(
+			real * signal_buffer,
+			real * result_buffer,
+			int sigcount,
+			int sigdim
+		) override
+		{
+			ralgo::matrix_view_co<real> sigmat(signal_buffer, sigcount, sigdim);
+			ralgo::matrix_view_co<real> result(result_buffer, 0, 0);
+			ralgo::matrix_view_co<real> transform { lr_transform_buffer, sigcount, sigcount };
+
+			PRINT(sigmat);
+			PRINT(result);
+			PRINT(transform);
+
+			ralgo::matops::multiply(transform, sigmat, result);
 		}
 	};
 }
