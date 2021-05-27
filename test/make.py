@@ -29,7 +29,8 @@ application("runtests",
 		"sliding_array.cpp",
 		"vecops.cpp",
 		"magnetometer.cpp",
-		"wishfeed.cpp"
+		"wishfeed.cpp",
+		"command_center_2.cpp"
 	],
 
 	ld_flags = "-L/usr/local/lib/",

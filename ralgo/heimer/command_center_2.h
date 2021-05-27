@@ -1,42 +1,58 @@
 #ifndef HEIMER_COMMAND_CENTER_2_H
 #define HEIMER_COMMAND_CENTER_2_H
 
-namespace heimer 
+#include <vector>
+
+#include <ralgo/heimer/wishfeed.h>
+#include <ralgo/heimer/wishfeed_node.h>
+
+namespace heimer
 {
-	union wishfeed_union 
+	class command_center_2;
+
+	struct command_record
 	{
-		
+		const char * cmd;
+		int (command_center_2::* ptr)(int argc, char ** argv);
 	};
 
-	class command_center_2 
+	class command_center_2
 	{
-		std::vector<wishfeed_union> signals;
-		igris::array_view<phasectr> servos;  
 
-		std::vector<phase_transformer *> trasformers;
+		std::vector<wishfeed> signals;
+		//igris::array_view<phasectr> servos;
+
+		std::vector<wishfeed_node *> trasformers;
+
+		static struct command_record * _comands;
 
 	public:
-		wishfeed_union * find_wishfeed(std::string_view name) 
+		int add_signal_command(int argc, char ** argv)
 		{
-			for (auto & wf : signals) 
+			return 0;
+		}
+
+		/*wishfeed_union * find_wishfeed(std::string_view name)
+		{
+			for (auto & wf : signals)
 			{
-				if (wf.name() == name) 
-					return &wf; 
+				if (wf.name() == name)
+					return &wf;
 			}
 			return nullptr;
 		}
 
 		void create_linear_transformer(
 			const char* name;
-			int dim, 
+			int dim,
 			const char ** left,
 			const char ** right,
-			real * matrix) 
+			real * matrix)
 		{
 			wishfeed<phase> * left_signals[MAXIMUM_SIGNALS];
 			wishfeed<phase> * right_signals[MAXIMUM_SIGNALS];
 
-			for (int i = 0; i < dim; ++i) 
+			for (int i = 0; i < dim; ++i)
 			{
 				left_signals[dim] = find_signal(left[i]);
 				right_signals[dim] = find_signal(right[i]);
@@ -48,13 +64,24 @@ namespace heimer
 			transformer->set_left_signals({left_signals, dim});
 			transformer->set_right_signals({right_signals, dim});
 			transformers.push_back(trasformer);
-		}
+		}*/
 
 
-		void create_phase_signal(
+		/*void create_phase_signal(
 			const char * name,
 
-		);
+		);*/
+
+
+		/*int add_signal(int argc, const char ** argv)
+		{
+
+		}
+
+		int command(int argc, const char ** argv)
+		{
+
+		}*/
 	};
 }
 
