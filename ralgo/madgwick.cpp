@@ -23,28 +23,6 @@ namespace ralgo
         return linalg::qrot(qinv(quat()), {0,0,-1});
     };
 
-    /*    void madgwick::update(
-            linalg::vec<float,3> g,
-            linalg::vec<float,3> a,
-            linalg::vec<float,3> m)
-        {
-            madgwick::update(g[0],g[1],g[2],a[0],a[1],a[2],m[0],m[1],m[2]);
-        }
-
-        void madgwick::update(
-            linalg::vec<float,3> g,
-            linalg::vec<float,3> a)
-        {
-            update(g[0],g[1],g[2],a[0],a[1],a[2]);
-        }
-
-        void madgwick::update(
-            linalg::vec<float,3> g)
-        {
-            update(g[0],g[1],g[2]);
-        }*/
-
-
 //---------------------------------------------------------------------------------------------------
 // AHRS algorithm update
 

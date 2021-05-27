@@ -1,6 +1,7 @@
 #ifndef RALGO_HEIMER_SIGNAL_WORKER_H
 #define RALGO_HEIMER_SIGNAL_WORKER_H
 
+#include <igris/container/array_view.h>
 #include <ralgo/heimer/wishfeed.h>
 
 #define SIGWORKER_NAME_MAXSIZE 8
@@ -10,33 +11,42 @@ namespace heimer
 {
 	class wishfeed_node
 	{
+	protected:
 		char _name[8];
-		WishfeedNodeType _type;
-
+	
 		int _left_dim;
 		int _right_dim;
 
-		wishfeed_union * _left_signals[WISHFEED_NODE_MAXDIM];
-		wishfeed_union * _right_signals[WISHFEED_NODE_MAXDIM];
+		wishfeed * _left_signals[WISHFEED_NODE_MAXDIM];
+		wishfeed * _right_signals[WISHFEED_NODE_MAXDIM];
 
 	public:
-		wishfeed_node(int left_signals_total) {}
+		wishfeed_node() = default;
 
-		igris::array_view<wishfeed_union*> & left_signals() override
+		void set_dim(int left, int right) 
 		{
-			return { _left_signals, left_dim };
+			_left_dim = left;
+			_right_dim = right;
 		}
 
-		igris::array_view<wishfeed_union*> & right_signals()  override
+		igris::array_view<wishfeed*> left_signals()
 		{
-			return { _right_signals, right_dim };
+			return { _left_signals, (size_t)_left_dim };
 		}
 
-		virtual int left_dim() = 0;
-		virtual int right_dim() = 0;
+		igris::array_view<wishfeed*> right_signals()
+		{
+			return { _right_signals, (size_t)_right_dim };
+		}
 
-		virtual wishfeed_union* left_signals() = 0;
-		virtual wishfeed_union* right_signals() = 0;
+		void bind_signals(
+			igris::array_view<wishfeed*> left, 
+			igris::array_view<wishfeed*> right
+		) 
+		{
+			std::copy(left.begin(), left.end(), _left_signals);
+			std::copy(right.begin(), right.end(), _right_signals);
+		}
 
 		virtual void serve_feed() = 0;
 		virtual void serve_wish() = 0;

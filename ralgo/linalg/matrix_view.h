@@ -45,6 +45,12 @@ namespace ralgo
 	public:
 		using value_type = T;
 
+		matrix_view() : _data(nullptr), _rows(0), _cols(0), _stride(0) {}
+
+		matrix_view(T* data, int rows, int cols, int stride) :
+			_data(data), _rows(rows), _cols(cols), _stride(stride)
+		{}
+
 		matrix_view(T* data, int rows, int cols) :
 			_data(data), _rows(rows), _cols(cols), _stride(accessor.stride(rows, cols))
 		{}
@@ -53,28 +59,31 @@ namespace ralgo
 			_data(oth._data), _rows(oth._rows), _cols(oth._cols), _stride(oth._stride)
 		{};
 
+		matrix_view(const std::initializer_list<T> & lst, int rows, int cols) 
+			: matrix_view((T*) std::begin(lst), rows, cols)
+		{}
+		
+		int rows() const { return _rows; }
+		int cols() const { return _cols; }
+
 		size_t size1() const { return _rows; }
 		size_t size2() const { return _cols; }
 
-		T& at(int i, int j)
+		T* data() { return _data; }
+		const T* data() const { return _data; }
+
+		void resize(int rows, int cols)
 		{
-			return accessor.at(_data, i, j, _stride);
+			_rows = rows; 
+			_cols = cols;
+			_stride = accessor.stride(rows, cols);
 		}
 
-		const T& at(int i, int j) const
-		{
-			return accessor.at(_data, i, j, _stride);
-		}
+		T& at(int i, int j) { return accessor.at(_data, i, j, _stride); }
+		const T& at(int i, int j) const { return accessor.at(_data, i, j, _stride); }
 
-		T& operator()(int i, int j)
-		{
-			return at(i, j);
-		}
-
-		const T& operator()(int i, int j) const
-		{
-			return at(i, j);
-		}
+		T& operator()(int i, int j) { return at(i, j); }
+		const T& operator()(int i, int j) const { return at(i, j); }
 
 		ralgo::vector_view<T> operator[](int i) { return accessor.sect(_data, i, _rows, _cols); }
 		const ralgo::vector_view<T> operator[](int i) const { return accessor.sect(_data, i, _rows, _cols); }
@@ -85,22 +94,12 @@ namespace ralgo
 		const T* begin() const { return _data; }
 		const T* const end() const { return _data + _rows * _cols; } // Stride ?
 
-		template<class M>
-		matrix_view& operator = (const M& oth)
-		{
-			for (int i = 0; i < _rows; ++i)
-				for (int j = 0; j < _cols; ++j)
-					operator()(i, j) = oth(i, j);
-
-			return *this;
-		}
-
 		matrix_view& operator = (const matrix_view& oth)
 		{
-			for (int i = 0; i < _rows; ++i)
-				for (int j = 0; j < _cols; ++j)
-					operator()(i, j) = oth(i, j);
-
+			_data = (T*)oth.data();
+			_rows = oth._rows;
+			_cols = oth._cols;
+			_stride = accessor.stride(_rows, _cols);
 			return *this;
 		}
 	};
