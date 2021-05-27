@@ -7,13 +7,13 @@ TEST_CASE("wishfeed")
 {
 	SUBCASE("0")
 	{
-		heimer::wishfeed l0;
-		heimer::wishfeed l1;
-		heimer::wishfeed l2;
+		heimer::wishfeed l0("l0", 2);
+		heimer::wishfeed l1("l1", 2);
+		heimer::wishfeed l2("l2", 2);
 
-		heimer::wishfeed r0;
-		heimer::wishfeed r1;
-		heimer::wishfeed r2;
+		heimer::wishfeed r0("r0", 2);
+		heimer::wishfeed r1("r1", 2);
+		heimer::wishfeed r2("r2", 2);
 
 		heimer::linear_wfnode node;
 

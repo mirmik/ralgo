@@ -12,7 +12,7 @@ namespace heimer
 	class wishfeed
 	{
 		char _name[SIGNAL_NAME_MAXSIZE];
-		int _size;
+		int _size = 0;
 
 		real _wish[MAXIMUM_WISHFEED_SIGNAL_SIZE];
 		real _feed[MAXIMUM_WISHFEED_SIGNAL_SIZE];
@@ -42,6 +42,8 @@ namespace heimer
 		{
 			_size = size;
 		}
+
+		int size() { return _size; }
 
 		std::string_view name()
 		{

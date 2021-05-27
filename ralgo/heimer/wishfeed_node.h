@@ -4,6 +4,9 @@
 #include <igris/container/array_view.h>
 #include <ralgo/heimer/wishfeed.h>
 
+#include <ralgo/linalg/matops.h>
+#include <ralgo/linalg/matrix_view.h>
+
 #define SIGWORKER_NAME_MAXSIZE 8
 #define WISHFEED_NODE_MAXDIM 3
 
@@ -21,6 +24,8 @@ namespace heimer
 		wishfeed * _right_signals[WISHFEED_NODE_MAXDIM];
 
 	public:
+		using getter_ptr = real*(wishfeed::*)();
+
 		wishfeed_node() = default;
 
 		void set_dim(int left, int right) 
@@ -51,6 +56,46 @@ namespace heimer
 		virtual void serve_feed() = 0;
 		virtual void serve_wish() = 0;
 
+		ralgo::matrix_view<real> signals_as_matrix(
+			igris::array_view<wishfeed *> inbuf, 
+			getter_ptr getter, 
+			real * signal_buffer)
+		{
+			int sigdim = inbuf[0]->size();
+			int sigcount = inbuf.size();
+
+			ralgo::matrix_view<real> signal {signal_buffer, sigcount, sigdim};
+
+			for (int i = 0; i < sigcount; ++i)
+			{
+				wishfeed * sig = inbuf[i];
+				real * data = (sig->*getter)();
+				for (int j = 0; j < sigdim; ++j)
+				{
+					signal.at(i, j) = data[j];
+				}
+			}
+
+			return signal;
+		}
+
+		void set_signals(
+			const ralgo::matrix_view<real> & result, 
+			getter_ptr getter, 
+			igris::array_view<wishfeed *> outsigs)
+		{
+			int sigdim = outsigs[0]->size();
+
+			for (int i = 0; i < outsigs.size(); ++i)
+			{
+				auto * sig = outsigs[i];
+				auto * data = (sig->*getter)();
+				for (int j = 0; j < sigdim; ++j)
+				{
+					data[j] = result.at(i, j);
+				}
+			}
+		}
 	};
 }
 
