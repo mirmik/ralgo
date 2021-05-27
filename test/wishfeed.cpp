@@ -37,6 +37,12 @@ TEST_CASE("wishfeed")
 			l->feed()[1] = 2;
 		}
 
+		for (auto * r : node.right_signals()) 
+		{
+			r->wish()[0] = 2;
+			r->wish()[1] = 1;
+		}
+
 		node.serve_feed();
 
 		CHECK_EQ(r0.feed()[0], 1);
@@ -45,5 +51,14 @@ TEST_CASE("wishfeed")
 		CHECK_EQ(r1.feed()[1], 1);
 		CHECK_EQ(r2.feed()[0], 1);
 		CHECK_EQ(r2.feed()[1], 2);
+
+		node.serve_wish();
+		CHECK_EQ(l0.wish()[0], 2);
+		CHECK_EQ(l0.wish()[1], 1);
+		CHECK_EQ(l1.wish()[0], 4);
+		CHECK_EQ(l1.wish()[1], 2);
+		CHECK_EQ(l2.wish()[0], 2);
+		CHECK_EQ(l2.wish()[1], 1);
+
 	}
 }

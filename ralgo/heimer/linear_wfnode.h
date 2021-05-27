@@ -34,9 +34,6 @@ namespace heimer
 		real lr_transform_buffer[16];
 		real rl_transform_buffer[16];
 
-		ralgo::matrix_view<real> lr_transform;
-		ralgo::matrix_view<real> rl_transform;
-
 		int _sigdim;
 		int _sigcount;
 
@@ -51,61 +48,90 @@ namespace heimer
 		template<class M>
 		void init(const M& matrix, int sigdim)
 		{
-			rl_transform = { rl_transform_buffer, 0, 0 };
-			lr_transform = { lr_transform_buffer, 0, 0 };
+			auto rl_transform = ralgo::matrix_view<real> { rl_transform_buffer, 0, 0 };
+			auto lr_transform = ralgo::matrix_view<real> { lr_transform_buffer, 0, 0 };
 
 			_sigcount = matrix.rows();
 			_sigdim = sigdim;
 
 			ralgo::matops::assign(matrix, rl_transform);
 			ralgo::matops::square_matrix_inverse(matrix, lr_transform);
+
+
 		}
 
 		void serve_feed()
 		{
-			real signal_buffer[_sigcount * _sigdim];
-			real result_buffer[_sigcount * _sigdim];
-
-			auto sigmat = left_feed_as_matrix(signal_buffer);
-
-			ralgo::matrix_view<real> result(result_buffer, 0, 0);
-
-			ralgo::matops::multiply(lr_transform, sigmat, result);
-			set_right_feed(result);
+			process(
+			    left_signals(),
+			    right_signals(),
+			    &wishfeed::feed,
+			    lr_transform_buffer);
 		}
 
 		void serve_wish()
 		{
-			//auto sigmat = right_wish_as_matrix(signal_buffer);
-			//parent::set_left_wish(mul(right_to_left_transform, feed));
+			process(
+			    right_signals(),
+			    left_signals(),
+			    &wishfeed::wish,
+			    rl_transform_buffer);
 		}
 
-		ralgo::matrix_view<real> left_feed_as_matrix(real * signal_buffer)
+		using getter_ptr = real*(wishfeed::*)();
+		void process(
+			igris::array_view<wishfeed *> inbuf, 
+			igris::array_view<wishfeed *> outbuf, 
+			getter_ptr getter, 
+			real * transform_buffer
+		)
+		{
+			real signal_buffer[_sigcount * _sigdim];
+			real result_buffer[_sigcount * _sigdim];
+
+			auto sigmat = signals_as_matrix(inbuf, getter, signal_buffer);
+
+			ralgo::matrix_view<real> result(result_buffer, 0, 0);
+			ralgo::matrix_view<real> transform { transform_buffer, _sigcount, _sigcount };
+
+			ralgo::matops::multiply(transform, sigmat, result);
+
+			nos::println(result);
+			set_signals(result, getter, outbuf);
+		}
+
+		ralgo::matrix_view<real> signals_as_matrix(
+			igris::array_view<wishfeed *> inbuf, 
+			getter_ptr getter, 
+			real * signal_buffer)
 		{
 			ralgo::matrix_view<real> signal {signal_buffer, _sigcount, _sigdim};
 
 			for (int i = 0; i < _sigcount; ++i)
 			{
-				auto & sig = *_left_signals[i];
-				auto * feed = sig.feed();
+				wishfeed * sig = inbuf[i];
+				real * data = (sig->*getter)();
 				for (int j = 0; j < _sigdim; ++j)
 				{
-					signal.at(i, j) = feed[j];
+					signal.at(i, j) = data[j];
 				}
 			}
 
 			return signal;
 		}
 
-		void set_right_feed(const ralgo::matrix_view<real> & result)
+		void set_signals(
+			const ralgo::matrix_view<real> & result, 
+			getter_ptr getter, 
+			igris::array_view<wishfeed *> outsigs)
 		{
 			for (int i = 0; i < _sigcount; ++i)
 			{
-				auto & sig = *_right_signals[i];
-				auto * feed = sig.feed();
+				auto * sig = outsigs[i];
+				auto * data = (sig->*getter)();
 				for (int j = 0; j < _sigdim; ++j)
 				{
-					feed[j] = result.at(i, j);
+					data[j] = result.at(i, j);
 				}
 			}
 		}
