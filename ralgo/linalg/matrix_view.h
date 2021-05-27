@@ -59,10 +59,10 @@ namespace ralgo
 			_data(oth._data), _rows(oth._rows), _cols(oth._cols), _stride(oth._stride)
 		{};
 
-		matrix_view(const std::initializer_list<T> & lst, int rows, int cols) 
+		matrix_view(const std::initializer_list<T> & lst, int rows, int cols)
 			: matrix_view((T*) std::begin(lst), rows, cols)
 		{}
-		
+
 		int rows() const { return _rows; }
 		int cols() const { return _cols; }
 
@@ -74,7 +74,7 @@ namespace ralgo
 
 		void resize(int rows, int cols)
 		{
-			_rows = rows; 
+			_rows = rows;
 			_cols = cols;
 			_stride = accessor.stride(rows, cols);
 		}
@@ -106,6 +106,27 @@ namespace ralgo
 
 	template <class T> using matrix_view_co = matrix_view<T, collumn_order<T>>;
 	template <class T> using matrix_view_ro = matrix_view<T, row_order<T>>;
+
+	template<class T, class O>
+	std::ostream& operator<<(std::ostream& os, const matrix_view<T,O>& m)
+	{
+		if (m.rows() == 0 || m.cols() == 0) 
+		{
+			os << "(null_matrix)";
+			return os;
+		}
+
+		for (int i = 0; i < m.rows(); ++i) 
+		{
+			for (int j = 0; j < m.cols(); ++j)  
+			{
+				os << m.at(i,j) << " ";
+			}
+			os << std::endl;
+		}
+
+		return os;
+	}
 }
 
 #endif

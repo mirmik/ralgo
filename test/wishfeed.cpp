@@ -29,9 +29,21 @@ TEST_CASE("wishfeed")
 		node.bind_signals({&l0,&l1,&l2}, {&r0,&r1,&r2});
 
 
-		node.set_matrix(ralgo::matrix_view_ro<float>({1,0,0,0,1,0,0,0,1}, 3, 3));
+		node.init(ralgo::matrix_view_ro<float>({1,0,0,0,2,0,0,0,1}, 3, 3), 2);
+
+		for (auto * l : node.left_signals()) 
+		{
+			l->feed()[0] = 1;
+			l->feed()[1] = 2;
+		}
+
+		node.serve_feed();
+
+		CHECK_EQ(r0.feed()[0], 1);
+		CHECK_EQ(r0.feed()[1], 2);
+		CHECK_EQ(r1.feed()[0], 0.5);
+		CHECK_EQ(r1.feed()[1], 1);
+		CHECK_EQ(r2.feed()[0], 1);
+		CHECK_EQ(r2.feed()[1], 2);
 	}
-
-
-
 }

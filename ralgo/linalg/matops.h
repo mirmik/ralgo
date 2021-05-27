@@ -103,13 +103,14 @@ namespace ralgo
 
 			for (int i = 0; i < m; ++i)
 			{
-				for (int j = 0; j < n; ++i)
+				for (int j = 0; j < n; ++j)
 				{
 					typename C::value_type acc = 0;
 					for (int k = 0; k < p; ++k)
 					{
 						acc += a.at(i, k) * b.at(k, j);
 					}
+					c.at(i,j) = acc;
 				}
 			}
 		}
