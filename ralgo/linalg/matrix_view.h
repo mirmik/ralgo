@@ -20,7 +20,7 @@ namespace ralgo
 	struct row_order
 	{
 		static T& at(T* data, int i, int j, int stride) { return *(data + i * stride + j); }
-		static int stride(int rows, int cols) { return cols; }
+		static int stride(int rows, int cols) { (void) rows; return cols; }
 		static vector_view<T> sect(T* data, int i, int rows, int cols) { return { data + i * cols, cols }; }
 	};
 
@@ -28,7 +28,7 @@ namespace ralgo
 	struct collumn_order
 	{
 		static T& at(T* data, int i, int j, int stride) { return *(data + j * stride + i); }
-		static int stride(int rows, int cols) { return rows; }
+		static int stride(int rows, int cols) { (void) cols; return rows; }
 		static vector_view<T> sect(T* data, int i, int rows, int cols) { return { data + i * rows, rows }; }
 	};
 
@@ -90,9 +90,9 @@ namespace ralgo
 
 		// vecops compatible. Убрать, если потребуются смещения.
 		T* begin() { return _data; }
-		T* const end() { return _data + _cols * _rows; } // Stride ?
+		T* end() { return _data + _cols * _rows; } // Stride ?
 		const T* begin() const { return _data; }
-		const T* const end() const { return _data + _rows * _cols; } // Stride ?
+		const T* end() const { return _data + _rows * _cols; } // Stride ?
 
 		matrix_view& operator = (const matrix_view& oth)
 		{
@@ -108,19 +108,19 @@ namespace ralgo
 	template <class T> using matrix_view_ro = matrix_view<T, row_order<T>>;
 
 	template<class T, class O>
-	std::ostream& operator<<(std::ostream& os, const matrix_view<T,O>& m)
+	std::ostream& operator<<(std::ostream& os, const matrix_view<T, O>& m)
 	{
-		if (m.rows() == 0 || m.cols() == 0) 
+		if (m.rows() == 0 || m.cols() == 0)
 		{
 			os << "(null_matrix)";
 			return os;
 		}
 
-		for (int i = 0; i < m.rows(); ++i) 
+		for (int i = 0; i < m.rows(); ++i)
 		{
-			for (int j = 0; j < m.cols(); ++j)  
+			for (int j = 0; j < m.cols(); ++j)
 			{
-				os << m.at(i,j) << " ";
+				os << m.at(i, j) << " ";
 			}
 			os << std::endl;
 		}

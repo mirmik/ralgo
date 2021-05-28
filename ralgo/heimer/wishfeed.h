@@ -1,7 +1,7 @@
 #ifndef RALGO_WISHFEED_H
 #define RALGO_WISHFEED_H
 
-#define SIGNAL_NAME_MAXSIZE 8
+#define SIGNAL_NAME_MAXSIZE 16
 #define MAXIMUM_WISHFEED_SIGNAL_SIZE 4
 
 #include <ralgo/heimer/types.h>
@@ -9,6 +9,8 @@
 
 namespace heimer
 {
+	class wishfeed_node;
+
 	class wishfeed
 	{
 		char _name[SIGNAL_NAME_MAXSIZE];
@@ -16,6 +18,11 @@ namespace heimer
 
 		real _wish[MAXIMUM_WISHFEED_SIGNAL_SIZE];
 		real _feed[MAXIMUM_WISHFEED_SIGNAL_SIZE];
+
+	public:
+		int _pos = -1;
+		wishfeed_node * left = nullptr;
+		wishfeed_node * right = nullptr;
 
 	public:
 		wishfeed()

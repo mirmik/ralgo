@@ -3,11 +3,12 @@
 
 #include <igris/container/array_view.h>
 #include <ralgo/heimer/wishfeed.h>
+#include <ralgo/heimer/status.h>
 
 #include <ralgo/linalg/matops.h>
 #include <ralgo/linalg/matrix_view.h>
 
-#define SIGWORKER_NAME_MAXSIZE 8
+#define SIGWORKER_NAME_MAXSIZE 16
 #define WISHFEED_NODE_MAXDIM 3
 
 namespace heimer
@@ -15,7 +16,7 @@ namespace heimer
 	class wishfeed_node
 	{
 	protected:
-		char _name[8];
+		char _name[SIGWORKER_NAME_MAXSIZE];
 
 		int _left_dim;
 		int _right_dim;
@@ -28,6 +29,16 @@ namespace heimer
 		using transform_ptr = void (wishfeed_node::*)(real*, real*, int, int);
 
 		wishfeed_node() = default;
+
+		void rename(std::string_view name) 
+		{
+			strncpy(_name, name.data(), SIGWORKER_NAME_MAXSIZE);
+		}
+
+		std::string_view name() 
+		{
+			return { _name, strnlen(_name, SIGWORKER_NAME_MAXSIZE) };
+		}
 
 		void set_dim(int left, int right)
 		{
@@ -45,13 +56,31 @@ namespace heimer
 			return { _right_signals, (size_t)_right_dim };
 		}
 
-		void bind_signals(
+		StatusPair bind_signals(
 		    igris::array_view<wishfeed*> left,
 		    igris::array_view<wishfeed*> right
 		)
 		{
 			std::copy(left.begin(), left.end(), _left_signals);
 			std::copy(right.begin(), right.end(), _right_signals);
+
+			for (unsigned int i = 0; i < left.size(); ++i) 
+			{
+				if (left[i]->right != nullptr) 
+					return { Status::SIGNAL_CONNECTION_CONFLICT, left[i]->name() }; 
+			
+				left[i]->right = this;
+			} 
+
+			for (unsigned int i = 0; i < right.size(); ++i) 
+			{
+				if (right[i]->left != nullptr) 
+					return { Status::SIGNAL_CONNECTION_CONFLICT, right[i]->name() }; 
+
+				right[i]->left = this;
+			} 
+
+			return { Status::OK, {} };
 		}
 
 		/**
@@ -99,7 +128,7 @@ namespace heimer
 		{
 			int sigdim = outsigs[0]->size();
 
-			for (int i = 0; i < outsigs.size(); ++i)
+			for (unsigned int i = 0; i < outsigs.size(); ++i)
 			{
 				auto * sig = outsigs[i];
 				auto * data = (sig->*getter)();
@@ -141,11 +170,10 @@ namespace heimer
 			real signal_buffer[sigs * dim];
 			real result_buffer[sigs * dim];
 
-			auto sigmat = signals_as_matrix(inbuf, getter, signal_buffer);
-			ralgo::matrix_view_co<real> result(result_buffer, 0, 0);
-			
+			signals_as_matrix(inbuf, getter, signal_buffer);		
 			(this->*do_transform)(signal_buffer, result_buffer, sigs, dim);
 
+			ralgo::matrix_view_co<real> result(result_buffer, sigs, dim);
 			set_signals(result, getter, outbuf);
 		}
 
