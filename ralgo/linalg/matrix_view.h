@@ -27,7 +27,7 @@ namespace ralgo
 	template <class T>
 	struct collumn_order
 	{
-		static T& at(T* data, int i, int j, int stride) { return *(data + j * stride + j); }
+		static T& at(T* data, int i, int j, int stride) { return *(data + j * stride + i); }
 		static int stride(int rows, int cols) { return rows; }
 		static vector_view<T> sect(T* data, int i, int rows, int cols) { return { data + i * rows, rows }; }
 	};
