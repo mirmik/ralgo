@@ -70,4 +70,34 @@ TEST_CASE("matops_test")
 		CHECK_EQ(result(1, 1), 1);
 		CHECK_EQ(result(1, 0), 0);
 	}
+
+	SUBCASE("matrix_view_co assign matrix_view_ro") 
+	{
+		double a[4] = { 1, 2, 3, 4 };
+		double b[4];
+		ralgo::matrix_view_co<double> matrix_a (a, 2, 2);
+		ralgo::matrix_view_ro<double> matrix_b (b, 2, 2);
+		
+		ralgo::matops::assign(matrix_a, matrix_b);
+
+		CHECK_EQ(b[0], 1);
+		CHECK_EQ(b[1], 3);
+		CHECK_EQ(b[2], 2);
+		CHECK_EQ(b[3], 4);
+	}
+
+	SUBCASE("matrix_view_ro assign matrix_view_co") 
+	{
+		double a[4] = { 1, 2, 3, 4 };
+		double b[4];
+		ralgo::matrix_view_ro<double> matrix_a (a, 2, 2);
+		ralgo::matrix_view_co<double> matrix_b (b, 2, 2);
+		
+		ralgo::matops::assign(matrix_a, matrix_b);
+
+		CHECK_EQ(b[0], 1);
+		CHECK_EQ(b[1], 3);
+		CHECK_EQ(b[2], 2);
+		CHECK_EQ(b[3], 4);
+	}
 }
