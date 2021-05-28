@@ -26,7 +26,7 @@ namespace ralgo
 		T*             begin()       { return dat; } 
 		T*             end()         { return dat + n; }
 		const T*       begin() const { return dat; } 
-		const T* const end()   const { return dat + n; }
+		const T*       end()   const { return dat + n; }
 	};
 }
 

@@ -34,9 +34,15 @@ namespace heimer
 		
 	public:
 		linear_wfnode() = default;
+
+		template<class M>
+		linear_wfnode(const M& matrix) 
+		{
+			init(matrix);
+		}
 		
 		template<class M>
-		void init(const M& matrix, int sigdim)
+		void init(const M& matrix)
 		{
 			auto rl_transform = ralgo::matrix_view<real> { rl_transform_buffer, 0, 0 };
 			auto lr_transform = ralgo::matrix_view<real> { lr_transform_buffer, 0, 0 };
@@ -56,10 +62,6 @@ namespace heimer
 			ralgo::matrix_view_co<real> result(result_buffer, 0, 0);
 			ralgo::matrix_view_co<real> transform { rl_transform_buffer, sigcount, sigcount };
 			
-			PRINT(sigmat);
-			PRINT(result);
-			PRINT(transform);
-
 			ralgo::matops::multiply(transform, sigmat, result);
 		}
 
@@ -73,10 +75,6 @@ namespace heimer
 			ralgo::matrix_view_co<real> sigmat(signal_buffer, sigcount, sigdim);
 			ralgo::matrix_view_co<real> result(result_buffer, 0, 0);
 			ralgo::matrix_view_co<real> transform { lr_transform_buffer, sigcount, sigcount };
-
-			PRINT(sigmat);
-			PRINT(result);
-			PRINT(transform);
 
 			ralgo::matops::multiply(transform, sigmat, result);
 		}
