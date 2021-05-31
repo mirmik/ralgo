@@ -20,14 +20,14 @@ namespace heimer
 			servo_wishfeed servowf;
 		} data;
 
+	public:
 		static int typehint_cast(const char * strhint) 
 		{
 			if (strcmp(strhint, "servowf") == 0) return DATANODE_TYPEHINT_SERVOWISHFEED;
 
 			return DATANODE_TYPEHINT_UNDEFINED;
 		}
-
-	public:
+		\
 		datanode() {}
 
 		servo_wishfeed & as_servowf() { return data.servowf; }
