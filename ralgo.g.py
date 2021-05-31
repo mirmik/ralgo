@@ -29,8 +29,11 @@ licant.module("ralgo.heimer",
 	sources=[
 		"ralgo/heimer/protect.cpp",
 		"ralgo/heimer/control.cpp",
+		"ralgo/heimer/node.cpp",
 		"ralgo/heimer/command_center.cpp",
 		"ralgo/heimer/command_center_2.cpp",
+		"ralgo/heimer/servo_wishfeed_node.cpp",
+		"ralgo/heimer/signal.cpp",
 	])
 
 #licant.module("ralgo.virtdevs", 

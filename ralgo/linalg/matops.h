@@ -6,6 +6,7 @@
 #include <utility>
 #include <iterator>
 
+#include <igris/container/array_view.h>
 #include <ralgo/linalg/vecops_base.h>
 #include <ralgo/linalg/vecops.h>
 
@@ -204,6 +205,24 @@ namespace ralgo
 			}
 			return 0;
 		};
+
+		template <class M, class T>
+		void diag(M & mat, const igris::array_view<T> & arr) 
+		{
+			for (int i = 0; i < mat.rows(); ++i) 
+			{
+				for (int j = 0; j < mat.cols(); ++j) 
+				{
+					mat.at(i, j) = i == j ? arr[i] : 0;
+				}
+			}
+		}
+
+		template <class M, class T>
+		void diag(M & mat, const std::initializer_list<T> & arr) 
+		{
+			diag(mat, igris::array_view<T>(arr));
+		}
 
 	}
 }

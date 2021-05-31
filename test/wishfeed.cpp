@@ -1,65 +1,34 @@
 #include <doctest/doctest.h>
-#include <ralgo/heimer/wishfeed.h>
-#include <ralgo/heimer/wishfeed_node.h>
-#include <ralgo/heimer/linear_wfnode.h>
+#include <ralgo/heimer/datanode.h>
+#include <ralgo/linalg/matrix_view.h>
+#include <ralgo/heimer/command_center_2.h>
 
 TEST_CASE("wishfeed")
 {
 	SUBCASE("0")
 	{
-		heimer::wishfeed l0("l0", 2);
-		heimer::wishfeed l1("l1", 2);
-		heimer::wishfeed l2("l2", 2);
+		int sts;
+		heimer::command_center_2 cmdcenter;
+		heimer::datanode * dnode;
+		heimer::node * node;
 
-		heimer::wishfeed r0("r0", 2);
-		heimer::wishfeed r1("r1", 2);
-		heimer::wishfeed r2("r2", 2);
+		dnode = cmdcenter.create_datanode("x0", DATANODE_TYPEHINT_SERVOWISHFEED); CHECK(dnode != nullptr);
+		dnode = cmdcenter.create_datanode("y0", DATANODE_TYPEHINT_SERVOWISHFEED); CHECK(dnode != nullptr);
+		dnode = cmdcenter.create_datanode("z0", DATANODE_TYPEHINT_SERVOWISHFEED); CHECK(dnode != nullptr);
 
-		heimer::linear_wfnode node;
+		dnode = cmdcenter.create_datanode("x1", DATANODE_TYPEHINT_SERVOWISHFEED); CHECK(dnode != nullptr);
+		dnode = cmdcenter.create_datanode("y1", DATANODE_TYPEHINT_SERVOWISHFEED); CHECK(dnode != nullptr);
+		dnode = cmdcenter.create_datanode("z1", DATANODE_TYPEHINT_SERVOWISHFEED); CHECK(dnode != nullptr);
 
-		node.left_signals()[0] = &l0;
-		node.left_signals()[1] = &l1;
-		node.left_signals()[2] = &l2;
-		
-		node.right_signals()[0] = &r0;
-		node.right_signals()[1] = &r1;
-		node.right_signals()[2] = &r2;
+		heimer::real mat[9];
+		ralgo::matrix_view_co<heimer::real> trans(mat, 3, 3);
+		ralgo::matops::diag(trans, {1,1,1});
 
-		node.set_dim(3, 3);
-		node.bind_signals({&l0,&l1,&l2}, {&r0,&r1,&r2});
-
-
-		node.init(ralgo::matrix_view_ro<float>({1,0,0,0,2,0,0,0,1}, 3, 3), 2);
-
-		node.left_signals()[0]->feed()[0] = 1;
-		node.left_signals()[0]->feed()[1] = 2;
-		node.left_signals()[1]->feed()[0] = 8;
-		node.left_signals()[1]->feed()[1] = 4;
-		node.left_signals()[2]->feed()[0] = 5;
-		node.left_signals()[2]->feed()[1] = 6;
-
-		for (auto * r : node.right_signals()) 
-		{
-			r->wish()[0] = 2;
-			r->wish()[1] = 1;
-		}
-
-		node.serve_feed();
-
-		CHECK_EQ(r0.feed()[0], 1);
-		CHECK_EQ(r0.feed()[1], 2);
-		CHECK_EQ(r1.feed()[0], 4);
-		CHECK_EQ(r1.feed()[1], 2);
-		CHECK_EQ(r2.feed()[0], 5);
-		CHECK_EQ(r2.feed()[1], 6);
-
-		node.serve_wish();
-		CHECK_EQ(l0.wish()[0], 2);
-		CHECK_EQ(l0.wish()[1], 1);
-		CHECK_EQ(l1.wish()[0], 4);
-		CHECK_EQ(l1.wish()[1], 2);
-		CHECK_EQ(l2.wish()[0], 2);
-		CHECK_EQ(l2.wish()[1], 1);
-
+		node = cmdcenter.create_linear_servowf_node(
+			"xyz",
+			trans,
+			{"x0", "y0", "z0"}, 
+			{"x1", "y1", "z1"}
+		);
 	}
 }
