@@ -23,4 +23,56 @@ int heimer::servo_wishfeed_node::init(
 		else 
 			return -1;
 	}
+
+	return 0;
+}
+
+int heimer::servo_wishfeed_node::doit(NodeMode mode, int argc, const int * argv) 
+{
+	(void) argc;
+
+	switch (mode) 
+	{
+		case NodeMode::SETUP: 
+		{
+			setup_doit();
+			return 0;
+		}
+
+		case NodeMode::SHUTDOWN: 
+		{
+			shutdown_doit();
+			return 0;
+		}
+
+		case NodeMode::NORMAL:
+		{
+			switch (argv[0]) 
+			{
+				case FEED_PHASE:
+					feed_doit();
+					return 0;
+
+				case WISH_PHASE:
+					wish_doit();
+					return 0;
+
+				default:
+					heimer::send_signal(HEIMER_SIGNAL_WRONG_NODE_MODE, (void*) this);
+					return -1;
+			}		
+		}
+	}
+
+	return -1;
+}
+
+void heimer::servo_wishfeed_node::setup_doit() 
+{
+
+}
+
+void heimer::servo_wishfeed_node::shutdown_doit() 
+{
+	
 }

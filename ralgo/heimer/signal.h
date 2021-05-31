@@ -7,7 +7,7 @@ using handler_ptr = void (*)(int signal, void * source);
 
 namespace heimer 
 {
-	extern std::pair<int, handler_ptr> signal_handlers;
+	//extern std::pair<int, handler_ptr> signal_handlers;
 	void send_signal(int signal, void * source);
 }
 

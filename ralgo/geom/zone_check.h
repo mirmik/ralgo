@@ -1,7 +1,7 @@
 #ifndef RALGO_GEOM_ZONE_CHECK_H
 #define RALGO_GEOM_ZONE_CHECK_H
 
-#include <linalg/linalg.h>
+#include <ralgo/linalg/linalg.h>
 
 namespace ralgo
 {
