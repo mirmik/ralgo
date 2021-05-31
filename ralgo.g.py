@@ -34,6 +34,7 @@ licant.module("ralgo.heimer",
 		"ralgo/heimer/command_center_2.cpp",
 		"ralgo/heimer/servo_wishfeed_node.cpp",
 		"ralgo/heimer/signal.cpp",
+		"ralgo/heimer/command_center_console.cpp"
 	])
 
 #licant.module("ralgo.virtdevs", 
