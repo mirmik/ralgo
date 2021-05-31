@@ -76,6 +76,8 @@ namespace heimer
 	public:
 		int doit(NodeMode mode, int argc, const int * argv) override
 		{
+			(void) argc;
+			(void) argv;
 			int sts;
 
 			for (auto & task : tasks)

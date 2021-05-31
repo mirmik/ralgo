@@ -4,7 +4,7 @@
 #include <cmath>
 #include <cstdlib>
 
-#include <linalg/linalg.h>
+#include <ralgo/linalg/linalg.h>
 #include <ralgo/geom/zone_check.h>
 #include <ralgo/heimer/interpolation_group.h>
 #include <igris/container/array_view.h>

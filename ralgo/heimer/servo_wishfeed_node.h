@@ -33,23 +33,10 @@ namespace heimer
 		virtual void feed_doit() = 0;
 		virtual void wish_doit() = 0;
 
-		int doit(NodeMode mode, int argc, const int * argv) override 
-		{
-			switch (argv[0]) 
-			{
-				case FEED_PHASE:
-					feed_doit();
-					return 0;
+		void setup_doit();
+		void shutdown_doit();
 
-				case WISH_PHASE:
-					wish_doit();
-					return 0;
-
-				default:
-					heimer::send_signal(HEIMER_SIGNAL_WRONG_NODE_MODE, (void*) this);
-					return -1;
-			}		
-		}
+		int doit(NodeMode mode, int argc, const int * argv) override;
 	};
 
 	class servo_wishfeed_transnode : public servo_wishfeed_node

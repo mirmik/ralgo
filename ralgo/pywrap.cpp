@@ -9,7 +9,7 @@
 #include <nos/fprint.h>
 
 #include <igris/math/deg.h>
-#include <linalg/linalg.h>
+#include <ralgo/linalg/linalg.h>
 
 #include <ralgo/madgwick.h>
 

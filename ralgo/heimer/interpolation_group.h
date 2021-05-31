@@ -5,7 +5,7 @@
 
 #include <ralgo/heimer/coordinate_checker.h>
 #include <ralgo/heimer/control.h>
-#include <linalg/linalg.h>
+#include <ralgo/linalg/linalg.h>
 
 namespace heimer
 {

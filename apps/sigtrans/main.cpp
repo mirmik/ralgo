@@ -2,9 +2,9 @@
 
 heimer::command_center_2 command_center;
 
-int main(int argc, char ** argv) 
+int main() 
 {
-	heimer::StatusPair sts;
+	/*heimer::StatusPair sts;
 
 	(void) argc;
 	(void) argv;
@@ -35,5 +35,5 @@ int main(int argc, char ** argv)
 	for (int i = 0; i < 10; ++i) 
 	{
 		command_center.onestep();
-	}
+	}*/
 }
