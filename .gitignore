@@ -148,3 +148,6 @@ dist
 runtests
 
 test/runtests
+
+sigtrans
+!*/sigtrans

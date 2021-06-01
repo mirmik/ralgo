@@ -1,7 +1,7 @@
 #ifndef RALGO_MAGNETOMETER_H
 #define RALGO_MAGNETOMETER_H
 
-#include <ralgo/ralgo/linalg/linalg.h>
+#include <ralgo/linalg/linalg.h>
 #include <nos/print.h>
 
 namespace ralgo
