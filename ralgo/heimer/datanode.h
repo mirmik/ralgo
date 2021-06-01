@@ -21,6 +21,9 @@ namespace heimer
 		} data;
 
 	public:
+		int refs = 0;
+
+	public:
 		static int typehint_cast(const char * strhint) 
 		{
 			if (strcmp(strhint, "servowf") == 0) return DATANODE_TYPEHINT_SERVOWISHFEED;
@@ -59,17 +62,17 @@ namespace heimer
 			memset(&data, 0, sizeof(data));
 		}
 
-		int typehint() 
+		int typehint() const
 		{
 			return _typehint;
 		}
 
-		const char * name() 
+		const char * name() const
 		{
 			return _name;
 		}
 
-		int compare_name(const char * name) 
+		int compare_name(const char * name) const
 		{
 			return strncmp(_name, name, DATANODE_NAME_MAXLEN);
 		}

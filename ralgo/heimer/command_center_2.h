@@ -10,16 +10,19 @@
 
 #include <nos/print.h>
 
+#define DATANODE_IS_USED_ERROR -2
+#define DATANODE_NOT_FOUND_ERROR -3
+
 namespace heimer
 {
 	class command_center_2
 	{
-		std::vector<heimer::datanode> datanodes;
+		std::list<heimer::datanode> datanodes;
 		std::vector<heimer::node *> nodes;		
 
 	public:
 		datanode * create_datanode(const char * name, int typehint);
-	
+
 		linear_servowf_node * create_linear_servowf_node(
 		    const char * name,
 		    ralgo::matrix_view_co<real> & co,
@@ -27,8 +30,13 @@ namespace heimer
 		    const igris::array_view<const char *> & rsigs	
 		);
 
+		bool datanode_is_used(datanode * dn);
+
 		datanode * find_datanode(const char * name);
 		node *     find_node    (const char * name);
+
+		int remove_datanode(const char * name);
+		int remove_node(const char * name);
 
 		~command_center_2();
 	};
