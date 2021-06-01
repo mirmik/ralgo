@@ -10,16 +10,22 @@ int heimer::servo_wishfeed_node::init(
 
 	for (int i = 0; i < lsigs.size(); ++i) 
 	{
-		if (lsigs[i]->typehint() == DATANODE_TYPEHINT_SERVOWISHFEED)
+		if (lsigs[i]->typehint() == DATANODE_TYPEHINT_SERVOWISHFEED) 
+		{
 			_left_signals[i] = &lsigs[i]->as_servowf();
+			lsigs[i]->refs++;
+		}
 		else 
 			return -1;
 	}
 
 	for (int i = 0; i < rsigs.size(); ++i) 
 	{
-		if (rsigs[i]->typehint() == DATANODE_TYPEHINT_SERVOWISHFEED)
+		if (rsigs[i]->typehint() == DATANODE_TYPEHINT_SERVOWISHFEED) 
+		{
 			_right_signals[i] = &rsigs[i]->as_servowf();
+			rsigs[i]->refs++;
+		}
 		else 
 			return -1;
 	}

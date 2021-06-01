@@ -58,6 +58,20 @@ int heimer::command_center_console::addsignal(int argc, char ** argv)
 
 int heimer::command_center_console::delsignal(int argc, char ** argv) 
 {
+    int sts;
+    if (argc != 1) 
+    {
+        printf("Usage: delsignal NAME");
+        return -1;
+    }
+
+    const char * name = argv[0];
+    
+    if ((sts = _comctr -> remove_datanode(argv[0]))) 
+    {
+        printf("%d", command_center_2::error_to_string(sts));
+        return -1;
+    }
 
     return 0;
 }
