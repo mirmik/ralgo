@@ -2,6 +2,7 @@
 #define RALGO_HEIMER_NODE_H
 
 #include <igris/container/array_view.h>
+#include <ralgo/heimer/errcode.h>
 #include <vector>
 
 #define NODE_NAME_MAXLEN 16
@@ -24,11 +25,18 @@ namespace heimer
 	class node
 	{
 		char _name [NODE_NAME_MAXLEN];
+		int typehint;
 
 	public:
 		void rename(const char * name);
 		int name_compare(const char * name);
 		virtual int doit(NodeMode mode, int argc, const int * argv) = 0;
+
+		// Comander interface support:
+		virtual heimer::errcode command(int argc, const char ** argv) 
+		{
+			return errcode::UNRESOLVED_COMMAND;
+		}
 	};
 
 	struct node_aggregation_task
@@ -40,6 +48,8 @@ namespace heimer
 
 	class node_aggregation : public node
 	{
+		using parent = node;
+
 		std::vector<node *> nodes;
 		std::vector<node_aggregation_task> tasks;
 
@@ -100,6 +110,11 @@ namespace heimer
 			}
 
 			return 0;
+		}
+
+		heimer::errcode command(int argc, const char ** argv) override
+		{
+			return parent::command(argc, argv);
 		}
 	};
 }
