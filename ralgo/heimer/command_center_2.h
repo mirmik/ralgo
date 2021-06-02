@@ -7,11 +7,9 @@
 #include <ralgo/heimer/node.h>
 #include <ralgo/heimer/linear_servowf_node.h>
 #include <ralgo/heimer/types.h>
+#include <ralgo/heimer/errcode.h>
 
 #include <nos/print.h>
-
-#define DATANODE_IS_USED_ERROR -2
-#define DATANODE_NOT_FOUND_ERROR -3
 
 namespace heimer
 {
@@ -32,13 +30,15 @@ namespace heimer
 
 		bool datanode_is_used(datanode * dn);
 
-		datanode * find_datanode(const char * name);
+		datanode_ptr find_datanode(const char * name);
 		node *     find_node    (const char * name);
 
-		int remove_datanode(const char * name);
-		int remove_node(const char * name);
+		heimer::errcode remove_datanode(const char * name);
+		heimer::errcode remove_node(const char * name);
 
 		~command_center_2();
+
+		const char * error_to_string(heimer::errcode errcode);
 	};
 }
 

@@ -25,8 +25,8 @@ heimer::linear_servowf_node *  heimer::command_center_2::create_linear_servowf_n
 {
 	int sts;
 
-	heimer::datanode * lnodes[SERVO_WISHFEED_MAXDIM];
-	heimer::datanode * rnodes[SERVO_WISHFEED_MAXDIM];
+	heimer::datanode_ptr lnodes[SERVO_WISHFEED_MAXDIM];
+	heimer::datanode_ptr rnodes[SERVO_WISHFEED_MAXDIM];
 
 	for (int i = 0; i < lsigs.size(); ++i)
 		lnodes[i] = find_datanode(lsigs[i]);
@@ -34,8 +34,8 @@ heimer::linear_servowf_node *  heimer::command_center_2::create_linear_servowf_n
 	for (int i = 0; i < rsigs.size(); ++i)
 		rnodes[i] = find_datanode(rsigs[i]);
 
-	igris::array_view<heimer::datanode *> lnodes_view(lnodes, lsigs.size());
-	igris::array_view<heimer::datanode *> rnodes_view(rnodes, rsigs.size());
+	igris::array_view<heimer::datanode_ptr> lnodes_view(lnodes, lsigs.size());
+	igris::array_view<heimer::datanode_ptr> rnodes_view(rnodes, rsigs.size());
 
 	auto * node = new linear_servowf_node;
 	sts = node->init(name, co, lnodes_view, rnodes_view);
@@ -60,7 +60,7 @@ heimer::command_center_2::~command_center_2()
 	}
 }
 
-heimer::datanode * heimer::command_center_2::find_datanode(const char * name)
+heimer::datanode_ptr heimer::command_center_2::find_datanode(const char * name)
 {
 	for (auto & dn : datanodes)
 	{
@@ -70,7 +70,7 @@ heimer::datanode * heimer::command_center_2::find_datanode(const char * name)
 	return nullptr;
 }
 
-int heimer::command_center_2::remove_datanode(const char * name)
+heimer::errcode heimer::command_center_2::remove_datanode(const char * name)
 {
 	auto beg = datanodes.begin();
 	auto end = datanodes.end();
@@ -81,19 +81,19 @@ int heimer::command_center_2::remove_datanode(const char * name)
 
 	if (datanode_is_used(&*it)) 
 	{
-		return DATANODE_IS_USED_ERROR;
+		return errcode::DATANODE_IS_USED_ERROR;
 	}
 
 	if (it != end) 
 	{
 		datanodes.erase(it);
-		return 0;
+		return errcode::OK;
 	}
 	else 
-		return DATANODE_NOT_FOUND_ERROR;
+		return errcode::DATANODE_NOT_FOUND_ERROR;
 }
 
 bool heimer::command_center_2::datanode_is_used(datanode * ptr) 
 {
-	return ptr->refs != 0;
+	return ptr->is_used();
 }

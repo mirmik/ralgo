@@ -25,6 +25,8 @@ namespace heimer
 
         int addnode(int argc, char ** argv);
         int delnode(int argc, char ** argv);
+
+        int help(int argc, char ** argv);
     };
 }
 

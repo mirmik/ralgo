@@ -31,6 +31,8 @@ namespace heimer
 {
 	class linear_servowf_node : public servo_wishfeed_transnode
 	{
+		using parent = servo_wishfeed_transnode;
+
 		real lr_transform_buffer[16];
 		real rl_transform_buffer[16];
 		
@@ -41,8 +43,8 @@ namespace heimer
 		int init(
 			const char * name, 
 			const M& matrix,
-			const igris::array_view<datanode *> & lsigs,
-			const igris::array_view<datanode *> & rsigs
+			const igris::array_view<datanode_ptr> & lsigs,
+			const igris::array_view<datanode_ptr> & rsigs
 		) 
 		{
 			set_matrix(matrix);
@@ -68,7 +70,7 @@ namespace heimer
 
 			for (int i = 0; i < _right_dim; ++i) 
 			{
-				signal_buffer[i] = _right_signals[i]->*fieldptr;
+				signal_buffer[i] = (_right_signals[i]->as_servowf()).*fieldptr;
 			}
 
 			ralgo::matrix_view_co<real> sigmat(signal_buffer, sigcount, 1);
@@ -79,7 +81,7 @@ namespace heimer
 
 			for (int i = 0; i < _right_dim; ++i) 
 			{
-				_left_signals[i]->*fieldptr = result_buffer[i];
+				(_left_signals[i]->as_servowf()).*fieldptr = result_buffer[i];
 			}
 		}
 
@@ -92,7 +94,7 @@ namespace heimer
 
 			for (int i = 0; i < sigcount; ++i) 
 			{
-				signal_buffer[i] = _right_signals[i]->*fieldptr;
+				signal_buffer[i] = (_right_signals[i]->as_servowf()).*fieldptr;
 			}
 
 			ralgo::matrix_view_co<real> sigmat(signal_buffer, sigcount, 1);
@@ -103,8 +105,18 @@ namespace heimer
 
 			for (int i = 0; i < _right_dim; ++i) 
 			{
-				_left_signals[i]->*fieldptr = result_buffer[i];
+				(_left_signals[i]->as_servowf()).*fieldptr = result_buffer[i];
 			}
+		}
+
+		heimer::errcode command(int argc, const char ** argv) override
+		{
+			heimer::errcode sts;
+
+			if (sts = parent::command(argc, argv)) 
+				return sts; 
+
+			return heimer::errcode::UNRESOLVED_COMMAND;
 		}
 	};
 }

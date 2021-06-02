@@ -9,10 +9,13 @@
 
 namespace heimer 
 {
+	class datanode_ptr;
+
 	class datanode 
 	{
 		char _name [DATANODE_NAME_MAXLEN];
 		int _typehint;
+		int _refs = 0;
 
 		union 
 		{
@@ -21,16 +24,18 @@ namespace heimer
 		} data;
 
 	public:
-		int refs = 0;
+	    bool is_used() 
+	    {
+	    	return _refs != 0; 
+	    }
 
-	public:
 		static int typehint_cast(const char * strhint) 
 		{
 			if (strcmp(strhint, "servowf") == 0) return DATANODE_TYPEHINT_SERVOWISHFEED;
 
 			return DATANODE_TYPEHINT_UNDEFINED;
 		}
-		\
+
 		datanode() {}
 
 		servo_wishfeed & as_servowf() { return data.servowf; }
@@ -76,6 +81,52 @@ namespace heimer
 		{
 			return strncmp(_name, name, DATANODE_NAME_MAXLEN);
 		}
+
+		friend datanode_ptr;
+	};
+
+	class datanode_ptr 
+	{
+		datanode * ptr;
+
+	public:
+		datanode_ptr() : ptr(nullptr) {}
+		datanode_ptr(datanode * dn) : ptr(dn) { ++ptr->_refs; }
+		~datanode_ptr() { release(); }
+
+		datanode * operator *  () { return ptr; }
+		datanode * operator -> () { return ptr; }
+		
+		const datanode * operator *  () const { return ptr; }
+		const datanode * operator -> () const { return ptr; }
+
+	    datanode_ptr & operator = (datanode_ptr && dn) 
+	    { 
+	    	release();
+
+	    	ptr = dn.ptr; 
+	    	dn.ptr = 0;
+	    	return *this; 
+	    }
+
+	    datanode_ptr & operator = (const datanode_ptr & dn) 
+	    { 
+	    	release();
+
+	    	ptr = dn.ptr; 
+	    	++ptr->_refs;
+	    	return *this; 
+	    }
+
+	    void release() 
+	    {
+			if (ptr) 
+	    		--ptr->_refs;
+	   		
+	    	assert(ptr->_refs > 0);
+
+	    	ptr = nullptr;
+	    }
 	};
 }
 
