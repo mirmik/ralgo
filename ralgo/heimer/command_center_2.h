@@ -20,6 +20,7 @@ namespace heimer
 
 	public:
 		datanode * create_datanode(const char * name, int typehint);
+		node * create_node(const char * name, int typehint) { return nullptr; }
 
 		linear_servowf_node * create_linear_servowf_node(
 		    const char * name,

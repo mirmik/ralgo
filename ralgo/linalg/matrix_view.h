@@ -1,5 +1,5 @@
-#ifndef RALGO_MATRIX_H
-#define RALGO_MATRIX_H
+#ifndef RALGO_LINALG_MATRIX_VIEW_H
+#define RALGO_LINALG_MATRIX_VIEW_H
 
 /**
 	Соглашение об интерфейсе матриц в библиотеке ralgo
@@ -11,6 +11,8 @@
 	Количество столбцов - matrix.size2()
 */
 
+#include <initializer_list>
+#include <iostream>
 #include <ralgo/linalg/vector_view.h>
 #include <ralgo/log.h>
 
@@ -35,6 +37,7 @@ namespace ralgo
 	template< class T, class O = row_order<T>>
 	class matrix_view
 	{
+	protected:
 		T*  _data;
 		int _rows;
 		int _cols;
@@ -65,6 +68,7 @@ namespace ralgo
 
 		int rows() const { return _rows; }
 		int cols() const { return _cols; }
+		int size() const { return _rows * _cols; }
 
 		size_t size1() const { return _rows; }
 		size_t size2() const { return _cols; }
@@ -72,11 +76,14 @@ namespace ralgo
 		T* data() { return _data; }
 		const T* data() const { return _data; }
 
-		void resize(int rows, int cols)
+		void resize(int rows, int cols, int stride = 0)
 		{
 			_rows = rows;
 			_cols = cols;
-			_stride = accessor.stride(rows, cols);
+			if (stride == 0)
+				_stride = accessor.stride(rows, cols);
+			else 
+				_stride = stride;
 		}
 
 		T& at(int i, int j) { return accessor.at(_data, i, j, _stride); }
@@ -101,6 +108,14 @@ namespace ralgo
 			_cols = oth._cols;
 			_stride = accessor.stride(_rows, _cols);
 			return *this;
+		}
+
+		void release() 
+		{
+			_data = nullptr;
+			_rows = 0;
+			_cols = 0;
+			_stride = 0;
 		}
 	};
 

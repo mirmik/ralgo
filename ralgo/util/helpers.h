@@ -6,7 +6,7 @@
 #include <complex>
 #include <vector>
 
-namespace ralgo 
+namespace ralgo
 {
 	constexpr const double epsilon = std::numeric_limits<double>::epsilon();
 
@@ -32,40 +32,49 @@ namespace ralgo
 #endif
 	template <class T> constexpr T log10(T x) { return std::log10(x); }
 
-		struct op_add { template<class A, class B> auto operator()(const A& a, const B& b) const { return a + b; } };
-		struct op_sub { template<class A, class B> auto operator()(const A& a, const B& b) const { return a - b; } };
-		struct op_mul { template<class A, class B> auto operator()(const A& a, const B& b) const { return a * b; } };
-		struct op_div { template<class A, class B> auto operator()(const A& a, const B& b) const { return a / b; } };
-	
-		struct op_abs { template<class A> auto operator()(const A& a) const { return std::abs(a); } };
+	struct op_add { template<class A, class B> auto operator()(const A& a, const B& b) const { return a + b; } };
+	struct op_sub { template<class A, class B> auto operator()(const A& a, const B& b) const { return a - b; } };
+	struct op_mul { template<class A, class B> auto operator()(const A& a, const B& b) const { return a * b; } };
+	struct op_div { template<class A, class B> auto operator()(const A& a, const B& b) const { return a / b; } };
 
-		struct op_eq { template<class A, class B> auto operator()(const A& a, const B& b) const { return a == b; } };
-		struct op_not_eq { template<class A, class B> auto operator()(const A& a, const B& b) const { return a != b; } };
+	struct op_abs { template<class A> auto operator()(const A& a) const { return std::abs(a); } };
 
-		struct op_and { template<class A, class B> bool operator()(const A& a, const B& b) const { return a && b; } };
-		struct op_or { template<class A, class B> bool operator()(const A& a, const B& b) const { return a || b; } };
-		struct op_bin_and { template<class A, class B> auto operator()(const A& a, const B& b) const { return a & b; } };
-		struct op_bin_or { template<class A, class B> auto operator()(const A& a, const B& b) const { return a | b; } };
+	struct op_eq
+	{
+		template<class A, class B>          auto operator()(const A& a, const B& b)            const { return a == b; }
+		template<class A, class B, class T> auto operator()(const A& a, const B& b, T epsilon) const { return std::abs(a - b) < epsilon; }
+	};
+
+	struct op_not_eq
+	{
+		template<class A, class B>          auto operator()(const A& a, const B& b) const { return a != b; }
+		template<class A, class B, class T> auto operator()(const A& a, const B& b, T epsilon) const { return a != b; }
+	};
+
+	struct op_and { template<class A, class B> bool operator()(const A& a, const B& b) const { return a && b; } };
+	struct op_or { template<class A, class B> bool operator()(const A& a, const B& b) const { return a || b; } };
+	struct op_bin_and { template<class A, class B> auto operator()(const A& a, const B& b) const { return a & b; } };
+	struct op_bin_or { template<class A, class B> auto operator()(const A& a, const B& b) const { return a | b; } };
 
 	template <typename ... T> struct rettype {};
-	template <class A, class B> struct rettype<A,B> { using type = A; };
+	template <class A, class B> struct rettype<A, B> { using type = A; };
 ///	template <template<class> V, class T> struct rettype { using type = V<T>; };
 	template <typename ... T> using rettype_t = typename rettype<T ...>::type;
 
 	// Определяет тип по умолчанию. Если тип равен void, то используется std::vector<>.
 	template<class R, class V> struct defvec { using type = R; };
 	template<class V> struct defvec<void, V> { using type = std::vector<value_t<V>>; };
-	template<class R, class V> using defvec_t = typename defvec<R,V>::type; 
+	template<class R, class V> using defvec_t = typename defvec<R, V>::type;
 
 	// Определяет тип по умолчанию. Если тип равен void, то используется std::vector<>.
 	template<class R, class V> struct defvec_of { using type = R; };
 	template<class V> struct defvec_of<void, V> { using type = std::vector<V>; };
-	template<class R, class V> using defvec_of_t = typename defvec_of<R,V>::type; 
+	template<class R, class V> using defvec_of_t = typename defvec_of<R, V>::type;
 
 	// Определяет тип по умолчанию. Если тип равен void, то используется тип результат функтора.
 	template<class R, class F> struct fretvec { using type = R; };
 	template<class F> struct fretvec<void, F> { using type = std::vector<std::result_of<F>>; };
-	template<class R, class F> using fretvec_t = typename fretvec<R,F>::type; 
+	template<class R, class F> using fretvec_t = typename fretvec<R, F>::type;
 
 	// Определяет тип по умолчанию. Если тип равен void, то используется тип по умолчанию.
 	template<class R, class V> struct defsame { using type = R; };

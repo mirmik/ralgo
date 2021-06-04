@@ -9,6 +9,9 @@
 #include <igris/container/array_view.h>
 #include <ralgo/linalg/vecops_base.h>
 #include <ralgo/linalg/vecops.h>
+#include <ralgo/util/helpers.h>
+
+#include <ralgo/linalg/matrix.h>
 
 #include <nos/print.h>
 
@@ -17,7 +20,18 @@ namespace ralgo
 {
 	namespace matops
 	{
-		template<class M> void fill(M& arr, const value_t<M>& val) { vecops::fill(arr, val); }
+		template<class M> void fill(M& arr, const value_t<M>& val) 
+		{ 
+			vecops::fill(arr, val); 
+		}
+
+		template <class T>
+		auto fill(int r, int c, T val) -> matrix<T>
+		{ 
+			matrix<T> ret(r, c);
+			vecops::fill(ret, val);
+			return ret; 
+		}
 
 		template<class A, class B>
 		void copy(A& a, const B& b)
@@ -73,15 +87,26 @@ namespace ralgo
 		template <class M, class VV> void copy_from_cols(M& tgt, const VV& vecs)
 		{ copy_from_cols(tgt, std::cbegin(vecs), std::cend(vecs)); }
 
+		template <class A, class B>
+		bool equal(const A& a, const B& b)
+		{
+			return ralgo::vecops::boolean_all(op_eq(), a, b);
+		}
+
+		template <class A, class B, class T>
+		bool equal(const A& a, const B& b, T epsilon)
+		{
+			return ralgo::vecops::boolean_all(op_eq(), a, b, epsilon);
+		}
 
 		template<class A, class B>
 		void assign(const A& a, B& b)
 		{
 			size_t m = a.rows();
 			size_t n = a.cols();
-			
-			b.resize(m,n);
-			
+
+			b.resize(m, n);
+
 			for (unsigned int i = 0; i < m; ++i)
 				for (unsigned int j = 0; j < n; ++j)
 				{
@@ -111,7 +136,7 @@ namespace ralgo
 					{
 						acc += a.at(i, k) * b.at(k, j);
 					}
-					c.at(i,j) = acc;
+					c.at(i, j) = acc;
 				}
 			}
 		}
@@ -127,12 +152,12 @@ namespace ralgo
 			int k, i, j;	// k: overall index along diagonal; i: row index; j: col index
 			int pivrows[n]; // keeps track of rows swaps to undo at end
 			double tmp;		// used for finding max value and making column swaps
-			
+
 			b.resize(a.cols(), a.cols());
 
 			for (i = 0 ; i < n; i++)
 				for (j = 0 ; j < n; j++)
-					b.at(i,j) = a.at(i,j);
+					b.at(i, j) = a.at(i, j);
 
 			for (k = 0; k < n; k++)
 			{
@@ -140,15 +165,15 @@ namespace ralgo
 				tmp = 0;
 				for (i = k; i < n; i++)
 				{
-					if (abs(b.at(i,k)) >= tmp)	// 'Avoid using other functions inside abs()?'
+					if (abs(b.at(i, k)) >= tmp)	// 'Avoid using other functions inside abs()?'
 					{
-						tmp = abs(b.at(i,k));
+						tmp = abs(b.at(i, k));
 						pivrow = i;
 					}
 				}
 
 				// check for singular matrix
-				if (b.at(pivrow,k) == 0.0f)
+				if (b.at(pivrow, k) == 0.0f)
 				{
 					return -1;
 				}
@@ -159,20 +184,20 @@ namespace ralgo
 					// swap row k with pivrow
 					for (j = 0; j < n; j++)
 					{
-						tmp = b.at(k,j);
-						b.at(k,j) = b.at(pivrow,j);
-						b.at(pivrow,j) = tmp;
+						tmp = b.at(k, j);
+						b.at(k, j) = b.at(pivrow, j);
+						b.at(pivrow, j) = tmp;
 					}
 				}
 				pivrows[k] = pivrow;	// record row swap (even if no swap happened)
 
-				tmp = 1.0f / b.at(k,k);	// invert pivot element
-				b.at(k,k) = 1.0f;		// This element of input matrix becomes result matrix
+				tmp = 1.0f / b.at(k, k);	// invert pivot element
+				b.at(k, k) = 1.0f;		// This element of input matrix becomes result matrix
 
 				// Perform row reduction (divide every element by pivot)
 				for (j = 0; j < n; j++)
 				{
-					b.at(k,j) = b.at(k,j) * tmp;
+					b.at(k, j) = b.at(k, j) * tmp;
 				}
 
 				// Now eliminate all other entries in this column
@@ -180,11 +205,11 @@ namespace ralgo
 				{
 					if (i != k)
 					{
-						tmp = b.at(i,k);
-						b.at(i,k) = 0.0f; // The other place where in matrix becomes result mat
+						tmp = b.at(i, k);
+						b.at(i, k) = 0.0f; // The other place where in matrix becomes result mat
 						for (j = 0; j < n; j++)
 						{
-							b.at(i,j) = b.at(i,j) - b.at(k,j) * tmp;
+							b.at(i, j) = b.at(i, j) - b.at(k, j) * tmp;
 						}
 					}
 				}
@@ -197,9 +222,9 @@ namespace ralgo
 				{
 					for (i = 0; i < n; i++)
 					{
-						tmp = b.at(i,k);
-						b.at(i,k) = b.at(i,pivrows[k]);
-						b.at(i,pivrows[k]) = tmp;
+						tmp = b.at(i, k);
+						b.at(i, k) = b.at(i, pivrows[k]);
+						b.at(i, pivrows[k]) = tmp;
 					}
 				}
 			}
@@ -207,11 +232,12 @@ namespace ralgo
 		};
 
 		template <class M, class T>
-		void diag(M & mat, const igris::array_view<T> & arr) 
+		void diag(M & mat, const igris::array_view<T> & arr)
 		{
-			for (int i = 0; i < mat.rows(); ++i) 
+			mat.resize(arr.size(), arr.size());
+			for (int i = 0; i < mat.rows(); ++i)
 			{
-				for (int j = 0; j < mat.cols(); ++j) 
+				for (int j = 0; j < mat.cols(); ++j)
 				{
 					mat.at(i, j) = i == j ? arr[i] : 0;
 				}
@@ -219,11 +245,28 @@ namespace ralgo
 		}
 
 		template <class M, class T>
-		void diag(M & mat, const std::initializer_list<T> & arr) 
+		void diag(M & mat, const std::initializer_list<T> & arr)
 		{
 			diag(mat, igris::array_view<T>(arr));
 		}
 
+		template <class R = void, class T> 
+		auto diag(const std::initializer_list<T> & arr) -> defsame_t<R, matrix<T>>
+		{
+			defsame_t<R, matrix<T>> ret;
+			diag(ret, arr);
+			return ret;
+		}
+
+		template <class R = void, class M>
+		auto inverse(const M & mat) -> defsame_t<R, matrix<value_t<M>>>
+		{
+			defsame_t<R, matrix<value_t<M>>> ret;
+
+			square_matrix_inverse(mat, ret);
+
+			return ret;
+		}
 	}
 }
 
