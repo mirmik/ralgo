@@ -2,14 +2,20 @@
 #define RALGO_SVD_H
 
 #include <limits>
+
 #include <ralgo/linalg/vecops.h>
 #include <ralgo/linalg/matops.h>
 #include <ralgo/util/math.h>
 #include <ralgo/log.h>
+
 // Based on numerical recipes.
 //Attention Row Order.
 
 #include <nos/print.h>
+
+#ifndef __MAX__
+#define __MAX__(a,b) ((a) > (b) ? (a) : (b))
+#endif
 
 namespace ralgo
 {
@@ -216,7 +222,7 @@ namespace ralgo
 					for (k = l - 1; k < n; k++) u[i][k] *= scale;
 				}
 			}
-			anorm = ralgo::max(anorm, (abs(w[i]) + abs(rv1[i])));
+			anorm = __MAX__(anorm, (abs(w[i]) + abs(rv1[i])));
 		}
 
 		for (i = n - 1; i >= 0; i--)

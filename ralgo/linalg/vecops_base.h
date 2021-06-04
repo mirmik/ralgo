@@ -51,8 +51,8 @@ namespace ralgo
 			return accum;
 		}
 
-		template <class F, class A, class B> bool boolean_all(F&& func, const A& a, const B& b) { auto ait = a.begin(); auto bit = b.begin(); auto aeit = a.end(); for (; ait != aeit; ++ait, ++bit) if (func(*ait, *bit) == false) return false; return true; }
-		template <class F, class A, class B> bool boolean_any(F&& func, const A& a, const B& b) { auto ait = a.begin(); auto bit = b.begin(); auto aeit = a.end(); for (; ait != aeit; ++ait, ++bit) if (func(*ait, *bit) == true) return true; return false; }
+		template <class F, class A, class B, class ... Args> bool boolean_all(F&& func, const A& a, const B& b, Args && ... args) { auto ait = a.begin(); auto bit = b.begin(); auto aeit = a.end(); for (; ait != aeit; ++ait, ++bit) if (func(*ait, *bit, std::forward<Args>(args) ... ) == false) return false; return true;  }
+		template <class F, class A, class B, class ... Args> bool boolean_any(F&& func, const A& a, const B& b, Args && ... args) { auto ait = a.begin(); auto bit = b.begin(); auto aeit = a.end(); for (; ait != aeit; ++ait, ++bit) if (func(*ait, *bit, std::forward<Args>(args) ... ) == true)  return true;  return false; }
 
 		// Применить функцию f ко всем элементам массива a. Допускается передача дополнительных аргументов.
 		template <class R = void, class F, class A, class ... Args>

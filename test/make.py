@@ -30,7 +30,8 @@ application("runtests",
 		"vecops.cpp",
 		"magnetometer.cpp",
 		"wishfeed.cpp",
-		"command_center_2.cpp"
+		"command_center_2.cpp",
+		"solve.cpp",
 	],
 
 	ld_flags = "-L/usr/local/lib/",

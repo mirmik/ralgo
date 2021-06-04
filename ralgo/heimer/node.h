@@ -4,6 +4,7 @@
 #include <igris/container/array_view.h>
 #include <ralgo/heimer/errcode.h>
 #include <vector>
+#include <string_view>
 
 #define NODE_NAME_MAXLEN 16
 
@@ -117,6 +118,8 @@ namespace heimer
 			return parent::command(argc, argv);
 		}
 	};
+
+	int node_typehint_cast(std::string_view str);
 }
 
 #endif

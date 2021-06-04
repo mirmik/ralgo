@@ -121,9 +121,10 @@ namespace heimer
 	    void release() 
 	    {
 			if (ptr) 
+			{
+				assert(ptr->_refs > 0);
 	    		--ptr->_refs;
-	   		
-	    	assert(ptr->_refs > 0);
+			}
 
 	    	ptr = nullptr;
 	    }
