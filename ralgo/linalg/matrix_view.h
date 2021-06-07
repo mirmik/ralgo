@@ -23,7 +23,9 @@ namespace ralgo
 	{
 		static T& at(T* data, int i, int j, int stride) { return *(data + i * stride + j); }
 		static int stride(int rows, int cols) { (void) rows; return cols; }
-		static vector_view<T> sect(T* data, int i, int rows, int cols) { return { data + i * cols, cols }; }
+		static vector_view<T> sect(T* data, int i, int rows, int cols) { return { data + i * cols, cols, 1    }; }
+		static vector_view<T> row(T* data, int i, int rows, int cols, int stride) { return {  data + i * cols, cols, 1    }; }
+		static vector_view<T> col(T* data, int i, int rows, int cols, int stride) { return {  data + i,        rows, stride }; }
 	};
 
 	template <class T>
@@ -31,7 +33,9 @@ namespace ralgo
 	{
 		static T& at(T* data, int i, int j, int stride) { return *(data + j * stride + i); }
 		static int stride(int rows, int cols) { (void) cols; return rows; }
-		static vector_view<T> sect(T* data, int i, int rows, int cols) { return { data + i * rows, rows }; }
+		static vector_view<T> sect(T* data, int i, int rows, int cols) { return { data + i * rows, rows, 1    }; }
+		static vector_view<T> row(T* data, int i, int rows, int cols, int stride) { return {  data + i * rows, rows, 1    }; }
+		static vector_view<T> col(T* data, int i, int rows, int cols, int stride) { return {  data + i,        cols, stride }; }
 	};
 
 	template< class T, class O = row_order<T>>
@@ -94,6 +98,11 @@ namespace ralgo
 
 		ralgo::vector_view<T> operator[](int i) { return accessor.sect(_data, i, _rows, _cols); }
 		const ralgo::vector_view<T> operator[](int i) const { return accessor.sect(_data, i, _rows, _cols); }
+
+		ralgo::vector_view<T> row(int i) { return accessor.row(_data, i, _rows, _cols, _stride); }
+		ralgo::vector_view<T> col(int i) { return accessor.col(_data, i, _rows, _cols, _stride); }
+		const ralgo::vector_view<T> row(int i) const { return accessor.row(_data, i, _rows, _cols, _stride); }
+		const ralgo::vector_view<T> col(int i) const { return accessor.col(_data, i, _rows, _cols, _stride); }
 
 		// vecops compatible. Убрать, если потребуются смещения.
 		T* begin() { return _data; }
