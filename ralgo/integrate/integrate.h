@@ -3,24 +3,6 @@
 
 namespace ralgo
 {
-	template <class T> struct linspace
-	{
-		T a, b;
-		int points;
-
-		T step()
-		{
-			return (b - a) / (points - 1);
-		}
-
-		T operator[](int p)
-		{
-			assert(p < points);
-			T koeff = (T)p / (T)(points - 1);
-			return a * (1 - koeff) + b * koeff;
-		}
-	};
-
 	template <class T, class F>
 	T integrate_trapecidal(F f, T begin, T end, int points);
 
