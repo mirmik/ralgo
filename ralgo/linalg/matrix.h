@@ -5,7 +5,7 @@
 #include <ralgo/linalg/matrix_view.h>
 #include <nos/print.h>
 
-namespace ralgo 
+namespace ralgo
 {
 	template <class T, class O = ralgo::row_order<T>, class Alloc = std::allocator<T>>
 	class matrix : public matrix_view<T, O>
@@ -14,82 +14,88 @@ namespace ralgo
 		Alloc alloc;
 
 	public:
-		matrix() : parent() {
-			nos::println("matrix()");
+		matrix() : parent() {}
+
+		matrix(const std::initializer_list<const std::initializer_list<T>>& lst) 
+		{
+			T* iter;
+
+			resize(lst.size(), lst.begin()->size());
+			iter = parent::_data;
+
+			for (auto a: lst) 
+			{
+				for (auto v: a) 
+				{
+					*iter++ = v;
+				}
+			}
 		}
 
-		matrix(const matrix & oth) 
+		matrix(const matrix & oth)
 			: parent()
 		{
-			nos::println("matrix(const&)");
 			int rows = oth.rows();
 			int cols = oth.cols();
 
 			resize(rows, cols);
 			for (int i = 0; i < rows; ++i)
 				for (int j = 0; j < cols; ++j)
-					this->at(i,j) = oth.at(i,j);
+					this->at(i, j) = oth.at(i, j);
 		}
 
-		matrix(int r, int c) : 
+		matrix(int r, int c) :
 			parent(nullptr, r, c)
 		{
-			nos::println("matrix(r,c)");
-			nos::println("allocate");
 			this->_data = alloc.allocate(r * c);
 		}
 
-		void resize(int r, int c) 
+		void resize(int r, int c)
 		{
-			nos::println("resize");
 			invalidate();
 
 			this->_data = alloc.allocate(r * c);
 			parent::resize(r, c);
 		}
 
-		~matrix() 
+		~matrix()
 		{
-			nos::println("~matrix()");
 			invalidate();
 		}
 
-		void invalidate() 
+		void invalidate()
 		{
-			nos::println("invalidate");
-			if (this->_data) {
-				nos::println("deallocate");
-				alloc.deallocate(this->_data, this->_rows * this->_cols);	
+			if (this->_data)
+			{
+				alloc.deallocate(this->_data, this->_rows * this->_cols);
 			}
-		
+
 			parent::release();
 		}
 
-		matrix & operator=(const matrix& oth) 
+		matrix & operator=(const matrix& oth)
 		{
-			nos::println("operator = matrix");
 			int rows = oth.rows();
 			int cols = oth.cols();
 
 			resize(rows, cols);
 			for (int i = 0; i < rows; ++i)
 				for (int j = 0; j < cols; ++j)
-					this->at(i,j) = oth.at(i,j);
+					this->at(i, j) = oth.at(i, j);
 
 			return *this;
 		}
 
 		template <class M>
-		matrix & operator=(const M& oth) 
+		matrix & operator=(const M& oth)
 		{
-			nos::println("operator = M");
 			int rows = oth.rows();
 			int cols = oth.cols();
 
 			resize(rows, cols);
 			for (int i = 0; i < rows; ++i)
 				for (int j = 0; j < cols; ++j)
-					this->at(i,j) = oth.at(i,j);
+					this->at(i, j) = oth.at(i, j);
 
 			return *this;
 		}

@@ -42,8 +42,8 @@ namespace ralgo
 			//assert(w.size() == (unsigned)n);
 
 			u.resize(a.rows(), a.cols());
-			v.resize(a.rows(), a.rows());
-			w.resize(a.rows());
+			v.resize(a.cols(), a.cols());
+			w.resize(a.cols());
 
 			ralgo::matops::copy(u, a); // Копируем данные.
 			ralgo::vecops::inplace::clean(v);

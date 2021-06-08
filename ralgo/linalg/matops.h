@@ -25,6 +25,12 @@ namespace ralgo
 			vecops::fill(arr, val); 
 		}
 
+		template<class M> 
+		void clean(M& arr) 
+		{ 
+			vecops::fill(arr, typename M::value_type {}); 
+		}
+
 		template <class T>
 		auto fill(int r, int c, T val) -> matrix<T>
 		{ 
@@ -141,6 +147,15 @@ namespace ralgo
 			}
 		}
 
+		template <class C = void, class A, class B>
+		auto multiply(const A& a, const B& b) 
+			-> defsame_t<C, ralgo::matrix<decltype(value_t<A>{}*value_t<B>{})>>
+		{
+			defsame_t<C, ralgo::matrix<decltype(value_t<A>{}*value_t<B>{})>> res;
+			multiply(a,b,res);
+			return res;
+		}
+
 		template <class A, class B>
 		int square_matrix_inverse(const A& a, B& b)
 		{
@@ -240,6 +255,18 @@ namespace ralgo
 				for (int j = 0; j < mat.cols(); ++j)
 				{
 					mat.at(i, j) = i == j ? arr[i] : 0;
+				}
+			}
+		}
+
+		template <class M>
+		void eye(M & mat)
+		{
+			for (int i = 0; i < mat.rows(); ++i)
+			{
+				for (int j = 0; j < mat.cols(); ++j)
+				{
+					mat.at(i, j) = i==j ? value_t<M>{1} : 0;
 				}
 			}
 		}
