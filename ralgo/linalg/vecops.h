@@ -54,6 +54,15 @@ namespace ralgo
 			return r;
 		}
 
+		template<class A, class B>
+		void swap(A && a, B && b)
+		{
+			for (int i = 0; i < a.size(); ++i) 
+			{
+				std::swap(a[i], b[i]);
+			}
+		}
+
 		template<class V=void>
 		defvec_of_t<V,int> arange(int stop)
 		{

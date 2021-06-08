@@ -89,7 +89,7 @@ namespace ralgo
 			_cols = cols;
 			if (stride == 0)
 				_stride = accessor.stride(rows, cols);
-			else 
+			else
 				_stride = stride;
 		}
 
@@ -122,13 +122,28 @@ namespace ralgo
 			return *this;
 		}
 
-		void release() 
+		void release()
 		{
 			_data = nullptr;
 			_rows = 0;
 			_cols = 0;
 			_stride = 0;
 		}
+
+		template <class M>
+		bool operator == (const M& oth) const
+		{
+			if (rows() != oth.rows()) return false;
+			if (cols() != oth.cols()) return false;
+
+			for (int i = 0; i < oth.rows(); ++i)
+				for (int j = 0; j < oth.cols(); ++j)
+					if (at(i, j) != oth.at(i, j))
+						return false;
+
+			return true;
+		}
+
 	};
 
 	template <class T> using matrix_view_co = matrix_view<T, collumn_order<T>>;

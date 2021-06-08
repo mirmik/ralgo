@@ -11,13 +11,13 @@ LT_BEGIN_TEST(ralgo_test_suite, backpack)
 	matrix_view<double> mat(arr,4,3);
 	matops::copy_from_cols(mat, dvec2{ {1,0,0,1}, {0,1,0,-1}, {0,0,1,0} });
 
-	dvec res{0,0,0};
-	dvec tgt{1,1,1,0};
+	std::vector<double> res{0,0,0};
+	std::vector<double> tgt{1,1,1,0};
 
 	svd_backpack(res, tgt, mat);
 
-	CHECK(abs(res[0] - 1) < EPSILON);
-	CHECK(abs(res[1] - 1) < EPSILON);
-	CHECK(abs(res[2] - 1) < EPSILON);
+	CHECK_EQ(res[0], doctest::Approx(1));
+	CHECK_EQ(res[1], doctest::Approx(1));
+	CHECK_EQ(res[2], doctest::Approx(1));
 }
 LT_END_TEST(backpack)
