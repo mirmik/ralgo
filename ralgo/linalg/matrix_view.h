@@ -21,6 +21,7 @@ namespace ralgo
 	template <class T>
 	struct row_order
 	{
+		using value_type = T;
 		static T& at(T* data, int i, int j, int stride) { return *(data + i * stride + j); }
 		static int stride(int rows, int cols) { (void) rows; return cols; }
 		static vector_view<T> sect(T* data, int i, int rows, int cols) { return { data + i * cols, cols, 1    }; }
@@ -31,6 +32,7 @@ namespace ralgo
 	template <class T>
 	struct collumn_order
 	{
+		using value_type = T;
 		static T& at(T* data, int i, int j, int stride) { return *(data + j * stride + i); }
 		static int stride(int rows, int cols) { (void) cols; return rows; }
 		static vector_view<T> sect(T* data, int i, int rows, int cols) { return { data + i * rows, rows, 1    }; }
@@ -50,6 +52,7 @@ namespace ralgo
 		O accessor;
 
 	public:
+		using __check_O_validity = typename O::value_type;  // order type validity
 		using value_type = T;
 
 		matrix_view() : _data(nullptr), _rows(0), _cols(0), _stride(0) {}

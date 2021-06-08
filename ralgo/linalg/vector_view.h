@@ -54,6 +54,8 @@ namespace ralgo
 		using iterator = vector_view_iterator<T>;
 		using value_type = T;
 
+		void resize(int sz) { n = sz; }
+
 		vector_view(T* dat, int n) : dat(dat), n(n), stride(1) {}
 		vector_view(T* dat, int n, int stride) : dat(dat), n(n), stride(stride) {}
 

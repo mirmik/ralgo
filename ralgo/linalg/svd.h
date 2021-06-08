@@ -2,6 +2,7 @@
 #define RALGO_SVD_H
 
 #include <limits>
+#include <vector>
 
 #include <ralgo/linalg/vecops.h>
 #include <ralgo/linalg/matops.h>
@@ -34,11 +35,15 @@ namespace ralgo
 			m(a.size1()), n(a.size2()), // берём размерность.
 			u(u), v(v), w(w)
 		{
-			assert(u.size1() == (unsigned)m);
-			assert(u.size2() == (unsigned)n);
-			assert(v.size1() == (unsigned)n);
-			assert(v.size2() == (unsigned)n);
-			assert(w.size() == (unsigned)n);
+			//assert(u.size1() == (unsigned)m);
+			//assert(u.size2() == (unsigned)n);
+			//assert(v.size1() == (unsigned)n);
+			//assert(v.size2() == (unsigned)n);
+			//assert(w.size() == (unsigned)n);
+
+			u.resize(a.rows(), a.cols());
+			v.resize(a.rows(), a.rows());
+			w.resize(a.rows());
 
 			ralgo::matops::copy(u, a); // Копируем данные.
 			ralgo::vecops::inplace::clean(v);
@@ -51,6 +56,10 @@ namespace ralgo
 			reorder();
 			tsh = 0.5 * sqrt(m + n + 1.) * w[0] * eps;
 		}
+
+		template<class MA>
+		SVD(const MA & a) : SVD(a,u,v,w)
+		{}
 
 		template<class A, class B>
 		void solve(const A &b, B &x, T thresh = -1.);
@@ -431,6 +440,23 @@ namespace ralgo
 	make_SVD(const MA & a, MU& u, MV& v, V& w)
 	{
 		return SVD<typename MA::value_type, MU, MV, V>(a, u, v, w);
+	}
+
+	template <class M>
+	SVD <
+	typename M::value_type,
+	ralgo::matrix<typename M::value_type, ralgo::row_order<typename M::value_type>, std::allocator<typename M::value_type>>,
+	ralgo::matrix<typename M::value_type, ralgo::row_order<typename M::value_type>, std::allocator<typename M::value_type>>,
+	std::vector<typename M::value_type>
+	>
+	svd(const M & a)
+	{
+		return SVD <
+		       typename M::value_type,
+		       ralgo::matrix<typename M::value_type, ralgo::row_order<typename M::value_type>, std::allocator<typename M::value_type>>,
+		       ralgo::matrix<typename M::value_type, ralgo::row_order<typename M::value_type>, std::allocator<typename M::value_type>>,
+		       std::vector<typename M::value_type>
+		>(a);
 	}
 }
 
