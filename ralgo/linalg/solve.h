@@ -44,7 +44,7 @@ namespace ralgo
 		auto solve(const A& a, const B& b) -> defsame_t<X, std::vector<value_t<A>>>
 		{
 			defsame_t<X, std::vector<value_t<A>>> x;
-			x.resize(a.rows());
+			x.resize(a.cols());
 			solve(x, a, b);
 			return x;
 		}

@@ -2,6 +2,7 @@
 #define RALGO_INTERPOLATE_H
 
 #include <iterator>
+#include <nos/print.h>
 
 namespace ralgo
 {
@@ -38,7 +39,15 @@ namespace ralgo
 		int points;
 
 	public:
-		linspace(T a, T b, int points) : a(a), b(b), points(points) {}
+		linspace(T _a, T _b, int _points, bool endpoint = true) :
+			a(_a), b(_b), points(_points)
+		{
+			if (!endpoint)
+			{
+				T k = (T)(points-1) / (T)(points);
+				b = lerp(a,b,k);
+			}
+		}
 
 		T step()
 		{
