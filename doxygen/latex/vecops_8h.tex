@@ -1,0 +1,208 @@
+\hypertarget{vecops_8h}{}\doxysection{/home/mirmik/project/ralgo/ralgo/linalg/vecops.h File Reference}
+\label{vecops_8h}\index{/home/mirmik/project/ralgo/ralgo/linalg/vecops.h@{/home/mirmik/project/ralgo/ralgo/linalg/vecops.h}}
+{\ttfamily \#include $<$assert.\+h$>$}\newline
+{\ttfamily \#include $<$algorithm$>$}\newline
+{\ttfamily \#include $<$iterator$>$}\newline
+{\ttfamily \#include $<$ralgo/util/helpers.\+h$>$}\newline
+{\ttfamily \#include $<$igris/util/signature.\+h$>$}\newline
+{\ttfamily \#include $<$ralgo/linalg/vecops\+\_\+base.\+h$>$}\newline
+Include dependency graph for vecops.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{vecops_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{vecops_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \mbox{\hyperlink{namespaceralgo}{ralgo}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{namespaceralgo_aa8237793881a756565ad9634c1c324de}\label{namespaceralgo_aa8237793881a756565ad9634c1c324de}} 
+{\bfseries ralgo\+::\+I\+G\+R\+I\+S\+\_\+\+S\+I\+G\+N\+A\+T\+U\+R\+E\+\_\+\+A\+T\+T\+R\+I\+B\+U\+T\+E\+\_\+\+C\+H\+E\+C\+K\+ER} (has\+\_\+reserve, reserve)
+\item 
+\mbox{\Hypertarget{vecops_8h_acf40ce6c4156e609f848ff990065a1da}\label{vecops_8h_acf40ce6c4156e609f848ff990065a1da}} 
+{\footnotesize template$<$class R  = void, class V $>$ }\\defvec\+\_\+t$<$ R, V $>$ {\bfseries ralgo\+::vecops\+::list} (const V \&u)
+\item 
+\mbox{\Hypertarget{vecops_8h_ae4f13a7a6cd40cfd017310393c821bf0}\label{vecops_8h_ae4f13a7a6cd40cfd017310393c821bf0}} 
+{\footnotesize template$<$class V $>$ }\\void {\bfseries ralgo\+::vecops\+::fill} (V \&arr, const value\+\_\+t$<$ V $>$ \&val)
+\item 
+\mbox{\Hypertarget{vecops_8h_a49e6cd83f7e273417314bcb4bd78268b}\label{vecops_8h_a49e6cd83f7e273417314bcb4bd78268b}} 
+{\footnotesize template$<$class V $>$ }\\auto {\bfseries ralgo\+::vecops\+::arange} (int start, int stop, int step)
+\item 
+\mbox{\Hypertarget{vecops_8h_a5329378d28a6c65806f7a994c00c38e0}\label{vecops_8h_a5329378d28a6c65806f7a994c00c38e0}} 
+{\footnotesize template$<$class A , class B $>$ }\\void {\bfseries ralgo\+::vecops\+::swap} (A \&\&a, B \&\&b)
+\item 
+\mbox{\Hypertarget{vecops_8h_a1e8bf8f07b8ee4152387133335ac61e3}\label{vecops_8h_a1e8bf8f07b8ee4152387133335ac61e3}} 
+{\footnotesize template$<$class V  = void$>$ }\\defvec\+\_\+of\+\_\+t$<$ V, int $>$ {\bfseries ralgo\+::vecops\+::arange} (int stop)
+\item 
+\mbox{\Hypertarget{vecops_8h_acc87326f2926fdcfbcb048072651ecfb}\label{vecops_8h_acc87326f2926fdcfbcb048072651ecfb}} 
+{\footnotesize template$<$class R $>$ }\\auto {\bfseries ralgo\+::vecops\+::linspace} (double s, double f, int n)
+\item 
+\mbox{\Hypertarget{vecops_8h_ab05ab71f8cf4f64718cd74943d833645}\label{vecops_8h_ab05ab71f8cf4f64718cd74943d833645}} 
+{\footnotesize template$<$class A , class B $>$ }\\void {\bfseries ralgo\+::vecops\+::copy} (const A \&a, B \&\&b)
+\item 
+\mbox{\Hypertarget{vecops_8h_a1b8550d89106b221251b1e7a4a07eb83}\label{vecops_8h_a1b8550d89106b221251b1e7a4a07eb83}} 
+{\footnotesize template$<$class V , class R  = V, typename F , class ... Args$>$ }\\constexpr auto {\bfseries ralgo\+::vecops\+::vectorize} (const F \&f, Args \&\&... args)
+\item 
+\mbox{\Hypertarget{vecops_8h_afedd1838da98a5556acb6d8b3f8b7ab4}\label{vecops_8h_afedd1838da98a5556acb6d8b3f8b7ab4}} 
+{\footnotesize template$<$class R  = void, class A $>$ }\\defsame\+\_\+t$<$ R, A $>$ {\bfseries ralgo\+::vecops\+::abs} (const A \&obj)
+\item 
+\mbox{\Hypertarget{vecops_8h_ae50f96d357a75a603366c4967298b1eb}\label{vecops_8h_ae50f96d357a75a603366c4967298b1eb}} 
+{\footnotesize template$<$template$<$ class C $>$ class V, class T $>$ }\\auto {\bfseries ralgo\+::vecops\+::real} (const V$<$ T $>$ \&obj)
+\item 
+\mbox{\Hypertarget{vecops_8h_afeadb79ccc27f0ef589f3190eb4fe03e}\label{vecops_8h_afeadb79ccc27f0ef589f3190eb4fe03e}} 
+{\footnotesize template$<$template$<$ class C $>$ class V, class T $>$ }\\auto {\bfseries ralgo\+::vecops\+::imag} (const V$<$ T $>$ \&obj)
+\item 
+\mbox{\Hypertarget{vecops_8h_a9eb4158ed259cd0b2d8423cb8018d45b}\label{vecops_8h_a9eb4158ed259cd0b2d8423cb8018d45b}} 
+{\footnotesize template$<$typename T $>$ }\\T {\bfseries ralgo\+::vecops\+::reverse} (const T \&src)
+\item 
+\mbox{\Hypertarget{vecops_8h_ab4f152acc2e4c36b98c1e56d76b3a0d7}\label{vecops_8h_ab4f152acc2e4c36b98c1e56d76b3a0d7}} 
+{\footnotesize template$<$class A , class B $>$ }\\value\+\_\+t$<$ A $>$ {\bfseries ralgo\+::vecops\+::dot\+\_\+product} (A \&\&a, B \&\&b)
+\item 
+\mbox{\Hypertarget{vecops_8h_a95f9cb817d63d672ba47c7ad44c6db9f}\label{vecops_8h_a95f9cb817d63d672ba47c7ad44c6db9f}} 
+{\footnotesize template$<$class A , class B $>$ }\\value\+\_\+t$<$ A $>$ {\bfseries ralgo\+::vecops\+::inner\+\_\+product} (A \&\&a, B \&\&b)
+\item 
+\mbox{\Hypertarget{vecops_8h_a2c75a31b1714645628ef001831bf8d3a}\label{vecops_8h_a2c75a31b1714645628ef001831bf8d3a}} 
+{\footnotesize template$<$typename T $>$ }\\T {\bfseries ralgo\+::vecops\+::slice} (const T \&src, size\+\_\+t start, size\+\_\+t size, size\+\_\+t stride=1)
+\item 
+\mbox{\Hypertarget{vecops_8h_a25b36c0c14957e7c987432b589e2276e}\label{vecops_8h_a25b36c0c14957e7c987432b589e2276e}} 
+{\footnotesize template$<$typename V $>$ }\\double {\bfseries ralgo\+::vecops\+::norm} (const V \&vec)
+\item 
+\mbox{\Hypertarget{vecops_8h_a873076b106c473ea0e2e5215e774c35a}\label{vecops_8h_a873076b106c473ea0e2e5215e774c35a}} 
+{\footnotesize template$<$typename V $>$ }\\double {\bfseries ralgo\+::vecops\+::length} (const V \&vec)
+\item 
+\mbox{\Hypertarget{vecops_8h_a21a38658da60bcaa1d85b2760d69c8a8}\label{vecops_8h_a21a38658da60bcaa1d85b2760d69c8a8}} 
+{\footnotesize template$<$class R  = double, class A , class B $>$ }\\R {\bfseries ralgo\+::vecops\+::distance2} (const A \&a, const B \&b)
+\item 
+\mbox{\Hypertarget{vecops_8h_af6d01feae801f12cbacd256fc033a198}\label{vecops_8h_af6d01feae801f12cbacd256fc033a198}} 
+{\footnotesize template$<$class R  = double, class A , class B $>$ }\\R {\bfseries ralgo\+::vecops\+::distance} (const A \&a, const B \&b)
+\item 
+\mbox{\Hypertarget{vecops_8h_a9f5227165a4ee5fb64450da5e310b8b7}\label{vecops_8h_a9f5227165a4ee5fb64450da5e310b8b7}} 
+{\footnotesize template$<$class R , class A $>$ }\\R {\bfseries ralgo\+::vecops\+::cast} (const A \&a)
+\item 
+\mbox{\Hypertarget{vecops_8h_abe878f1819d2fcc795e09b222e8e9cac}\label{vecops_8h_abe878f1819d2fcc795e09b222e8e9cac}} 
+{\footnotesize template$<$class A $>$ }\\bool {\bfseries ralgo\+::vecops\+::all} (const A \&a)
+\item 
+\mbox{\Hypertarget{vecops_8h_a197daf638a9e3bcf57335b064209eb3f}\label{vecops_8h_a197daf638a9e3bcf57335b064209eb3f}} 
+{\footnotesize template$<$class A $>$ }\\bool {\bfseries ralgo\+::vecops\+::any} (const A \&a)
+\item 
+\mbox{\Hypertarget{vecops_8h_a807fa4ffb46b55be32a1ad5c8b5e4e7c}\label{vecops_8h_a807fa4ffb46b55be32a1ad5c8b5e4e7c}} 
+{\footnotesize template$<$class A , class B $>$ }\\bool {\bfseries ralgo\+::vecops\+::equal\+\_\+all} (const A \&a, const B \&b)
+\item 
+\mbox{\Hypertarget{vecops_8h_a618878534af609ae55458a7b80d92105}\label{vecops_8h_a618878534af609ae55458a7b80d92105}} 
+{\footnotesize template$<$class A , class B $>$ }\\bool {\bfseries ralgo\+::vecops\+::equal\+\_\+any} (const A \&a, const B \&b)
+\item 
+\mbox{\Hypertarget{vecops_8h_ae9eec0c9a391f42df839409dd22718c1}\label{vecops_8h_ae9eec0c9a391f42df839409dd22718c1}} 
+{\footnotesize template$<$class R  = void, class A , class B $>$ }\\defsame\+\_\+t$<$ R, A $>$ {\bfseries ralgo\+::vecops\+::add\+\_\+vs} (const A \&a, B b)
+\item 
+\mbox{\Hypertarget{vecops_8h_adff4b96fa1f103b4e865e01491a51d96}\label{vecops_8h_adff4b96fa1f103b4e865e01491a51d96}} 
+{\footnotesize template$<$class R  = void, class A , class B $>$ }\\defsame\+\_\+t$<$ R, A $>$ {\bfseries ralgo\+::vecops\+::sub\+\_\+vs} (const A \&a, B b)
+\item 
+\mbox{\Hypertarget{vecops_8h_a5cd058e67963f8a6953ecf59ff1e6142}\label{vecops_8h_a5cd058e67963f8a6953ecf59ff1e6142}} 
+{\footnotesize template$<$class R  = void, class A , class B $>$ }\\defsame\+\_\+t$<$ R, A $>$ {\bfseries ralgo\+::vecops\+::mul\+\_\+vs} (const A \&a, B b)
+\item 
+\mbox{\Hypertarget{vecops_8h_aa40fd08e2161136fc95daf1aefb74424}\label{vecops_8h_aa40fd08e2161136fc95daf1aefb74424}} 
+{\footnotesize template$<$class R  = void, class A , class B $>$ }\\defsame\+\_\+t$<$ R, A $>$ {\bfseries ralgo\+::vecops\+::div\+\_\+vs} (const A \&a, B b)
+\item 
+\mbox{\Hypertarget{vecops_8h_a3c4527556382ceb9fe14fe819c53de8b}\label{vecops_8h_a3c4527556382ceb9fe14fe819c53de8b}} 
+{\footnotesize template$<$class R  = void, class A , class B $>$ }\\defsame\+\_\+t$<$ R, A $>$ {\bfseries ralgo\+::vecops\+::add\+\_\+vv} (const A \&a, const B \&b)
+\item 
+\mbox{\Hypertarget{vecops_8h_a063dd4679c1c697b673f9507974b15fb}\label{vecops_8h_a063dd4679c1c697b673f9507974b15fb}} 
+{\footnotesize template$<$class R  = void, class A , class B $>$ }\\defsame\+\_\+t$<$ R, A $>$ {\bfseries ralgo\+::vecops\+::sub\+\_\+vv} (const A \&a, const B \&b)
+\item 
+\mbox{\Hypertarget{vecops_8h_a0d14494eedf9d348a90c637150c66ec8}\label{vecops_8h_a0d14494eedf9d348a90c637150c66ec8}} 
+{\footnotesize template$<$class R  = void, class A , class B $>$ }\\defsame\+\_\+t$<$ R, A $>$ {\bfseries ralgo\+::vecops\+::mul\+\_\+vv} (const A \&a, const B \&b)
+\item 
+\mbox{\Hypertarget{vecops_8h_a740e66675345e7e3054e54bbdc43645c}\label{vecops_8h_a740e66675345e7e3054e54bbdc43645c}} 
+{\footnotesize template$<$class R  = void, class A , class B $>$ }\\defsame\+\_\+t$<$ R, A $>$ {\bfseries ralgo\+::vecops\+::div\+\_\+vv} (const A \&a, const B \&b)
+\item 
+\mbox{\Hypertarget{vecops_8h_aac8eda9300118911978665f064a65a08}\label{vecops_8h_aac8eda9300118911978665f064a65a08}} 
+{\footnotesize template$<$class A , class B , class C $>$ }\\void {\bfseries ralgo\+::vecops\+::add\+\_\+vv\+\_\+to} (C \&c, const A \&a, const B \&b)
+\item 
+\mbox{\Hypertarget{vecops_8h_a74670ca4c7ca61ae286cf581c1b23255}\label{vecops_8h_a74670ca4c7ca61ae286cf581c1b23255}} 
+{\footnotesize template$<$class A , class B , class C $>$ }\\void {\bfseries ralgo\+::vecops\+::sub\+\_\+vv\+\_\+to} (C \&c, const A \&a, const B \&b)
+\item 
+\mbox{\Hypertarget{vecops_8h_a46d1c3392a7bca0ba43e4c281e5d8060}\label{vecops_8h_a46d1c3392a7bca0ba43e4c281e5d8060}} 
+{\footnotesize template$<$class A , class B , class C $>$ }\\void {\bfseries ralgo\+::vecops\+::mul\+\_\+vv\+\_\+to} (C \&c, const A \&a, const B \&b)
+\item 
+\mbox{\Hypertarget{vecops_8h_a854f0234b8511f5246eb0295d3e0b7c8}\label{vecops_8h_a854f0234b8511f5246eb0295d3e0b7c8}} 
+{\footnotesize template$<$class A , class B , class C $>$ }\\void {\bfseries ralgo\+::vecops\+::div\+\_\+vv\+\_\+to} (C \&c, const A \&a, const B \&b)
+\item 
+\mbox{\Hypertarget{vecops_8h_affd60147786077a2093eae045f10e855}\label{vecops_8h_affd60147786077a2093eae045f10e855}} 
+{\footnotesize template$<$class A , class S , class R $>$ }\\void {\bfseries ralgo\+::vecops\+::scalar\+\_\+add} (const A \&a, S b, R \&\&res)
+\item 
+\mbox{\Hypertarget{vecops_8h_a266abd84286c326a955c927f4fd9f6d4}\label{vecops_8h_a266abd84286c326a955c927f4fd9f6d4}} 
+{\footnotesize template$<$class A , class S , class R $>$ }\\void {\bfseries ralgo\+::vecops\+::scalar\+\_\+sub} (const A \&a, S b, R \&\&res)
+\item 
+\mbox{\Hypertarget{vecops_8h_ac4f339645dd650078928dc434e26353a}\label{vecops_8h_ac4f339645dd650078928dc434e26353a}} 
+{\footnotesize template$<$class A , class S , class R $>$ }\\void {\bfseries ralgo\+::vecops\+::scalar\+\_\+div} (const A \&a, S b, R \&\&res)
+\item 
+\mbox{\Hypertarget{vecops_8h_a546611afbde5a8ebc3d0c621ac80521c}\label{vecops_8h_a546611afbde5a8ebc3d0c621ac80521c}} 
+{\footnotesize template$<$class A , class S , class R $>$ }\\void {\bfseries ralgo\+::vecops\+::scalar\+\_\+mul} (const A \&a, S b, R \&\&res)
+\item 
+\mbox{\Hypertarget{vecops_8h_a3130f8d7fd74cbb7c6e4ab71f765e956}\label{vecops_8h_a3130f8d7fd74cbb7c6e4ab71f765e956}} 
+{\footnotesize template$<$class V , class F , class ... A$>$ }\\V \& {\bfseries ralgo\+::vecops\+::inplace\+::elementwise} (V \&v, F f, A \&\&... a)
+\item 
+\mbox{\Hypertarget{vecops_8h_ab6eb0b8c5d1c484e326f8263d19903d9}\label{vecops_8h_ab6eb0b8c5d1c484e326f8263d19903d9}} 
+{\footnotesize template$<$class V $>$ }\\void {\bfseries ralgo\+::vecops\+::inplace\+::clean} (V \&v)
+\item 
+\mbox{\Hypertarget{vecops_8h_ad110ebda32f4cbf5305ddee976382118}\label{vecops_8h_ad110ebda32f4cbf5305ddee976382118}} 
+{\footnotesize template$<$class V , class S $>$ }\\V \& {\bfseries ralgo\+::vecops\+::inplace\+::add} (V \&vec, S m)
+\item 
+\mbox{\Hypertarget{vecops_8h_af30bdc3b93a3ea67159ef3fe2f2aac38}\label{vecops_8h_af30bdc3b93a3ea67159ef3fe2f2aac38}} 
+{\footnotesize template$<$class V , class S $>$ }\\V \& {\bfseries ralgo\+::vecops\+::inplace\+::sub} (V \&vec, S m)
+\item 
+\mbox{\Hypertarget{vecops_8h_ade714169cc198946866a236b1e021793}\label{vecops_8h_ade714169cc198946866a236b1e021793}} 
+{\footnotesize template$<$class V , class S $>$ }\\V \& {\bfseries ralgo\+::vecops\+::inplace\+::mul} (V \&vec, S m)
+\item 
+\mbox{\Hypertarget{vecops_8h_af7e9478a2fc4b963d6208b9f3f4bbc93}\label{vecops_8h_af7e9478a2fc4b963d6208b9f3f4bbc93}} 
+{\footnotesize template$<$class V , class S $>$ }\\V \& {\bfseries ralgo\+::vecops\+::inplace\+::div} (V \&vec, S m)
+\item 
+\mbox{\Hypertarget{vecops_8h_a2c4b24debed651d7d6521d074780137c}\label{vecops_8h_a2c4b24debed651d7d6521d074780137c}} 
+{\footnotesize template$<$class V $>$ }\\V \& {\bfseries ralgo\+::vecops\+::inplace\+::conj} (V \&vec)
+\item 
+\mbox{\Hypertarget{vecops_8h_a5d4e6d9d3c37b1c6aa434cb430eeb445}\label{vecops_8h_a5d4e6d9d3c37b1c6aa434cb430eeb445}} 
+{\footnotesize template$<$class V $>$ }\\V \& {\bfseries ralgo\+::vecops\+::inplace\+::sin} (V \&vec)
+\item 
+\mbox{\Hypertarget{vecops_8h_a9c72909858796d6cf2544fa12fbb8cc6}\label{vecops_8h_a9c72909858796d6cf2544fa12fbb8cc6}} 
+{\footnotesize template$<$class V $>$ }\\V \& {\bfseries ralgo\+::vecops\+::inplace\+::cos} (V \&vec)
+\item 
+\mbox{\Hypertarget{vecops_8h_ad9d003cd7146b9fbce5e5dcdfcb9471c}\label{vecops_8h_ad9d003cd7146b9fbce5e5dcdfcb9471c}} 
+{\footnotesize template$<$class V $>$ }\\V \& {\bfseries ralgo\+::vecops\+::inplace\+::tan} (V \&vec)
+\item 
+\mbox{\Hypertarget{vecops_8h_a8803c7dc6ab2611b7737fc5c98522abd}\label{vecops_8h_a8803c7dc6ab2611b7737fc5c98522abd}} 
+{\footnotesize template$<$class V $>$ }\\V \& {\bfseries ralgo\+::vecops\+::inplace\+::exp} (V \&vec)
+\item 
+\mbox{\Hypertarget{vecops_8h_a9bd56ce942b622933dbd3535ad5d49fb}\label{vecops_8h_a9bd56ce942b622933dbd3535ad5d49fb}} 
+{\footnotesize template$<$class V $>$ }\\V \& {\bfseries ralgo\+::vecops\+::inplace\+::log} (V \&vec)
+\item 
+\mbox{\Hypertarget{vecops_8h_af90446c4d27d70072226befa0102f98a}\label{vecops_8h_af90446c4d27d70072226befa0102f98a}} 
+{\footnotesize template$<$class V $>$ }\\V \& {\bfseries ralgo\+::vecops\+::inplace\+::log2} (V \&vec)
+\item 
+\mbox{\Hypertarget{vecops_8h_a436ab3bf2355bc6dde418734daa9a94a}\label{vecops_8h_a436ab3bf2355bc6dde418734daa9a94a}} 
+{\footnotesize template$<$class V $>$ }\\V \& {\bfseries ralgo\+::vecops\+::inplace\+::log10} (V \&vec)
+\item 
+\mbox{\Hypertarget{vecops_8h_a416aad5562f34645a77b31b5cc8d211e}\label{vecops_8h_a416aad5562f34645a77b31b5cc8d211e}} 
+{\footnotesize template$<$class V $>$ }\\V \& {\bfseries ralgo\+::vecops\+::inplace\+::normalize} (V \&vec)
+\item 
+\mbox{\Hypertarget{vecops_8h_a18beb6e0caf09e24d976d88279400408}\label{vecops_8h_a18beb6e0caf09e24d976d88279400408}} 
+{\footnotesize template$<$class VI , class WI , class RI $>$ }\\void {\bfseries ralgo\+::vecops\+::merge\+\_\+sorted} (VI vit, const VI vend, WI wit, const WI wend, RI rit)
+\item 
+\mbox{\Hypertarget{vecops_8h_aa69e99ca117395baf8095fa925974a47}\label{vecops_8h_aa69e99ca117395baf8095fa925974a47}} 
+{\footnotesize template$<$class V , class W , class R $>$ }\\void {\bfseries ralgo\+::vecops\+::merge\+\_\+sorted} (const V \&v, const W \&w, R writer, double start, double stop)
+\item 
+\mbox{\Hypertarget{vecops_8h_a1ac244550d9acd2593ef16aff7f4e8a1}\label{vecops_8h_a1ac244550d9acd2593ef16aff7f4e8a1}} 
+{\footnotesize template$<$class V , class W $>$ }\\auto {\bfseries ralgo\+::vecops\+::merge\+\_\+sorted} (const V \&v, const W \&w, double start, double stop)
+\end{DoxyCompactItemize}

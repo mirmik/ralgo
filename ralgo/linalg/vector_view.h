@@ -1,7 +1,9 @@
 #ifndef RALGO_VECTOR_VIEW_H
 #define RALGO_VECTOR_VIEW_H
 
-//#include <stdlib.h>
+/**
+	@file
+*/
 
 namespace ralgo 
 {

@@ -1,6 +1,10 @@
 #ifndef RALGO_LINALG_QRD_H
 #define RALGO_LINALG_QRD_H
 
+/**
+	@file
+*/
+
 // QR decomposition
 // Based on: https://rpubs.com/aaronsc32/qr-decomposition-gram-schmidt
 

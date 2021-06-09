@@ -1,6 +1,10 @@
 #ifndef RALGO_CONVOLUTION_H
 #define RALGO_CONVOLUTION_H
 
+/**
+	@file
+*/
+
 #include <ralgo/interpolate.h>
 #include <ralgo/signal/signal.h>
 #include <igris/util/bug.h>

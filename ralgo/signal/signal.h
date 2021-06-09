@@ -1,6 +1,10 @@
 #ifndef RALGO_SIGNAL_SIGNAL_H
 #define RALGO_SIGNAL_SIGNAL_H
 
+/**
+	@file
+*/
+
 #include <igris/util/bug.h>
 #include <nos/print.h>
 
@@ -43,15 +47,6 @@ namespace ralgo
 				auto sright = *sitnext;
 				auto lkoeff = ralgo::lerpkoeff(sleft, sright, key);
 				auto lerp = ralgo::lerp(vleft, vright, lkoeff);
-
-				/*nos::println();
-				PRINT(vleft);
-				PRINT(vright);
-				PRINT(sleft);
-				PRINT(sright);
-				PRINT(key);
-				PRINT(lkoeff);
-				PRINT(lerp);*/
 
 				*rit = lerp;
 			}

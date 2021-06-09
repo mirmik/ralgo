@@ -1,6 +1,10 @@
 #ifndef RALGO_HEIMER_NODE_H
 #define RALGO_HEIMER_NODE_H
 
+/**
+	@file
+*/
+
 #include <igris/container/array_view.h>
 #include <ralgo/heimer/errcode.h>
 #include <vector>

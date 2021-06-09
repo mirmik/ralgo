@@ -1,6 +1,10 @@
 #ifndef RALGO_UTIL_FUNC_HELPERS_H
 #define RALGO_UTIL_FUNC_HELPERS_H
 
+/**
+	@file
+*/
+
 #include <cmath>
 #include <numeric>
 #include <complex>

@@ -1,6 +1,10 @@
 #ifndef RALGO_SPECTRE_FFT_H
 #define RALGO_SPECTRE_FFT_H
 
+/**
+	@file
+*/
+
 #include <vector>
 #include <complex>
 #include <stdlib.h>

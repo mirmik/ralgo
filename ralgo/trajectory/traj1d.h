@@ -1,6 +1,10 @@
 #ifndef HEIMER_TRAJ1D_H
 #define HEIMER_TRAJ1D_H
 
+/**
+	@file
+*/
+
 #include <ralgo/trajectory/speed_deformer.h>
 #include <ralgo/disctime.h>
 #include <nos/fprint.h>

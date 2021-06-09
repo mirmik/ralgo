@@ -1,0 +1,136 @@
+\hypertarget{classheimer_1_1control__node}{}\doxysection{heimer\+::control\+\_\+node Class Reference}
+\label{classheimer_1_1control__node}\index{heimer::control\_node@{heimer::control\_node}}
+
+
+Inheritance diagram for heimer\+::control\+\_\+node\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classheimer_1_1control__node__inherit__graph}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_a1e70b419bcd923a3b17a674e06bf359f}\label{classheimer_1_1control__node_a1e70b419bcd923a3b17a674e06bf359f}} 
+const \mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$ {\bfseries last\+\_\+controller} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_ac6f308c27e04512c85397d5bdec59120}\label{classheimer_1_1control__node_ac6f308c27e04512c85397d5bdec59120}} 
+constexpr {\bfseries control\+\_\+node} (const char $\ast$mnemo)
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_a88503a2db2ffb37f4b071e9585bf3f7e}\label{classheimer_1_1control__node_a88503a2db2ffb37f4b071e9585bf3f7e}} 
+void {\bfseries set\+\_\+alarm} (int \mbox{\hyperlink{structheimer_1_1errcode}{errcode}})
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_abeafaa4604548111a724c43c153ecd8f}\label{classheimer_1_1control__node_abeafaa4604548111a724c43c153ecd8f}} 
+virtual \mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$ {\bfseries iterate} (\mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$it)
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_ae3a1d5af56cae013847f8a37230af649}\label{classheimer_1_1control__node_ae3a1d5af56cae013847f8a37230af649}} 
+virtual \mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$ {\bfseries controllers\+\_\+iterate} (\mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$it)
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_a1cb5f4d109b9ff49ee292557149183c8}\label{classheimer_1_1control__node_a1cb5f4d109b9ff49ee292557149183c8}} 
+int {\bfseries activate} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_a3550e04da698a4e6b738618519dd125e}\label{classheimer_1_1control__node_a3550e04da698a4e6b738618519dd125e}} 
+int {\bfseries deactivate} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_abcb24d302dfb9ecf016669b620872b11}\label{classheimer_1_1control__node_abcb24d302dfb9ecf016669b620872b11}} 
+int {\bfseries take\+\_\+control} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_a73552b179f69291fb19939f569f1df71}\label{classheimer_1_1control__node_a73552b179f69291fb19939f569f1df71}} 
+int {\bfseries release\+\_\+control} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_ae4dabe2818e2c0978b11a00486e6b7df}\label{classheimer_1_1control__node_ae4dabe2818e2c0978b11a00486e6b7df}} 
+void {\bfseries serve} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_a1b9dc59e3c512b81fd20f65cec911227}\label{classheimer_1_1control__node_a1b9dc59e3c512b81fd20f65cec911227}} 
+virtual void {\bfseries serve\+\_\+impl} ()=0
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_a408960ad14aa81bf4df76b0d97d04f62}\label{classheimer_1_1control__node_a408960ad14aa81bf4df76b0d97d04f62}} 
+bool {\bfseries is\+\_\+active} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_aa1960bdda63ebb2e3145e4b98c21f563}\label{classheimer_1_1control__node_aa1960bdda63ebb2e3145e4b98c21f563}} 
+bool {\bfseries is\+\_\+controlled} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_a9a632f923c129953193aa41d127c3b96}\label{classheimer_1_1control__node_a9a632f923c129953193aa41d127c3b96}} 
+bool {\bfseries is\+\_\+multicontrolled} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_a14b4a6c0e9da73210d4c8865e7c09f2a}\label{classheimer_1_1control__node_a14b4a6c0e9da73210d4c8865e7c09f2a}} 
+bool {\bfseries is\+\_\+alarmed} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_a2fa06f451f0a4097abc2ac92cfa5e819}\label{classheimer_1_1control__node_a2fa06f451f0a4097abc2ac92cfa5e819}} 
+void {\bfseries set\+\_\+multicontrolled\+\_\+mode} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_a42f4c596cf3998f77bb8f1d3c0beb166}\label{classheimer_1_1control__node_a42f4c596cf3998f77bb8f1d3c0beb166}} 
+const char $\ast$ {\bfseries mnemo} () const
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_a0ea624653bcd8c970a689b5fe17b05f2}\label{classheimer_1_1control__node_a0ea624653bcd8c970a689b5fe17b05f2}} 
+void {\bfseries set\+\_\+mnemo} (const char $\ast$str)
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_aa7b9f0485a7e91f36fabbdfd2ca81b9b}\label{classheimer_1_1control__node_aa7b9f0485a7e91f36fabbdfd2ca81b9b}} 
+virtual void {\bfseries print\+\_\+info} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_a9a11a3a3b6376e303018c1ec79c5a187}\label{classheimer_1_1control__node_a9a11a3a3b6376e303018c1ec79c5a187}} 
+virtual int {\bfseries internal\+\_\+command} (int argc, char $\ast$$\ast$argv)
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_ab1f8ccec3cfafee9494743acf4271f32}\label{classheimer_1_1control__node_ab1f8ccec3cfafee9494743acf4271f32}} 
+void {\bfseries rethrow\+\_\+interrupt} (\mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$slave, \mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$source, \mbox{\hyperlink{classheimer_1_1interrupt__args}{interrupt\+\_\+args}} $\ast$data)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+dlist\+\_\+head {\bfseries control\+\_\+node\+\_\+list\+\_\+lnk}
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_afe6835ecd02c58aba747e58667851e6d}\label{classheimer_1_1control__node_afe6835ecd02c58aba747e58667851e6d}} 
+uint16\+\_\+t {\bfseries flags} = 0
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_a3f273e6f137a2f3b75343a9dfffe677b}\label{classheimer_1_1control__node_a3f273e6f137a2f3b75343a9dfffe677b}} 
+virtual int {\bfseries on\+\_\+external\+\_\+take} (\mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$master)
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_a52c8fc7aa4306fcf02114098935279b2}\label{classheimer_1_1control__node_a52c8fc7aa4306fcf02114098935279b2}} 
+virtual int {\bfseries on\+\_\+external\+\_\+release} (\mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$master)
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_a1aa2308e1d87f2d678d8218daa23e434}\label{classheimer_1_1control__node_a1aa2308e1d87f2d678d8218daa23e434}} 
+virtual int {\bfseries on\+\_\+activate} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_ac6d70bc7ad68d5ebd52991d9f2803bb1}\label{classheimer_1_1control__node_ac6d70bc7ad68d5ebd52991d9f2803bb1}} 
+virtual int {\bfseries on\+\_\+deactivate} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_aae5961f707ab420b3b10b440105af78b}\label{classheimer_1_1control__node_aae5961f707ab420b3b10b440105af78b}} 
+virtual bool {\bfseries on\+\_\+interrupt} (\mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$slave, \mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$source, \mbox{\hyperlink{classheimer_1_1interrupt__args}{interrupt\+\_\+args}} $\ast$data)=0
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_a8116dba4cd2eebff228371ec52fe0dd2}\label{classheimer_1_1control__node_a8116dba4cd2eebff228371ec52fe0dd2}} 
+void {\bfseries on\+\_\+interrupt\+\_\+common} (\mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$slave, \mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$source, \mbox{\hyperlink{classheimer_1_1interrupt__args}{interrupt\+\_\+args}} $\ast$data)
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_a5a0b4a11ca4d7cce84bdfeaa21775255}\label{classheimer_1_1control__node_a5a0b4a11ca4d7cce84bdfeaa21775255}} 
+void {\bfseries throw\+\_\+interrupt} (\mbox{\hyperlink{classheimer_1_1interrupt__args}{interrupt\+\_\+args}} $\ast$interrupt)
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classheimer_1_1control__node_ad62a1aee281489d21915e88338e55750}\label{classheimer_1_1control__node_ad62a1aee281489d21915e88338e55750}} 
+static \mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$ {\bfseries vector\+\_\+iterate} (\mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$$\ast$bit, \mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$$\ast$eit, \mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$it)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Data Documentation}
+\mbox{\Hypertarget{classheimer_1_1control__node_a0e0f1aa5d351cee5a4d9e7da58354b99}\label{classheimer_1_1control__node_a0e0f1aa5d351cee5a4d9e7da58354b99}} 
+\index{heimer::control\_node@{heimer::control\_node}!control\_node\_list\_lnk@{control\_node\_list\_lnk}}
+\index{control\_node\_list\_lnk@{control\_node\_list\_lnk}!heimer::control\_node@{heimer::control\_node}}
+\doxysubsubsection{\texorpdfstring{control\_node\_list\_lnk}{control\_node\_list\_lnk}}
+{\footnotesize\ttfamily dlist\+\_\+head heimer\+::control\+\_\+node\+::control\+\_\+node\+\_\+list\+\_\+lnk}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{            DLIST\_HEAD\_INIT(control\_node\_list\_lnk)}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/mirmik/project/ralgo/ralgo/heimer/control.\+h\item 
+/home/mirmik/project/ralgo/ralgo/heimer/control.\+cpp\end{DoxyCompactItemize}

@@ -1,6 +1,10 @@
 #ifndef HEIMER_COMMAND_CENTER_2_H
 #define HEIMER_COMMAND_CENTER_2_H
 
+/**
+	@file
+*/
+
 #include <vector>
 
 #include <ralgo/heimer/datanode.h>

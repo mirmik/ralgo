@@ -1,14 +1,16 @@
 #ifndef RALGO_VECTOR_OPERATIONS_H
 #define RALGO_VECTOR_OPERATIONS_H
 
+/**
+@file
+*/
+
 #include <assert.h>
 #include <algorithm>
 #include <iterator>
 #include <ralgo/util/helpers.h>
 
-#include <igris/dprint.h>
 #include <igris/util/signature.h>
-
 #include <ralgo/linalg/vecops_base.h>
 
 namespace ralgo
