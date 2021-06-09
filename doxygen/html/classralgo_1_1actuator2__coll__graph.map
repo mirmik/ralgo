@@ -1,6 +1,0 @@
-<map id="ralgo::actuator2" name="ralgo::actuator2">
-<area shape="rect" id="node1" title=" " alt="" coords="31,247,156,273"/>
-<area shape="rect" id="node2" href="$classralgo_1_1unit2d__1dof.html" title=" " alt="" coords="23,171,163,197"/>
-<area shape="rect" id="node3" href="$classralgo_1_1kinematic__unit2d.html" title=" " alt="" coords="5,95,181,121"/>
-<area shape="rect" id="node4" href="$classralgo_1_1unit2d.html" title=" " alt="" coords="41,5,145,32"/>
-</map>
