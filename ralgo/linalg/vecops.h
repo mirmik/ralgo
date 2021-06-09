@@ -137,6 +137,16 @@ namespace ralgo
 			return acc;
 		}
 
+		template <class A, class B>
+		value_t<A> inner_product (A&& a, B&& b)
+		{
+			value_t<A> acc;
+			for (int i = 0; i < a.size(); i++)
+			{
+				acc += a[i] * b[i];
+			}
+			return acc;
+		}
 
 		template <typename T>
 		T slice(const T& src, size_t start, size_t size, size_t stride = 1)
@@ -226,9 +236,9 @@ namespace ralgo
 
 
 		template <class A, class S, class R> void scalar_add(const A& a, S b, R&& res) { elementwise_to(res, ralgo::op_add(), a, b); }
-		template <class A, class S, class R> void scalar_sub(const A& a, S b, R&& res) { elementwise_to(res, ralgo::op_add(), a, b); }
-		template <class A, class S, class R> void scalar_div(const A& a, S b, R&& res) { elementwise_to(res, ralgo::op_add(), a, b); }
-		template <class A, class S, class R> void scalar_mul(const A& a, S b, R&& res) { elementwise_to(res, ralgo::op_add(), a, b); }
+		template <class A, class S, class R> void scalar_sub(const A& a, S b, R&& res) { elementwise_to(res, ralgo::op_sub(), a, b); }
+		template <class A, class S, class R> void scalar_div(const A& a, S b, R&& res) { elementwise_to(res, ralgo::op_div(), a, b); }
+		template <class A, class S, class R> void scalar_mul(const A& a, S b, R&& res) { elementwise_to(res, ralgo::op_mul(), a, b); }
 
 
 		namespace inplace
