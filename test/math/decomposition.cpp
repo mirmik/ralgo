@@ -1,6 +1,8 @@
 #include <doctest/doctest.h>
+
 #include <ralgo/linalg/svd.h>
-#include <ralgo/linalg/lu_decomposition.h>
+#include <ralgo/linalg/plud.h>
+#include <ralgo/linalg/qrd.h>
 
 TEST_CASE("svd") 
 {
@@ -16,7 +18,7 @@ TEST_CASE("svd")
 	CHECK_EQ(svd.w.size(), 3);
 }
 
-TEST_CASE("plu_decomposition") 
+TEST_CASE("plud") 
 {
 	ralgo::matrix<double> mat {
 		{4,3},
@@ -36,5 +38,28 @@ TEST_CASE("plu_decomposition")
 	CHECK_EQ(lu.u.at(1,1), doctest::Approx(1));
 
 	auto mmul = ralgo::matops::multiply(lu.p, ralgo::matops::multiply(lu.l, lu.u));
+	CHECK_EQ(mmul, mat);
+}
+
+TEST_CASE("qrd") 
+{
+	ralgo::matrix<double> mat {
+		{4,3},
+		{6,3}
+	};
+
+	auto qr = ralgo::qrd(mat);
+
+	//CHECK_EQ(lu.l.at(0,0), doctest::Approx(1));
+	//CHECK_EQ(lu.l.at(0,1), doctest::Approx(0));
+	//CHECK_EQ(lu.l.at(1,0), doctest::Approx(0.666666667));
+	//CHECK_EQ(lu.l.at(1,1), doctest::Approx(1));
+
+	//CHECK_EQ(lu.u.at(0,0), doctest::Approx(6));
+	//CHECK_EQ(lu.u.at(0,1), doctest::Approx(3));
+	//CHECK_EQ(lu.u.at(1,0), doctest::Approx(0));
+	//CHECK_EQ(lu.u.at(1,1), doctest::Approx(1));
+
+	auto mmul = ralgo::matops::multiply(qr.q, qr.r);
 	CHECK_EQ(mmul, mat);
 }

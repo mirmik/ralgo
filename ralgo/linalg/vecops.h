@@ -17,17 +17,17 @@ namespace ralgo
 
 	namespace vecops
 	{
-		template < class R=void, class V >
-		defvec_t<R,V> list(const V& u) 
+		template < class R = void, class V >
+		defvec_t<R, V> list(const V& u)
 		{
-			defvec_t<R,V> ret;
+			defvec_t<R, V> ret;
 
 #if __cplusplus >= 201703L
-			if constexpr (has_reserve<defvec_t<R,V>>()) 
+			if constexpr (has_reserve<defvec_t<R, V>>())
 				ret.reserve(u.size());
 #endif
 
-			for (const auto& a : u) 
+			for (const auto& a : u)
 				ret.push_back(a);
 
 			return ret;
@@ -36,7 +36,7 @@ namespace ralgo
 		template<class V>
 		void fill(V& arr, const value_t<V>& val)
 		{
-			for (auto & a : arr) 
+			for (auto & a : arr)
 				a = val;
 		}
 
@@ -57,16 +57,16 @@ namespace ralgo
 		template<class A, class B>
 		void swap(A && a, B && b)
 		{
-			for (int i = 0; i < a.size(); ++i) 
+			for (int i = 0; i < a.size(); ++i)
 			{
 				std::swap(a[i], b[i]);
 			}
 		}
 
-		template<class V=void>
-		defvec_of_t<V,int> arange(int stop)
+		template<class V = void>
+		defvec_of_t<V, int> arange(int stop)
 		{
-			defvec_of_t<V,int> r(stop);
+			defvec_of_t<V, int> r(stop);
 
 			for (int i = 0; i < stop; ++i) { r[i] = i; }
 
@@ -87,6 +87,14 @@ namespace ralgo
 			}
 
 			return r;
+		}
+
+		template<class A, class B>
+		void copy(const A& a, B&& b)
+		{
+			b.resize(a.size());
+			for (unsigned int i = 0; i < a.size(); ++i)
+				b[i] = a[i];
 		}
 
 
@@ -116,6 +124,19 @@ namespace ralgo
 
 			return dst;
 		}
+
+
+		template <class A, class B>
+		value_t<A> dot_product (A&& a, B&& b)
+		{
+			value_t<A> acc;
+			for (int i = 0; i < a.size(); i++)
+			{
+				acc += a[i] * b[i];
+			}
+			return acc;
+		}
+
 
 		template <typename T>
 		T slice(const T& src, size_t start, size_t size, size_t stride = 1)
@@ -202,6 +223,13 @@ namespace ralgo
 		template <class A, class B, class C> void sub_vv_to(C& c, const A& a, const B& b) { return elementwise2_to(c, ralgo::op_sub(), a, b); }
 		template <class A, class B, class C> void mul_vv_to(C& c, const A& a, const B& b) { return elementwise2_to(c, ralgo::op_mul(), a, b); }
 		template <class A, class B, class C> void div_vv_to(C& c, const A& a, const B& b) { return elementwise2_to(c, ralgo::op_div(), a, b); }
+
+
+		template <class A, class S, class R> void scalar_add(const A& a, S b, R&& res) { elementwise_to(res, ralgo::op_add(), a, b); }
+		template <class A, class S, class R> void scalar_sub(const A& a, S b, R&& res) { elementwise_to(res, ralgo::op_add(), a, b); }
+		template <class A, class S, class R> void scalar_div(const A& a, S b, R&& res) { elementwise_to(res, ralgo::op_add(), a, b); }
+		template <class A, class S, class R> void scalar_mul(const A& a, S b, R&& res) { elementwise_to(res, ralgo::op_add(), a, b); }
+
 
 		namespace inplace
 		{

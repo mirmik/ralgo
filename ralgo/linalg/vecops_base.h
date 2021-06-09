@@ -86,6 +86,18 @@ namespace ralgo
 			return c;
 		}
 
+		template <class C, class F, class A, class ... Args>
+		void elementwise_to(C& c, const F& f, const A& a, Args&& ... args)
+		{
+			c.resize(a.size());
+
+			auto ait = a.begin(), aend = a.end();
+			auto cit = c.begin();
+
+			for (; ait != aend; ++ait, ++cit)
+				*cit = f(*ait, std::forward<Args>(args) ...);
+		}
+
 		template <class C, class F, class A, class B, class ... Args>
 		void elementwise2_to(C& c, const F& f, const A& a, const B& b, Args&& ... args)
 		{
