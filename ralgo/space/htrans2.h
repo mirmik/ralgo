@@ -2,7 +2,7 @@
 #define RABBIT_TRANS2_H
 
 #include <ralgo/space/screw.h>
-#include <ralgo/linalg/linalg.h>
+#include <ralgo/ralgo/linalg/linalg.h>
 
 #include <nos/fprint.h>
 

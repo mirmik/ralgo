@@ -1,7 +1,10 @@
 #ifndef RALGO_HEIMER_COORDINATE_CHECKER_H
 #define RALGO_HEIMER_COORDINATE_CHECKER_H
 
-#include <linalg/linalg.h>
+#include <cmath>
+#include <cstdlib>
+
+#include <ralgo/linalg/linalg.h>
 #include <ralgo/geom/zone_check.h>
 #include <ralgo/heimer/interpolation_group.h>
 #include <igris/container/array_view.h>

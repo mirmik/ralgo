@@ -27,7 +27,9 @@ namespace ralgo
 
 	template <class T> constexpr T exp(T x) { return std::exp(x); }
 	template <class T> constexpr T log(T x) { return std::log(x); }
+#if !(WITHOUT_LOG2)
 	template <class T> constexpr T log2(T x) { return std::log2(x); }
+#endif
 	template <class T> constexpr T log10(T x) { return std::log10(x); }
 
 		struct op_add { template<class A, class B> auto operator()(const A& a, const B& b) const { return a + b; } };

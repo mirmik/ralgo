@@ -1,7 +1,7 @@
 #ifndef RALGO_SPACE_SCREW_H
 #define RALGO_SPACE_SCREW_H
 
-#include <linalg/linalg.h>
+#include <ralgo/linalg/linalg.h>
 
 namespace ralgo
 {

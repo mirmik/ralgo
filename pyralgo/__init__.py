@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt   
-import ralgo.libralgo as lib
+from ralgo.libralgo import * 
 import sympy
 import numpy as np
 import cmath
