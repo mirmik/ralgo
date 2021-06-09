@@ -2,6 +2,27 @@
 #define RALGO_LINALG_QRD_H
 
 // QR decomposition
+// Based on: https://rpubs.com/aaronsc32/qr-decomposition-gram-schmidt
+
+/*
+	В процессе ортагонализации Грамма-Шмидта происходит итеративное построение
+	нового базиса e на основе старого базиса a согласно принципа:
+
+	b1 = a1
+	b2 = a2 - proj(b1, a2) 
+	b3 = a3 - proj(b1, a3) - proj(u2, a3)         (1)
+	...
+
+	e_i = b_i / ||b_i||   	                      (2)
+
+	Новый базис e оказывается ортонормированным. Ортогонализация достигается 
+	последовательным исключением компонентов проекций из конструируемого базиса (1),
+	а нормирование выполняется непосредственно (2).
+
+	По мере работы алгоритма компоненты векторов e оказываются в матрице Q,
+	а множители, восстанавливающие матрицу Q до исходного состояния складываются
+	в R.
+*/
 
 #include <ralgo/linalg/matrix.h>
 #include <ralgo/linalg/matops.h>
@@ -9,7 +30,7 @@
 namespace ralgo
 {
 	template <class M, class TQ, class TR>
-	class QRD
+	class QRD_gramschmidt
 	{
 	public:
 		M a;
@@ -21,7 +42,7 @@ namespace ralgo
 	public:
 		using value_type = typename M::value_type;
 
-		QRD(const M & _mat) : a(_mat)
+		QRD_gramschmidt(const M & _mat) : a(_mat)
 		{
 			if (_mat.rows() != _mat.rows())
 			{
@@ -29,70 +50,52 @@ namespace ralgo
 				return;
 			}
 
-			int n = a.rows();
 			int m = a.rows();
+			int n = a.cols();
 
 			q.resize(n, m);
-			r.resize(n, m);
+			r.resize(n, n);
 
 			ralgo::matops::clean(q);
 			ralgo::matops::clean(r);
-
-			ralgo::matops::assign(a, q);
 
 			decompose();
 		}
 
 		void decompose()
 		{
-			int i, j;
-			double anorm, tol = 10e-7;
-
 			int m = a.rows();
-			int n = a.rows();
+			int n = a.cols();
 
-			for (i = 0; i < n; i++)
+			ralgo::matops::assign(a, q);
+
+			for (int j = 0; j < a.cols(); ++j)
 			{
-				r.at(i,i) = ralgo::vecops::length(a.row(i)); // r_ii = ||a_i||
-
-				if (r.at(i,i) > tol)
+				// Определяем следующий базисный вектор.
+				// b_i = a_i - sum(j=1:i, proj(e_j, a_i) )
+				value_type v_data[a.rows()];
+				ralgo::vector_view v(v_data, a.rows());
+				ralgo::vecops::copy(a.col(j), v);
+				for (int i = 0; i < j; ++i)
 				{
-					// a_i = a_i/r_ii
-					ralgo::vecops::scalar_div(a.row(i), r.at(i,i), a.row(i)); 
-				}
-				else if (i == 0)  // set a[0] = [1 0 0 ... 0]^T
-				{
-					a.at(i,0) = 1;
-					for (j = 1; j < m; j++)
-					{
-						a.at(i,j) = 0;
-					}
-				}
-				else  // need to choose a_i orthogonal to < a_1, ... a_{i-1} >
-				{
-					for (j = 0; j < m; j++)
-					{
-						a.at(i,j) = -a.at(0,i) * a.at(0,j);
-					}
-					a.at(i,i) += 1;
+					// Ищем операторы проекции. 
+					// q содержит компоненты расчитанных ранее векторов:
+					// попутно запоминаем множители. r_ij = e_i * a_j
+					r.at(i, j) = ralgo::vecops::inner_product(q.col(i), a.col(j));
 
-					for (j = 1; j < i; j++)
-					{
-						ralgo::vecops::scalar_sub(a.row(j), a.at(j,i), a.row(i));
-					}
-
-					anorm = ralgo::vecops::length(a.row(i));
-					ralgo::vecops::scalar_div(a.row(i), anorm, a.row(i));
+					// вычитаем слагаемое из компонент вектора.
+					for (int k = 0; k < v.size(); ++k)
+						v[k] -= r.at(i, j) * q.at(k, i);
 				}
 
-				for (j = i + 1; j < n; j++)
-				{
-					r.at(j,i) = ralgo::vecops::dot_product(a.row(i), a.row(j)); // r_ij = a_i*a_j
-					ralgo::vecops::scalar_sub(a.row(i), r.at(j,i), a.row(j)); // a_j -= r_ij a_i
-				}
+				// Устанавливаем диагональные элементы R 
+				// равными длине векторов v.
+				r.at(j, j) = ralgo::vecops::length(v);
+
+				// The orthogonalized result is found and stored
+				// in the ith column of Q.
+				ralgo::vecops::scalar_div(v, r.at(j, j), q.col(j));
 			}
-
-			print();
 		}
 
 		void print()
@@ -102,7 +105,6 @@ namespace ralgo
 			nos::println();
 
 			nos::println("QR:"); nos::print_matrix(ralgo::matops::multiply(q, r));
-
 		}
 	};
 
@@ -111,9 +113,23 @@ namespace ralgo
 	    class Q = ralgo::matrix<typename M::value_type, ralgo::row_order<typename M::value_type>, std::allocator<typename M::value_type>>,
 	    class R = ralgo::matrix<typename M::value_type, ralgo::row_order<typename M::value_type>, std::allocator<typename M::value_type>>
 	    >
-	QRD<M, Q, R> qrd(const M & mat)
+	QRD_gramschmidt<M, Q, R> qrd_gramschmidt(const M & mat)
 	{
-		return QRD <
+		return QRD_gramschmidt <
+		       M,
+		       Q,
+		       R
+		       > (mat);
+	}
+
+	template <
+	    class M,
+	    class Q = ralgo::matrix<typename M::value_type, ralgo::row_order<typename M::value_type>, std::allocator<typename M::value_type>>,
+	    class R = ralgo::matrix<typename M::value_type, ralgo::row_order<typename M::value_type>, std::allocator<typename M::value_type>>
+	    >
+	QRD_gramschmidt<M, Q, R> qrd(const M & mat)
+	{
+		return QRD_gramschmidt <
 		       M,
 		       Q,
 		       R
