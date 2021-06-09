@@ -6,8 +6,6 @@
 
 #include <ralgo/heimer/interrupt_args.h>
 
-#include <nos/print.h>
-
 namespace heimer
 {
 	extern dlist_head control_node_list;
@@ -124,7 +122,7 @@ namespace heimer
 		virtual
 		void print_info()
 		{
-			nos::println("info");
+
 		}
 
 		virtual
