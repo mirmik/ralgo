@@ -1,7 +1,7 @@
 #ifndef RABBIT_SPACE_FORCE_H
 #define RABBIT_SPACE_FORCE_H
 
-#include <linalg/linalg.h>
+#include <ralgo/linalg/linalg.h>
 
 namespace rabbit 
 {

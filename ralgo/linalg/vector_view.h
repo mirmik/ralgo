@@ -9,12 +9,12 @@ namespace ralgo
 	class vector_view 
 	{
 		T* dat;
-		size_t n;
+		int n;
 
 	public:
 		using value_type = T;
 
-		vector_view(T* dat, size_t n) : dat(dat), n(n) {}
+		vector_view(T* dat, int n) : dat(dat), n(n) {}
 
 		T& operator[](int i) { return *(dat+i); }
 		const T& operator[](int i) const { return *(dat+i); }
@@ -26,7 +26,7 @@ namespace ralgo
 		T*             begin()       { return dat; } 
 		T*             end()         { return dat + n; }
 		const T*       begin() const { return dat; } 
-		const T* const end()   const { return dat + n; }
+		const T*       end()   const { return dat + n; }
 	};
 }
 
