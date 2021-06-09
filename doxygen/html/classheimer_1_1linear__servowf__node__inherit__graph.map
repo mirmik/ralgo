@@ -1,6 +1,0 @@
-<map id="heimer::linear_servowf_node" name="heimer::linear_servowf_node">
-<area shape="rect" id="node1" title=" " alt="" coords="9,244,219,271"/>
-<area shape="rect" id="node2" href="$classheimer_1_1servo__wishfeed__transnode.html" title=" " alt="" coords="25,155,203,196"/>
-<area shape="rect" id="node3" href="$classheimer_1_1servo__wishfeed__node.html" title=" " alt="" coords="5,80,223,107"/>
-<area shape="rect" id="node4" href="$classheimer_1_1node.html" title=" " alt="" coords="60,5,168,32"/>
-</map>

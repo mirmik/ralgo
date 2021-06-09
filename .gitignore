@@ -151,3 +151,6 @@ test/runtests
 
 sigtrans
 !*/sigtrans
+
+doxygen/html
+doxygen/latex
