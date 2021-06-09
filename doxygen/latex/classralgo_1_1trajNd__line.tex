@@ -1,0 +1,71 @@
+\hypertarget{classralgo_1_1trajNd__line}{}\doxysection{ralgo\+::traj\+Nd\+\_\+line$<$ Dim, P, V $>$ Class Template Reference}
+\label{classralgo_1_1trajNd__line}\index{ralgo::trajNd\_line$<$ Dim, P, V $>$@{ralgo::trajNd\_line$<$ Dim, P, V $>$}}
+
+
+Inheritance diagram for ralgo\+::traj\+Nd\+\_\+line$<$ Dim, P, V $>$\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=192pt]{classralgo_1_1trajNd__line__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for ralgo\+::traj\+Nd\+\_\+line$<$ Dim, P, V $>$\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=192pt]{classralgo_1_1trajNd__line__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classralgo_1_1trajNd__line_a32ae46d122c2dc3d1d774cdbb14c9846}\label{classralgo_1_1trajNd__line_a32ae46d122c2dc3d1d774cdbb14c9846}} 
+void {\bfseries set\+\_\+start\+\_\+position} (int i, P pos)
+\item 
+\mbox{\Hypertarget{classralgo_1_1trajNd__line_aae9da5b6af3e90b85243553d8ffed483}\label{classralgo_1_1trajNd__line_aae9da5b6af3e90b85243553d8ffed483}} 
+void {\bfseries set\+\_\+finish\+\_\+position\+\_\+inc} (int i, P inc)
+\item 
+\mbox{\Hypertarget{classralgo_1_1trajNd__line_a9f40b3a39703f04176a2b6e00d785b40}\label{classralgo_1_1trajNd__line_a9f40b3a39703f04176a2b6e00d785b40}} 
+int {\bfseries reset} (int64\+\_\+t stim, int64\+\_\+t ftim)
+\item 
+\mbox{\Hypertarget{classralgo_1_1trajNd__line_ae612bdbc5b642debc7668f2fb3e4fcb3}\label{classralgo_1_1trajNd__line_ae612bdbc5b642debc7668f2fb3e4fcb3}} 
+int {\bfseries reset} (igris\+::array\+\_\+view$<$ P $>$ \&spos, int64\+\_\+t stim, igris\+::array\+\_\+view$<$ P $>$ \&fpos, int64\+\_\+t ftim)
+\item 
+\mbox{\Hypertarget{classralgo_1_1trajNd__line_aa1d14bedda64e8ebbc6b5c2aa08a9e6a}\label{classralgo_1_1trajNd__line_aa1d14bedda64e8ebbc6b5c2aa08a9e6a}} 
+int {\bfseries attime} (int64\+\_\+t time, igris\+::array\+\_\+view$<$ P $>$ pos, igris\+::array\+\_\+view$<$ V $>$ spd) override
+\item 
+\mbox{\Hypertarget{classralgo_1_1trajNd__line_a2dd5b0d6111fa9636e6af3dc287d1d3c}\label{classralgo_1_1trajNd__line_a2dd5b0d6111fa9636e6af3dc287d1d3c}} 
+void {\bfseries set\+\_\+speed\+\_\+pattern} (float acc, float dcc, float speed, bool full\+\_\+spattern=false)
+\item 
+\mbox{\Hypertarget{classralgo_1_1trajNd__line_aa1f3e5036341ff2533a7620e077b2e97}\label{classralgo_1_1trajNd__line_aa1f3e5036341ff2533a7620e077b2e97}} 
+void {\bfseries set\+\_\+stop\+\_\+trajectory} (igris\+::array\+\_\+view$<$ P $>$ curpos, igris\+::array\+\_\+view$<$ V $>$ curspd, V dccval)
+\item 
+\mbox{\Hypertarget{classralgo_1_1trajNd__line_a033af464b660e4c4c7d8f4c6de6fc027}\label{classralgo_1_1trajNd__line_a033af464b660e4c4c7d8f4c6de6fc027}} 
+void {\bfseries set\+\_\+point\+\_\+hold} (igris\+::array\+\_\+view$<$ P $>$ curpos)
+\item 
+\mbox{\Hypertarget{classralgo_1_1trajNd__line_a904e8b143759c48bed0b9ec3f16b1e62}\label{classralgo_1_1trajNd__line_a904e8b143759c48bed0b9ec3f16b1e62}} 
+ssize\+\_\+t {\bfseries print\+\_\+to} (nos\+::ostream \&os) const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classralgo_1_1trajNd__line_ae9f252e48f0550e050e7258bc9498794}\label{classralgo_1_1trajNd__line_ae9f252e48f0550e050e7258bc9498794}} 
+P {\bfseries spos} \mbox{[}Dim\mbox{]}
+\item 
+\mbox{\Hypertarget{classralgo_1_1trajNd__line_a3cb4db4f4bca1f79074d0ab6862287bb}\label{classralgo_1_1trajNd__line_a3cb4db4f4bca1f79074d0ab6862287bb}} 
+P {\bfseries fpos} \mbox{[}Dim\mbox{]}
+\item 
+\mbox{\Hypertarget{classralgo_1_1trajNd__line_a444b33626dddea13b8a3ee3b0bfee4fb}\label{classralgo_1_1trajNd__line_a444b33626dddea13b8a3ee3b0bfee4fb}} 
+V {\bfseries setted\+\_\+speed} \mbox{[}Dim\mbox{]}
+\item 
+\mbox{\Hypertarget{classralgo_1_1trajNd__line_afe61ddae6327ab6c237d80e25539afde}\label{classralgo_1_1trajNd__line_afe61ddae6327ab6c237d80e25539afde}} 
+ralgo\+::speed\+\_\+deformer {\bfseries spddeform}
+\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/mirmik/project/ralgo/ralgo/trajectory/traj\+Nd.\+h\end{DoxyCompactItemize}

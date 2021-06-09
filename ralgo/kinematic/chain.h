@@ -1,6 +1,10 @@
 #ifndef RALGO_CYNEMATIC_CHAIN_H
 #define RALGO_CYNEMATIC_CHAIN_H
 
+/**
+	@file
+*/
+
 #include <ralgo/linalg/htrans.h>
 #include <ralgo/linalg/bivec.h>
 #include <ralgo/linalg/optimize.h>

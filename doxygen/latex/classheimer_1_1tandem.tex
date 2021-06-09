@@ -1,0 +1,71 @@
+\hypertarget{classheimer_1_1tandem}{}\doxysection{heimer\+::tandem$<$ P, V $>$ Class Template Reference}
+\label{classheimer_1_1tandem}\index{heimer::tandem$<$ P, V $>$@{heimer::tandem$<$ P, V $>$}}
+
+
+Inheritance diagram for heimer\+::tandem$<$ P, V $>$\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=216pt]{classheimer_1_1tandem__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for heimer\+::tandem$<$ P, V $>$\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=216pt]{classheimer_1_1tandem__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classheimer_1_1tandem_ad29727ba6cf46b77770934b42e1d8cf1}\label{classheimer_1_1tandem_ad29727ba6cf46b77770934b42e1d8cf1}} 
+constexpr {\bfseries tandem} (const char $\ast$mnemo, const char $\ast$master\+\_\+mnemo, const char $\ast$slave\+\_\+mnemo, \mbox{\hyperlink{classheimer_1_1axis__node}{axis\+\_\+node}}$<$ P, V $>$ $\ast$\+\_\+master, \mbox{\hyperlink{classheimer_1_1axis__node}{axis\+\_\+node}}$<$ P, V $>$ $\ast$\+\_\+slave, float koeff)
+\item 
+\mbox{\Hypertarget{classheimer_1_1tandem_ae333c991d12efaa6a3542d1dbd36f2ab}\label{classheimer_1_1tandem_ae333c991d12efaa6a3542d1dbd36f2ab}} 
+void {\bfseries feedback} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1tandem_afc8363b0e2bf46030a3cfe6a532eb614}\label{classheimer_1_1tandem_afc8363b0e2bf46030a3cfe6a532eb614}} 
+void {\bfseries serve\+\_\+impl} () override
+\item 
+\mbox{\Hypertarget{classheimer_1_1tandem_a7034c48afcb516d4a0bfd4e646f62542}\label{classheimer_1_1tandem_a7034c48afcb516d4a0bfd4e646f62542}} 
+\mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$ {\bfseries iterate} (\mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$slt) override
+\item 
+\mbox{\Hypertarget{classheimer_1_1tandem_a6ea36fee3d4e6cae599e79b9ce4901ad}\label{classheimer_1_1tandem_a6ea36fee3d4e6cae599e79b9ce4901ad}} 
+int {\bfseries on\+\_\+activate} () override
+\item 
+\mbox{\Hypertarget{classheimer_1_1tandem_a56c13c9d2c27addd0f63530e6815a83d}\label{classheimer_1_1tandem_a56c13c9d2c27addd0f63530e6815a83d}} 
+int {\bfseries on\+\_\+deactivate} () override
+\item 
+\mbox{\Hypertarget{classheimer_1_1tandem_ae7db618aea9d57ab7251172b22b8f0fb}\label{classheimer_1_1tandem_ae7db618aea9d57ab7251172b22b8f0fb}} 
+void {\bfseries print\+\_\+info} () override
+\item 
+\mbox{\Hypertarget{classheimer_1_1tandem_a48212c76ad3549df6bed9bf97d7fc798}\label{classheimer_1_1tandem_a48212c76ad3549df6bed9bf97d7fc798}} 
+virtual bool {\bfseries on\+\_\+interrupt} (\mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$slave\+\_\+node, \mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$source, \mbox{\hyperlink{classheimer_1_1interrupt__args}{interrupt\+\_\+args}} $\ast$data)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classheimer_1_1tandem_a572a0054162e40919384052a23ce5364}\label{classheimer_1_1tandem_a572a0054162e40919384052a23ce5364}} 
+\mbox{\hyperlink{classheimer_1_1virtual__axis__node}{virtual\+\_\+axis\+\_\+node}}$<$ P, V $>$ {\bfseries master}
+\item 
+\mbox{\Hypertarget{classheimer_1_1tandem_af193516b959e43dc008df6a63d15e871}\label{classheimer_1_1tandem_af193516b959e43dc008df6a63d15e871}} 
+\mbox{\hyperlink{classheimer_1_1virtual__axis__node}{virtual\+\_\+axis\+\_\+node}}$<$ P, V $>$ {\bfseries slave}
+\item 
+\mbox{\Hypertarget{classheimer_1_1tandem_a5994ba7777c13bba36339784077558a5}\label{classheimer_1_1tandem_a5994ba7777c13bba36339784077558a5}} 
+\mbox{\hyperlink{classheimer_1_1axis__node}{axis\+\_\+node}}$<$ P, V $>$ $\ast$ {\bfseries master\+\_\+controlled}
+\item 
+\mbox{\Hypertarget{classheimer_1_1tandem_acc6c0c590bb4eeda5c2bb28556491941}\label{classheimer_1_1tandem_acc6c0c590bb4eeda5c2bb28556491941}} 
+\mbox{\hyperlink{classheimer_1_1axis__node}{axis\+\_\+node}}$<$ P, V $>$ $\ast$ {\bfseries slave\+\_\+controlled}
+\item 
+\mbox{\Hypertarget{classheimer_1_1tandem_a93546ebf3fd0fffc5fc5a22a2f2798a2}\label{classheimer_1_1tandem_a93546ebf3fd0fffc5fc5a22a2f2798a2}} 
+float {\bfseries koeff}
+\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/mirmik/project/ralgo/ralgo/heimer/tandem.\+h\end{DoxyCompactItemize}

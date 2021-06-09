@@ -1,6 +1,10 @@
 #ifndef RALGO_LINALG_LU_DECOMPOSITION_H
 #define RALGO_LINALG_LU_DECOMPOSITION_H
 
+/**
+	@file
+*/
+
 #include <ralgo/linalg/matrix.h>
 #include <ralgo/linalg/matops.h>
 

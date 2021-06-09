@@ -1,6 +1,10 @@
 #ifndef RALGO_SPEED_DEFORMATION_H
 #define RALGO_SPEED_DEFORMATION_H
 
+/**
+	@file
+*/
+
 #include <math.h>
 #include <assert.h>
 

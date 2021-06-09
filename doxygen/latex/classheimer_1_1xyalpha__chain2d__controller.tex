@@ -1,0 +1,115 @@
+\hypertarget{classheimer_1_1xyalpha__chain2d__controller}{}\doxysection{heimer\+::xyalpha\+\_\+chain2d\+\_\+controller$<$ P, V $>$ Class Template Reference}
+\label{classheimer_1_1xyalpha__chain2d__controller}\index{heimer::xyalpha\_chain2d\_controller$<$ P, V $>$@{heimer::xyalpha\_chain2d\_controller$<$ P, V $>$}}
+
+
+Inheritance diagram for heimer\+::xyalpha\+\_\+chain2d\+\_\+controller$<$ P, V $>$\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=229pt]{classheimer_1_1xyalpha__chain2d__controller__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for heimer\+::xyalpha\+\_\+chain2d\+\_\+controller$<$ P, V $>$\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classheimer_1_1xyalpha__chain2d__controller__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classheimer_1_1xyalpha__chain2d__controller_a17e7ecd98d46978bb0ea6479791c7288}\label{classheimer_1_1xyalpha__chain2d__controller_a17e7ecd98d46978bb0ea6479791c7288}} 
+{\bfseries xyalpha\+\_\+chain2d\+\_\+controller} (const char $\ast$name, const char $\ast$xname, const char $\ast$yname, const char $\ast$aname, \mbox{\hyperlink{classheimer_1_1axis__node}{axis\+\_\+node}}$<$ P, V $>$ $\ast$x\+\_\+controlled, \mbox{\hyperlink{classheimer_1_1axis__node}{axis\+\_\+node}}$<$ P, V $>$ $\ast$y\+\_\+controlled, \mbox{\hyperlink{classheimer_1_1axis__node}{axis\+\_\+node}}$<$ P, V $>$ $\ast$a\+\_\+controlled)
+\item 
+\mbox{\Hypertarget{classheimer_1_1xyalpha__chain2d__controller_a26947d82f8d05311844853ebd155fb47}\label{classheimer_1_1xyalpha__chain2d__controller_a26947d82f8d05311844853ebd155fb47}} 
+void {\bfseries relocate} (ralgo\+::htrans2$<$ float $>$ x, ralgo\+::htrans2$<$ float $>$ y, ralgo\+::htrans2$<$ float $>$ a, ralgo\+::htrans2$<$ float $>$ out)
+\item 
+\mbox{\Hypertarget{classheimer_1_1xyalpha__chain2d__controller_a1bbb88af15b98debc9107bee969b60d4}\label{classheimer_1_1xyalpha__chain2d__controller_a1bbb88af15b98debc9107bee969b60d4}} 
+void {\bfseries get\+\_\+control\+\_\+phase} (int64\+\_\+t time, ralgo\+::htrans2$<$ float $>$ \&pos, ralgo\+::screw2$<$ float $>$ \&spd)
+\item 
+\mbox{\Hypertarget{classheimer_1_1xyalpha__chain2d__controller_adae1dd9059149b15323abff678ac21be}\label{classheimer_1_1xyalpha__chain2d__controller_adae1dd9059149b15323abff678ac21be}} 
+void {\bfseries restore\+\_\+control\+\_\+model} () override
+\item 
+\mbox{\Hypertarget{classheimer_1_1xyalpha__chain2d__controller_a6eb1a5ab7f46641dfbb6ddc5f1d70f91}\label{classheimer_1_1xyalpha__chain2d__controller_a6eb1a5ab7f46641dfbb6ddc5f1d70f91}} 
+void {\bfseries feedback} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1xyalpha__chain2d__controller_a053f1d1268d9b1f34370f093b8e27c26}\label{classheimer_1_1xyalpha__chain2d__controller_a053f1d1268d9b1f34370f093b8e27c26}} 
+double $\ast$ {\bfseries ctrspd\+\_\+array} () override
+\item 
+\mbox{\Hypertarget{classheimer_1_1xyalpha__chain2d__controller_a33ede2c6df626b45c580b351a7fe852d}\label{classheimer_1_1xyalpha__chain2d__controller_a33ede2c6df626b45c580b351a7fe852d}} 
+void {\bfseries apply\+\_\+control} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1xyalpha__chain2d__controller_a3e9eca8cd3316ba0bdd42176797b77cc}\label{classheimer_1_1xyalpha__chain2d__controller_a3e9eca8cd3316ba0bdd42176797b77cc}} 
+void {\bfseries print\+\_\+info} () override
+\item 
+\mbox{\Hypertarget{classheimer_1_1xyalpha__chain2d__controller_a046858e6874eb2db0a6b54f5b38317d5}\label{classheimer_1_1xyalpha__chain2d__controller_a046858e6874eb2db0a6b54f5b38317d5}} 
+\mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$ {\bfseries iterate} (\mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$slt) override
+\item 
+\mbox{\Hypertarget{classheimer_1_1xyalpha__chain2d__controller_abae5cdcc2032f64769ddea653220ea12}\label{classheimer_1_1xyalpha__chain2d__controller_abae5cdcc2032f64769ddea653220ea12}} 
+int {\bfseries on\+\_\+activate} () override
+\item 
+\mbox{\Hypertarget{classheimer_1_1xyalpha__chain2d__controller_aa28b6e72715a59a75d679caa28c90aee}\label{classheimer_1_1xyalpha__chain2d__controller_aa28b6e72715a59a75d679caa28c90aee}} 
+int {\bfseries on\+\_\+deactivate} () override
+\item 
+\mbox{\Hypertarget{classheimer_1_1xyalpha__chain2d__controller_ae32038875f2db64bc6674124a6d988d3}\label{classheimer_1_1xyalpha__chain2d__controller_ae32038875f2db64bc6674124a6d988d3}} 
+virtual bool {\bfseries on\+\_\+interrupt} (\mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$slave, \mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$source, \mbox{\hyperlink{classheimer_1_1interrupt__args}{interrupt\+\_\+args}} $\ast$data)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classheimer_1_1xyalpha__chain2d__controller_a005ac68d40ec1b9e2dfd6fda50059871}\label{classheimer_1_1xyalpha__chain2d__controller_a005ac68d40ec1b9e2dfd6fda50059871}} 
+\mbox{\hyperlink{classralgo_1_1actuator2}{ralgo\+::actuator2}} {\bfseries x\+\_\+link}
+\item 
+\mbox{\Hypertarget{classheimer_1_1xyalpha__chain2d__controller_ae7459f5853d2e5645965184bf6709607}\label{classheimer_1_1xyalpha__chain2d__controller_ae7459f5853d2e5645965184bf6709607}} 
+\mbox{\hyperlink{classralgo_1_1actuator2}{ralgo\+::actuator2}} {\bfseries y\+\_\+link}
+\item 
+\mbox{\Hypertarget{classheimer_1_1xyalpha__chain2d__controller_a8e1a7d0e0b14bbc55a9cfa50c0849320}\label{classheimer_1_1xyalpha__chain2d__controller_a8e1a7d0e0b14bbc55a9cfa50c0849320}} 
+\mbox{\hyperlink{classralgo_1_1rotator2}{ralgo\+::rotator2}} {\bfseries a\+\_\+link}
+\item 
+\mbox{\Hypertarget{classheimer_1_1xyalpha__chain2d__controller_a1e20553a144d803bc382b575d2a5c870}\label{classheimer_1_1xyalpha__chain2d__controller_a1e20553a144d803bc382b575d2a5c870}} 
+\mbox{\hyperlink{classralgo_1_1unit2d}{ralgo\+::unit2d}} {\bfseries output\+\_\+link}
+\item 
+\mbox{\Hypertarget{classheimer_1_1xyalpha__chain2d__controller_aafe8d8a12c864e4a58c1a93b73039abc}\label{classheimer_1_1xyalpha__chain2d__controller_aafe8d8a12c864e4a58c1a93b73039abc}} 
+\mbox{\hyperlink{classheimer_1_1axis__node}{heimer\+::axis\+\_\+node}}$<$ P, V $>$ $\ast$ {\bfseries x\+\_\+controlled}
+\item 
+\mbox{\Hypertarget{classheimer_1_1xyalpha__chain2d__controller_ae5e54a9e3fa2927dec71c9ca5a224674}\label{classheimer_1_1xyalpha__chain2d__controller_ae5e54a9e3fa2927dec71c9ca5a224674}} 
+\mbox{\hyperlink{classheimer_1_1axis__node}{heimer\+::axis\+\_\+node}}$<$ P, V $>$ $\ast$ {\bfseries y\+\_\+controlled}
+\item 
+\mbox{\Hypertarget{classheimer_1_1xyalpha__chain2d__controller_a770216ed8571760a254349ec97e06418}\label{classheimer_1_1xyalpha__chain2d__controller_a770216ed8571760a254349ec97e06418}} 
+\mbox{\hyperlink{classheimer_1_1axis__node}{heimer\+::axis\+\_\+node}}$<$ P, V $>$ $\ast$ {\bfseries a\+\_\+controlled}
+\item 
+\mbox{\Hypertarget{classheimer_1_1xyalpha__chain2d__controller_af4ee69980144d550ab9fe3f8ba238dcb}\label{classheimer_1_1xyalpha__chain2d__controller_af4ee69980144d550ab9fe3f8ba238dcb}} 
+ralgo\+::htrans2$<$ float $>$ {\bfseries nullpos}
+\item 
+\mbox{\Hypertarget{classheimer_1_1xyalpha__chain2d__controller_a1987928b7696fa7d38edec6e1faeb26a}\label{classheimer_1_1xyalpha__chain2d__controller_a1987928b7696fa7d38edec6e1faeb26a}} 
+ralgo\+::htrans2$<$ float $>$ {\bfseries invnullpos}
+\item 
+\mbox{\Hypertarget{classheimer_1_1xyalpha__chain2d__controller_ac4d6356e04eda16ab62a9a752640f741}\label{classheimer_1_1xyalpha__chain2d__controller_ac4d6356e04eda16ab62a9a752640f741}} 
+ralgo\+::htrans2$<$ float $>$ {\bfseries outpos}
+\item 
+\mbox{\Hypertarget{classheimer_1_1xyalpha__chain2d__controller_a2794c95481371e37af91dfde6a897d6f}\label{classheimer_1_1xyalpha__chain2d__controller_a2794c95481371e37af91dfde6a897d6f}} 
+\begin{tabbing}
+xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=xx\=\kill
+union \{\\
+\>\mbox{\hyperlink{classheimer_1_1virtual__axis__node}{virtual\_axis\_node}}$<$ P, V $>$ {\bfseries ctraxes} \mbox{[}3\mbox{]}\\
+\mbox{\Hypertarget{unionheimer_1_1xyalpha__chain2d__controller_1_1_0d2_a788c769f02bf59d8e74d7cecfd844e3e}\label{unionheimer_1_1xyalpha__chain2d__controller_1_1_0d2_a788c769f02bf59d8e74d7cecfd844e3e}} 
+\>struct \{\\
+\>\>\mbox{\hyperlink{classheimer_1_1virtual__axis__node}{virtual\_axis\_node}}$<$ P, V $>$ {\bfseries x\_axis}\\
+\>\>\mbox{\hyperlink{classheimer_1_1virtual__axis__node}{virtual\_axis\_node}}$<$ P, V $>$ {\bfseries y\_axis}\\
+\>\>\mbox{\hyperlink{classheimer_1_1virtual__axis__node}{virtual\_axis\_node}}$<$ P, V $>$ {\bfseries a\_axis}\\
+\>\} \\
+\}; \\
+
+\end{tabbing}\item 
+\mbox{\Hypertarget{classheimer_1_1xyalpha__chain2d__controller_a7a6104c2c26c3d5b3dcc4ddfc92553c6}\label{classheimer_1_1xyalpha__chain2d__controller_a7a6104c2c26c3d5b3dcc4ddfc92553c6}} 
+P {\bfseries axposes} \mbox{[}3\mbox{]}
+\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/mirmik/project/ralgo/ralgo/heimer/xyalpha.\+h\end{DoxyCompactItemize}

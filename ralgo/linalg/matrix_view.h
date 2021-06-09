@@ -14,7 +14,6 @@
 #include <initializer_list>
 #include <iostream>
 #include <ralgo/linalg/vector_view.h>
-#include <ralgo/log.h>
 
 namespace ralgo
 {

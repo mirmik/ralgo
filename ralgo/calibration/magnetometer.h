@@ -1,6 +1,10 @@
 #ifndef RALGO_MAGNETOMETER_H
 #define RALGO_MAGNETOMETER_H
 
+/**
+	@file
+*/
+
 #include <ralgo/linalg/linalg.h>
 #include <nos/print.h>
 

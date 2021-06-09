@@ -1,0 +1,125 @@
+\hypertarget{classheimer_1_1linintctr}{}\doxysection{heimer\+::linintctr$<$ Position, Speed, Dim $>$ Class Template Reference}
+\label{classheimer_1_1linintctr}\index{heimer::linintctr$<$ Position, Speed, Dim $>$@{heimer::linintctr$<$ Position, Speed, Dim $>$}}
+
+
+Inheritance diagram for heimer\+::linintctr$<$ Position, Speed, Dim $>$\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=212pt]{classheimer_1_1linintctr__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for heimer\+::linintctr$<$ Position, Speed, Dim $>$\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=340pt]{classheimer_1_1linintctr__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_a4aaf8467b3b799cf0d6ea11e5a29b78a}\label{classheimer_1_1linintctr_a4aaf8467b3b799cf0d6ea11e5a29b78a}} 
+bool {\bfseries in\+\_\+operate} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_a7fe85f559f07874938b78326f35a2373}\label{classheimer_1_1linintctr_a7fe85f559f07874938b78326f35a2373}} 
+{\bfseries linintctr} (const char $\ast$name, igris\+::array\+\_\+view$<$ \mbox{\hyperlink{classheimer_1_1axis__node}{heimer\+::axis\+\_\+node}}$<$ Position, Speed $>$ $\ast$ $>$ axes)
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_aead2ce0eb9d8c84098c344170603032e}\label{classheimer_1_1linintctr_aead2ce0eb9d8c84098c344170603032e}} 
+void {\bfseries current\+\_\+point} (Position $\ast$ptr)
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_a669a3a8363b87f5b8631e4ade258ceba}\label{classheimer_1_1linintctr_a669a3a8363b87f5b8631e4ade258ceba}} 
+{\bfseries linintctr} (const char $\ast$name, \mbox{\hyperlink{classheimer_1_1axis__node}{heimer\+::axis\+\_\+node}}$<$ Position, Speed $>$ $\ast$$\ast$axes)
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_a7d6e974bf31f5b2a4986fca04cf98adb}\label{classheimer_1_1linintctr_a7d6e974bf31f5b2a4986fca04cf98adb}} 
+constexpr int {\bfseries dim} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_ab0325bb767b093c942411f2a245e7bcb}\label{classheimer_1_1linintctr_ab0325bb767b093c942411f2a245e7bcb}} 
+\mbox{\hyperlink{classheimer_1_1axis__node}{axis\+\_\+node}}$<$ float, float $>$ $\ast$ {\bfseries get\+\_\+axis} (int index)
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_a9d76832235c523cb55bcc476ade76019}\label{classheimer_1_1linintctr_a9d76832235c523cb55bcc476ade76019}} 
+int {\bfseries \+\_\+move} (igris\+::array\+\_\+view$<$ Position $>$ curpos, igris\+::array\+\_\+view$<$ Position $>$ tgtpos)
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_afd97238f9907d59c0ce44ee278c0b20b}\label{classheimer_1_1linintctr_afd97238f9907d59c0ce44ee278c0b20b}} 
+float {\bfseries evaluate\+\_\+speed\+\_\+multiplier} (igris\+::array\+\_\+view$<$ Position $>$ curpos, igris\+::array\+\_\+view$<$ Position $>$ tgtpos)
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_a53bd51eaa7f641b1afaff5be724b9109}\label{classheimer_1_1linintctr_a53bd51eaa7f641b1afaff5be724b9109}} 
+float {\bfseries evaluate\+\_\+speed\+\_\+multiplier\+\_\+by\+\_\+curspd} (igris\+::array\+\_\+view$<$ Position $>$ curspd)
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_a33274d4715faec8c25f5276031331019}\label{classheimer_1_1linintctr_a33274d4715faec8c25f5276031331019}} 
+int {\bfseries incmove} (igris\+::array\+\_\+view$<$ Position $>$ mov)
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_aa7a9d07ba437b092173a18075aabbf6e}\label{classheimer_1_1linintctr_aa7a9d07ba437b092173a18075aabbf6e}} 
+int {\bfseries absmove} (igris\+::array\+\_\+view$<$ Position $>$ pos)
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_ad80f93a0f7691b859dd16d35b8e2d060}\label{classheimer_1_1linintctr_ad80f93a0f7691b859dd16d35b8e2d060}} 
+int {\bfseries incmove} (Position $\ast$mov)
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_a437509e36c6bb91553025b53b424b1e0}\label{classheimer_1_1linintctr_a437509e36c6bb91553025b53b424b1e0}} 
+int {\bfseries absmove} (Position $\ast$pos)
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_a27e5b8084008160b7cf8b1caaa62b1aa}\label{classheimer_1_1linintctr_a27e5b8084008160b7cf8b1caaa62b1aa}} 
+int {\bfseries parted\+\_\+absmove} (int $\ast$axno, Position $\ast$pos, int len)
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_aee54f3420fd451f40e9648e9aef90c51}\label{classheimer_1_1linintctr_aee54f3420fd451f40e9648e9aef90c51}} 
+int {\bfseries set\+\_\+speed} (Speed speed)
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_ada14a4db2878e1b32190994d1b289712}\label{classheimer_1_1linintctr_ada14a4db2878e1b32190994d1b289712}} 
+int {\bfseries set\+\_\+accdcc} (float acc, float dcc)
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_aa900d53c06de8fef56deac7ea7b0044b}\label{classheimer_1_1linintctr_aa900d53c06de8fef56deac7ea7b0044b}} 
+int {\bfseries update\+\_\+control\+\_\+by\+\_\+trajectory} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_a20007ea21dfd45b819bd6f13c6aacd6a}\label{classheimer_1_1linintctr_a20007ea21dfd45b819bd6f13c6aacd6a}} 
+void {\bfseries apply\+\_\+phase} (Position $\ast$ctrpos, Speed $\ast$ctrspd)
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_a34aded1b45f089a46cc4d0216adaca53}\label{classheimer_1_1linintctr_a34aded1b45f089a46cc4d0216adaca53}} 
+float $\ast$ {\bfseries gains} () override
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_ab1200f6fe0ee388fff24208f423fff7d}\label{classheimer_1_1linintctr_ab1200f6fe0ee388fff24208f423fff7d}} 
+void {\bfseries set\+\_\+gains} (igris\+::array\+\_\+view$<$ float $>$ arr) override
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_a82b0cb02f223aca2befb7001110b345d}\label{classheimer_1_1linintctr_a82b0cb02f223aca2befb7001110b345d}} 
+void {\bfseries set\+\_\+reverses} (igris\+::array\+\_\+view$<$ int $>$ arr) override
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_a26547599f6308bd313e8aa199b51eca9}\label{classheimer_1_1linintctr_a26547599f6308bd313e8aa199b51eca9}} 
+void {\bfseries serve\+\_\+impl} () override
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_a2a16b0d67ef617dee4f14694c8c5dc6e}\label{classheimer_1_1linintctr_a2a16b0d67ef617dee4f14694c8c5dc6e}} 
+void {\bfseries print\+\_\+info} () override
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_a8654e8cb4231786bc694a615b0e6b75d}\label{classheimer_1_1linintctr_a8654e8cb4231786bc694a615b0e6b75d}} 
+Speed {\bfseries speed} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_a8fcd083cb2b7cd016d90dcdf827e9411}\label{classheimer_1_1linintctr_a8fcd083cb2b7cd016d90dcdf827e9411}} 
+Speed {\bfseries acceleration} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_abdd504b53ce6aa02dd5f690acc94817d}\label{classheimer_1_1linintctr_abdd504b53ce6aa02dd5f690acc94817d}} 
+Speed {\bfseries deceleration} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_a17b08d1fcf366eed5272265f45eaae7f}\label{classheimer_1_1linintctr_a17b08d1fcf366eed5272265f45eaae7f}} 
+\mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$ {\bfseries iterate} (\mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$slt) override
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_a34b5418dafe45e2138455e69bd231aac}\label{classheimer_1_1linintctr_a34b5418dafe45e2138455e69bd231aac}} 
+int {\bfseries hardstop} () override
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_a311ae202d8e98c4a129ca424551a7192}\label{classheimer_1_1linintctr_a311ae202d8e98c4a129ca424551a7192}} 
+void {\bfseries collect\+\_\+feedpos} (Position $\ast$feedpos)
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_a824dd0973690a78fcb2a1697e1930a33}\label{classheimer_1_1linintctr_a824dd0973690a78fcb2a1697e1930a33}} 
+void {\bfseries collect\+\_\+feedspd} (Position $\ast$feedspd)
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_a08a9d9b07ddf7ec5150e7866e840c685}\label{classheimer_1_1linintctr_a08a9d9b07ddf7ec5150e7866e840c685}} 
+int {\bfseries stop} () override
+\item 
+\mbox{\Hypertarget{classheimer_1_1linintctr_aa2a69a4d19b5926858dc51fbd79098aa}\label{classheimer_1_1linintctr_aa2a69a4d19b5926858dc51fbd79098aa}} 
+bool {\bfseries on\+\_\+interrupt} (\mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$slave, \mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$source, \mbox{\hyperlink{classheimer_1_1interrupt__args}{interrupt\+\_\+args}} $\ast$data) override
+\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/mirmik/project/ralgo/ralgo/heimer/linintctr.\+h\end{DoxyCompactItemize}

@@ -1,0 +1,74 @@
+\hypertarget{classheimer_1_1kinematic__chain2d__controller}{}\doxysection{heimer\+::kinematic\+\_\+chain2d\+\_\+controller$<$ P, V $>$ Class Template Reference}
+\label{classheimer_1_1kinematic__chain2d__controller}\index{heimer::kinematic\_chain2d\_controller$<$ P, V $>$@{heimer::kinematic\_chain2d\_controller$<$ P, V $>$}}
+
+
+Inheritance diagram for heimer\+::kinematic\+\_\+chain2d\+\_\+controller$<$ P, V $>$\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=229pt]{classheimer_1_1kinematic__chain2d__controller__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for heimer\+::kinematic\+\_\+chain2d\+\_\+controller$<$ P, V $>$\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classheimer_1_1kinematic__chain2d__controller__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classheimer_1_1kinematic__chain2d__controller_a53fdc441fef0dd25a66780d52f5c8499}\label{classheimer_1_1kinematic__chain2d__controller_a53fdc441fef0dd25a66780d52f5c8499}} 
+ralgo\+::htrans2$<$ float $>$ {\bfseries control\+\_\+position} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1kinematic__chain2d__controller_aaaa8f026efa06a3bc197508a19ac3142}\label{classheimer_1_1kinematic__chain2d__controller_aaaa8f026efa06a3bc197508a19ac3142}} 
+void {\bfseries setup} (igris\+::array\+\_\+view$<$ \mbox{\hyperlink{classralgo_1_1unit2d}{ralgo\+::unit2d}} $\ast$ $>$ a, igris\+::array\+\_\+view$<$ \mbox{\hyperlink{classralgo_1_1kinematic__unit2d}{ralgo\+::kinematic\+\_\+unit2d}} $\ast$ $>$ b, \mbox{\hyperlink{classralgo_1_1unit2d}{ralgo\+::unit2d}} $\ast$finallink, \mbox{\hyperlink{classralgo_1_1unit2d}{ralgo\+::unit2d}} $\ast$startlink=nullptr)
+\item 
+\mbox{\Hypertarget{classheimer_1_1kinematic__chain2d__controller_a34f6b892ba287a815463308eda6a935a}\label{classheimer_1_1kinematic__chain2d__controller_a34f6b892ba287a815463308eda6a935a}} 
+{\bfseries kinematic\+\_\+chain2d\+\_\+controller} (const char $\ast$name)
+\item 
+\mbox{\Hypertarget{classheimer_1_1kinematic__chain2d__controller_a895f7cdbfb799c72ea68bae8a8b206b6}\label{classheimer_1_1kinematic__chain2d__controller_a895f7cdbfb799c72ea68bae8a8b206b6}} 
+ralgo\+::htrans2$<$ float $>$ {\bfseries location} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1kinematic__chain2d__controller_a94bddaa09e17ee3d7fd7864928ee5c2d}\label{classheimer_1_1kinematic__chain2d__controller_a94bddaa09e17ee3d7fd7864928ee5c2d}} 
+virtual void {\bfseries restore\+\_\+control\+\_\+model} ()=0
+\item 
+\mbox{\Hypertarget{classheimer_1_1kinematic__chain2d__controller_a94e59f535e7cd86f94d5450449a75dd9}\label{classheimer_1_1kinematic__chain2d__controller_a94e59f535e7cd86f94d5450449a75dd9}} 
+void {\bfseries update\+\_\+model\+\_\+location} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1kinematic__chain2d__controller_a6804fe470e46fbc6331e16ccd1de578d}\label{classheimer_1_1kinematic__chain2d__controller_a6804fe470e46fbc6331e16ccd1de578d}} 
+void {\bfseries evaluate\+\_\+links\+\_\+speeds} (ralgo\+::htrans2$<$ float $>$ pos, ralgo\+::screw2$<$ float $>$ spd)
+\item 
+\mbox{\Hypertarget{classheimer_1_1kinematic__chain2d__controller_ac01ed8a48d9f166ef6990449d83bb31b}\label{classheimer_1_1kinematic__chain2d__controller_ac01ed8a48d9f166ef6990449d83bb31b}} 
+void {\bfseries set\+\_\+compensate} (double k)
+\item 
+\mbox{\Hypertarget{classheimer_1_1kinematic__chain2d__controller_a9c6a9bb637be4b65cb6d08bdc3b64200}\label{classheimer_1_1kinematic__chain2d__controller_a9c6a9bb637be4b65cb6d08bdc3b64200}} 
+virtual void {\bfseries get\+\_\+control\+\_\+phase} (int64\+\_\+t time, ralgo\+::htrans2$<$ float $>$ \&pos, ralgo\+::screw2$<$ float $>$ \&spd)=0
+\item 
+\mbox{\Hypertarget{classheimer_1_1kinematic__chain2d__controller_ad22f014c7d0112fd50e7f2f2e2b698d1}\label{classheimer_1_1kinematic__chain2d__controller_ad22f014c7d0112fd50e7f2f2e2b698d1}} 
+virtual double $\ast$ {\bfseries ctrspd\+\_\+array} ()=0
+\item 
+\mbox{\Hypertarget{classheimer_1_1kinematic__chain2d__controller_aa261b7e6ef67a98c20172741eb113428}\label{classheimer_1_1kinematic__chain2d__controller_aa261b7e6ef67a98c20172741eb113428}} 
+virtual void {\bfseries apply\+\_\+control} ()=0
+\item 
+\mbox{\Hypertarget{classheimer_1_1kinematic__chain2d__controller_a8dcdd44733a3e9d6633cd1a6cc2a9e4c}\label{classheimer_1_1kinematic__chain2d__controller_a8dcdd44733a3e9d6633cd1a6cc2a9e4c}} 
+void {\bfseries serve\+\_\+impl} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classheimer_1_1kinematic__chain2d__controller_a7ca49d003c0da055534c2152f2b3abed}\label{classheimer_1_1kinematic__chain2d__controller_a7ca49d003c0da055534c2152f2b3abed}} 
+\mbox{\hyperlink{classralgo_1_1kinematic__chain2d}{ralgo\+::kinematic\+\_\+chain2d}} {\bfseries chain}
+\item 
+\mbox{\Hypertarget{classheimer_1_1kinematic__chain2d__controller_ac3753c266b13f3f79129ffadee73355b}\label{classheimer_1_1kinematic__chain2d__controller_ac3753c266b13f3f79129ffadee73355b}} 
+float {\bfseries compensation\+\_\+koefficient} = 1
+\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/mirmik/project/ralgo/ralgo/heimer/kin2d\+\_\+controller.\+h\end{DoxyCompactItemize}

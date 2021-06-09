@@ -1,0 +1,53 @@
+\hypertarget{fft_8h}{}\doxysection{/home/mirmik/project/ralgo/ralgo/signal/fft.h File Reference}
+\label{fft_8h}\index{/home/mirmik/project/ralgo/ralgo/signal/fft.h@{/home/mirmik/project/ralgo/ralgo/signal/fft.h}}
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$complex$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$ralgo/linalg/vecops.\+h$>$}\newline
+{\ttfamily \#include $<$igris/math/defs.\+h$>$}\newline
+Include dependency graph for fft.\+h\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{fft_8h__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \mbox{\hyperlink{namespaceralgo}{ralgo}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{fft_8h_ac6bed56dcc8e7a4558f783eadff99f19}\label{fft_8h_ac6bed56dcc8e7a4558f783eadff99f19}} 
+void {\bfseries ralgo\+::signal\+::fft\+\_\+reference} (std\+::vector$<$ std\+::complex$<$ double $>$$>$ \&a, bool invert)
+\item 
+\mbox{\Hypertarget{fft_8h_a068b28d9b79aceaba2d15d47f25f7f77}\label{fft_8h_a068b28d9b79aceaba2d15d47f25f7f77}} 
+void {\bfseries ralgo\+::signal\+::spectre} (double $\ast$A\+Val, double $\ast$F\+Tvl, int Nvl, int Nft)
+\item 
+\mbox{\Hypertarget{fft_8h_a4a29c41101d5c19c04048e83c41c8740}\label{fft_8h_a4a29c41101d5c19c04048e83c41c8740}} 
+std\+::vector$<$ double $>$ {\bfseries ralgo\+::signal\+::spectre} (double $\ast$src, size\+\_\+t srclen, size\+\_\+t dstlen)
+\item 
+\mbox{\Hypertarget{fft_8h_a8234ba28cd2c497515ae52cb4ac9bc16}\label{fft_8h_a8234ba28cd2c497515ae52cb4ac9bc16}} 
+void {\bfseries ralgo\+::signal\+::fftfreq} (double $\ast$dst, size\+\_\+t n, double delta)
+\item 
+\mbox{\Hypertarget{fft_8h_aa06a68705de17f33c02f40aecf3947cf}\label{fft_8h_aa06a68705de17f33c02f40aecf3947cf}} 
+std\+::vector$<$ double $>$ {\bfseries ralgo\+::signal\+::fftfreq} (size\+\_\+t n, double delta)
+\item 
+\mbox{\Hypertarget{fft_8h_a89486b3d0d530ad3e60793a14f78b634}\label{fft_8h_a89486b3d0d530ad3e60793a14f78b634}} 
+void {\bfseries ralgo\+::signal\+::rfftfreq} (double $\ast$dst, size\+\_\+t n, double delta)
+\item 
+\mbox{\Hypertarget{fft_8h_addf529f990464d082b3a8b4bc5edd126}\label{fft_8h_addf529f990464d082b3a8b4bc5edd126}} 
+std\+::vector$<$ double $>$ {\bfseries ralgo\+::signal\+::rfftfreq} (size\+\_\+t n, double delta)
+\item 
+\mbox{\Hypertarget{fft_8h_a94ac3177733dbf85e78ac752b23a1bb9}\label{fft_8h_a94ac3177733dbf85e78ac752b23a1bb9}} 
+{\footnotesize template$<$class C\+Array $>$ }\\void {\bfseries ralgo\+::signal\+::fft\+\_\+reference2} (C\+Array \&x)
+\item 
+\mbox{\Hypertarget{fft_8h_abee9736b73a94a79b7a7e669150ede4a}\label{fft_8h_abee9736b73a94a79b7a7e669150ede4a}} 
+{\footnotesize template$<$class C\+Array $>$ }\\void {\bfseries ralgo\+::signal\+::fft} (C\+Array \&x)
+\item 
+\mbox{\Hypertarget{fft_8h_a0bbdf58d8f85077f180d97086e216b7e}\label{fft_8h_a0bbdf58d8f85077f180d97086e216b7e}} 
+{\footnotesize template$<$class C\+Array $>$ }\\void {\bfseries ralgo\+::signal\+::ifft} (C\+Array \&x)
+\end{DoxyCompactItemize}

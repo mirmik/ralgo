@@ -1,9 +1,12 @@
 #ifndef RALGO_LINALG_MATRIX_H
 #define RALGO_LINALG_MATRIX_H
 
+/**
+@file
+*/
+
 #include <memory>
 #include <ralgo/linalg/matrix_view.h>
-#include <nos/print.h>
 
 namespace ralgo
 {

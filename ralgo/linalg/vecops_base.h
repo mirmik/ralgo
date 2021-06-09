@@ -1,6 +1,10 @@
 #ifndef RALGO_VECOPS_BASE_H
 #define RALGO_VECOPS_BASE_H
 
+/**
+@file
+*/
+
 #include <type_traits>
 #include <ralgo/util/helpers.h>
 

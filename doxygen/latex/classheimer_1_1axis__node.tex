@@ -1,0 +1,89 @@
+\hypertarget{classheimer_1_1axis__node}{}\doxysection{heimer\+::axis\+\_\+node$<$ P, V $>$ Class Template Reference}
+\label{classheimer_1_1axis__node}\index{heimer::axis\_node$<$ P, V $>$@{heimer::axis\_node$<$ P, V $>$}}
+
+
+Inheritance diagram for heimer\+::axis\+\_\+node$<$ P, V $>$\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classheimer_1_1axis__node__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for heimer\+::axis\+\_\+node$<$ P, V $>$\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=200pt]{classheimer_1_1axis__node__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classheimer_1_1axis__node_af4e719c9f931b8b42b8bd957cd6e61d1}\label{classheimer_1_1axis__node_af4e719c9f931b8b42b8bd957cd6e61d1}} 
+constexpr {\bfseries axis\+\_\+node} (const char $\ast$mnemo)
+\item 
+\mbox{\Hypertarget{classheimer_1_1axis__node_a784308227895318c6d99ad94efa676df}\label{classheimer_1_1axis__node_a784308227895318c6d99ad94efa676df}} 
+void {\bfseries print\+\_\+info} () override
+\item 
+\mbox{\Hypertarget{classheimer_1_1axis__node_a8e660190e17529827c055cb4222147d9}\label{classheimer_1_1axis__node_a8e660190e17529827c055cb4222147d9}} 
+P {\bfseries feedback\+\_\+position} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1axis__node_a5d8c508e939fac7bed401a0904bf6876}\label{classheimer_1_1axis__node_a5d8c508e939fac7bed401a0904bf6876}} 
+P {\bfseries feedback\+\_\+speed} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1axis__node_abe3b384b55d95312417f0281a8b7bcb5}\label{classheimer_1_1axis__node_abe3b384b55d95312417f0281a8b7bcb5}} 
+P {\bfseries target\+\_\+position} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1axis__node_a288bcf09a86da28583b987d462cef530}\label{classheimer_1_1axis__node_a288bcf09a86da28583b987d462cef530}} 
+P {\bfseries target\+\_\+speed} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1axis__node_afe5eb1d32515a2bb901640c8f499aa9d}\label{classheimer_1_1axis__node_afe5eb1d32515a2bb901640c8f499aa9d}} 
+void {\bfseries restore\+\_\+control} (P pos, V spd)
+\item 
+\mbox{\Hypertarget{classheimer_1_1axis__node_a8e8cd5e12c2bdaa7fb2db04a955aa2a7}\label{classheimer_1_1axis__node_a8e8cd5e12c2bdaa7fb2db04a955aa2a7}} 
+void {\bfseries set\+\_\+current\+\_\+phase} (P pos, V spd)
+\item 
+\mbox{\Hypertarget{classheimer_1_1axis__node_a62bcfe7c0c03f3aa7b050d59c715800d}\label{classheimer_1_1axis__node_a62bcfe7c0c03f3aa7b050d59c715800d}} 
+void {\bfseries control} (P pos, V spd)
+\item 
+\mbox{\Hypertarget{classheimer_1_1axis__node_a853708f8ea57c4b1994b174452503397}\label{classheimer_1_1axis__node_a853708f8ea57c4b1994b174452503397}} 
+virtual void {\bfseries hardstop} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1axis__node_a7fd20f62a4b158f30b02beb86dbbdf8c}\label{classheimer_1_1axis__node_a7fd20f62a4b158f30b02beb86dbbdf8c}} 
+P {\bfseries position\+\_\+error} ()
+\item 
+\mbox{\Hypertarget{classheimer_1_1axis__node_af8ecdfbf3202f0aec7fb8559748aebf2}\label{classheimer_1_1axis__node_af8ecdfbf3202f0aec7fb8559748aebf2}} 
+virtual P {\bfseries request\+\_\+feedback\+\_\+position} ()=0
+\item 
+\mbox{\Hypertarget{classheimer_1_1axis__node_aee176a057cfc67d8a5f6935bfae167c5}\label{classheimer_1_1axis__node_aee176a057cfc67d8a5f6935bfae167c5}} 
+virtual bool {\bfseries on\+\_\+interrupt} (\mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$slave, \mbox{\hyperlink{classheimer_1_1control__node}{control\+\_\+node}} $\ast$source, \mbox{\hyperlink{classheimer_1_1interrupt__args}{interrupt\+\_\+args}} $\ast$data)
+\item 
+\mbox{\Hypertarget{classheimer_1_1axis__node_a4db7aca98c3c6ac9eacbe7a11ead1528}\label{classheimer_1_1axis__node_a4db7aca98c3c6ac9eacbe7a11ead1528}} 
+void {\bfseries serve\+\_\+impl} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classheimer_1_1axis__node_a306ea624cfaa2425f8608c6806c4d153}\label{classheimer_1_1axis__node_a306ea624cfaa2425f8608c6806c4d153}} 
+P {\bfseries feedpos} = 0
+\item 
+\mbox{\Hypertarget{classheimer_1_1axis__node_a3ad821847d5283831a5f7b1837d0eebc}\label{classheimer_1_1axis__node_a3ad821847d5283831a5f7b1837d0eebc}} 
+V {\bfseries feedspd} = 0
+\item 
+\mbox{\Hypertarget{classheimer_1_1axis__node_a4e21cf57189a79272502c6dcb6e3d3e8}\label{classheimer_1_1axis__node_a4e21cf57189a79272502c6dcb6e3d3e8}} 
+P {\bfseries ctrpos} = 0
+\item 
+\mbox{\Hypertarget{classheimer_1_1axis__node_a4e919135c3df561896b29629fe837edf}\label{classheimer_1_1axis__node_a4e919135c3df561896b29629fe837edf}} 
+V {\bfseries ctrspd} = 0
+\item 
+\mbox{\Hypertarget{classheimer_1_1axis__node_a750747f99bdeada3d34a03a9a4e00208}\label{classheimer_1_1axis__node_a750747f99bdeada3d34a03a9a4e00208}} 
+bool {\bfseries updated\+\_\+flag} = false
+\end{DoxyCompactItemize}
+\doxysubsection*{Additional Inherited Members}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/mirmik/project/ralgo/ralgo/heimer/axis.\+h\end{DoxyCompactItemize}

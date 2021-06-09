@@ -1,0 +1,133 @@
+\hypertarget{helpers_8h}{}\doxysection{/home/mirmik/project/ralgo/ralgo/util/helpers.h File Reference}
+\label{helpers_8h}\index{/home/mirmik/project/ralgo/ralgo/util/helpers.h@{/home/mirmik/project/ralgo/ralgo/util/helpers.h}}
+{\ttfamily \#include $<$cmath$>$}\newline
+{\ttfamily \#include $<$numeric$>$}\newline
+{\ttfamily \#include $<$complex$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+Include dependency graph for helpers.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=344pt]{helpers_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{helpers_8h__dep__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structralgo_1_1value}{ralgo\+::value$<$ V $>$}}
+\item 
+struct \mbox{\hyperlink{structralgo_1_1value_3_01T_0fN_0e_4}{ralgo\+::value$<$ T\mbox{[}\+N\mbox{]}$>$}}
+\item 
+struct \mbox{\hyperlink{structralgo_1_1scalar}{ralgo\+::scalar$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{structralgo_1_1scalar_3_01std_1_1complex_3_01T_01_4_01_4}{ralgo\+::scalar$<$ std\+::complex$<$ T $>$ $>$}}
+\item 
+struct \mbox{\hyperlink{structralgo_1_1op__add}{ralgo\+::op\+\_\+add}}
+\item 
+struct \mbox{\hyperlink{structralgo_1_1op__sub}{ralgo\+::op\+\_\+sub}}
+\item 
+struct \mbox{\hyperlink{structralgo_1_1op__mul}{ralgo\+::op\+\_\+mul}}
+\item 
+struct \mbox{\hyperlink{structralgo_1_1op__div}{ralgo\+::op\+\_\+div}}
+\item 
+struct \mbox{\hyperlink{structralgo_1_1op__abs}{ralgo\+::op\+\_\+abs}}
+\item 
+struct \mbox{\hyperlink{structralgo_1_1op__eq}{ralgo\+::op\+\_\+eq}}
+\item 
+struct \mbox{\hyperlink{structralgo_1_1op__not__eq}{ralgo\+::op\+\_\+not\+\_\+eq}}
+\item 
+struct \mbox{\hyperlink{structralgo_1_1op__and}{ralgo\+::op\+\_\+and}}
+\item 
+struct \mbox{\hyperlink{structralgo_1_1op__or}{ralgo\+::op\+\_\+or}}
+\item 
+struct \mbox{\hyperlink{structralgo_1_1op__bin__and}{ralgo\+::op\+\_\+bin\+\_\+and}}
+\item 
+struct \mbox{\hyperlink{structralgo_1_1op__bin__or}{ralgo\+::op\+\_\+bin\+\_\+or}}
+\item 
+struct \mbox{\hyperlink{structralgo_1_1rettype}{ralgo\+::rettype$<$ T $>$}}
+\item 
+struct \mbox{\hyperlink{structralgo_1_1rettype_3_01A_00_01B_01_4}{ralgo\+::rettype$<$ A, B $>$}}
+\item 
+struct \mbox{\hyperlink{structralgo_1_1defvec}{ralgo\+::defvec$<$ R, V $>$}}
+\item 
+struct \mbox{\hyperlink{structralgo_1_1defvec_3_01void_00_01V_01_4}{ralgo\+::defvec$<$ void, V $>$}}
+\item 
+struct \mbox{\hyperlink{structralgo_1_1defvec__of}{ralgo\+::defvec\+\_\+of$<$ R, V $>$}}
+\item 
+struct \mbox{\hyperlink{structralgo_1_1defvec__of_3_01void_00_01V_01_4}{ralgo\+::defvec\+\_\+of$<$ void, V $>$}}
+\item 
+struct \mbox{\hyperlink{structralgo_1_1fretvec}{ralgo\+::fretvec$<$ R, F $>$}}
+\item 
+struct \mbox{\hyperlink{structralgo_1_1fretvec_3_01void_00_01F_01_4}{ralgo\+::fretvec$<$ void, F $>$}}
+\item 
+struct \mbox{\hyperlink{structralgo_1_1defsame}{ralgo\+::defsame$<$ R, V $>$}}
+\item 
+struct \mbox{\hyperlink{structralgo_1_1defsame_3_01void_00_01V_01_4}{ralgo\+::defsame$<$ void, V $>$}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \mbox{\hyperlink{namespaceralgo}{ralgo}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{namespaceralgo_a07b493dda8e2e296148b8bc05af4cdd2}\label{namespaceralgo_a07b493dda8e2e296148b8bc05af4cdd2}} 
+{\footnotesize template$<$typename V $>$ }\\using {\bfseries ralgo\+::value\+\_\+t} = typename value$<$ V $>$\+::type
+\item 
+\mbox{\Hypertarget{namespaceralgo_a0c572d5576a913bd9ea4f7fe0a30476f}\label{namespaceralgo_a0c572d5576a913bd9ea4f7fe0a30476f}} 
+{\footnotesize template$<$typename T $>$ }\\using {\bfseries ralgo\+::scalar\+\_\+t} = typename scalar$<$ T $>$\+::type
+\item 
+\mbox{\Hypertarget{namespaceralgo_a6dd9c16963252b912764161724c19dfe}\label{namespaceralgo_a6dd9c16963252b912764161724c19dfe}} 
+{\footnotesize template$<$typename ... T$>$ }\\using \mbox{\hyperlink{namespaceralgo_a6dd9c16963252b912764161724c19dfe}{ralgo\+::rettype\+\_\+t}} = typename rettype$<$ T ... $>$\+::type
+\begin{DoxyCompactList}\small\item\em template $<$template$<$class$>$ V, class T$>$ struct rettype \{ using type = V$<$\+T$>$; \}; \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{namespaceralgo_a5b4f70035a17522328f4f510373992d1}\label{namespaceralgo_a5b4f70035a17522328f4f510373992d1}} 
+{\footnotesize template$<$class R , class V $>$ }\\using {\bfseries ralgo\+::defvec\+\_\+t} = typename defvec$<$ R, V $>$\+::type
+\item 
+\mbox{\Hypertarget{namespaceralgo_ac4097f702cf2fc4728d724b49bb9c599}\label{namespaceralgo_ac4097f702cf2fc4728d724b49bb9c599}} 
+{\footnotesize template$<$class R , class V $>$ }\\using {\bfseries ralgo\+::defvec\+\_\+of\+\_\+t} = typename defvec\+\_\+of$<$ R, V $>$\+::type
+\item 
+\mbox{\Hypertarget{namespaceralgo_ac4b721c7994f5175df5b6f288303880a}\label{namespaceralgo_ac4b721c7994f5175df5b6f288303880a}} 
+{\footnotesize template$<$class R , class F $>$ }\\using {\bfseries ralgo\+::fretvec\+\_\+t} = typename fretvec$<$ R, F $>$\+::type
+\item 
+\mbox{\Hypertarget{namespaceralgo_a87abec5e6ed861671ab25ef05a511515}\label{namespaceralgo_a87abec5e6ed861671ab25ef05a511515}} 
+{\footnotesize template$<$class R , class V $>$ }\\using {\bfseries ralgo\+::defsame\+\_\+t} = typename defsame$<$ R, V $>$\+::type
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{namespaceralgo_a49cacc775ca403e68ea411c8f8072ea9}\label{namespaceralgo_a49cacc775ca403e68ea411c8f8072ea9}} 
+{\footnotesize template$<$class T $>$ }\\constexpr T {\bfseries ralgo\+::sin} (T x)
+\item 
+\mbox{\Hypertarget{namespaceralgo_a08162d2e637d2503fed9463cde3096ce}\label{namespaceralgo_a08162d2e637d2503fed9463cde3096ce}} 
+{\footnotesize template$<$class T $>$ }\\constexpr T {\bfseries ralgo\+::cos} (T x)
+\item 
+\mbox{\Hypertarget{namespaceralgo_abfafae8b4aef3932c81b425150ba60d2}\label{namespaceralgo_abfafae8b4aef3932c81b425150ba60d2}} 
+{\footnotesize template$<$class T $>$ }\\constexpr T {\bfseries ralgo\+::tan} (T x)
+\item 
+\mbox{\Hypertarget{namespaceralgo_a956ec5a4a347447789a7df55dcffec98}\label{namespaceralgo_a956ec5a4a347447789a7df55dcffec98}} 
+{\footnotesize template$<$class T $>$ }\\constexpr T {\bfseries ralgo\+::exp} (T x)
+\item 
+\mbox{\Hypertarget{namespaceralgo_ad2d634ebd18b122825dbf71de2c94aac}\label{namespaceralgo_ad2d634ebd18b122825dbf71de2c94aac}} 
+{\footnotesize template$<$class T $>$ }\\constexpr T {\bfseries ralgo\+::log} (T x)
+\item 
+\mbox{\Hypertarget{namespaceralgo_a542440ffb2a6aa495339a97e04614e96}\label{namespaceralgo_a542440ffb2a6aa495339a97e04614e96}} 
+{\footnotesize template$<$class T $>$ }\\constexpr T {\bfseries ralgo\+::log2} (T x)
+\item 
+\mbox{\Hypertarget{namespaceralgo_a873bc2cfd19d6a5112ab45586cb9c73d}\label{namespaceralgo_a873bc2cfd19d6a5112ab45586cb9c73d}} 
+{\footnotesize template$<$class T $>$ }\\constexpr T {\bfseries ralgo\+::log10} (T x)
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{namespaceralgo_a76a70fbb5e71e26f1fdaab71d9199637}\label{namespaceralgo_a76a70fbb5e71e26f1fdaab71d9199637}} 
+constexpr const double {\bfseries ralgo\+::epsilon} = std\+::numeric\+\_\+limits$<$double$>$\+::epsilon()
+\end{DoxyCompactItemize}

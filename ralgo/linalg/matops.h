@@ -1,7 +1,9 @@
 #ifndef RALGO_MATOPS_H
 #define RALGO_MATOPS_H
 
-#include "assert.h"
+/**
+	@file
+*/
 
 #include <utility>
 #include <iterator>
@@ -12,8 +14,6 @@
 #include <ralgo/util/helpers.h>
 
 #include <ralgo/linalg/matrix.h>
-
-#include <nos/print.h>
 
 // Алгоритмы для матриц имеющих интерфейс схожий с интерфейсом boost.matrix
 namespace ralgo

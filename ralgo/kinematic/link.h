@@ -1,6 +1,10 @@
 #ifndef CYNEMATIC_LINK_H
 #define CYNEMATIC_LINK_H
 
+/**
+	@file
+*/
+
 //#include <linalg-add.h>
 #include <linalg-v3/linalg-ext.h>
 #include <linalg-v3/linalg.h>
