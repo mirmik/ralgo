@@ -7,7 +7,7 @@
 
 #include <ralgo/linalg/matrix.h>
 #include <ralgo/linalg/matops.h>
-#include <ralgo/linalg/triangle_solve.h>
+#include <ralgo/linalg/trivial_solve.h>
 
 #include <nos/print.h>
 

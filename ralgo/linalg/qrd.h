@@ -30,6 +30,7 @@
 
 #include <ralgo/linalg/matrix.h>
 #include <ralgo/linalg/matops.h>
+#include <ralgo/linalg/trivial_solve.h>
 
 namespace ralgo
 {
@@ -100,6 +101,29 @@ namespace ralgo
 				// in the ith column of Q.
 				ralgo::vecops::scalar_div(v, r.at(j, j), q.col(j));
 			}
+		}
+
+		template <class X, class B>
+		void solve(const B& b, X&& x) 
+		{
+			vector_value_t<B> ybuf[b.size()];
+			vector_view y(ybuf, b.size());
+
+			x.resize(b.size());
+
+			// Последовательно применяем решения матриц простого вида.
+			// Данная процедура эквивалентна последовательному
+			// умножению на обращенные Q, R.
+			unary_solve(q, b, y);
+			U_triangle_solve(r, y, x);
+		}
+
+		template <class X=void, class B>
+		defvec_t<X,B> solve(B && b) 
+		{
+			defvec_t<X,B> x;
+			solve(b, x);
+			return x;	
 		}
 	};
 

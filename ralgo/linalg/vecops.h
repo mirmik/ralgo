@@ -218,6 +218,18 @@ namespace ralgo
 		//template <class A, class B> bool equal_all(const A& a, const B& b)
 		//{ return fold(ralgo::op_not_eq(), a, veciter(b)); }
 
+		template <class A, class B>
+		bool equal(const A& a, const B& b)
+		{
+			return ralgo::vecops::boolean_all(op_eq(), a, b);
+		}
+
+		template <class A, class B, class T>
+		bool equal(const A& a, const B& b, T epsilon)
+		{
+			return ralgo::vecops::boolean_all(op_eq(), a, b, epsilon);
+		}
+		
 		template <class A, class B> bool equal_all(const A& a, const B& b) { return boolean_all(ralgo::op_eq(), a, b); }
 		template <class A, class B> bool equal_any(const A& a, const B& b) { return boolean_any(ralgo::op_eq(), a, b); }
 

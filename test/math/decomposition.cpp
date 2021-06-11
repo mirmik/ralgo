@@ -72,4 +72,8 @@ TEST_CASE("qrd")
 
 	auto mmul = ralgo::matops::multiply(qr.q, qr.r);
 	CHECK_EQ(mmul, mat);
+
+	auto a = ralgo::matops::multiply(mat, ralgo::vector<double>{1,1,1});
+
+	CHECK(ralgo::vecops::equal(qr.solve(a), std::vector<double>{1,1,1}, 1e-10));
 }
