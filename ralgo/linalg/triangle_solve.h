@@ -1,45 +1,66 @@
 #ifndef RALGO_LINALG_TRIANGLE_SOLVE_H
 #define RALGO_LINALG_TRIANGLE_SOLVE_H
 
+#include <ralgo/util/helpers.h>
+
 namespace ralgo
 {
 	// B = MX -> X
 	template<class X, class M, class B>
 	void L_triangle_solve(const M & a, const B & b, X&& x) 
-	{
-		nos::println("L_triangle_solve");
-		nos::println("a:");
-		nos::print_matrix(a);
-		nos::println("b:");
-		nos::print_list(b);
+	{	
+		ralgo::resize(x, ralgo::size(b));
 
 		typename M::value_type acc;
-
 		for (int i = 0; i < a.rows(); ++i) 
 		{
-			acc = b[i];
+			acc = ralgo::get(b,i);
 
 			for (int j = 0; j < i; j++) 
 			{
-				acc -= x[j] * a.at(i,j);
-				nos::println(acc);
+				acc -= x[j] * ralgo::get(a,i,j);
 			}
 
-			x[i] = acc / a.at(i, i);
+			x[i] = acc / ralgo::get(a,i,i);
 		}
-
-		nos::println("\nx:");
-		nos::print_list(x);
-		nos::println();
 	}
 
-	/*template<class X=void, class M, class B>
-	defvec_t<X> L_triangle_solve(M&& a, B&& b) 
+	template<class X=void, class M, class B>
+	defvec_t<X,B> L_triangle_solve(M&& a, B&& b) 
 	{
-		defvec_t<X> x;
+		defvec_t<X,B> x;
 		L_triangle_solve(a, b, x);
 		return x;	
-	}*/	
+	}	
+
+
+	// B = MX -> X
+	template<class X, class M, class B>
+	void U_triangle_solve(const M & a, const B & b, X&& x) 
+	{	
+		ralgo::resize(x, ralgo::size(b));
+
+		typename M::value_type acc;
+		for (int i = a.rows() - 1; i >= 0; --i) 
+		{
+			acc = ralgo::get(b,i);
+
+			for (int j = i+1; j < a.cols(); j++) 
+			{
+				acc -= x[j] * ralgo::get(a,i,j);
+			}
+
+			x[i] = acc / ralgo::get(a,i,i);
+		}
+	}
+
+	template<class X=void, class M, class B>
+	defvec_t<X,B> U_triangle_solve(M&& a, B&& b) 
+	{
+		defvec_t<X,B> x;
+		U_triangle_solve(a, b, x);
+		return x;	
+	}	
 }
 
 #endif

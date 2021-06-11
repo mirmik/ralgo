@@ -108,6 +108,85 @@ namespace ralgo
 		optional_vector_resize_helper<T>::doit(a, b);
 	}
 
+
+
+	template <class T> constexpr bool is_vector_compatible();
+	template <class T> struct is_vector_compatible_checker
+	{
+	private:
+		template <class U>
+		static decltype(
+		    std::declval<U>().size(),
+		    std::declval<U>().data(),
+		    std::enable_if_t < !is_vector_compatible<decltype(
+		        std::declval<U>()[0])>(), bool > (),
+		    std::true_type()) test(int);
+		template <class> static std::false_type test(...);
+
+	public:
+		static constexpr const bool value = decltype(test<T>(0))::value;
+	};
+
+	template <class T> constexpr bool is_vector_compatible()
+	{
+		return is_vector_compatible_checker<std::remove_cv_t<T>>::value;
+	}
+
+
+
+	template <class T> struct is_matrix_compatible_checker
+	{
+	private:
+		template <class U>
+		static decltype(
+		    std::declval<U>().at(0, 0),
+		    std::declval<U>().rows(),
+		    std::declval<U>().cols(),
+		    std::declval<U>().row(0),
+		    std::declval<U>().col(0),
+		    std::enable_if_t<is_vector_compatible<decltype(
+		        std::declval<U>()[0])>(), bool>(),
+		    std::true_type()) test(int);
+		template <class> static std::false_type test(...);
+
+	public:
+		static constexpr const bool value = decltype(test<T>(0))::value;
+	};
+
+	template <class T> constexpr bool is_matrix_compatible()
+	{
+		return is_matrix_compatible_checker<std::remove_cv_t<T>>::value;
+	}
+
+	template <class C>
+	constexpr auto size(const C& c) -> decltype(std::size(c))
+	{
+		return std::size(c);
+	}
+
+	template <class C>
+	void resize(C& c, int n)
+	{
+		return c.resize(n);
+	}
+
+	template <class C>
+	void resize(C& c, int m, int n)
+	{
+		return c.resize(m,n);
+	}
+
+	template <class C>
+	constexpr auto get(const C& c, int i)
+	{
+		return c[i];
+	}
+
+	template <class C>
+	constexpr auto get(const C& c, int i, int j)
+	{
+		return c.at(i, j);
+	}
 }
 
 #endif

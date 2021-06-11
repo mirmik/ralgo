@@ -3,9 +3,35 @@
 #include <ralgo/linalg/matops.h>
 #include <ralgo/linalg/solve.h>
 
+#include <ralgo/linalg/triangle_solve.h>
+
 #include <memory>
 
 // x = A*b
+
+TEST_CASE("L_triangle_solve") 
+{
+	ralgo::matrix<double> mat 
+	{
+		{1, 0, 0},
+		{1, 1, 0},
+		{1, 1, 1},
+	};
+
+	CHECK_EQ(L_triangle_solve(mat, ralgo::vector<double>{1,2,3}), ralgo::vector<double>{1,1,1});
+}
+
+TEST_CASE("U_triangle_solve") 
+{
+	ralgo::matrix<double> mat 
+	{
+		{1, 1, 1},
+		{0, 1, 1},
+		{0, 0, 1},
+	};
+
+	CHECK_EQ(U_triangle_solve(mat, ralgo::vector<double>{3,2,1}), ralgo::vector<double>{1,1,1});
+}
 
 TEST_CASE("solve") 
 {
