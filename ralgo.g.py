@@ -10,7 +10,7 @@ licant.module("ralgo.log", "console",
 
 licant.module("ralgo",
 	sources=[
-		"ralgo/madgwick.cpp",
+		"ralgo/imu/madgwick.cpp",
 		#"ralgo/signal/fft.cpp",
 		"ralgo/log/log.cpp",
 		#"ralgo/heimer/control.cpp",

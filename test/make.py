@@ -18,7 +18,7 @@ tests_c = [
 
 application("runtests",
 	sources = [
-		"madgwick.cpp",
+		"imu/*",
 		"main.cpp",
 		#"heimer.cpp",
 		#"heimer2.cpp",

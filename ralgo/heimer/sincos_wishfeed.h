@@ -1,3 +1,5 @@
+/** @file */
+
 #ifndef HEIMER_SINCOS_WISHFEED_H
 #define HEIMER_SINCOS_WISHFEED_H
 

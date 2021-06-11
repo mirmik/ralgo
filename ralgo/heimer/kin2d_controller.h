@@ -1,3 +1,5 @@
+/** @file */
+
 #ifndef RALGO_kinematic_CHAIN_OBJECT2D_H
 #define RALGO_kinematic_CHAIN_OBJECT2D_H
 

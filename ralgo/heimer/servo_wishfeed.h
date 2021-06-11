@@ -1,3 +1,5 @@
+/** @file */
+
 #ifndef RALGO_HEIMER_SIGNAL_H
 #define RALGO_HEIMER_SIGNAL_H
 

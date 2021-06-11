@@ -1,3 +1,5 @@
+/** @file */
+
 #include <ralgo/heimer/command_center_console.h>
 #include <igris/datastruct/argvc.h>
 

@@ -1,3 +1,5 @@
+/** @file */
+
 #ifndef RALGO_HEIMER_SPEED_PHASER
 #define RALGO_HEIMER_SPEED_PHASER
 

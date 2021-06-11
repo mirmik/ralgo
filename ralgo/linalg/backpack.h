@@ -1,9 +1,7 @@
 #ifndef RALGO_UTIL_BACKPACK_H
 #define RALGO_UTIL_BACKPACK_H
 
-#include <nos/trace.h>
 #include <igris/container/array_view.h>
-
 #include <ralgo/linalg/solve.h>
 
 namespace ralgo

@@ -1,4 +1,4 @@
-#include "ralgo/madgwick.h"
+#include "ralgo/imu/madgwick.h"
 #include <igris/math/fast_invsqrt.h>
 
 namespace ralgo

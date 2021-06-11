@@ -1,12 +1,12 @@
-#ifndef HEIMER_XYALPHA_COORDINATE_CONTROLLER_H
-#define HEIMER_XYALPHA_COORDINATE_CONTROLLER_H
+/** 
+@file
 
-/*
-	Данный контроллер реализует управление
-	кинематической цепью из двух ортагональных актуаторов и
-	поворотного звена, перенося управляющие оси в точку выходного
-	звена
+Данный контроллер реализует управление
+кинематической цепью из двух ортагональных актуаторов и
+поворотного звена, перенося управляющие оси в точку выходного
+звена.
 
+\code
 	Аппаратные оси:
 					   ^ y
 			 alpha     |
@@ -30,7 +30,11 @@
 					 |
 					---
 		=================
+\endcode
 */
+
+#ifndef HEIMER_XYALPHA_COORDINATE_CONTROLLER_H
+#define HEIMER_XYALPHA_COORDINATE_CONTROLLER_H
 
 #include <nos/print.h>
 #include <nos/fprint.h>
@@ -130,8 +134,8 @@ namespace heimer
 			output_link.relocate(out);
 		}
 
-		// Расчитывает положение и винт скорости
-		// для текущей управляющей конфигурации.
+		/// @brief Расчитывает положение и винт скорости
+		///        для текущей управляющей конфигурации.
 		void get_control_phase(
 			int64_t time,
 			ralgo::htrans2<float>& pos,
