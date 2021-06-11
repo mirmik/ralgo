@@ -10,11 +10,16 @@
 
 #include <ralgo/linalg/vecops.h>
 #include <ralgo/linalg/matops.h>
+#include <ralgo/linalg/proxy.h>
 #include <ralgo/util/math.h>
 #include <ralgo/log.h>
 
+#include <nos/print.h>
+
 // Based on numerical recipes.
 //Attention Row Order.
+
+// A = U W V*
 
 #ifndef __MAX__
 #define __MAX__(a,b) ((a) > (b) ? (a) : (b))
@@ -69,6 +74,34 @@ namespace ralgo
 
 		template<class A, class B>
 		void solve(const A &b, B &x, T thresh = -1.);
+
+		template <class R>
+		void pinv(R& result) 
+		{
+			//T u_inv_buffer [u.rows() * u.cols()];
+			//T v_inv_buffer [v.rows() * v.cols()];
+			//T w_inv_buffer [w.size()];
+
+			//ralgo::matrix_view<T> u_inv(u_inv_buffer, u.cols(), u.rows());
+			//ralgo::matrix_view<T> v_inv(v_inv_buffer, v.cols(), v.rows());
+			//ralgo::vector_view<T> w_inv(w_inv_buffer, w.size());
+
+			//ralgo::transpose(u, u_inv);
+			//ralgo::transpose(v, v_inv);
+
+			ralgo::transposed_matrix_proxy u_inv(u);
+			ralgo::transposed_matrix_proxy v_inv(v);
+			ralgo::inverted_diagonal_proxy w_inv(w);
+
+			ralgo::matops::multiply(u_inv, w_inv, result);
+		}
+
+		ralgo::matrix<T> pinv() 
+		{
+			ralgo::matrix<T> x;
+			pinv(x);
+			return x;	
+		}
 
 		void decompose();
 		void reorder();
