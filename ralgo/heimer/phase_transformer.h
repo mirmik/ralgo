@@ -1,3 +1,5 @@
+/** @file */
+
 #ifndef HEIMER_PHASE_TRANSFORMER_H
 #define HEIMER_PHASE_TRANSFORMER_H
 

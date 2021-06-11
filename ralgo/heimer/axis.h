@@ -1,3 +1,5 @@
+/** @file */
+
 #ifndef HEIMER_AXIS_H
 #define HEIMER_AXIS_H
 

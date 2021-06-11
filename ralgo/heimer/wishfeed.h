@@ -1,3 +1,5 @@
+/** @file */
+
 #ifndef RALGO_WISHFEED_H
 #define RALGO_WISHFEED_H
 

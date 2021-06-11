@@ -1,3 +1,5 @@
+/** @file */
+
 #ifndef INTERRUPT_ARGS
 #define INTERRUPT_ARGS
 

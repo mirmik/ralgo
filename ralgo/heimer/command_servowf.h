@@ -1,3 +1,5 @@
+/** @file */
+
 #ifndef RALGO_HEIMER_COMMAND_SERVOWF_H
 #define RALGO_HEIMER_COMMAND_SERVOWF_H
 

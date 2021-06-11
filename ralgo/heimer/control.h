@@ -1,3 +1,5 @@
+/** @file */
+
 #ifndef HEIMER_CONTROL2_H
 #define HEIMER_CONTROL2_H
 

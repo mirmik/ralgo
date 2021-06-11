@@ -1,3 +1,5 @@
+/** @file */
+
 #ifndef HEIMER_PROTECT_H
 #define HEIMER_PROTECT_H
 

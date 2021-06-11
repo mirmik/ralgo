@@ -1,5 +1,5 @@
 #include <doctest/doctest.h>
-#include <ralgo/madgwick.h>
+#include <ralgo/imu/madgwick.h>
 #include <nos/print.h>
 #include <linalg/linalg.h>
 

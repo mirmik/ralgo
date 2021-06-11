@@ -1,3 +1,5 @@
+/** @file */
+
 #ifndef RALGO_HEIMER_TANDEM_H
 #define RALGO_HEIMER_TANDEM_H
 
