@@ -16,8 +16,6 @@
 // Based on numerical recipes.
 //Attention Row Order.
 
-#include <nos/print.h>
-
 #ifndef __MAX__
 #define __MAX__(a,b) ((a) > (b) ? (a) : (b))
 #endif
@@ -35,34 +33,38 @@ namespace ralgo
 		T  tsh;
 
 		template<class MA>
-		SVD(const MA & a, MU& u, MV& v, V& w) :
-			m(a.size1()), n(a.size2()), // берём размерность.
-			u(u), v(v), w(w)
+		SVD(const MA & _a, const MU& _u, const MV& _v, const V& _w) :
+			m(_a.size1()), n(_a.size2()), // берём размерность.
+			u(_u), v(_v), w(_w)
 		{
+			//u = _u;
+			//v = _v;
+			//w = _w;
+
 			//assert(u.size1() == (unsigned)m);
 			//assert(u.size2() == (unsigned)n);
 			//assert(v.size1() == (unsigned)n);
 			//assert(v.size2() == (unsigned)n);
 			//assert(w.size() == (unsigned)n);
 
-			u.resize(a.rows(), a.cols());
-			v.resize(a.cols(), a.cols());
-			w.resize(a.cols());
+			u.resize(_a.rows(), _a.cols());
+			v.resize(_a.cols(), _a.cols());
+			w.resize(_a.cols());
 
-			ralgo::matops::copy(u, a); // Копируем данные.
+			ralgo::matops::copy(u, _a); // Копируем данные.
 			ralgo::vecops::inplace::clean(v);
 			ralgo::vecops::inplace::clean(w);
 
 			eps = std::numeric_limits<T>::epsilon();
 
-			decompose();
 
+			decompose();
 			reorder();
 			tsh = 0.5 * sqrt(m + n + 1.) * w[0] * eps;
 		}
 
 		template<class MA>
-		SVD(const MA & a) : SVD(a,u,v,w)
+		SVD(const MA & a) : SVD(a,MU{},MV{},V{})
 		{}
 
 		template<class A, class B>

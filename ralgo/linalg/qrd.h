@@ -101,15 +101,6 @@ namespace ralgo
 				ralgo::vecops::scalar_div(v, r.at(j, j), q.col(j));
 			}
 		}
-
-		void print()
-		{
-			nos::println("Q:"); nos::print_matrix(q);
-			nos::println("R:"); nos::print_matrix(r);
-			nos::println();
-
-			nos::println("QR:"); nos::print_matrix(ralgo::matops::multiply(q, r));
-		}
 	};
 
 	template <

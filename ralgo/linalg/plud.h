@@ -107,15 +107,6 @@ namespace ralgo
 			solve(b, x);
 			return x;	
 		}
-
-		void print()
-		{
-			nos::println("A:"); nos::print_matrix(a);
-			nos::println("P:"); nos::print_matrix(p);
-			nos::println("L:"); nos::print_matrix(l);
-			nos::println("U:"); nos::print_matrix(u);
-			nos::println();
-		}
 	};
 
 	template <

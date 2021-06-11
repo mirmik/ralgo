@@ -13,6 +13,7 @@
 #include <ralgo/linalg/vecops.h>
 #include <ralgo/util/helpers.h>
 
+#include <ralgo/linalg/vector.h>
 #include <ralgo/linalg/matrix.h>
 
 // Алгоритмы для матриц имеющих интерфейс схожий с интерфейсом boost.matrix
@@ -20,23 +21,23 @@ namespace ralgo
 {
 	namespace matops
 	{
-		template<class M> void fill(M& arr, const value_t<M>& val) 
-		{ 
-			vecops::fill(arr, val); 
+		template<class M> void fill(M& arr, const value_t<M>& val)
+		{
+			vecops::fill(arr, val);
 		}
 
-		template<class M> 
-		void clean(M& arr) 
-		{ 
-			vecops::fill(arr, typename M::value_type {}); 
+		template<class M>
+		void clean(M& arr)
+		{
+			vecops::fill(arr, typename M::value_type {});
 		}
 
 		template <class T>
 		auto fill(int r, int c, T val) -> matrix<T>
-		{ 
+		{
 			matrix<T> ret(r, c);
 			vecops::fill(ret, val);
-			return ret; 
+			return ret;
 		}
 
 		template<class A, class B>
@@ -120,13 +121,10 @@ namespace ralgo
 				}
 		}
 
-		template <class A, class B, class C>
+		template <class A, class B, class C,
+		          std::enable_if_t<is_matrix_compatible<B>(), int> = 0>
 		void multiply(const A& a, const B& b, C& c)
 		{
-			// m must be equal a.rows() and c.rows();
-			// p must be equal a.cols() and b.rows();
-			// n must be equal b.cols() and c.cols();
-
 			int m = a.rows();
 			int p = a.cols();
 			int n = b.cols();
@@ -147,12 +145,43 @@ namespace ralgo
 			}
 		}
 
-		template <class C = void, class A, class B>
-		auto multiply(const A& a, const B& b) 
-			-> defsame_t<C, ralgo::matrix<decltype(value_t<A>{}*value_t<B>{})>>
+		template <class A, class B, class C,
+		          std::enable_if_t<is_vector_compatible<B>(), int> = 0>
+		void multiply(const A& a, const B& b, C& c)
 		{
-			defsame_t<C, ralgo::matrix<decltype(value_t<A>{}*value_t<B>{})>> res;
-			multiply(a,b,res);
+			int m = a.rows();
+			int n = a.cols();
+
+			c.resize(a.rows());
+
+			for (int i = 0; i < m; ++i)
+			{
+				typename C::value_type acc = 0;
+				for (int k = 0; k < n; ++k)
+				{
+					acc += a.at(i, k) * b[k];
+				}
+				c[i] = acc;
+			}
+		}
+
+		template <class C = void, class A, class B,
+		          std::enable_if_t<is_matrix_compatible<B>(), int> = 0>
+		auto multiply(const A& a, const B& b)
+		-> defsame_t < C, ralgo::matrix < decltype(value_t<A> {}*value_t<B> {}) >>
+		{
+			defsame_t < C, ralgo::matrix < decltype(value_t<A>{}*value_t<B>{}) >> res;
+			multiply(a, b, res);
+			return res;
+		}
+
+		template <class C = void, class A, class B,
+		          std::enable_if_t<is_vector_compatible<B>(), int> = 0>
+		auto multiply(const A& a, const B& b)
+		-> defsame_t < C, ralgo::vector < decltype(value_t<A> {}*value_t<B> {}) >>
+		{
+			defsame_t < C, ralgo::vector < decltype(value_t<A>{}*value_t<B>{}) >> res;
+			multiply(a, b, res);
 			return res;
 		}
 
@@ -266,7 +295,7 @@ namespace ralgo
 			{
 				for (int j = 0; j < mat.cols(); ++j)
 				{
-					mat.at(i, j) = i==j ? value_t<M>{1} : 0;
+					mat.at(i, j) = i == j ? value_t<M> {1} : 0;
 				}
 			}
 		}
@@ -277,7 +306,7 @@ namespace ralgo
 			diag(mat, igris::array_view<T>(arr));
 		}
 
-		template <class R = void, class T> 
+		template <class R = void, class T>
 		auto diag(const std::initializer_list<T> & arr) -> defsame_t<R, matrix<T>>
 		{
 			defsame_t<R, matrix<T>> ret;

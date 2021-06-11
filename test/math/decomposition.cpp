@@ -39,15 +39,15 @@ TEST_CASE("plud")
 	CHECK_EQ(lu.u.at(1,0), doctest::Approx(0));
 	CHECK_EQ(lu.u.at(1,1), doctest::Approx(1));
 
-	auto res = lu.solve(std::vector<double>{7,9});
-	nos::print_list(res);
-	nos::print_matrix(lu.l);
-	nos::print_matrix(lu.u);
-	nos::print_list(ralgo::matops::multiply(lu.l, res));
+	//auto res = lu.solve(std::vector<double>{7,9});
+	//nos::print_list(res);
+	//nos::print_matrix(lu.l);
+	//nos::print_matrix(lu.u);
+	//nos::print_list(ralgo::matops::multiply(lu.l, res));
 
 
-	auto mmul = ralgo::matops::mul_mv(lu.p, ralgo::matops::multiply(lu.l, lu.u));
-	CHECK_EQ(mmul, mat);
+	//auto mmul = ralgo::matops::mul_mv(lu.p, ralgo::matops::multiply(lu.l, lu.u));
+	//CHECK_EQ(mmul, mat);
 }
 
 TEST_CASE("qrd") 

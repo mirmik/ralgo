@@ -78,6 +78,8 @@ namespace ralgo
 
 		matrix & operator=(const matrix& oth)
 		{
+			if (this == &oth) return *this;
+
 			int rows = oth.rows();
 			int cols = oth.cols();
 
@@ -92,6 +94,8 @@ namespace ralgo
 		template <class M>
 		matrix & operator=(const M& oth)
 		{
+			if (this == &oth) return *this;
+
 			int rows = oth.rows();
 			int cols = oth.cols();
 
