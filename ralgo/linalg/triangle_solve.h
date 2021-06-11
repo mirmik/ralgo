@@ -7,6 +7,32 @@ namespace ralgo
 {
 	// B = MX -> X
 	template<class X, class M, class B>
+	void pivot_solve(const M & a, const B & b, X&& x) 
+	{	
+		ralgo::resize(x, ralgo::size(b));
+
+		typename M::value_type acc;
+		for (int i = 0; i < a.rows(); ++i) 
+		{
+			for (int j = 0; j < a.cols(); ++j) 
+			{
+				auto val = ralgo::get(a,i,j);
+				if (val) ralgo::get(x,j) = ralgo::get(b,i);
+			}
+		}
+	}
+
+	template<class X=void, class M, class B>
+	defvec_t<X,B> pivot_solve(M&& a, B&& b) 
+	{
+		defvec_t<X,B> x;
+		pivot_solve(a, b, x);
+		return x;	
+	}	
+
+
+	// B = MX -> X
+	template<class X, class M, class B>
 	void L_triangle_solve(const M & a, const B & b, X&& x) 
 	{	
 		ralgo::resize(x, ralgo::size(b));

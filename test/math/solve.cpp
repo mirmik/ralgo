@@ -9,6 +9,18 @@
 
 // x = A*b
 
+TEST_CASE("pivot_solve") 
+{
+	ralgo::matrix<double> mat 
+	{
+		{0, 0, 1},
+		{1, 0, 0},
+		{0, 1, 0},
+	};
+
+	CHECK_EQ(pivot_solve(mat, ralgo::vector<double>{3,1,2}), ralgo::vector<double>{1,2,3});
+}
+
 TEST_CASE("L_triangle_solve") 
 {
 	ralgo::matrix<double> mat 

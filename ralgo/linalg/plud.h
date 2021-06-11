@@ -7,8 +7,9 @@
 
 #include <ralgo/linalg/matrix.h>
 #include <ralgo/linalg/matops.h>
-
 #include <ralgo/linalg/triangle_solve.h>
+
+#include <nos/print.h>
 
 namespace ralgo
 {
@@ -95,9 +96,12 @@ namespace ralgo
 
 			x.resize(b.size());
 
-			L_triangle_solve(l, b, y);
-
-			ralgo::vecops::copy(y, x);
+			// Последовательно применяем решения матриц простого вида.
+			// Данная процедура эквивалентна последовательному
+			// умножению на обращенные P, L, U.
+			pivot_solve(p, b, x);
+			L_triangle_solve(l, x, y);
+			U_triangle_solve(u, y, x);
 		}
 
 		template <class X=void, class B>

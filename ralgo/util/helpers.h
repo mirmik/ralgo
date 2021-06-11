@@ -177,13 +177,25 @@ namespace ralgo
 	}
 
 	template <class C>
-	constexpr auto get(const C& c, int i)
+	constexpr const auto& get(const C& c, int i)
 	{
 		return c[i];
 	}
 
 	template <class C>
-	constexpr auto get(const C& c, int i, int j)
+	constexpr const auto& get(const C& c, int i, int j)
+	{
+		return c.at(i, j);
+	}
+
+	template <class C>
+	constexpr auto& get(C& c, int i)
+	{
+		return c[i];
+	}
+
+	template <class C>
+	constexpr auto& get(C& c, int i, int j)
 	{
 		return c.at(i, j);
 	}
