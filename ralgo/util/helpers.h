@@ -142,10 +142,6 @@ namespace ralgo
 		    std::declval<U>().at(0, 0),
 		    std::declval<U>().rows(),
 		    std::declval<U>().cols(),
-		    std::declval<U>().row(0),
-		    std::declval<U>().col(0),
-		    std::enable_if_t<is_vector_compatible<decltype(
-		        std::declval<U>()[0])>(), bool>(),
 		    std::true_type()) test(int);
 		template <class> static std::false_type test(...);
 

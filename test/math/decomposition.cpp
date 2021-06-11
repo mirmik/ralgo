@@ -18,6 +18,8 @@ TEST_CASE("svd")
 	CHECK_EQ(svd.u.size(), 12);
 	CHECK_EQ(svd.v.size(), 9);
 	CHECK_EQ(svd.w.size(), 3);
+
+	svd.pinv();
 }
 
 TEST_CASE("plud") 
