@@ -4,6 +4,8 @@
 #include <ralgo/linalg/plud.h>
 #include <ralgo/linalg/qrd.h>
 
+#include <ralgo/linalg/linalg.h>
+
 TEST_CASE("svd") 
 {
 	double arr[12];
@@ -37,7 +39,14 @@ TEST_CASE("plud")
 	CHECK_EQ(lu.u.at(1,0), doctest::Approx(0));
 	CHECK_EQ(lu.u.at(1,1), doctest::Approx(1));
 
-	auto mmul = ralgo::matops::multiply(lu.p, ralgo::matops::multiply(lu.l, lu.u));
+	auto res = lu.solve(std::vector<double>{7,9});
+	nos::print_list(res);
+	nos::print_matrix(lu.l);
+	nos::print_matrix(lu.u);
+	nos::print_list(ralgo::matops::multiply(lu.l, res));
+
+
+	auto mmul = ralgo::matops::mul_mv(lu.p, ralgo::matops::multiply(lu.l, lu.u));
 	CHECK_EQ(mmul, mat);
 }
 

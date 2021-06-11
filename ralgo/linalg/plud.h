@@ -8,6 +8,8 @@
 #include <ralgo/linalg/matrix.h>
 #include <ralgo/linalg/matops.h>
 
+#include <ralgo/linalg/triangle_solve.h>
+
 namespace ralgo
 {
 	template <class M, class TL, class TU, class TP>
@@ -83,6 +85,27 @@ namespace ralgo
 					u(i, j) = 0;
 				}
 			}
+		}
+
+		template <class X, class B>
+		void solve(const B& b, X&& x) 
+		{
+			vector_value_t<B> ybuf[b.size()];
+			vector_view y(ybuf, b.size());
+
+			x.resize(b.size());
+
+			L_triangle_solve(l, b, y);
+
+			ralgo::vecops::copy(y, x);
+		}
+
+		template <class X=void, class B>
+		defvec_t<X,B> solve(B && b) 
+		{
+			defvec_t<X,B> x;
+			solve(b, x);
+			return x;	
 		}
 
 		void print()
