@@ -19,6 +19,10 @@ namespace ralgo
 	template <typename T, int N> struct value<T[N]> { using type = T; };
 	template <typename V> using value_t = typename value<V>::type;
 
+	template <typename V> struct vector_value { using type = std::remove_reference_t<decltype(std::declval<V>()[0])>; };
+	template <typename T, int N> struct vector_value<T[N]> { using type = T; };
+	template <typename V> using vector_value_t = typename vector_value<V>::type;
+
 	// Превести тип комплексного аргумента или вектора к соответствующему базовому скалярному типу.
 	template <typename T> struct scalar { using type = T; };
 	template <typename T> struct scalar<std::complex<T>> { using type = T; };
@@ -67,7 +71,7 @@ namespace ralgo
 
 	// Определяет тип по умолчанию. Если тип равен void, то используется std::vector<>.
 	template<class R, class V> struct defvec { using type = R; };
-	template<class V> struct defvec<void, V> { using type = std::vector<value_t<V>>; };
+	template<class V> struct defvec<void, V> { using type = std::vector<std::remove_reference_t<decltype(std::declval<V>()[0])>> ; };
 	template<class R, class V> using defvec_t = typename defvec<R, V>::type;
 
 	// Определяет тип по умолчанию. Если тип равен void, то используется std::vector<>.
@@ -84,6 +88,25 @@ namespace ralgo
 	template<class R, class V> struct defsame { using type = R; };
 	template<class V> struct defsame<void, V> { using type = V; };
 	template<class R, class V> using defsame_t = typename defsame<R, V>::type;
+
+
+	template<class T, int K = 0>
+	struct optional_vector_resize_helper
+	{
+		static void doit(T& a, int arg) { a.resize(arg); }
+	};
+
+	template<class T>
+	struct optional_vector_resize_helper<T, 0>
+	{
+		static void doit(T& a, int arg) {}
+	};
+
+	template<class T>
+	void optional_vector_resize(T & a, int b)
+	{
+		optional_vector_resize_helper<T>::doit(a, b);
+	}
 
 }
 
