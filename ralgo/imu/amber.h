@@ -9,27 +9,28 @@
 
 namespace ralgo
 {
+	template <class T>
 	class amber
 	{
 	public:
-		linalg::vec<float, 3> vel = {};
-		linalg::vec<float, 3> pos = {};
+		T vel = {};
+		T pos = {};
 
 		float velkoeff = 0.1;
 		float poskoeff = 0.1;
 
 	public:
-		void set_pos(linalg::vec<float, 3> _pos)
+		void set_pos(T _pos)
 		{
 			pos = _pos;
 		}
 
-		void set_vel(linalg::vec<float, 3> _vel)
+		void set_vel(T _vel)
 		{
 			vel = _vel;
 		}
 
-		void step_acc(linalg::vec<float, 3> acc, float delta)
+		void step_acc(T acc, float delta)
 		{
 			vel += acc * delta;
 		}
@@ -44,7 +45,7 @@ namespace ralgo
 		/// @param[in] koeff  Коэффициент доверия к источнику в диапазоне (0,1]. 
 		///                   Чем выше шум, тем меньше доверие.   
 		/// @param[in] delta  Время в секундах с прошлой итерации
-		void correct_vel(linalg::vec<float, 3> extvel, float koeff, float delta)
+		void correct_vel(T extvel, float koeff, float delta)
 		{
 			assert(koeff > 0 && koeff <= 1);
 			vel += (extvel - vel) * koeff * delta;
@@ -55,10 +56,20 @@ namespace ralgo
 		/// @param[in] koeff  Коэффициент доверия к источнику в диапазоне (0,1]. 
 		///                   Чем выше шум, тем меньше доверие.   
 		/// @param[in] delta  Время в секундах с прошлой итерации
-		void correct_pos(linalg::vec<float, 3> extpos, float koeff, float delta)
+		void correct_pos(T extpos, float koeff, float delta)
 		{
 			assert(koeff > 0 && koeff <= 1);
 			pos += (extpos - pos) * koeff * delta;
+		}
+
+		void correct_pos(T extpos, float delta) 
+		{
+			correct_pos(extpos, poskoeff, delta);
+		}
+
+		void correct_vel(T extvel, float delta) 
+		{
+			correct_vel(extvel, velkoeff, delta);
 		}
 	};
 }
