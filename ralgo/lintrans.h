@@ -1,5 +1,8 @@
+
 #ifndef RALGO_LINFILTERS_H
 #define RALGO_LINFILTERS_H
+
+#error is compiled ?
 
 #include <ralgo/linalg/extension.h>
 #include <ralgo/inout/inout.h>

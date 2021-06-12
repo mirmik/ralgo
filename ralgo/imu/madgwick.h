@@ -1,3 +1,5 @@
+/** @file */
+
 #ifndef MADGWICK_AHRS_H_
 #define MADGWICK_AHRS_H_
 
@@ -15,6 +17,21 @@ namespace ralgo
 {
     class madgwick
     {
+    private:
+        static float invSqrt(float x);
+
+        float beta = 0;                // algorithm gain
+        float sampleFreq = 0;
+        float invSampleFreq = 0;
+
+        linalg::vec<float,4> q = {0,0,0,1};
+
+        float hx, hy;
+    
+        float q0=1;
+        float q1=0;
+        float q2=0;
+        float q3=0;
 
     public:
         madgwick();
@@ -32,18 +49,25 @@ namespace ralgo
         void setKoeff(float sampleFreq, float beta);
 
         void update_magnetic_reference_direction(float umx, float umy, float umz);
+
+        /// Отмасштабировать и применить.
         void update(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz);
         void update(float gx, float gy, float gz, float ax, float ay, float az);
         void update(float gx, float gy, float gz);
 
-//        void update(linalg::vec<float,3> g, linalg::vec<float,3> a, linalg::vec<float,3> m);
-//        void update(linalg::vec<float,3> g, linalg::vec<float,3> a);
-//        void update(linalg::vec<float,3> g);
+        void update(const linalg::vec<float,3> & g, const linalg::vec<float,3> & a, const linalg::vec<float,3> & m);
+        void update(const linalg::vec<float,3> & g, const linalg::vec<float,3> & a);
+        void update(const linalg::vec<float,3> & g);
 
-
+        /// Применить без масштабирования.
         void apply(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz);
         void apply(float gx, float gy, float gz, float ax, float ay, float az);
         void apply(float gx, float gy, float gz);
+
+
+        linalg::vec<float, 3> body2earth(const linalg::vec<float, 3> & vec);
+        linalg::vec<float, 3> earth2body(const linalg::vec<float, 3> & vec);
+
 
         linalg::vec<float, 3> gravity_direction();
 
@@ -58,24 +82,11 @@ namespace ralgo
         void ZYZ(float *z, float *y, float *z2);
         void ZYZ_u(float *z, float *y, float *z2);
 
+        linalg::vec<float,3> ZYX();
+
         float magnetic_reference_x() { return hx; }
         float magnetic_reference_y() { return hy; }
 
-    public:
-        static float invSqrt(float x);
-
-        float beta;                // algorithm gain
-        float sampleFreq;
-        float invSampleFreq;
-
-        linalg::vec<float,4> q = {0,0,0,1};
-
-        float hx, hy;
-    
-        float q0=1;
-        float q1=0;
-        float q2=0;
-        float q3=0;
     };
 }
 

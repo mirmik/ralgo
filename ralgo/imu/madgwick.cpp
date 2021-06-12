@@ -18,10 +18,37 @@ namespace ralgo
         q0 = 1; q1 = q2 = q3 = 0;
     }
 
-    linalg::vec<float, 3> madgwick::gravity_direction() 
+    linalg::vec<float, 3> madgwick::earth2body(const linalg::vec<float, 3> & vec)
     {
-        return linalg::qrot(qinv(quat()), {0,0,-1});
+        return linalg::qrot(qinv(quat()), vec);
     };
+
+
+    linalg::vec<float, 3> madgwick::body2earth(const linalg::vec<float, 3> & vec)
+    {
+        return linalg::qrot(quat(), vec);
+    };
+
+    linalg::vec<float, 3> madgwick::gravity_direction()
+    {
+        return earth2body({0, 0, -1});
+    };
+
+
+    void madgwick::update(const linalg::vec<float, 3> & g, const linalg::vec<float, 3> & a, const linalg::vec<float, 3> & m) 
+    {
+        update(g[0], g[1], g[2], a[0], a[1], a[2], m[0], m[1], m[2]);
+    }
+
+    void madgwick::update(const linalg::vec<float, 3> & g, const linalg::vec<float, 3> & a) 
+    {
+        update(g[0], g[1], g[2], a[0], a[1], a[2]);
+    }
+    
+    void madgwick::update(const linalg::vec<float, 3> & g) 
+    {
+        update(g[0], g[1], g[2]);
+    }
 
 //---------------------------------------------------------------------------------------------------
 // AHRS algorithm update
@@ -288,6 +315,13 @@ namespace ralgo
         *z = atan2(q1 * q2 + q3 * q0, 0.5 - q2 * q2 - q3 * q3);
         *y = - asin(2 * (q1 * q3 - q2 * q0));
         *x = atan2(q2 * q3 + q1 * q0, 0.5 - q1 * q1 - q2 * q2);
+    }
+
+    linalg::vec<float,3> madgwick::ZYX()
+    {
+        linalg::vec<float,3> ret;
+        ZYX(&ret[0], &ret[1], &ret[2]);
+        return ret;
     }
 
 
