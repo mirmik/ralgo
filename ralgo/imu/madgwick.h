@@ -25,8 +25,6 @@ namespace ralgo
         float invSampleFreq = 0;
 
         linalg::vec<float,4> q = {0,0,0,1};
-
-        float hx, hy;
     
         float q0=1;
         float q1=0;
@@ -34,6 +32,8 @@ namespace ralgo
         float q3=0;
 
     public:
+        float hx, hy;
+
         madgwick();
 
         linalg::vec<float,4> quat()
@@ -68,6 +68,7 @@ namespace ralgo
         linalg::vec<float, 3> body2earth(const linalg::vec<float, 3> & vec);
         linalg::vec<float, 3> earth2body(const linalg::vec<float, 3> & vec);
 
+        linalg::vec<float, 3> horizon_projection(const linalg::vec<float, 3> & vec);
 
         linalg::vec<float, 3> gravity_direction();
 

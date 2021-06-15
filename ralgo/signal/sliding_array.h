@@ -31,11 +31,13 @@ namespace ralgo
 	public:
 		sliding_array(size_t size) : cursor(0)
 		{
-			allocate_buffer(size);
+			resize(size);
 		}
 
-		void allocate_buffer(size_t halfsize)
+		void resize(size_t halfsize)
 		{
+			if (dataarr) delete[](dataarr);
+
 			this->halfsize = halfsize;
 			dataarr = new T[halfsize * 2];
 			memset(dataarr, 0, halfsize * 2 * sizeof(T));

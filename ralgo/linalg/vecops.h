@@ -19,6 +19,22 @@ namespace ralgo
 
 	namespace vecops
 	{
+		template <class T>
+		class constant_generator 
+		{
+			T val;
+		public:
+			constant_generator(T v) : val(v) {}
+
+			T operator[] (int i) 
+			{
+				(void) i;
+				return val;
+			}
+		};
+
+
+
 		template < class R = void, class V >
 		defvec_t<R, V> list(const V& u)
 		{
@@ -229,7 +245,7 @@ namespace ralgo
 		{
 			return ralgo::vecops::boolean_all(op_eq(), a, b, epsilon);
 		}
-		
+
 		template <class A, class B> bool equal_all(const A& a, const B& b) { return boolean_all(ralgo::op_eq(), a, b); }
 		template <class A, class B> bool equal_any(const A& a, const B& b) { return boolean_any(ralgo::op_eq(), a, b); }
 
@@ -254,6 +270,20 @@ namespace ralgo
 		template <class A, class S, class R> void scalar_div(const A& a, S b, R&& res) { elementwise_to(res, ralgo::op_div(), a, b); }
 		template <class A, class S, class R> void scalar_mul(const A& a, S b, R&& res) { elementwise_to(res, ralgo::op_mul(), a, b); }
 
+
+		template <class R = void, class Head, class ... Args>
+		auto zip(Head&& head, Args && ... args) -> defsame_t<R, std::vector<std::tuple<Args...>>>
+		{
+			defsame_t<R, std::vector<std::tuple<Args...>>> ret;
+			ret.reserve(head.size());
+
+			for (int i = 0 ; i < head.size(); ++i) 
+			{
+				ret.emplace_back(head[i], args[i] ...);
+			}
+
+			return ret;
+		}
 
 		namespace inplace
 		{

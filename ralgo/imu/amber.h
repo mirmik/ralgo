@@ -45,10 +45,10 @@ namespace ralgo
 		/// @param[in] koeff  Коэффициент доверия к источнику в диапазоне (0,1]. 
 		///                   Чем выше шум, тем меньше доверие.   
 		/// @param[in] delta  Время в секундах с прошлой итерации
-		void correct_vel(T extvel, float koeff, float delta)
+		void correct_vel(T extvel, float koeff)
 		{
 			assert(koeff > 0 && koeff <= 1);
-			vel += (extvel - vel) * koeff * delta;
+			vel += (extvel - vel) * koeff;
 		}
 
 		/// @brief            Корректирует положение по информации внешнего источника.
@@ -62,7 +62,7 @@ namespace ralgo
 			pos += (extpos - pos) * koeff * delta;
 		}
 
-		void correct_pos(T extpos, float delta) 
+		/*void correct_pos(T extpos, float delta) 
 		{
 			correct_pos(extpos, poskoeff, delta);
 		}
@@ -70,7 +70,7 @@ namespace ralgo
 		void correct_vel(T extvel, float delta) 
 		{
 			correct_vel(extvel, velkoeff, delta);
-		}
+		}*/
 	};
 }
 
