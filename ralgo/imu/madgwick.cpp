@@ -338,4 +338,14 @@ namespace ralgo
         *y = acos(1 - 2 * (q1 * q1 + q2 * q2));
         *z2 = -atan2(q2 * q3 + q1 * q0, q1 * q3 - q2 * q0);
     }
+
+    linalg::vec<float, 3> madgwick::horizon_projection(const linalg::vec<float, 3> & vec) 
+    {
+        auto gravity = gravity_direction();
+        
+        auto zaxis_projection_norm = linalg::dot(gravity, vec); 
+        auto zaxis_projection = gravity * zaxis_projection_norm;
+        
+        return vec - zaxis_projection; 
+    }
 }

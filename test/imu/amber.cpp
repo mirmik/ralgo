@@ -3,5 +3,5 @@
 
 TEST_CASE("amber") 
 {
-	ralgo::amber amber;
+	ralgo::amber<float> amber;
 }

@@ -23,6 +23,8 @@ namespace ralgo
 			state += (in - state) * koeff;
 			return state;
 		}
+
+		void reset(T val) { state = val; }
 	};
 }
 
