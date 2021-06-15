@@ -626,7 +626,7 @@ namespace linalg
     }
 }
 
-namespace std
+/*namespace std
 {
     template<class C, class T> std::basic_ostream<C> & operator << (std::basic_ostream<C> & out, const linalg::vec<T, 1> & v) { return out << '{' << v[0] << '}'; }
     template<class C, class T> std::basic_ostream<C> & operator << (std::basic_ostream<C> & out, const linalg::vec<T, 2> & v) { return out << '{' << v[0] << ',' << v[1] << '}'; }
@@ -638,7 +638,7 @@ namespace std
     template<class C, class T, int M> std::basic_ostream<C> & operator << (std::basic_ostream<C> & out, const linalg::mat<T, M, 3> & m) { return out << '{' << m[0] << ',' << m[1] << ',' << m[2] << '}'; }
     template<class C, class T, int M> std::basic_ostream<C> & operator << (std::basic_ostream<C> & out, const linalg::mat<T, M, 4> & m) { return out << '{' << m[0] << ',' << m[1] << ',' << m[2] << ',' << m[3] << '}'; }
 
-}
+}*/
 
 #include <nos/print.h>
 #include <nos/fprint.h>

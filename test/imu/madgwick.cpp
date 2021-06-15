@@ -5,7 +5,7 @@
 
 double deg(double x) { return x / 180. * M_PI; }
 
-//using namespace linalg::ostream_overloads;
+using linalg::ostream_overloads::operator <<;
 
 TEST_CASE("madgwick")
 {

@@ -6,7 +6,7 @@
 
 using namespace ralgo;
 
-LT_BEGIN_TEST(ralgo_test_suite, sliding_array)
+TEST_CASE("sliding_array")
 {
 	ralgo::sliding_array<double> arr(4);
 	igris::array_view<double> check;
@@ -65,7 +65,3 @@ LT_BEGIN_TEST(ralgo_test_suite, sliding_array)
 	CHECK_EQ(arr.cursor,3);
 
 }
-LT_END_TEST(sliding_array)
-
-
-
