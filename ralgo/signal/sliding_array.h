@@ -29,7 +29,7 @@ namespace ralgo
 		int cursor;
 
 	public:
-		sliding_array(size_t size) : cursor(0)
+		sliding_array(size_t size) : cursor(0), dataarr(nullptr)
 		{
 			resize(size);
 		}
