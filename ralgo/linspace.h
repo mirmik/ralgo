@@ -8,19 +8,19 @@ namespace ralgo
 {
 	template <class V, class C>
 	V bilinear_interpolation(
-		const С & rkoeff, 
+		const C & rkoeff, 
 		const C & ckoeff,
 		const V & lb,
-		const V & rb 
+		const V & rb,
 		const V & lt,
-		const V & rt,
+		const V & rt
 	) 
 	{
 		return 
 			(1-rkoeff)*(1-ckoeff) * lb +
-			(1-rkoeff)*(ckoeff) * rb + 	
-			(rkoeff)*(1-ckoeff) * lb +
-			(rkoeff)*(ckoeff) * rb;
+			(rkoeff)*(1-ckoeff) * rb + 	
+			(1-rkoeff)*(ckoeff) * lt +
+			(rkoeff)*(ckoeff) * rt;
 	}
 
 	template <class A, class B, class K>
