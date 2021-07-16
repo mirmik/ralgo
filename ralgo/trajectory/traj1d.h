@@ -102,7 +102,7 @@ namespace ralgo
 				dcc_part = 0.5;
 			}
 
-			tsdeform_set_time_pattern(
+			tsdeform_set_timestamp_pattern(
 				&spddeform,
 			    acc_part, dcc_part,
 			    0, 0
@@ -117,7 +117,7 @@ namespace ralgo
 			               ralgo::discrete_time_frequency();
 
 			P dist = args->fpos - args->spos;
-			float time = std::fabs(dist) / setted_speed;
+			float time = fabs(dist) / setted_speed;
 
 			if (dist < 0)
 				setted_speed = -setted_speed;
