@@ -115,7 +115,7 @@ namespace heimer
 		{
 			heimer::errcode sts;
 
-			if (sts = parent::command(argc, argv)) 
+			if ((sts = parent::command(argc, argv))) 
 				return sts; 
 
 			return heimer::errcode::UNRESOLVED_COMMAND;

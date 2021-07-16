@@ -11,7 +11,7 @@
 #include <igris/math/deg.h>
 #include <ralgo/linalg/linalg.h>
 
-#include <ralgo/madgwick.h>
+#include <ralgo/imu/madgwick.h>
 
 using namespace ralgo;
 using namespace linalg;
@@ -116,8 +116,8 @@ PYBIND11_MODULE(libralgo, m)
 		.def("update", (void(madgwick::*)(float,float,float,float,float,float,float,float,float))&madgwick::update)
 		.def("update", (void(madgwick::*)(float,float,float,float,float,float))&madgwick::update)
 		.def("update", (void(madgwick::*)(float,float,float))&madgwick::update)
-		.def("quat", (linalg::vec<float,4>(madgwick::*)())&madgwick::quat_copy) 
-		.def("reset", &madgwick::reset)
+		.def("quat", (linalg::vec<float,4>(madgwick::*)())&madgwick::quat) 
+		.def("reset",(void(madgwick::*)())&madgwick::reset)
 		.def("setKoeff", &madgwick::setKoeff)
         .def("getPitchRad", &madgwick::getPitchRad)
         .def("getRollRad", &madgwick::getRollRad)
@@ -170,5 +170,5 @@ PYBIND11_MODULE(libralgo, m)
 */
 
 	// IGRIS
-	m.def("deg", (double(*)(double))&deg );
+	m.def("deg", (double(*)(double))&deg2rad<double> );
 }
