@@ -20,17 +20,22 @@ namespace heimer
 	class command_center_2
 	{
 		std::list<heimer::datanode> datanodes;
-		std::vector<heimer::node *> nodes;		
+		std::vector<heimer::node *> nodes;
 
 	public:
 		datanode * create_datanode(const char * name, int typehint);
-		node * create_node(const char * name, int typehint) { return nullptr; }
+		node * create_node(const char * name, int typehint)
+		{
+			(void) name;
+			(void) typehint;
+			return nullptr;
+		}
 
 		linear_servowf_node * create_linear_servowf_node(
 		    const char * name,
 		    ralgo::matrix_view_co<real> & co,
 		    const igris::array_view<const char *> & lsigs,
-		    const igris::array_view<const char *> & rsigs	
+		    const igris::array_view<const char *> & rsigs
 		);
 
 		bool datanode_is_used(datanode * dn);

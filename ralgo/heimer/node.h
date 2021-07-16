@@ -42,6 +42,8 @@ namespace heimer
 		// Comander interface support:
 		virtual heimer::errcode command(int argc, const char ** argv) 
 		{
+			(void) argc;
+			(void) argv;
 			return errcode::UNRESOLVED_COMMAND;
 		}
 	};
