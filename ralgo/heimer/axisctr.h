@@ -8,6 +8,8 @@
 #include <ralgo/heimer/axis.h>
 #include <ralgo/heimer/protect.h>
 
+#include <nos/fprint.h>
+
 #include <igris/event/delegate.h>
 #include <igris/math.h>
 #include <igris/util/numconvert.h>
@@ -147,7 +149,7 @@ namespace heimer
 			P ctrpos = 0;
 			V ctrspd = 0;
 
-			nos::println(lintraj);
+			//nos::println(lintraj);
 
 			if (curtraj)
 				sts = curtraj->attime(ralgo::discrete_time(), ctrpos, ctrspd);

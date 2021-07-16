@@ -7,7 +7,6 @@
 
 #include <ralgo/trajectory/tsdeform.h>
 #include <ralgo/disctime.h>
-#include <nos/fprint.h>
 
 #include <igris/dprint.h>
 
@@ -209,12 +208,6 @@ namespace ralgo
 			setted_speed = 0;
 
 			tsdeform_set_stop_pattern(&spddeform);
-		}
-
-		ssize_t print_to(nos::ostream& out) const
-		{
-			return nos::fprint_to(out, "stim:{} ftim:{} spos:{} fpos:{} spd:{}",
-			                      stim, ftim, spos, fpos, setted_speed);
 		}
 	};
 }
