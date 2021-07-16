@@ -7,6 +7,8 @@
 #include <ralgo/heimer/control.h>
 #include <assert.h>
 
+#include <nos/print.h>
+
 namespace heimer
 {
 	template <class P, class V>
