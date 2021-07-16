@@ -22,7 +22,7 @@ namespace ralgo
 		    igris::array_view<V> spd
 		) = 0;
 
-		virtual bool is_finished(int64_t time)
+		bool is_finished(int64_t time)
 		{
 			return time > ftim;
 		}

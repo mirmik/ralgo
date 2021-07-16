@@ -49,8 +49,15 @@ namespace ralgo
 	class traj1d
 	{
 	public:
+		int64_t stim = -1;
+		int64_t ftim = 0;
+
+	public:
 		virtual int attime(int64_t time, P& pos, V& spd) = 0;
-		virtual bool is_finished(int64_t time) = 0;
+		bool is_finished(int64_t time)
+		{
+			return time > ftim;
+		}
 	};
 
 
@@ -58,9 +65,8 @@ namespace ralgo
 	class traj1d_line : public traj1d<P, V>
 	{
 	public:
-		int64_t stim = -1;
-		int64_t ftim = 0;
-
+		using traj1d<P, V>::stim;
+		using traj1d<P, V>::ftim;
 		P spos = 0;
 		P fpos = 0;
 
@@ -138,12 +144,6 @@ namespace ralgo
 			    acc_part, dcc_part, 
 			    0, 0,
 			    args->full_spattern);
-		}
-
-
-		bool is_finished(int64_t time) override
-		{
-			return time > ftim;
 		}
 
 		int attime(int64_t time, P& pos, V& spd) override
