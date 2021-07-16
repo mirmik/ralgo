@@ -5,28 +5,12 @@ from licant.cxx_modules import application
 from licant.modules import submodule, module
 from licant.libs import include
 
-licant.include("ralgo")
-licant.include("linalg")
-licant.include("igris")
-
-tests = [
-	"virtdevs"
-]
-
-tests_c = [
-]
+licant.execute("../ralgo.g.py")
 
 application("runtests",
 	sources = [
 		"imu/*",
-		"main.cpp",
-		#"heimer.cpp",
-		#"heimer2.cpp",
-		"traj.cpp",
-		"geom.cpp",
-		"sliding_array.cpp",
-		"magnetometer.cpp",
-
+		"*.cpp",
 		"heimer/*.cpp",
 		"math/*.cpp",
 	],
@@ -34,7 +18,7 @@ application("runtests",
 	ld_flags = "-L/usr/local/lib/",
 
 	include_paths = ["."],
-	mdepends = ["ralgo", "linalg"],
+	mdepends = ["ralgo"],
 	libs = ["igris", "nos"],
 )
 

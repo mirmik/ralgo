@@ -1,5 +1,4 @@
 #include <ralgo/geom/zone_check.h>
-#include <linalg/linalg.h>
 #include <main.h>
 
 using namespace ralgo;

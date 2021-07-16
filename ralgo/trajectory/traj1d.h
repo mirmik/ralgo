@@ -5,7 +5,7 @@
 	@file
 */
 
-#include <ralgo/trajectory/speed_deformer.h>
+#include <ralgo/trajectory/tsdeform.h>
 #include <ralgo/disctime.h>
 #include <nos/fprint.h>
 
@@ -66,9 +66,11 @@ namespace ralgo
 
 		V setted_speed = 0;
 
-	public:
-		ralgo::speed_deformer spddeform;
+	private:
+		struct trajectory_speed_deformer spddeform;
 
+	public:
+	
 		void init_timestamp_mode(
 		    struct traj1d_timestamp_params<P, V> * args)
 		{
@@ -95,8 +97,10 @@ namespace ralgo
 				dcc_part = 0.5;
 			}
 
-			spddeform.set_time_pattern(
-			    acc_part, dcc_part
+			tsdeform_set_time_pattern(
+				&spddeform,
+			    acc_part, dcc_part,
+			    0, 0
 			);
 		}
 
@@ -129,8 +133,10 @@ namespace ralgo
 
 			// Учёт возможного треугольного паттерна осуществляется
 			// здесь:
-			spddeform.set_speed_pattern(
-			    acc_part, dcc_part, 0, 0,
+			tsdeform_set_speed_pattern(
+				&spddeform,
+			    acc_part, dcc_part, 
+			    0, 0,
 			    args->full_spattern);
 		}
 
@@ -157,13 +163,13 @@ namespace ralgo
 
 			assert(!isnan(time_unit));
 
-			auto posmod = spddeform.posmod(time_unit);
-			auto spdmod = spddeform.spdmod(time_unit);
+			auto posmod = tsdeform_posmod(&spddeform, time_unit);
+			auto spdmod = tsdeform_spdmod(&spddeform, time_unit);
 
 			pos = fpos * posmod + spos * (1 - posmod);
 			spd = setted_speed * spdmod * ralgo::discrete_time_frequency();
 
-			return (spddeform.is_finished(time_unit) || stim == ftim) ? 1 : 0;
+			return (tsdeform_is_finished(&spddeform, time_unit) || stim == ftim) ? 1 : 0;
 		}
 
 		void set_stop_trajectory(P curpos, V curspd, V dccval)
@@ -189,7 +195,7 @@ namespace ralgo
 				setted_speed = 0;
 			}
 
-			spddeform.set_stop_pattern();
+			tsdeform_set_stop_pattern(&spddeform);
 		}
 
 		void set_point_hold(P pos)
@@ -202,7 +208,7 @@ namespace ralgo
 
 			setted_speed = 0;
 
-			spddeform.set_stop_pattern();
+			tsdeform_set_stop_pattern(&spddeform);
 		}
 
 		ssize_t print_to(nos::ostream& out) const

@@ -1,10 +1,10 @@
 #include <ralgo/trajectory/traj1d.h>
-#include <ralgo/trajectory/speed_deformer.h>
+//#include <ralgo/trajectory/speed_deformer.h>
 
 #include <igris/math.h>
 #include <main.h>
 
-LT_BEGIN_TEST(ralgo_test_suite, traj_speed_deformer)
+/*LT_BEGIN_TEST(ralgo_test_suite, traj_speed_deformer)
 {
 	ralgo::speed_deformer deform;
 	deform.set_time_pattern(0.2, 0.2);
@@ -20,7 +20,7 @@ LT_BEGIN_TEST(ralgo_test_suite, traj_speed_deformer)
 	CHECK_LT(deform.posmod(1), 1);
 	CHECK_EQ(deform.spdmod(0.5), 1);
 }
-LT_END_TEST(traj_speed_deformer)
+LT_END_TEST(traj_speed_deformer)*/
 
 LT_BEGIN_TEST(ralgo_test_suite, traj_traj1_nominal_speed)
 {
@@ -143,16 +143,3 @@ LT_BEGIN_TEST(ralgo_test_suite, traj_traj1_nominal_speed_mmm)
 }
 LT_END_TEST(traj_traj1_nominal_speed_mmm)
 
-LT_BEGIN_TEST(ralgo_test_suite, traj_traj1_speed_deformer)
-{
-	ralgo::speed_deformer deform;
-
-	deform.set_speed_pattern(0.25, 0.25, 0, 0, true);
-	CHECK(igris::early(deform.x0h, 0.25/12));	
-	CHECK(igris::early(deform.posmod(0.125), 
-		2*(0.125*0.125*0.125)/3/(0.25*0.25)));	
-	CHECK(igris::early(deform.spdmod(0.125), 
-		2*(0.125*0.125)/(0.25*0.25)));	
-
-}
-LT_END_TEST(traj_traj1_nominal_speed_mmm)

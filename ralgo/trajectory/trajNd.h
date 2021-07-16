@@ -2,7 +2,7 @@
 #define RALGO_PLANNING_TRAJ_ND_H
 
 #include <nos/fprint.h>
-#include <ralgo/trajectory/speed_deformer.h>
+#include <ralgo/trajectory/tsdeform.h>
 
 namespace ralgo
 {
@@ -41,7 +41,7 @@ namespace ralgo
 		V setted_speed[Dim];
 
 	public:
-		ralgo::speed_deformer spddeform;
+		struct trajectory_speed_deformer spddeform;
 
 		void set_start_position(int i, P pos)
 		{
@@ -110,8 +110,8 @@ namespace ralgo
 
 			assert(!isnan(time_unit));
 
-			auto posmod = spddeform.posmod(time_unit);
-			auto spdmod = spddeform.spdmod(time_unit);
+			auto posmod = tsdeform_posmod(&spddeform, time_unit);
+			auto spdmod = tsdeform_spdmod(&spddeform, time_unit);
 
 			for (unsigned int i = 0; i < Dim; ++i)
 			{
@@ -119,7 +119,7 @@ namespace ralgo
 				spd[i] = setted_speed[i] * spdmod * ralgo::discrete_time_frequency();
 			}
 
-			return (spddeform.is_finished(time_unit) || stim == ftim) ? 1 : 0;
+			return (tsdeform_is_finished(&spddeform, time_unit) || stim == ftim) ? 1 : 0;
 		}
 
 		void set_speed_pattern(float acc, float dcc,
@@ -141,7 +141,11 @@ namespace ralgo
 
 			//ralgo::speed_deformer::acc_dcc_balance(acc_part, dcc_part);
 
-			spddeform.set_speed_pattern(acc_part, dcc_part, 0, 0, full_spattern);
+			tsdeform_set_speed_pattern(
+				&spddeform, 
+				acc_part, dcc_part, 
+				0, 0, 
+				full_spattern);
 		}
 
 		void set_stop_trajectory(igris::array_view<P> curpos, igris::array_view<V> curspd, V dccval)
@@ -171,7 +175,7 @@ namespace ralgo
 				ralgo::vecops::fill(setted_speed, 0);
 			}
 
-			spddeform.set_stop_pattern();
+			tsdeform_set_stop_pattern(&spddeform);
 		}
 
 		void set_point_hold(igris::array_view<P> curpos)
@@ -184,7 +188,7 @@ namespace ralgo
 
 			ralgo::vecops::fill(setted_speed, 0);
 
-			spddeform.set_stop_pattern();
+			tsdeform_set_stop_pattern(&spddeform);
 		}
 
 
