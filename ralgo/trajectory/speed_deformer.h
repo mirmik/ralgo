@@ -143,7 +143,6 @@ namespace ralgo
 	class speed_deformer
 	{
 	public:
-		static constexpr float t0 = 0;
 		float t01 = 0;
 		float t23 = 0;
 		float t3 = 1;
@@ -151,12 +150,9 @@ namespace ralgo
 		float v0 = 0;
 		float v3 = 0;
 		float v1 = 0;
-		// v2 = v1;
 
-		static constexpr float x0 = 0;
 		float x1 = 0;
 		float x2 = 0;
-		static constexpr float x3 = 1;
 
 		bool full_spattern = false;
 		float t2 = 0;
