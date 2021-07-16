@@ -6,7 +6,7 @@ int tsdeform_is_finished(tsdeform_t * tsd, float t)
 }
 
 /// Вариант движения с увеличением максимальной скорости.
-void tsdeform_set_time_pattern(
+void tsdeform_set_timestamp_pattern(
 	tsdeform_t * tsd, 
 	float t01, 
 	float t23, 

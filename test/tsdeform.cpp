@@ -7,7 +7,7 @@ TEST_CASE("tsdeformer")
 {
 	trajectory_speed_deformer deform;
 
-	tsdeform_set_time_pattern(&deform, 0.2, 0.2, 0, 0);
+	tsdeform_set_timestamp_pattern(&deform, 0.2, 0.2, 0, 0);
 	CHECK(igris::early(deform.v1, 1.25));
 	CHECK(igris::early(deform.t3, 1));
 	CHECK_EQ(tsdeform_posmod(&deform, 1  ), 1);
