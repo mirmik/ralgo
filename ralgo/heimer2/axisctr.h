@@ -37,6 +37,13 @@ struct axis_controller
 
 __BEGIN_DECLS
 
+void axis_controller_init(struct axis_controller * axctr);
+void axis_controller_set_handlers(
+	struct axis_controller * axctr,
+	void * operation_handlers_priv,
+	void (* operation_start_handler)(void * priv, struct axis_controller * ax),
+	void (* operation_finish_handler)(void * priv, struct axis_controller * ax)
+);
 
 void axis_controller_set_gain(struct axis_controller * axctr, double gain);
 
@@ -50,10 +57,13 @@ void axis_controller_set_accdcc_internal(struct axis_controller * axctr, float a
 
 void axis_controller_set_controlled(struct axis_controller * axctr, struct axis_state * state);
 
-void axis_controller_incmove(struct axis_controller * axctr, double dist_real);
-void axis_controller_absmove(struct axis_controller * axctr, double pos_real);
+int axis_controller_incmove(struct axis_controller * axctr, disctime_t current_time, double dist_real);
+int axis_controller_absmove(struct axis_controller * axctr, disctime_t current_time, double pos_real);
 
 void axis_controller_serve(struct axis_controller * axctr, disctime_t time);
+
+float axis_controller_ctrpos_external(struct axis_controller * axctr);
+float axis_controller_ctrvel_external(struct axis_controller * axctr);
 
 __END_DECLS
 
