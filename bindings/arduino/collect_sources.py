@@ -4,12 +4,15 @@ import os
 import shutil
 import glob
 
-shutil.rmtree("src")
+if os.path.exists("src"):
+	shutil.rmtree("src")
 os.makedirs("src/ralgo", exist_ok=True)
 
 PREFIX = "../../ralgo"
 
 SOURCES = [
+	"robo/quadgen4_arduino.c",
+	"heimer2/stepctr.c",
 ]
 
 for path, subdirs, files in os.walk(PREFIX):

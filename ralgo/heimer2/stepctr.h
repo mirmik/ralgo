@@ -2,17 +2,13 @@
 #define RALGO_HEIMER2_STEPCTR_H
 
 #include <stdint.h>
-#include <math.h>
 #include <igris/compiler.h>
-
-#include <ralgo/disctime.h>
 
 #define STEPCTR_OVERRUN -22
 
 struct stepctr_controller
 {
-	void (*dec)(void*);
-	void (*inc)(void*);
+	void (*set_quaddgen_state)(void*, uint8_t);
 	void * incdec_priv;
 
 	int64_t units_in_step;
@@ -20,56 +16,27 @@ struct stepctr_controller
 
 	int64_t control_pos;
 	int64_t virtual_pos;
+
+	uint8_t state;
 };
 
 __BEGIN_DECLS
 
 void stepctr_controller_init(
 	struct stepctr_controller * ctr,
+	void (*set_quaddgen_state)(void*, uint8_t),
+	void * priv,
 	int64_t units_in_step,
 	float trigger_level
-)
-{
-	ctr -> units_in_step = units_in_step;
-	ctr -> units_in_step_triggered = trigger_level * units_in_step;
+);
 
-	ctr->control_pos = 0;
-	ctr->virtual_pos = 0; 
-}
+void stepctr_controller_set_position(struct stepctr_controller * ctr, int64_t pos);
 
-void stepctr_controller_set_position(struct stepctr_controller * ctr, int64_t pos) 
-{
-	ctr->control_pos = ctr->virtual_pos = pos;
-}
+void stepctr_controller_inc(struct stepctr_controller * ctr);
 
-int stepctr_controller_shift(struct stepctr_controller * ctr, int64_t shift)
-{
-	if (abs(shift) >= ctr->units_in_step)
-		return STEPCTR_OVERRUN;
+void stepctr_controller_dec(struct stepctr_controller * ctr);
 
-	ctr->virtual_pos += shift;
-	int64_t diffpos = ctr->virtual_pos - ctr->control_pos;
-
-	if (diffpos > 0)
-	{
-		if (diffpos > ctr->units_in_step_triggered)
-		{
-			ctr->inc(ctr->incdec_priv);
-			ctr->control_pos += ctr->units_in_step;
-		}
-	}
-
-	else
-	{
-		if (diffpos < -ctr->units_in_step_triggered)
-		{
-			ctr->dec(ctr->incdec_priv);
-			ctr->control_pos -= ctr->units_in_step;
-		}
-	}
-
-	return 0;
-}
+int stepctr_controller_shift(struct stepctr_controller * ctr, int64_t shift);
 
 int stepctr_controller_speed_apply(struct stepctr_controller * ctr, 
 	float speed, 
@@ -78,11 +45,7 @@ int stepctr_controller_speed_apply(struct stepctr_controller * ctr,
 		// чтобы можно было передавать интервалы времени
 		// меньше disctime
 
-) 
-{
-	int64_t shift = speed * delta;
-	return stepctr_controller_shift(ctr, shift);
-}
+);
 
 __END_DECLS
 

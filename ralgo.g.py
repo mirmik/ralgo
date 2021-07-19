@@ -16,6 +16,9 @@ licant.module("ralgo",
 		#"ralgo/heimer/control.cpp",
 		#"ralgo/heimer/command_center.cpp"
 		"ralgo/trajectory/tsdeform.c",
+
+		"ralgo/heimer2/stepctr.c",
+		"ralgo/robo/quadgen4_arduino.c",
 	],
 	include_paths=["."],
 	mdepends=[
