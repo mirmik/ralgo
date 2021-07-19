@@ -16,6 +16,10 @@ licant.module("ralgo",
 		#"ralgo/heimer/control.cpp",
 		#"ralgo/heimer/command_center.cpp"
 		"ralgo/trajectory/tsdeform.c",
+		"ralgo/trajectory/trajectory.c",
+		"ralgo/trajectory/linetraj.c",
+		"ralgo/heimer2/axisctr.c",
+		"ralgo/heimer2/stepctr.c",
 	],
 	include_paths=["."],
 	mdepends=[
