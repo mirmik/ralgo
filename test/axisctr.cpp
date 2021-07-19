@@ -12,6 +12,7 @@ TEST_CASE("axisctr")
 	axis_controller_set_limits_external(&axctr, -100, 100);
 
 	axis_controller_set_controlled(&axctr, &state);
+	axis_controller_incmove(100);
 
 	axis_controller_serve(&axctr, 0);
 }
