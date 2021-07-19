@@ -1,7 +1,6 @@
 #ifndef RALGO_TRAJECTORY_H
 #define RALGO_TRAJECTORY_H
 
-#include <ralgo/heimer2/phase.h>
 #include <ralgo/trajectory/tsdeform.h>
 #include <ralgo/disctime.h>
 
