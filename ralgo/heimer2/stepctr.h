@@ -2,17 +2,13 @@
 #define RALGO_HEIMER2_STEPCTR_H
 
 #include <stdint.h>
-#include <math.h>
 #include <igris/compiler.h>
-
-#include <ralgo/disctime.h>
 
 #define STEPCTR_OVERRUN -22
 
 struct stepctr_controller
 {
-	void (*dec)(void*);
-	void (*inc)(void*);
+	void (*set_quaddgen_state)(void*, uint8_t);
 	void * incdec_priv;
 
 	int64_t units_in_step;
@@ -20,17 +16,25 @@ struct stepctr_controller
 
 	int64_t control_pos;
 	int64_t virtual_pos;
+
+	uint8_t state;
 };
 
 __BEGIN_DECLS
 
 void stepctr_controller_init(
 	struct stepctr_controller * ctr,
+	void (*set_quaddgen_state)(void*, uint8_t),
+	void * priv,
 	int64_t units_in_step,
 	float trigger_level
 );
 
 void stepctr_controller_set_position(struct stepctr_controller * ctr, int64_t pos);
+
+void stepctr_controller_inc(struct stepctr_controller * ctr);
+
+void stepctr_controller_dec(struct stepctr_controller * ctr);
 
 int stepctr_controller_shift(struct stepctr_controller * ctr, int64_t shift);
 
