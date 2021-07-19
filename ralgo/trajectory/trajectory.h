@@ -7,7 +7,7 @@
 
 typedef int (* trajectory_attime_t) (
     void * priv,
-    disctime_t timestamp, struct control_phase * outs);
+    disctime_t timestamp, int64_t * outpos, float * outspd);
 
 struct trajectory 
 {

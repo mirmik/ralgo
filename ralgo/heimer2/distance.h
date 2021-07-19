@@ -10,9 +10,7 @@
 #include <igris/compiler.h>
 #include <stdint.h>
 
-#define DISTANCE_SHIFT (32) // 2**32 == 4294967296
-#define DISTANCE_LOPART (0x00000000FFFFFFFFULL) 
-#define DISTANCE_HIPART (0xFFFFFFFF00000000ULL) 
+#define DISTANCE_SHIFT (24)
 
 #define DISTANCE_MULTIPLIER (1LL << DISTANCE_SHIFT)
 
