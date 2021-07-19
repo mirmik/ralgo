@@ -4,14 +4,18 @@
 TEST_CASE("line trajectory") 
 {
 	struct line_trajectory ltraj;
-	struct control_phase phase;
+	int64_t pos;
+	float   vel;
 
+	int64_t spos_buffer;
+	int64_t fpos_buffer;
 	int64_t spos = 300;
 	int64_t fpos = 400;
 
+	line_trajectory_init(&ltraj, 1, &spos, &fpos);
+
 	line_trajectory_init_nominal_speed(
 		&ltraj,
-		1,
 		0,
 		100,
 		&spos,
@@ -21,15 +25,15 @@ TEST_CASE("line trajectory")
 		false
 	);
 
-	line_trajectory_attime((void*)&ltraj, 0, &phase);
-	CHECK_EQ(phase.pos, 300);
-	CHECK_EQ(phase.spd, 0);
+	line_trajectory_attime((void*)&ltraj, 0, &pos, &vel);
+	CHECK_EQ(pos, 300);
+	CHECK_EQ(vel, 0);
 
-	line_trajectory_attime((void*)&ltraj, 120, &phase);
-	CHECK_EQ(phase.pos, 400);
-	CHECK_EQ(phase.spd, 0);
+	line_trajectory_attime((void*)&ltraj, 120, &pos, &vel);
+	CHECK_EQ(pos, 400);
+	CHECK_EQ(vel, 0);
 
-	line_trajectory_attime((void*)&ltraj, 55, &phase);
-	CHECK_EQ(phase.pos, 350);
-	CHECK_EQ(phase.spd, 1);
+	line_trajectory_attime((void*)&ltraj, 55, &pos, &vel);
+	CHECK_EQ(pos, 350);
+	CHECK_EQ(vel, 1);
 }
