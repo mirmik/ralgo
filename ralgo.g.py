@@ -20,6 +20,7 @@ licant.module("ralgo",
 		"ralgo/trajectory/linetraj.c",
 		"ralgo/heimer2/axisctr.c",
 		"ralgo/heimer2/stepctr.c",
+		"ralgo/robo/quadgen4_arduino.c",
 	],
 	include_paths=["."],
 	mdepends=[
