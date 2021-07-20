@@ -201,7 +201,7 @@ float axis_controller_ctrvel_external(struct axis_controller * axctr)
 	return axctr->controlled->ctrvel * discrete_time_frequency() / DISTANCE_MULTIPLIER / axctr->gain;
 }
 
-struct axis_controller * create_axis_controller(struct axis_controller * axctr, const char * name)
+struct axis_controller * create_axis_controller(const char * name)
 {
 	struct axis_controller * ptr = (struct axis_controller *) malloc(sizeof(struct axis_controller));
 	axis_controller_init(ptr, name);
