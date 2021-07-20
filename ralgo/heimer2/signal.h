@@ -21,6 +21,12 @@ void signal_head_init(struct signal_head * sig, const char * name);
 void signal_head_get(struct signal_head * sig);
 void signal_head_put(struct signal_head * sig);
 
+int heimer_signals_count();
+
+void signal_head_list_reinit();
+
+int heimer_command_signals(int argc, char ** argv, char * output);
+
 __END_DECLS
 
 #endif

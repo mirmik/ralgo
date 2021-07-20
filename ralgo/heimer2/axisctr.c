@@ -3,18 +3,19 @@
 
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-const struct signal_processor_operations axisctr_ops = 
+const struct signal_processor_operations axisctr_ops =
 {
 	.serve = axis_controller_serve
 };
 
 void axis_controller_set_handlers(
-	struct axis_controller * axctr,
-	void * operation_handlers_priv,
-	void (* operation_start_handler)(void * priv, struct axis_controller * ax),
-	void (* operation_finish_handler)(void * priv, struct axis_controller * ax)
-) 
+    struct axis_controller * axctr,
+    void * operation_handlers_priv,
+    void (* operation_start_handler)(void * priv, struct axis_controller * ax),
+    void (* operation_finish_handler)(void * priv, struct axis_controller * ax)
+)
 {
 	axctr->operation_handlers_priv = operation_handlers_priv;
 	axctr->operation_start_handler = operation_start_handler;
@@ -107,7 +108,7 @@ void axis_controller_finish_trajectory(struct axis_controller * axctr, disctime_
 
 void axis_controller_serve(struct signal_processor * sigproc, disctime_t time)
 {
-	struct axis_controller * axctr =  mcast_out(sigproc, struct axis_controller, sigproc); 
+	struct axis_controller * axctr =  mcast_out(sigproc, struct axis_controller, sigproc);
 	int64_t ctrpos;
 	float   ctrvel;
 
@@ -135,7 +136,7 @@ int __axis_controller_absmove(
     int64_t tgtpos)
 {
 	int64_t dist = tgtpos - curpos;
-	disctime_t tgttim = curtim + (float)(ABS(dist)) / axctr->vel; 
+	disctime_t tgttim = curtim + (float)(ABS(dist)) / axctr->vel;
 
 	if (dist == 0 || axctr->vel == 0)
 	{
@@ -190,12 +191,19 @@ int axis_controller_absmove(struct axis_controller * axctr, disctime_t current_t
 	return __axis_controller_absmove(axctr, current_time, curpos, tgtpos);
 }
 
-float axis_controller_ctrpos_external(struct axis_controller * axctr) 
+float axis_controller_ctrpos_external(struct axis_controller * axctr)
 {
 	return  distance_fixed_to_float(axctr->controlled->ctrpos) / axctr->gain;
 }
 
-float axis_controller_ctrvel_external(struct axis_controller * axctr) 
+float axis_controller_ctrvel_external(struct axis_controller * axctr)
 {
 	return axctr->controlled->ctrvel * discrete_time_frequency() / DISTANCE_MULTIPLIER / axctr->gain;
+}
+
+struct axis_controller * create_axis_controller(struct axis_controller * axctr, const char * name)
+{
+	struct axis_controller * ptr = (struct axis_controller *) malloc(sizeof(struct axis_controller));
+	axis_controller_init(ptr, name);
+	return ptr;
 }
