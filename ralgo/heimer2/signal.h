@@ -25,8 +25,6 @@ int heimer_signals_count();
 
 void signal_head_list_reinit();
 
-int heimer_command_signals(int argc, char ** argv, char * output);
-
 __END_DECLS
 
 #endif
