@@ -4,6 +4,11 @@
 #include <stddef.h>
 #include <stdio.h>
 
+const struct signal_processor_operations axisctr_ops = 
+{
+	.serve = axis_controller_serve
+};
+
 void axis_controller_set_handlers(
 	struct axis_controller * axctr,
 	void * operation_handlers_priv,
@@ -17,8 +22,10 @@ void axis_controller_set_handlers(
 }
 
 
-void axis_controller_init(struct axis_controller * axctr)
+void axis_controller_init(struct axis_controller * axctr, const char * name)
 {
+	signal_processor_init(&axctr->sigproc, name, &axisctr_ops);
+
 	axctr->vel = 0;
 	axctr->acc = 0;
 	axctr->dcc = 0;
@@ -86,6 +93,8 @@ void axis_controller_set_limits_external(struct axis_controller * axctr, double 
 void axis_controller_set_controlled(struct axis_controller * axctr, struct axis_state * state)
 {
 	axctr->controlled = state;
+
+	signal_head_get(&axctr->controlled->sig);
 }
 
 void axis_controller_finish_trajectory(struct axis_controller * axctr, disctime_t time, int64_t ctrpos)
@@ -96,8 +105,9 @@ void axis_controller_finish_trajectory(struct axis_controller * axctr, disctime_
 	axctr->curtraj = &axctr->lintraj.traj;
 }
 
-void axis_controller_serve(struct axis_controller * axctr, disctime_t time)
+void axis_controller_serve(struct signal_processor * sigproc, disctime_t time)
 {
+	struct axis_controller * axctr =  mcast_out(sigproc, struct axis_controller, sigproc); 
 	int64_t ctrpos;
 	float   ctrvel;
 

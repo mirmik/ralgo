@@ -1,0 +1,26 @@
+#ifndef RALGO_HEIMER_SIGNAL_H
+#define RALGO_HEIMER_SIGNAL_H
+
+#include <igris/compiler.h>
+#include <igris/datastruct/dlist.h>
+
+#define SIGNAL_NAME_MAX_LENGTH 8
+
+struct signal_head
+{
+	struct dlist_head signal_list_lnk;
+	char name[SIGNAL_NAME_MAX_LENGTH];
+
+	int16_t refs;
+};
+
+__BEGIN_DECLS
+
+void signal_head_init(struct signal_head * sig, const char * name);
+
+void signal_head_get(struct signal_head * sig);
+void signal_head_put(struct signal_head * sig);
+
+__END_DECLS
+
+#endif
