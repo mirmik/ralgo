@@ -6,8 +6,12 @@
 #include <ralgo/trajectory/linetraj.h>
 #include <ralgo/disctime.h>
 
+#include <ralgo/heimer2/signal_processor.h>
+
 struct axis_controller 
 {
+	struct signal_processor sigproc;
+
 	float vel; // скорость в единицах  
 	float acc; 
 	float dcc;
@@ -37,7 +41,7 @@ struct axis_controller
 
 __BEGIN_DECLS
 
-void axis_controller_init(struct axis_controller * axctr);
+void axis_controller_init(struct axis_controller * axctr, const char * name);
 void axis_controller_set_handlers(
 	struct axis_controller * axctr,
 	void * operation_handlers_priv,
@@ -60,7 +64,7 @@ void axis_controller_set_controlled(struct axis_controller * axctr, struct axis_
 int axis_controller_incmove(struct axis_controller * axctr, disctime_t current_time, double dist_real);
 int axis_controller_absmove(struct axis_controller * axctr, disctime_t current_time, double pos_real);
 
-void axis_controller_serve(struct axis_controller * axctr, disctime_t time);
+void axis_controller_serve(struct signal_processor * sigproc, disctime_t time);
 
 float axis_controller_ctrpos_external(struct axis_controller * axctr);
 float axis_controller_ctrvel_external(struct axis_controller * axctr);
