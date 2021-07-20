@@ -69,6 +69,8 @@ void axis_controller_serve(struct signal_processor * sigproc, disctime_t time);
 float axis_controller_ctrpos_external(struct axis_controller * axctr);
 float axis_controller_ctrvel_external(struct axis_controller * axctr);
 
+struct axis_controller * create_axis_controller(struct axis_controller * axctr, const char * name);
+
 __END_DECLS
 
 #endif

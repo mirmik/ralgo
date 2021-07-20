@@ -37,6 +37,12 @@ void signal_processor_deinit(
 void signal_processor_feedback(struct signal_processor * processor, disctime_t time);
 void signal_processor_serve(struct signal_processor * processor, disctime_t time);
 
+int heimer_signal_processors_count();
+
+void signal_processors_list_reinit();
+
+int heimer_command_signal_processors(int argc, char ** argv, char * output);
+
 __END_DECLS
 
 #endif

@@ -19,11 +19,9 @@ struct axis_state
 
 __BEGIN_DECLS
 
-static inline
-void axis_state_init(struct axis_state * state, char * name) 
-{
-	signal_head_init(&state->sig, name);
-}
+void axis_state_init(struct axis_state * state, const char * name);
+
+struct axis_state * create_axis_state(const char * name);
 
 __END_DECLS
 
