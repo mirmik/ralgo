@@ -9,10 +9,12 @@ DLIST_HEAD(signals_list);
 void signal_head_init(
 	struct signal_head * sig, 
 	const char * name, 
+	uint8_t type,
 	const struct signal_head_operations * ops)
 {
 	sig->refs = 0;
 	sig->ops = ops;
+	sig->type = type;
 	strncpy(sig->name, name, SIGNAL_NAME_MAX_LENGTH);
 	dlist_add_tail(&sig->signal_list_lnk, &signals_list);
 }
@@ -37,7 +39,7 @@ void signal_head_list_reinit()
 	dlist_init(&signals_list);
 }
 
-struct signal_head * signals_get_by_name(const char * name)
+struct signal_head * signal_get_by_name(const char * name)
 {
 	struct signal_head * sig;
 	dlist_for_each_entry(sig, &signals_list, signal_list_lnk)

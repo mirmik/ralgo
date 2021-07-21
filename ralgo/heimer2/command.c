@@ -78,7 +78,7 @@ int signal_head_command_new(int argc, char ** argv, char * output, int maxsize)
 int heimer_command_signals(int argc, char ** argv, char * output, int maxsize) 
 {
 	char * signame = argv[0];
-	struct signal_head * sig = signals_get_by_name(signame);
+	struct signal_head * sig = signal_get_by_name(signame);
 
 	if (sig == NULL) 
 	{

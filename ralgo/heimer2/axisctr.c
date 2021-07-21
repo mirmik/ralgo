@@ -1,14 +1,12 @@
 #include <ralgo/heimer2/axisctr.h>
+#include <ralgo/heimer2/sigtypes.h>
 #include <igris/math.h>
+#include <igris/util/bug.h>
 
+#include <string.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-const struct signal_processor_operations axisctr_ops =
-{
-	.serve = axis_controller_serve
-};
 
 void axis_controller_set_handlers(
     struct axis_controller * axctr,
@@ -20,36 +18,6 @@ void axis_controller_set_handlers(
 	axctr->operation_handlers_priv = operation_handlers_priv;
 	axctr->operation_start_handler = operation_start_handler;
 	axctr->operation_finish_handler = operation_finish_handler;
-}
-
-
-void axis_controller_init(struct axis_controller * axctr, const char * name)
-{
-	signal_processor_init(&axctr->sigproc, name, &axisctr_ops);
-
-	axctr->vel = 0;
-	axctr->acc = 0;
-	axctr->dcc = 0;
-
-	axctr->gain = 0;
-
-	axctr->backlim = 0;
-	axctr->forwlim = 0;
-
-	axctr->operation_finished_flag = 0;
-
-	axctr->operation_start_handler = NULL;
-	axctr->operation_finish_handler = NULL;
-	axctr->operation_handlers_priv = NULL;
-
-	axctr->spattern_enabled = 0;
-	axctr->curtraj = NULL;
-	axctr->controlled = NULL;
-
-	line_trajectory_init(&axctr->lintraj, 1,
-	                     &axctr->_line_trajectory_spos,
-	                     &axctr->_line_trajectory_fpos
-	                    );
 }
 
 void axis_controller_set_gain(struct axis_controller * axctr, double gain)
@@ -104,6 +72,11 @@ void axis_controller_finish_trajectory(struct axis_controller * axctr, disctime_
 	axctr->operation_finish_handler(axctr->operation_handlers_priv, axctr);
 	line_trajectory_set_point_hold(&axctr->lintraj, time, &ctrpos);
 	axctr->curtraj = &axctr->lintraj.traj;
+}
+
+void axis_controller_feedback(struct signal_processor * sigproc, disctime_t time)
+{
+	BUG();
 }
 
 void axis_controller_serve(struct signal_processor * sigproc, disctime_t time)
@@ -196,6 +169,11 @@ float axis_controller_ctrpos_external(struct axis_controller * axctr)
 	return  distance_fixed_to_float(axctr->controlled->ctrpos) / axctr->gain;
 }
 
+float axis_controller_feedpos_external(struct axis_controller * axctr)
+{
+	return  distance_fixed_to_float(axctr->controlled->feedpos) / axctr->gain;
+}
+
 float axis_controller_ctrvel_external(struct axis_controller * axctr)
 {
 	return axctr->controlled->ctrvel * discrete_time_frequency() / DISTANCE_MULTIPLIER / axctr->gain;
@@ -206,4 +184,56 @@ struct axis_controller * create_axis_controller(const char * name)
 	struct axis_controller * ptr = (struct axis_controller *) malloc(sizeof(struct axis_controller));
 	axis_controller_init(ptr, name);
 	return ptr;
+}
+
+void axis_controller_release_controlled(struct axis_controller * axctr)
+{
+	if (axctr->controlled)
+	{
+		signal_head_put(&axctr->controlled->sig);
+		axctr ->controlled = NULL;
+	}
+}
+
+void axis_controller_deinit(struct signal_processor * sigproc)
+{
+	struct axis_controller * axctr = mcast_out(sigproc, struct axis_controller, sigproc);
+	axis_controller_release_controlled(axctr);
+}
+
+const struct signal_processor_operations axisctr_ops =
+{
+	.feedback = axis_controller_feedback,
+	.serve = axis_controller_serve,
+	.command = axis_controller_command,
+	.deinit = axis_controller_deinit
+};
+
+void axis_controller_init(struct axis_controller * axctr, const char * name)
+{
+	signal_processor_init(&axctr->sigproc, name, &axisctr_ops);
+
+	axctr->vel = 0;
+	axctr->acc = 0;
+	axctr->dcc = 0;
+
+	axctr->gain = 0;
+
+	axctr->backlim = 0;
+	axctr->forwlim = 0;
+
+	axctr->operation_finished_flag = 0;
+
+	axctr->operation_start_handler = NULL;
+	axctr->operation_finish_handler = NULL;
+	axctr->operation_handlers_priv = NULL;
+
+	axctr->spattern_enabled = 0;
+	axctr->curtraj = NULL;
+	axctr->controlled = NULL;
+
+	line_trajectory_init(&axctr->lintraj, 1,
+	                     &axctr->_line_trajectory_spos,
+	                     &axctr->_line_trajectory_fpos
+	                    );
 }

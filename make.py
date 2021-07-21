@@ -22,7 +22,7 @@ licant.cxx_shared_library("libralgo.so",
 		"ralgo"
 	],
 	cxx_flags="-fPIC",
-	cc_flags="-fPIC",
+	cc_flags="-fPIC -Werror=implicit-function-declaration",
 	libs=["igris", "nos"]
 )
 

@@ -10,8 +10,10 @@ struct signal_processor;
 
 struct signal_processor_operations 
 {	
-	void (* feedback)(struct signal_processor *, disctime_t);
-	void (* serve)(struct signal_processor *, disctime_t);
+	void (* feedback)(struct signal_processor * proc, disctime_t time);
+	void (* serve)(struct signal_processor * proc, disctime_t time);
+	int  (* command)(struct signal_processor * proc, int argc, char ** argv, char * output, int outmax);
+	void (* deinit)(struct signal_processor *proc);
 };
 
 struct signal_processor 
