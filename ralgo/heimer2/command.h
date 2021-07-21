@@ -8,11 +8,11 @@
 
 __BEGIN_DECLS
 
-int heimer_command_signal_processors(int argc, char ** argv, char * output);
-int heimer_command_signals(int argc, char ** argv, char * output);
-int heimer_command(int argc, char ** argv, char * output);
+int heimer_command_signal_processors(int argc, char ** argv, char * output, int maxsize);
+int heimer_command_signals(int argc, char ** argv, char * output, int maxsize);
+int heimer_command(int argc, char ** argv, char * output, int maxsize);
 
-int heimer_command_exec_safe(const char * str, char * output);
+int heimer_command_exec_safe(const char * str, char * output, int maxsize);
 
 void heimer_system_init();
 

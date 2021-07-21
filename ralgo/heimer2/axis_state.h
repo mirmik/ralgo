@@ -14,12 +14,14 @@ struct axis_state
 	float   ctrvel; /// Сигнал управления по скорости.
 
 	int64_t feedpos; /// Данные нижнего уровня о позиции
-	float   feedspd; /// Данные нижнего уровня о скорости
+	float   feedvel; /// Данные нижнего уровня о скорости
 };
 
 __BEGIN_DECLS
 
 void axis_state_init(struct axis_state * state, const char * name);
+
+int axis_state_info(struct signal_head * sig, char * data, int maxsize);
 
 struct axis_state * create_axis_state(const char * name);
 
