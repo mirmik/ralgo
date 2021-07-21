@@ -41,7 +41,7 @@ int heimer_signal_processors_count();
 
 void signal_processors_list_reinit();
 
-int heimer_command_signal_processors(int argc, char ** argv, char * output);
+int heimer_command_signal_processors(int argc, char ** argv, char * output,int maxsize);
 
 __END_DECLS
 

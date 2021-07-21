@@ -15,8 +15,8 @@ application("runtests",
 		"math/*.cpp",
 	],
 
-	cxx_flags = "",
-	cc_flags = "",
+	cxx_flags = "-g",
+	cc_flags = "-g",
 	ld_flags = "-L/usr/local/lib/",
 
 	include_paths = ["."],
