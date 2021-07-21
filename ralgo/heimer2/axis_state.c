@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <ralgo/heimer2/sigtypes.h>
+
 int axis_state_info(struct signal_head * sig, char * data, int maxsize) 
 {
 	struct axis_state * s = mcast_out(sig, struct axis_state, sig);
@@ -16,7 +18,7 @@ const struct signal_head_operations axis_state_ops = {
 
 void axis_state_init(struct axis_state * state, const char * name) 
 {
-	signal_head_init(&state->sig, name, & axis_state_ops);
+	signal_head_init(&state->sig, name, SIGNAL_TYPE_AXIS_STATE, &axis_state_ops);
 	state->ctrpos = state->ctrvel = state->feedpos = state->feedvel = 0;
 }
 

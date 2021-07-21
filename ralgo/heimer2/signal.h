@@ -17,6 +17,7 @@ struct signal_head
 {
 	struct dlist_head signal_list_lnk;
 	char name[SIGNAL_NAME_MAX_LENGTH];
+	uint8_t type;
 
 	const struct signal_head_operations * ops;
 	int16_t refs;
@@ -26,7 +27,8 @@ __BEGIN_DECLS
 
 void signal_head_init(
 	struct signal_head * sig, 
-	const char * name, 
+	const char * name,
+	uint8_t type, 
 	const struct signal_head_operations * ops
 );
 
@@ -37,7 +39,7 @@ int heimer_signals_count();
 
 void signal_head_list_reinit();
 
-struct signal_head * signals_get_by_name(const char * name);
+struct signal_head * signal_get_by_name(const char * name);
 int signal_command_v(struct signal_head * head, int argc, char ** argv, char * output, int maxsize);
 
 __END_DECLS

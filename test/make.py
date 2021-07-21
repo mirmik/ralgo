@@ -16,7 +16,7 @@ application("runtests",
 	],
 
 	cxx_flags = "-g",
-	cc_flags = "-g",
+	cc_flags = "-g -Werror=incompatible-pointer-types",
 	ld_flags = "-L/usr/local/lib/",
 
 	include_paths = ["."],
