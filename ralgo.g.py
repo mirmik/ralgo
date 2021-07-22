@@ -28,6 +28,9 @@ licant.module("ralgo",
 		"ralgo/heimer2/axis_state.c",
 		#"ralgo/heimer2/axstate_linear_processor.c",
 		"ralgo/robo/quadgen4_arduino.c",
+
+		"ralgo/clinalg/*.cpp",
+		"ralgo/clinalg/*.c",
 	],
 	include_paths=["."],
 	mdepends=[
@@ -35,7 +38,7 @@ licant.module("ralgo",
 		"ralgo.log",
 		"ralgo.disctime",
 		"ralgo.heimer",
-		"f2clib.internal",
+		#"f2clib.internal",
 		#"blas.internal",
 		#"lapack.internal",
 	],
@@ -88,7 +91,7 @@ licant.module("f2clib.internal",
 		"ralgo/compat/install/dlamch.c",
 	
 	],
-	defines = ["INTEGER_STAR_8=1", "IEEE_COMPLEX_DIVIDE=1"],
+	defines = ["IEEE_COMPLEX_DIVIDE=1"],
 	include_paths=["ralgo/compat/include"]
 )
 
