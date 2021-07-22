@@ -19,7 +19,7 @@ int matops_square_inverse_d(double * data, int n, int stride, double * out)
 } 
 
 
-void matops_multiply_frr(float* a, int n, int k, int m, float * b, float *c) 
+void matops_multiply_frrr(float* a, int n, int k, int m, float * b, float *c) 
 {
 	ralgo::matrix_view_ro<float> A(a, n, k);
 	ralgo::matrix_view_ro<float> B(b, k, m);

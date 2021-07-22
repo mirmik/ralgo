@@ -14,7 +14,7 @@ __BEGIN_DECLS
 int matops_square_inverse_f(float * data,  int n, int stride, float * out);
 int matops_square_inverse_d(double * data, int n, int stride, double * out);
 
-void matops_multiply_frr(float* a, int n, int k, int m, float * b, float *c);
+void matops_multiply_frrr(float* a, int n, int k, int m, float * b, float *c);
 
 __END_DECLS
 

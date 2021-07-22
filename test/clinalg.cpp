@@ -43,7 +43,7 @@ TEST_CASE("clinalg.matops_multiply_frr")
 	float b[4] = { 2, 0, 0, 2 } ; 
 	float c[4];
 
-	matops_multiply_frr(a, 2, 2, 2, b, c);
+	matops_multiply_frrr(a, 2, 2, 2, b, c);
 
 	CHECK_EQ(c[0], 2);
 	CHECK_EQ(c[1], 0);
