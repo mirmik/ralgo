@@ -143,21 +143,6 @@ namespace ralgo
 	}
 	/*
 		template <typename M>
-		void SVD<M>::solve(const mroot<M> &b, mroot<M> &x, type_t<M> thresh)
-		{
-			int i, j, p = b.ncols();
-			if (b.nrows() != m || x.nrows() != n || x.ncols() != p)
-				throw("SVD::solve bad sizes");
-			vector_t<M> xx(n), bcol(m);
-			for (j = 0; j < p; j++)
-			{
-				for (i = 0; i < m; i++) bcol[i] = b[i][j];
-				solve(bcol, xx, thresh);
-				for (i = 0; i < n; i++) x[i][j] = xx[i];
-			}
-		}
-
-		template <typename M>
 		int SVD<M>::rank(type_t<M> thresh)
 		{
 			int j, nr = 0;
