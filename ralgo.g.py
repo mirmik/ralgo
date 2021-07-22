@@ -26,7 +26,7 @@ licant.module("ralgo",
 		"ralgo/heimer2/signal.c",
 		"ralgo/heimer2/command.c",
 		"ralgo/heimer2/axis_state.c",
-		"ralgo/heimer2/axstate_linear_processor.c",
+		#"ralgo/heimer2/axstate_linear_processor.c",
 		"ralgo/robo/quadgen4_arduino.c",
 	],
 	include_paths=["."],
@@ -35,6 +35,9 @@ licant.module("ralgo",
 		"ralgo.log",
 		"ralgo.disctime",
 		"ralgo.heimer",
+		"f2clib.internal",
+		#"blas.internal",
+		#"lapack.internal",
 	],
 )
 
@@ -49,6 +52,60 @@ licant.module("ralgo.heimer",
 		"ralgo/heimer/signal.cpp",
 		"ralgo/heimer/command_center_console.cpp"
 	])
+
+
+licant.module("f2clib.internal",
+	sources = [
+		"ralgo/compat/f2clib/c_*.c",
+		"ralgo/compat/f2clib/d_*.c",
+		"ralgo/compat/f2clib/r_*.c",
+		"ralgo/compat/f2clib/z_*.c",
+		"ralgo/compat/f2clib/i_*.c",
+		"ralgo/compat/f2clib/s_*.c",
+		"ralgo/compat/f2clib/cabs.c",
+		"ralgo/compat/f2clib/f77_aloc.c",
+		"ralgo/compat/f2clib/pow_ri.c",
+		"ralgo/compat/f2clib/pow_di.c",
+		"ralgo/compat/f2clib/pow_ii.c",
+		"ralgo/compat/f2clib/pow_ci.c",
+		"ralgo/compat/f2clib/pow_dd.c",
+		"ralgo/compat/f2clib/pow_zi.c",
+		"ralgo/compat/f2clib/fmt.c",
+		"ralgo/compat/f2clib/sfe.c",
+		"ralgo/compat/f2clib/err.c",
+		"ralgo/compat/f2clib/open.c",
+		"ralgo/compat/f2clib/close.c",
+		"ralgo/compat/f2clib/util.c",
+		"ralgo/compat/f2clib/wsfe.c",
+		"ralgo/compat/f2clib/wrtfmt.c",
+		"ralgo/compat/f2clib/wref.c",
+		"ralgo/compat/f2clib/fmtlib.c",
+		"ralgo/compat/f2clib/ctype.c",
+		"ralgo/compat/f2clib/sig_die.c",
+		"ralgo/compat/lapack/*.c",
+		"ralgo/compat/blas/*.c",
+		"ralgo/compat/install/slamch.c",
+		"ralgo/compat/install/dlamch.c",
+	
+	],
+	defines = ["INTEGER_STAR_8=1", "IEEE_COMPLEX_DIVIDE=1"],
+	include_paths=["ralgo/compat/include"]
+)
+
+
+#licant.module("blas.internal",
+#	sources = [
+#		"ralgo/compat/blas/*.c",
+#	],
+#	include_paths=["ralgo/compat/include"]
+#)
+
+#licant.module("lapack.internal",
+#	sources = [
+#		"ralgo/compat/lapack/*.c",
+#	],
+#	include_paths=["ralgo/compat/include"]
+#)
 
 #licant.module("ralgo.virtdevs", 
 #	mdepends=["ralgo.include"],
