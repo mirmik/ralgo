@@ -30,6 +30,8 @@ void axstate_linear_processor_init(
     float * invert_matrix
 );
 
+void axstate_linear_processor_evaluate_invertion(struct axstate_linear_processor * lproc);
+
 __END_DECLS
 
 #endif

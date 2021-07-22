@@ -26,7 +26,7 @@ licant.module("ralgo",
 		"ralgo/heimer2/signal.c",
 		"ralgo/heimer2/command.c",
 		"ralgo/heimer2/axis_state.c",
-		#"ralgo/heimer2/axstate_linear_processor.c",
+		"ralgo/heimer2/axstate_linear_processor.c",
 		"ralgo/robo/quadgen4_arduino.c",
 
 		"ralgo/clinalg/*.cpp",

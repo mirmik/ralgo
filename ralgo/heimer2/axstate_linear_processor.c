@@ -1,4 +1,5 @@
 #include <ralgo/heimer2/axstate_linear_processor.h>
+#include <ralgo/clinalg/matops.h>
 
 void axstate_linear_processor_serve(struct signal_processor * proc, disctime_t time) 
 {
@@ -60,7 +61,7 @@ const struct signal_processor_operations axstate_linear_processor_ops =
 
 void axstate_linear_processor_evaluate_invertion(struct axstate_linear_processor * lproc) 
 {
-	square_matrix_invert(
+	matops_square_inverse_f(
 		lproc->matrix, // in
 		lproc->dim,  //size, n==m
 		lproc->dim,  //stride
@@ -80,9 +81,9 @@ void axstate_linear_processor_init(
 {
 	signal_processor_init(&lproc->proc, name, &axstate_linear_processor_ops);
 
-	lproc->dim = 0;
+	lproc->dim = dim;
 	lproc->leftside = leftside;
 	lproc->rightside = rightside;
 	lproc->matrix = matrix;
-	lproc->matrix = invert_matrix;
+	lproc->invert_matrix = invert_matrix;
 }
