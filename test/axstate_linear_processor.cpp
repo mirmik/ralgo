@@ -27,4 +27,14 @@ TEST_CASE("axstate_linear_processor")
 	CHECK_EQ(inverse_matrix[1], -0.0625);
 	CHECK_EQ(inverse_matrix[2], 0);
 	CHECK_EQ(inverse_matrix[3], 0.25);
+
+	c.ctrpos = 200;
+	c.ctrvel = 10;
+	d.ctrpos = 115;
+	d.ctrvel = 10;
+
+	signal_processor_serve(&linproc.proc, 0);
+
+	CHECK_EQ(a.ctrpos, 500);
+	CHECK_EQ(b.ctrpos, 460);
 }
