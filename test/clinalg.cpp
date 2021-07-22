@@ -36,3 +36,18 @@ TEST_CASE("clinalg.matops_square_inverse_d")
 	CHECK_EQ(b[7], 0);
 	CHECK_EQ(b[8], 0.125);
 }
+
+TEST_CASE("clinalg.matops_multiply_frr") 
+{
+	float a[4] = { 1, 0, 0, 2 } ; 
+	float b[4] = { 2, 0, 0, 2 } ; 
+	float c[4];
+
+	matops_multiply_frr(a, 2, 2, 2, b, c);
+
+	CHECK_EQ(c[0], 2);
+	CHECK_EQ(c[1], 0);
+	CHECK_EQ(c[2], 0);
+	CHECK_EQ(c[3], 4);
+} 
+
