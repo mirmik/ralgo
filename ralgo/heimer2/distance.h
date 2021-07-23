@@ -4,7 +4,7 @@
 	Точность по умолчанию состовляет 2**32 == 4294967296 (примерно один нанометр).
 */
 
-#ifndef RALGO_HEIMER_DISTANCE_H
+/*#ifndef RALGO_HEIMER_DISTANCE_H
 #define RALGO_HEIMER_DISTANCE_H
 
 #include <ralgo/heimer2/heimer_types.h>
@@ -81,4 +81,4 @@ float heimpos_sin(position_t x)
 
 __END_DECLS
 
-#endif
+#endif*/
