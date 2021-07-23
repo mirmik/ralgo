@@ -1,4 +1,5 @@
 #include <ralgo/heimer2/signal.h>
+#include <ralgo/heimer2/signal_processor.h>
 #include <igris/shell/rshell.h>
 #include <string.h>
 
@@ -17,6 +18,8 @@ void signal_head_init(
 	sig->type = type;
 	strncpy(sig->name, name, SIGNAL_NAME_MAX_LENGTH);
 	dlist_add_tail(&sig->signal_list_lnk, &signals_list);
+	sig->current_controller = NULL;
+	sig->listener = NULL;
 }
 
 void signal_head_deinit(struct signal_head * sig) 
@@ -64,4 +67,34 @@ int signal_command_v(struct signal_head * head, int argc, char ** argv, char * o
 		return head->ops->info(head, output, maxsize);
 
 	return -1; 
+}
+
+
+int signal_head_activate(struct signal_head * sig, struct signal_processor * proc) 
+{
+//	if (!sig->listener)
+//		return -1;
+	
+	if (sig->listener && signal_processor_activate(sig->listener))
+		return -1;
+
+	sig->current_controller = proc;
+	sig->active = 1;
+	return 0;
+}
+
+int signal_head_deactivate(struct signal_head * sig, struct signal_processor * proc) 
+{
+	if (!sig->listener)
+		return -1;
+
+	if (proc != sig->current_controller)
+		return -1;
+
+	if (signal_processor_deactivate(sig->listener)) 
+		return -1;
+
+	sig->current_controller = NULL;
+	sig->active = -1;
+	return 0;
 }

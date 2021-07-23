@@ -51,12 +51,34 @@ void axstate_linear_processor_deinit(struct signal_processor * proc)
 	struct axstate_linear_processor * lproc = (struct axstate_linear_processor *) proc;	
 }
 
+struct signal_head * axstate_linear_processor_iterate_left(struct signal_processor * sigproc, struct signal_head * iter)
+{
+	struct axstate_linear_processor * ctr = mcast_out(sigproc, struct axstate_linear_processor, proc);
+
+	if (iter == NULL)
+		return &(*ctr->leftside)->sig;
+
+	if (iter == &(*(ctr->leftside + ctr->dim - 1))->sig) 
+		return NULL;
+
+	struct axis_state ** it = ctr->leftside;
+	for (; it != ctr->leftside + ctr->dim -1  ; ++it) 
+	{
+		if (&(*it)->sig == iter) 
+		{
+			it++;
+			return &((*it)->sig);
+		}
+	}
+}
+
 const struct signal_processor_operations axstate_linear_processor_ops =
 {
 	.feedback = axstate_linear_processor_feedback,
 	.serve = axstate_linear_processor_serve,
 	.deinit = axstate_linear_processor_deinit,
 	.command = axstate_linear_processor_command,
+	.iterate_left = axstate_linear_processor_iterate_left
 };
 
 void axstate_linear_processor_evaluate_invertion(struct axstate_linear_processor * lproc) 

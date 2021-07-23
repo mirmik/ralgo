@@ -1,5 +1,6 @@
 #include <doctest/doctest.h>
 #include <ralgo/heimer2/axisctr.h>
+#include <ralgo/heimer2/command.h>
 
 #include <nos/print.h>
 
@@ -12,10 +13,14 @@ void finish_handler(void * arg, struct axis_controller * ctr)
 
 TEST_CASE("axisctr")
 {
+	heimer_reinit();
+
 	int sts;
 
 	struct axis_state state;
 	struct axis_controller axctr;
+
+	axis_state_init(&state, "state");
 
 	axis_controller_init(&axctr, "axctr");
 	axis_controller_set_handlers(&axctr, nullptr, nullptr, finish_handler);
@@ -25,7 +30,8 @@ TEST_CASE("axisctr")
 	axis_controller_set_limits_external(&axctr, -100, 100);
 
 	axis_controller_set_controlled(&axctr, &state);
-	axis_controller_incmove(&axctr, 0, 100);
+	sts = axis_controller_incmove(&axctr, 0, 100);
+	CHECK_EQ(sts, 0);
 
 	CHECK_EQ(axctr.vel, doctest::Approx(10.f / discrete_time_frequency() * 1000));
 	CHECK_EQ(axctr.acc, doctest::Approx(5.f / discrete_time_frequency() / discrete_time_frequency() * 1000));

@@ -67,12 +67,35 @@ void axstate_sincos_processor_deinit(struct signal_processor * proc)
 	struct axstate_sincos_processor * scproc = (struct axstate_sincos_processor *) proc;
 }
 
+
+struct signal_head * axstate_sincos_processor_iterate_left(struct signal_processor * sigproc, struct signal_head * iter)
+{
+	struct axstate_sincos_processor * ctr = mcast_out(sigproc, struct axstate_sincos_processor, proc);
+
+	if (iter == NULL)
+		return &(*ctr->leftside)->sig;
+
+	if (iter == &(*(ctr->leftside + 2))->sig) 
+		return NULL;
+
+	struct axis_state ** it = ctr->leftside;
+	for (; it != ctr->leftside + 2; ++it) 
+	{
+		if (&(*it)->sig == iter) 
+		{
+			it++;
+			return &((*it)->sig);
+		}
+	}
+}
+
 const struct signal_processor_operations axstate_sincos_processor_ops =
 {
 	.feedback = axstate_sincos_processor_feedback,
 	.serve = axstate_sincos_processor_serve,
 	.deinit = axstate_sincos_processor_deinit,
 	.command = axstate_sincos_processor_command,
+	.iterate_left = axstate_sincos_processor_iterate_left
 };
 
 void axstate_sincos_processor_set_alpha_scale(
