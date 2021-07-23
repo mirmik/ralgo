@@ -27,6 +27,7 @@ TEST_CASE("axstate_linear_processor")
 		inverse_matrix
 	);
 	axstate_linear_processor_evaluate_invertion(&linproc);
+	CHECK_NE(inverse_matrix[0], 0);
 
 	c.ctrpos = 200;
 	d.ctrpos = 100;
@@ -40,18 +41,17 @@ TEST_CASE("axstate_linear_processor")
 	CHECK_EQ(a.ctrvel, 45);
 	CHECK_EQ(b.ctrvel, 10);
 
-	a.feedpos = 200;
-	b.feedpos = 100;
-	a.feedvel = 20;
-	b.feedvel = 10;
+	a.feedpos = a.ctrpos;
+	b.feedpos = b.ctrpos;
+	a.feedvel = a.ctrvel;
+	b.feedvel = b.ctrvel;
 
 	signal_processor_feedback(&linproc.proc, 0);
 
-	CHECK_EQ(c.feedpos, 0);
-	CHECK_EQ(d.feedpos, 0);
-	CHECK_EQ(c.feedvel, 0);
-	CHECK_EQ(d.feedvel, 0);
-
+	CHECK_EQ(c.feedpos, 200);
+	CHECK_EQ(d.feedpos, 100);
+	CHECK_EQ(c.feedvel, 20);
+	CHECK_EQ(d.feedvel, 10);
 
 	signal_head_deinit(&a.sig);
 	signal_head_deinit(&b.sig);
