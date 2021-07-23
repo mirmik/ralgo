@@ -85,6 +85,16 @@ struct axstate_sincos_processor
 	float alpha_to_radian_scale;
 };
 
+__BEGIN_DECLS
+
+void axstate_sincos_processor_init(
+	struct axstate_sincos_processor * scproc, 
+	const char* name,
+	struct axis_state ** leftside,
+	struct axis_state ** rightside,
+	position_t radius
+); 
+
 void axstate_sincos_processor_set_alpha_scale(struct axstate_sincos_processor * scproc, float ascale);
 void axstate_sincos_processor_set_offset(
 	struct axstate_sincos_processor * scproc, 
@@ -97,15 +107,6 @@ void axstate_sincos_processor_set_y_offset(struct axstate_sincos_processor * scp
 void axstate_sincos_processor_set_a_left_offset(struct axstate_sincos_processor * scproc, position_t aoff);
 void axstate_sincos_processor_set_a_right_offset(struct axstate_sincos_processor * scproc, position_t aoff);
 
-__BEGIN_DECLS
-
-void axstate_sincos_processor_init(
-	struct axstate_sincos_processor * scproc, 
-	const char* name,
-	struct axis_state ** leftside,
-	struct axis_state ** rightside,
-	position_t radius
-); 
 
 __END_DECLS
 
