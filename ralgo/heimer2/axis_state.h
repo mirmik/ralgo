@@ -4,17 +4,18 @@
 #include <stdint.h>
 
 #include <igris/compiler.h>
+#include <ralgo/heimer2/heimer_types.h>
 #include <ralgo/heimer2/signal.h>
 
 struct axis_state 
 {
 	struct signal_head sig;
 
-	int64_t ctrpos; /// Контрольная позиция в формате с фиксированной точкой	
-	float   ctrvel; /// Сигнал управления по скорости.
+	position_t ctrpos; /// Контрольная позиция в формате с фиксированной точкой	
+	velocity_t ctrvel; /// Сигнал управления по скорости.
 
-	int64_t feedpos; /// Данные нижнего уровня о позиции
-	float   feedvel; /// Данные нижнего уровня о скорости
+	position_t feedpos; /// Данные нижнего уровня о позиции
+	velocity_t feedvel; /// Данные нижнего уровня о скорости
 };
 
 __BEGIN_DECLS

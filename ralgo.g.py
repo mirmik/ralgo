@@ -11,13 +11,12 @@ licant.module("ralgo.log", "console",
 licant.module("ralgo",
 	sources=[
 		"ralgo/imu/madgwick.cpp",
-		#"ralgo/signal/fft.cpp",
 		"ralgo/log/log.cpp",
-		#"ralgo/heimer/control.cpp",
-		#"ralgo/heimer/command_center.cpp"
 		"ralgo/trajectory/tsdeform.c",
 		"ralgo/trajectory/trajectory.c",
 		"ralgo/trajectory/linetraj.c",
+		"ralgo/robo/quadgen4_arduino.c",
+
 		"ralgo/heimer2/axisctr.c",
 		"ralgo/heimer2/axisctr_command.c",
 		"ralgo/heimer2/stepctr.c",
@@ -27,7 +26,7 @@ licant.module("ralgo",
 		"ralgo/heimer2/command.c",
 		"ralgo/heimer2/axis_state.c",
 		"ralgo/heimer2/axstate_linear_processor.c",
-		"ralgo/robo/quadgen4_arduino.c",
+		"ralgo/heimer2/axstate_sincos_processor.c",
 
 		"ralgo/clinalg/*.cpp",
 		"ralgo/clinalg/*.c",
@@ -38,9 +37,6 @@ licant.module("ralgo",
 		"ralgo.log",
 		"ralgo.disctime",
 		"ralgo.heimer",
-		#"f2clib.internal",
-		#"blas.internal",
-		#"lapack.internal",
 	],
 )
 
@@ -94,26 +90,6 @@ licant.module("f2clib.internal",
 	defines = ["IEEE_COMPLEX_DIVIDE=1"],
 	include_paths=["ralgo/compat/include"]
 )
-
-
-#licant.module("blas.internal",
-#	sources = [
-#		"ralgo/compat/blas/*.c",
-#	],
-#	include_paths=["ralgo/compat/include"]
-#)
-
-#licant.module("lapack.internal",
-#	sources = [
-#		"ralgo/compat/lapack/*.c",
-#	],
-#	include_paths=["ralgo/compat/include"]
-#)
-
-#licant.module("ralgo.virtdevs", 
-#	mdepends=["ralgo.include"],
-#	sources=["ralgo/virtdevs/device.cpp"]
-#)
 
 licant.module("ralgo.disctime", "chrono-millis",
 	sources = ["ralgo/disctime-chrono-millis.cpp"], default=True)

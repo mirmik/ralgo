@@ -14,6 +14,8 @@ int heimer_command(int argc, char ** argv, char * output, int maxsize);
 
 int heimer_command_exec_safe(const char * str, char * output, int maxsize);
 
+void heimer_reinit();
+
 void heimer_system_init();
 
 __END_DECLS
