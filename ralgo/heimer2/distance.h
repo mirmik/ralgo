@@ -9,6 +9,8 @@
 
 #include <ralgo/heimer2/heimer_types.h>
 #include <igris/compiler.h>
+#include <igris/math.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #define DISTANCE_SHIFT (24)
@@ -33,6 +35,24 @@ static inline
 position_t heimdist(double dist) 
 {
 	return distance_float_to_fixed(dist);
+} 
+
+static inline 
+position_t heimdeg(double dist) 
+{
+	return distance_float_to_fixed(dist / 180. * M_PI);
+}
+
+static inline 
+float heimpos_cos(position_t x) 
+{
+	return cosf(distance_fixed_to_float(x));
+} 
+
+static inline 
+float heimpos_sin(position_t x) 
+{
+	return sinf(distance_fixed_to_float(x));
 } 
 
 __END_DECLS

@@ -36,7 +36,10 @@ void signal_processor_deinit(
 	struct signal_processor * processor
 );
 
+/// feedback отвечает за движение сигнала слева направо.  physical ----> virtual
 void signal_processor_feedback(struct signal_processor * processor, disctime_t time);
+
+/// serve отвечает за движение сигнала справа налево. physical <---- virtual
 void signal_processor_serve(struct signal_processor * processor, disctime_t time);
 
 int heimer_signal_processors_count();

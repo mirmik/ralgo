@@ -3,6 +3,8 @@
 #include <ralgo/heimer2/axstate_sincos_processor.h>
 #include <ralgo/heimer2/distance.h>
 
+#include <igris/math.h>
+
 TEST_CASE("axstate_sincos_processor") 
 {
 	heimer_reinit();
@@ -13,14 +15,27 @@ TEST_CASE("axstate_sincos_processor")
 
 	struct axstate_sincos_processor scproc;
 
-	xl->ctrpos = heimdist(0);
-	yl->ctrpos = heimdist(0);
-	al->ctrpos = heimdist(0);
+	float angle = 60.f;
 
-	axstate_sincos_processor_init(&scproc, "axproc", left, right, heimdist(50), 0, 0);	
+	xr.ctrpos = heimdist(10.f);
+	yr.ctrpos = heimdist(20.f);
+	ar.ctrpos = heimdeg(angle);
+
+	xr.ctrvel = 1;
+	yr.ctrvel = 2;
+	ar.ctrvel = 1;
+
+	axstate_sincos_processor_init(&scproc, "axproc", left, right, heimdist(10.f));	
 	signal_processor_serve(&scproc.proc, 0);
 
-	CHECK_EQ(ar->ctrpos, heimdist(0));
-	CHECK_EQ(xr->ctrpos, heimdist(0));
-	CHECK_EQ(yr->ctrpos, heimdist(0));
+	CHECK_EQ(heimdist(10), 167772160);
+	CHECK_EQ(heimpos_cos(ar.ctrpos), doctest::Approx(cosf(deg2rad(angle))));
+	CHECK_EQ(heimpos_sin(ar.ctrpos), doctest::Approx(sinf(deg2rad(angle))));
+	CHECK_EQ(xl.ctrpos, heimdist(10.f + 10.f * cosf(deg2rad(angle))));
+	CHECK_EQ(yl.ctrpos, heimdist(20.f + 10.f * sinf(deg2rad(angle))));
+	CHECK_EQ(al.ctrpos, heimdeg(angle));
+
+	CHECK_EQ(xl.ctrvel, doctest::Approx(1. - 10. * sinf(deg2rad(angle))));
+	CHECK_EQ(yl.ctrvel, doctest::Approx(2. + 10. * cosf(deg2rad(angle))));
+	CHECK_EQ(al.ctrvel, 1);
 }
