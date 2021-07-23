@@ -38,6 +38,24 @@ position_t heimdist(double dist)
 } 
 
 static inline 
+velocity_t heimvel(double vel) 
+{
+	return vel * DISTANCE_MULTIPLIER;
+}
+
+static inline 
+double heimvel_restore(velocity_t vel) 
+{
+	return vel / DISTANCE_MULTIPLIER;
+}
+
+static inline 
+acceleration_t heimacc(double acc) 
+{
+	return acc * DISTANCE_MULTIPLIER;
+}
+
+static inline 
 position_t heimdeg(double dist) 
 {
 	return distance_float_to_fixed(dist / 180. * M_PI);

@@ -15,17 +15,17 @@ void axstate_sincos_processor_serve(struct signal_processor * proc, disctime_t t
 
 	float ascale = scproc->alpha_to_radian_scale;
 
-	position_t aposoff = ar->ctrpos + scproc->a_offset;  // ar + aoff
-	float s = heimpos_sin(aposoff * ascale);             // sin((ar + aoff) * ascale)
-	float c = heimpos_cos(aposoff * ascale);             // cos((ar + aoff) * ascale)
-	float avelocity = ar->ctrvel * ascale;               // dar/dt * ascale
+	position_t a = ar->ctrpos + scproc->a_right_offset;
+	float s = heimpos_sin(a * ascale);             // безразмерная величина
+	float c = heimpos_cos(a * ascale);             // безразмерная величина
+	float avelocity = heimvel_restore(ar->ctrvel) * ascale;         // скорость в радианах
 
 	xl->ctrpos = xr->ctrpos + scproc->x_offset + scproc->radius * c;
 	yl->ctrpos = yr->ctrpos + scproc->y_offset + scproc->radius * s;
-	al->ctrpos = ar->ctrpos;
+	al->ctrpos = a + scproc->a_left_offset;
 
-	xl->ctrvel = xr->ctrvel - distance_fixed_to_float(scproc->radius) * s * avelocity; 
-	yl->ctrvel = yr->ctrvel + distance_fixed_to_float(scproc->radius) * c * avelocity;
+	xl->ctrvel = xr->ctrvel - scproc->radius * s * avelocity; 
+	yl->ctrvel = yr->ctrvel + scproc->radius * c * avelocity;
 	al->ctrvel = ar->ctrvel;
 }
 
@@ -43,18 +43,18 @@ void axstate_sincos_processor_feedback(struct signal_processor * proc, disctime_
 
 	float ascale = scproc->alpha_to_radian_scale;
 
-	position_t aposoff = ar->ctrpos + scproc->a_offset;  // ar + aoff
-	float s = heimpos_sin(aposoff * ascale);             // sin((ar + aoff) * ascale)
-	float c = heimpos_cos(aposoff * ascale);             // cos((ar + aoff) * ascale)
-	float avelocity = ar->ctrvel * ascale;               // dar/dt * ascale
+	position_t a = al->feedpos - scproc->a_left_offset;
+	float s = heimpos_sin(a * ascale);             // безразмерная величина
+	float c = heimpos_cos(a * ascale);             // безразмерная величина
+	float avelocity = heimvel_restore(al->feedvel) * ascale;         // скорость в радианах
 
-	xl->ctrpos = xr->ctrpos + scproc->x_offset + scproc->radius * c;
-	yl->ctrpos = yr->ctrpos + scproc->y_offset + scproc->radius * s;
-	al->ctrpos = ar->ctrpos;
+	xr->feedpos = xl->feedpos - scproc->x_offset - scproc->radius * c;
+	yr->feedpos = yl->feedpos - scproc->y_offset - scproc->radius * s;
+	ar->feedpos = al->feedpos - scproc->a_right_offset;
 
-	xl->ctrvel = xr->ctrvel - scproc->radius * s * avelocity; 
-	yl->ctrvel = yr->ctrvel + scproc->radius * c * avelocity;
-	al->ctrvel = ar->ctrvel;
+	xr->feedvel = xl->feedvel + scproc->radius * s * avelocity; 
+	yr->feedvel = yl->feedvel - scproc->radius * c * avelocity;
+	ar->feedvel = al->feedvel;
 }
 
 int  axstate_sincos_processor_command(struct signal_processor * proc, int argc, char ** argv, char * output, int outmax)
@@ -83,11 +83,17 @@ void axstate_sincos_processor_set_alpha_scale(
 	scproc->alpha_to_radian_scale = ascale;
 }
 
-void axstate_sincos_processor_set_offset(struct axstate_sincos_processor * scproc, position_t xoff, position_t yoff, position_t aoff)
+void axstate_sincos_processor_set_offset(
+	struct axstate_sincos_processor * scproc, 
+	position_t xoff, 
+	position_t yoff, 
+	position_t aloff, 
+	position_t aroff)
 {
 	scproc->x_offset = xoff;
-	scproc->x_offset = yoff;
-	scproc->x_offset = aoff;
+	scproc->y_offset = yoff;
+	scproc->a_left_offset = aloff;
+	scproc->a_right_offset = aroff;
 }
 
 void axstate_sincos_processor_set_x_offset(struct axstate_sincos_processor * scproc, position_t xoff)
@@ -97,12 +103,17 @@ void axstate_sincos_processor_set_x_offset(struct axstate_sincos_processor * scp
 
 void axstate_sincos_processor_set_y_offset(struct axstate_sincos_processor * scproc, position_t yoff)
 {
-	scproc->x_offset = yoff;
+	scproc->y_offset = yoff;
 }
 
-void axstate_sincos_processor_set_a_offset(struct axstate_sincos_processor * scproc, position_t aoff)
+void axstate_sincos_processor_set_a_left_offset(struct axstate_sincos_processor * scproc, position_t aoff)
 {
-	scproc->x_offset = aoff;
+	scproc->a_left_offset = aoff;
+}
+
+void axstate_sincos_processor_set_a_right_offset(struct axstate_sincos_processor * scproc, position_t aoff)
+{
+	scproc->a_right_offset = aoff;
 }
 
 
@@ -122,7 +133,8 @@ void axstate_sincos_processor_init(
 	scproc -> radius = radius;
 	scproc -> x_offset = 0;
 	scproc -> y_offset = 0;
-	scproc -> a_offset = 0;
+	scproc -> a_right_offset = 0;
+	scproc -> a_left_offset = 0;
 
 	scproc -> alpha_to_radian_scale = 1;
 }
