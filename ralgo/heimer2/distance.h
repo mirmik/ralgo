@@ -38,6 +38,12 @@ position_t heimdist(double dist)
 } 
 
 static inline 
+double heimdist_restore(position_t dist) 
+{
+	return distance_fixed_to_float(dist);
+}
+
+static inline 
 velocity_t heimvel(double vel) 
 {
 	return vel * DISTANCE_MULTIPLIER;

@@ -50,7 +50,7 @@ void axstate_sincos_processor_feedback(struct signal_processor * proc, disctime_
 
 	xr->feedpos = xl->feedpos - scproc->x_offset - scproc->radius * c;
 	yr->feedpos = yl->feedpos - scproc->y_offset - scproc->radius * s;
-	ar->feedpos = al->feedpos - scproc->a_right_offset;
+	ar->feedpos = a - scproc->a_right_offset;
 
 	xr->feedvel = xl->feedvel + scproc->radius * s * avelocity; 
 	yr->feedvel = yl->feedvel - scproc->radius * c * avelocity;
