@@ -85,6 +85,9 @@ void axis_controller_serve(struct signal_processor * sigproc, disctime_t time)
 	position_t ctrpos;
 	velocity_t ctrvel;
 
+	if (axctr->controlled->sig.current_controller && axctr->controlled->sig.current_controller != sigproc) 
+		return;
+
 	if (!axctr->curtraj)
 		return;
 
@@ -108,6 +111,14 @@ int __axis_controller_absmove(
     position_t curpos,
     position_t tgtpos)
 {
+	if (axctr->controlled->sig.current_controller) 
+	{
+		return -1;
+	}
+
+	if (signal_processor_activate(&axctr->sigproc))
+		return -1;
+	
 	position_t dist = tgtpos - curpos;
 	disctime_t tgttim = curtim + (float)(ABS(dist)) / axctr->vel;
 
@@ -201,12 +212,24 @@ void axis_controller_deinit(struct signal_processor * sigproc)
 	axis_controller_release_controlled(axctr);
 }
 
+struct signal_head * axis_controller_iterate_left(struct signal_processor * sigproc, struct signal_head * iter)
+{
+	struct axis_controller * axctr = mcast_out(sigproc, struct axis_controller, sigproc);
+
+	if (iter == NULL)
+		return &axctr->controlled->sig;
+
+	else
+		return NULL;
+}
+
 const struct signal_processor_operations axisctr_ops =
 {
 	.feedback = axis_controller_feedback,
 	.serve = axis_controller_serve,
 	.command = axis_controller_command,
-	.deinit = axis_controller_deinit
+	.deinit = axis_controller_deinit,
+	.iterate_left = axis_controller_iterate_left
 };
 
 void axis_controller_init(struct axis_controller * axctr, const char * name)

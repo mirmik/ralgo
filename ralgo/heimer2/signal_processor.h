@@ -14,6 +14,7 @@ struct signal_processor_operations
 	void (* serve)(struct signal_processor * proc, disctime_t time);
 	int  (* command)(struct signal_processor * proc, int argc, char ** argv, char * output, int outmax);
 	void (* deinit)(struct signal_processor *proc);
+	struct signal_head * (* iterate_left)(struct signal_processor *proc, struct signal_head *);
 };
 
 struct signal_processor 
@@ -21,7 +22,10 @@ struct signal_processor
 	struct dlist_head list_lnk;
 	char name[SIGNAL_PROCESSOR_NAME_MAX_LENGTH];
 
+
+
 	const struct signal_processor_operations * ops;
+	uint8_t active;
 };
 
 __BEGIN_DECLS
@@ -47,6 +51,9 @@ int heimer_signal_processors_count();
 void signal_processors_list_reinit();
 
 int heimer_command_signal_processors(int argc, char ** argv, char * output,int maxsize);
+
+int signal_processor_activate(struct signal_processor * processor);
+int signal_processor_deactivate(struct signal_processor * processor);
 
 __END_DECLS
 

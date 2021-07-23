@@ -7,6 +7,7 @@
 #include <ralgo/heimer2/heimer_types.h>
 #include <ralgo/heimer2/signal.h>
 
+struct signal_processor;
 struct axis_state 
 {
 	struct signal_head sig;
