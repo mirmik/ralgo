@@ -12,8 +12,8 @@ void axstate_linear_processor_serve(struct signal_processor * proc, disctime_t t
 		float   accvel = 0;
 		for (int j = 0; j < dim; ++j) 
 		{
-			accpos += *(lproc->matrix + i * dim + j) * lproc->rightside[i]->ctrpos;
-			accvel += *(lproc->matrix + i * dim + j) * lproc->rightside[i]->ctrvel;
+			accpos += *(lproc->matrix + i * dim + j) * lproc->rightside[j]->ctrpos;
+			accvel += *(lproc->matrix + i * dim + j) * lproc->rightside[j]->ctrvel;
 		}
 
 		lproc->leftside[i]->ctrpos = accpos;
@@ -32,8 +32,8 @@ void axstate_linear_processor_feedback(struct signal_processor * proc, disctime_
 		float   accvel = 0;
 		for (int j = 0; j < dim; ++j) 
 		{
-			accpos += *(lproc->invert_matrix + i * dim + j) * lproc->leftside[i]->ctrpos;
-			accvel += *(lproc->invert_matrix + i * dim + j) * lproc->leftside[i]->ctrvel;
+			accpos += *(lproc->invert_matrix + i * dim + j) * lproc->leftside[j]->ctrpos;
+			accvel += *(lproc->invert_matrix + i * dim + j) * lproc->leftside[j]->ctrvel;
 		}
 
 		lproc->rightside[i]->ctrpos = accpos;
