@@ -2,11 +2,12 @@
 #define RALGO_TRAJECTORY_H
 
 #include <ralgo/trajectory/tsdeform.h>
+#include <ralgo/heimer2/heimer_types.h>
 #include <ralgo/disctime.h>
 
 typedef int (* trajectory_attime_t) (
     void * priv,
-    disctime_t timestamp, int64_t * outpos, float * outspd);
+    disctime_t timestamp, position_t * outpos, position_t * outspd);
 
 struct trajectory 
 {

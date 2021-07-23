@@ -7,7 +7,7 @@
 int axis_state_info(struct signal_head * sig, char * data, int maxsize) 
 {
 	struct axis_state * s = mcast_out(sig, struct axis_state, sig);
-	snprintf(data, maxsize, "(ctrpos:%ld,ctrvel:%f,feedpos:%ld,feedspd:%f)", 
+	snprintf(data, maxsize, "(ctrpos:%f,ctrvel:%f,feedpos:%f,feedspd:%f)", 
 		s->ctrpos, s->ctrvel, s->feedpos, s->feedvel);
 	return 0;
 };

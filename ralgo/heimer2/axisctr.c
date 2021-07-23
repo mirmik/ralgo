@@ -25,23 +25,23 @@ void axis_controller_set_gain(struct axis_controller * axctr, double gain)
 	axctr->gain = gain;
 }
 
-void axis_controller_set_limits_internal_fixed(struct axis_controller * axctr, int64_t back, int64_t forw)
+void axis_controller_set_limits_internal(struct axis_controller * axctr, position_t back, position_t forw)
 {
 	axctr->backlim = back;
 	axctr->forwlim = forw;
 }
 
-void axis_controller_set_velocity_internal(struct axis_controller * axctr, float speed)
+void axis_controller_set_velocity_internal(struct axis_controller * axctr, velocity_t speed)
 {
 	axctr->vel = speed;
 }
 
 void axis_controller_set_velocity_external(struct axis_controller * axctr, float speed)
 {
-	axctr->vel = speed * DISTANCE_MULTIPLIER / discrete_time_frequency() * axctr->gain;
+	axctr->vel = speed / discrete_time_frequency() * axctr->gain;
 }
 
-void axis_controller_set_accdcc_internal(struct axis_controller * axctr, float acc, float dcc)
+void axis_controller_set_accdcc_internal(struct axis_controller * axctr, velocity_t  acc, velocity_t  dcc)
 {
 	axctr->acc = acc;
 	axctr->dcc = dcc;
@@ -49,14 +49,14 @@ void axis_controller_set_accdcc_internal(struct axis_controller * axctr, float a
 
 void axis_controller_set_accdcc_external(struct axis_controller * axctr, float acc, float dcc)
 {
-	axctr->acc = acc * DISTANCE_MULTIPLIER / discrete_time_frequency() / discrete_time_frequency() * axctr->gain;
-	axctr->dcc = dcc * DISTANCE_MULTIPLIER / discrete_time_frequency() / discrete_time_frequency() * axctr->gain;
+	axctr->acc = acc / discrete_time_frequency() / discrete_time_frequency() * axctr->gain;
+	axctr->dcc = dcc / discrete_time_frequency() / discrete_time_frequency() * axctr->gain;
 }
 
 void axis_controller_set_limits_external(struct axis_controller * axctr, double back, double forw)
 {
-	axctr->backlim = distance_float_to_fixed(back * axctr->gain);
-	axctr->forwlim = distance_float_to_fixed(forw * axctr->gain);
+	axctr->backlim = back * axctr->gain;
+	axctr->forwlim = forw * axctr->gain;
 }
 
 void axis_controller_set_controlled(struct axis_controller * axctr, struct axis_state * state)
@@ -66,7 +66,7 @@ void axis_controller_set_controlled(struct axis_controller * axctr, struct axis_
 	signal_head_get(&axctr->controlled->sig);
 }
 
-void axis_controller_finish_trajectory(struct axis_controller * axctr, disctime_t time, int64_t ctrpos)
+void axis_controller_finish_trajectory(struct axis_controller * axctr, disctime_t time, position_t ctrpos)
 {
 	axctr->operation_finished_flag = 1;
 	axctr->operation_finish_handler(axctr->operation_handlers_priv, axctr);
@@ -76,14 +76,14 @@ void axis_controller_finish_trajectory(struct axis_controller * axctr, disctime_
 
 void axis_controller_feedback(struct signal_processor * sigproc, disctime_t time)
 {
-	BUG();
+	//pass
 }
 
 void axis_controller_serve(struct signal_processor * sigproc, disctime_t time)
 {
 	struct axis_controller * axctr =  mcast_out(sigproc, struct axis_controller, sigproc);
-	int64_t ctrpos;
-	float   ctrvel;
+	position_t ctrpos;
+	velocity_t ctrvel;
 
 	if (!axctr->curtraj)
 		return;
@@ -105,10 +105,10 @@ static
 int __axis_controller_absmove(
     struct axis_controller * axctr,
     disctime_t curtim,
-    int64_t curpos,
-    int64_t tgtpos)
+    position_t curpos,
+    position_t tgtpos)
 {
-	int64_t dist = tgtpos - curpos;
+	position_t dist = tgtpos - curpos;
 	disctime_t tgttim = curtim + (float)(ABS(dist)) / axctr->vel;
 
 	if (dist == 0 || axctr->vel == 0)
@@ -117,8 +117,8 @@ int __axis_controller_absmove(
 		return 0;
 	}
 
-	float acc_time = axctr->vel / axctr->acc;
-	float dcc_time = axctr->vel / axctr->dcc;
+	disctime_t acc_time = (axctr->vel / axctr->acc);
+	disctime_t dcc_time = (axctr->vel / axctr->dcc);
 
 	line_trajectory_init_nominal_speed(&axctr->lintraj,
 	                                   curtim,
@@ -140,10 +140,10 @@ int __axis_controller_absmove(
 
 int axis_controller_incmove(struct axis_controller * axctr, disctime_t current_time, double dist_real)
 {
-	int64_t dist = distance_float_to_fixed(dist_real * axctr->gain);
+	position_t dist = dist_real * axctr->gain;
 
-	int64_t curpos = axctr->controlled->ctrpos;
-	int64_t tgtpos = curpos + dist;
+	position_t curpos = axctr->controlled->ctrpos;
+	position_t tgtpos = curpos + dist;
 
 	tgtpos = CLAMP(tgtpos,
 	               axctr->backlim,
@@ -154,8 +154,8 @@ int axis_controller_incmove(struct axis_controller * axctr, disctime_t current_t
 
 int axis_controller_absmove(struct axis_controller * axctr, disctime_t current_time, double pos_real)
 {
-	int64_t curpos = axctr->controlled->ctrpos;
-	int64_t tgtpos = distance_float_to_fixed(tgtpos * axctr->gain);
+	position_t curpos = axctr->controlled->ctrpos;
+	position_t tgtpos = tgtpos * axctr->gain;
 
 	tgtpos = CLAMP(tgtpos,
 	               axctr->backlim,
@@ -166,17 +166,17 @@ int axis_controller_absmove(struct axis_controller * axctr, disctime_t current_t
 
 float axis_controller_ctrpos_external(struct axis_controller * axctr)
 {
-	return  distance_fixed_to_float(axctr->controlled->ctrpos) / axctr->gain;
+	return  axctr->controlled->ctrpos / axctr->gain;
 }
 
 float axis_controller_feedpos_external(struct axis_controller * axctr)
 {
-	return  distance_fixed_to_float(axctr->controlled->feedpos) / axctr->gain;
+	return  axctr->controlled->feedpos / axctr->gain;
 }
 
 float axis_controller_ctrvel_external(struct axis_controller * axctr)
 {
-	return axctr->controlled->ctrvel * discrete_time_frequency() / DISTANCE_MULTIPLIER / axctr->gain;
+	return axctr->controlled->ctrvel * discrete_time_frequency() / axctr->gain;
 }
 
 struct axis_controller * create_axis_controller(const char * name)

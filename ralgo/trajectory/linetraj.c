@@ -2,8 +2,8 @@
 
 int line_trajectory_attime (void * priv,
                             disctime_t time,
-                            int64_t * pos,
-                            float * spd)
+                            position_t  * pos,
+                            velocity_t * spd)
 {
 	struct line_trajectory * traj = (struct line_trajectory *) priv;
 
@@ -29,7 +29,7 @@ int line_trajectory_attime (void * priv,
 		// Скорость вычисляется просто путём умножения на коэффицент.
 		// Выходная скорость имеет размерность единицы длины
 		// на дискретную единицу времени
-		float naive_speed = (float)(traj->fpos[i] - traj->spos[i]) / (float)full_time;
+		velocity_t naive_speed = (velocity_t)(traj->fpos[i] - traj->spos[i]) / (velocity_t)full_time;
 		spd[i] = naive_speed * spdmod;
 	}
 
@@ -37,7 +37,7 @@ int line_trajectory_attime (void * priv,
 	        traj->stim == traj->ftim) ? 1 : 0;
 }
 
-void line_trajectory_init(struct line_trajectory * lintraj, int dim, int64_t * spos, int64_t * fpos)
+void line_trajectory_init(struct line_trajectory * lintraj, int dim, position_t * spos, position_t * fpos)
 {
 	trajectory_init(&lintraj->traj, dim, line_trajectory_attime);
 	lintraj->spos = spos;
@@ -49,8 +49,8 @@ void line_trajectory_init_nominal_speed(
     struct line_trajectory * lintraj,
     disctime_t   stim,
     disctime_t   ftim,
-    int64_t * spos,
-    int64_t * fpos,
+    position_t * spos,
+    position_t * fpos,
 
     disctime_t acc_time,
     disctime_t dcc_time,
@@ -82,7 +82,7 @@ void line_trajectory_init_nominal_speed(
 void line_trajectory_set_point_hold(
     struct line_trajectory * traj,
     disctime_t ftim,
-    int64_t * pos)
+    position_t * pos)
 {
 	traj->ftim = ftim;
 	traj->stim = ftim - 1;

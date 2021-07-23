@@ -18,8 +18,8 @@ struct axis_controller
 
 	double gain;
 
-	int64_t backlim; // Расстояние в единицах с фиксированной точкой.
-	int64_t forwlim; // Расстояние в единицах с фиксированной точкой.
+	position_t backlim; // Расстояние в единицах с фиксированной точкой.
+	position_t forwlim; // Расстояние в единицах с фиксированной точкой.
 
 	int operation_finished_flag;
 
@@ -35,8 +35,8 @@ struct axis_controller
 	struct axis_state * controlled;
 
 	// private:
-	int64_t _line_trajectory_spos;
-	int64_t _line_trajectory_fpos;
+	position_t _line_trajectory_spos;
+	position_t _line_trajectory_fpos;
 };
 
 __BEGIN_DECLS
@@ -57,9 +57,9 @@ void axis_controller_set_limits_external(struct axis_controller * axctr, double 
 void axis_controller_set_velocity_external(struct axis_controller * axctr, float vel);
 void axis_controller_set_accdcc_external(struct axis_controller * axctr, float acc, float dcc);
 
-void axis_controller_set_limits_internal(struct axis_controller * axctr, int64_t back, int64_t forw);
-void axis_controller_set_velocity_internal(struct axis_controller * axctr, float vel);
-void axis_controller_set_accdcc_internal(struct axis_controller * axctr, float acc, float dcc);
+void axis_controller_set_limits_internal(struct axis_controller * axctr, position_t back, position_t forw);
+void axis_controller_set_velocity_internal(struct axis_controller * axctr, velocity_t vel);
+void axis_controller_set_accdcc_internal(struct axis_controller * axctr, acceleration_t acc, acceleration_t dcc);
 
 void axis_controller_set_controlled(struct axis_controller * axctr, struct axis_state * state);
 void axis_controller_release_controlled(struct axis_controller * axctr);
