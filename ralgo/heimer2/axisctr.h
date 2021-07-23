@@ -12,9 +12,9 @@ struct axis_controller
 {
 	struct signal_processor sigproc;
 
-	float vel; // скорость в единицах  
-	float acc; 
-	float dcc;
+	velocity_t     vel; // скорость в единицах  
+	acceleration_t acc; 
+	acceleration_t dcc;
 
 	double gain;
 

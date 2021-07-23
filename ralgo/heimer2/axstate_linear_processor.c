@@ -8,8 +8,8 @@ void axstate_linear_processor_serve(struct signal_processor * proc, disctime_t t
 
 	for (int i = 0; i < dim; ++i) 
 	{
-		int64_t accpos = 0;
-		float   accvel = 0;
+		position_t accpos = 0;
+		velocity_t accvel = 0;
 		for (int j = 0; j < dim; ++j) 
 		{
 			accpos += *(lproc->matrix + i * dim + j) * lproc->rightside[j]->ctrpos;
@@ -28,8 +28,8 @@ void axstate_linear_processor_feedback(struct signal_processor * proc, disctime_
 
 	for (int i = 0; i < dim; ++i) 
 	{
-		int64_t accpos = 0;
-		float   accvel = 0;
+		position_t accpos = 0;
+		velocity_t accvel = 0;
 		for (int j = 0; j < dim; ++j) 
 		{
 			accpos += *(lproc->invert_matrix + i * dim + j) * lproc->leftside[j]->feedpos;

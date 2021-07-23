@@ -108,3 +108,9 @@ int heimer_command(int argc, char ** argv, char * output, int maxsize)
 
 	return sts ? sts : ret;
 }
+
+void heimer_reinit() 
+{
+	signal_head_list_reinit();
+	signal_processors_list_reinit();
+}

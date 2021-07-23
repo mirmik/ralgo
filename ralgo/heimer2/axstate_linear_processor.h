@@ -1,3 +1,5 @@
+/** @file */
+
 #ifndef RALGO_HEIMER_AXSTATE_LINEAR_PROCESSOR_H
 #define RALGO_HEIMER_AXSTATE_LINEAR_PROCESSOR_H
 
@@ -5,6 +7,12 @@
 #include <ralgo/heimer2/signal_processor.h>
 #include <ralgo/heimer2/axis_state.h>
 
+/**
+    Преобразователь реализует линейное преобразование путём умножения сигнала на матрицу.
+
+    R = M * L
+    L = M^-1 * R
+*/
 struct axstate_linear_processor
 {
 	struct signal_processor proc;

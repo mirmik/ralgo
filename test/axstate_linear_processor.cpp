@@ -1,8 +1,11 @@
 #include <doctest/doctest.h>
+#include <ralgo/heimer2/command.h>
 #include <ralgo/heimer2/axstate_linear_processor.h>
 
 TEST_CASE("axstate_linear_processor") 
 {
+	heimer_reinit();
+
 	struct axis_state a, b, c, d;
 	struct axis_state * left[] = { &a, &b };
 	struct axis_state * right[] = { &c, &d };
