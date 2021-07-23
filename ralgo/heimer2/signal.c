@@ -19,6 +19,12 @@ void signal_head_init(
 	dlist_add_tail(&sig->signal_list_lnk, &signals_list);
 }
 
+void signal_head_deinit(struct signal_head * sig) 
+{
+	dlist_del(&sig->signal_list_lnk);	
+}
+
+
 void signal_head_get(struct signal_head * sig)
 {
 	++sig->refs;

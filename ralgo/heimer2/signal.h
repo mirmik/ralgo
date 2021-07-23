@@ -32,6 +32,8 @@ void signal_head_init(
 	const struct signal_head_operations * ops
 );
 
+void signal_head_deinit(struct signal_head * sig);
+
 void signal_head_get(struct signal_head * sig);
 void signal_head_put(struct signal_head * sig);
 

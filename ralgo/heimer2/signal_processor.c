@@ -25,6 +25,11 @@ void signal_processor_serve(struct signal_processor * processor, disctime_t time
 	processor->ops->serve(processor, time);
 }
 
+void signal_processor_feedback(struct signal_processor * processor, disctime_t time) 
+{
+	processor->ops->feedback(processor, time);		
+}
+
 int heimer_signal_processors_count()
 {
 	return dlist_size(&signal_processor_list);
