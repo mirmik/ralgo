@@ -49,8 +49,8 @@ struct axis_controller
 	struct axis_state * controlled;
 
 	// private:
-	position_t _line_trajectory_spos;
-	position_t _line_trajectory_fpos;
+	sf_position_t _line_trajectory_sfpos;
+	//position_t _line_trajectory_fpos;
 };
 
 __BEGIN_DECLS
