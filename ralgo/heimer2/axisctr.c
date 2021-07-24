@@ -256,7 +256,7 @@ void axis_controller_init(struct axis_controller * axctr, const char * name)
 	axctr->controlled = NULL;
 
 	line_trajectory_init(&axctr->lintraj, 1,
-	                     &axctr->_line_trajectory_spos,
-	                     &axctr->_line_trajectory_fpos
+	                     &axctr->_line_trajectory_sfpos,
+	                     0
 	                    );
 }

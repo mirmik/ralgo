@@ -17,7 +17,7 @@ licant.module("ralgo",
 		"ralgo/trajectory/linetraj.c",
 		"ralgo/robo/quadgen4_arduino.c",
 
-		#"ralgo/heimer2/axisctr.c",
+		"ralgo/heimer2/axisctr.c",
 		"ralgo/heimer2/axisctr_command.c",
 		"ralgo/heimer2/stepctr.c",
 		"ralgo/heimer2/stepctr_applier.c",
