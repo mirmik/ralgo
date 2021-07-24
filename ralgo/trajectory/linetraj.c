@@ -23,13 +23,17 @@ int line_trajectory_attime (void * priv,
 
 	for (unsigned int i = 0; i < traj->traj.dim; ++i)
 	{
+		sf_position_t * pair = sparse_array_ptr(&traj->sfpos, i, sf_position_t);
+		position_t spos = pair->spos;
+		position_t fpos = pair->fpos;		
+
 		// Положение вычисляется по формуле линейной интерполяции.
-		pos[i] = traj->fpos[i] * posmod + traj->spos[i] * (1 - posmod);
+		pos[i] = fpos * posmod + spos * (1 - posmod);
 
 		// Скорость вычисляется просто путём умножения на коэффицент.
 		// Выходная скорость имеет размерность единицы длины
 		// на дискретную единицу времени
-		velocity_t naive_speed = (velocity_t)(traj->fpos[i] - traj->spos[i]) / (velocity_t)full_time;
+		velocity_t naive_speed = (velocity_t)(fpos - spos) / (velocity_t)full_time;
 		spd[i] = naive_speed * spdmod;
 	}
 
@@ -37,11 +41,15 @@ int line_trajectory_attime (void * priv,
 	        traj->stim == traj->ftim) ? 1 : 0;
 }
 
-void line_trajectory_init(struct line_trajectory * lintraj, int dim, position_t * spos, position_t * fpos)
+void line_trajectory_init(
+	struct line_trajectory * lintraj, 
+	int dim, 
+    sf_position_t  * sfpos_array,
+    int sfpos_stride
+)
 {
 	trajectory_init(&lintraj->traj, dim, line_trajectory_attime);
-	lintraj->spos = spos;
-	lintraj->fpos = fpos;
+	sparse_array_init(&lintraj->sfpos, sfpos_array, sfpos_stride);
 }
 
 /// detail: Процедура не учитывает возможные начальную и оконечную скорости.
@@ -63,8 +71,10 @@ void line_trajectory_init_nominal_speed(
 
 	for (unsigned int i = 0; i < lintraj->traj.dim; ++i)
 	{
-		lintraj->spos[i] = spos[i];
-		lintraj->fpos[i] = fpos[i];
+		sf_position_t * pair = sparse_array_ptr(&lintraj->sfpos, i, sf_position_t);
+
+		pair->spos = spos[i];
+		pair->fpos = fpos[i];
 	}
 
 	int time = ftim - stim;
@@ -89,8 +99,10 @@ void line_trajectory_set_point_hold(
 
 	for (unsigned int i = 0; i < traj->traj.dim; ++i)
 	{
-		traj->spos[i] = pos[i];
-		traj->fpos[i] = pos[i];
+		sf_position_t * pair = sparse_array_ptr(&traj->sfpos, i, sf_position_t);
+
+		pair->spos = pos[i];
+		pair->fpos = pos[i];
 	}
 
 	tsdeform_set_stop_pattern(&traj->tsd);
