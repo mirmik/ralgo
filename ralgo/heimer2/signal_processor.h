@@ -21,9 +21,6 @@ struct signal_processor
 {
 	struct dlist_head list_lnk;
 	char name[SIGNAL_PROCESSOR_NAME_MAX_LENGTH];
-
-
-
 	const struct signal_processor_operations * ops;
 	uint8_t active;
 };
