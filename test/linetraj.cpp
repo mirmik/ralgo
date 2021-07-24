@@ -9,10 +9,12 @@ TEST_CASE("line trajectory")
 
 	position_t spos_buffer;
 	position_t fpos_buffer;
+
+	sf_position_t sfpos;
 	position_t spos = 300;
 	position_t fpos = 400;
 
-	line_trajectory_init(&ltraj, 1, &spos, &fpos);
+	line_trajectory_init(&ltraj, 1, &sfpos, 0);
 
 	line_trajectory_init_nominal_speed(
 		&ltraj,

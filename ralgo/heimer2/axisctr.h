@@ -8,6 +8,20 @@
 
 #include <ralgo/heimer2/signal_processor.h>
 
+struct axis_settings 
+{
+	struct axis_state * controlled;
+	position_t backlim; // Расстояние в единицах с фиксированной точкой.
+	position_t forwlim; // Расстояние в единицах с фиксированной точкой.
+
+	velocity_t     vel; // скорость в единицах  
+
+	acceleration_t acc; 
+	acceleration_t dcc;
+
+	double gain;
+};
+
 struct axis_controller 
 {
 	struct signal_processor sigproc;
