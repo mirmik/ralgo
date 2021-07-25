@@ -28,13 +28,13 @@ int bind(struct axis_controller * axctr, int argc, char ** argv, char * output, 
 static inline
 int info(struct axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
 {
-	if (!axctr->controlled) 
-	{
-		snprintf(output, outmax, "Constrolled axis is not binded");
-		return 0; 		
-	}
+//	if (!axctr->controlled) 
+//	{
+//		snprintf(output, outmax, "Constrolled axis is not binded");
+//		return 0; 		
+//	}
 
-	int64_t ctrpos_int = axctr->controlled->ctrpos; 
+/*	int64_t ctrpos_int = axctr->controlled->ctrpos; 
 	int64_t feedpos_int = axctr->controlled->feedpos;
 
 	float ctrpos_ext =  axis_controller_ctrpos_external(axctr); 
@@ -57,21 +57,34 @@ int info(struct axis_controller * axctr, int argc, char ** argv, char * output, 
 		ctrvel,
 		feedvel
 	);
-
+*/
 	return 0;
 }
 
 static inline
 int incmov(struct axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
 {
-	double dist = atof(argv[0]);
+	int dim = axctr->dim;
+	position_t dist[dim];
+
+	for (int i = 0; i < dim; ++i) 
+	{
+		dist[i] = atof(argv[i]);
+	}
+
 	return axis_controller_incmove(axctr, discrete_time(), dist);
 }
 
 static inline
 int absmov(struct axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
 {
-	double pos = atof(argv[0]);
+	int dim = axctr->dim;
+	position_t pos[dim];
+
+	for (int i = 0; i < dim; ++i) 
+	{
+		pos[i] = atof(argv[i]);
+	}
 	return axis_controller_absmove(axctr, discrete_time(), pos);
 }
 

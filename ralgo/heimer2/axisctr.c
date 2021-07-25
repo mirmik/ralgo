@@ -233,14 +233,18 @@ struct axis_controller * create_axis_controller(const char * name, int dim)
 	return ptr;
 }
 
-/*void axis_controller_release_controlled(struct axis_controller * axctr)
+void axis_controller_release_controlled(struct axis_controller * axctr)
 {
-	if (axctr->controlled)
+
+	for (int i = 0; i < axctr->dim; ++i)
 	{
-		signal_head_put(&axctr->controlled->sig);
-		axctr ->controlled = NULL;
+		if (axctr->settings[i].controlled)
+		{
+			signal_head_put(&axctr->settings[i].controlled->sig);
+			axctr->settings[i].controlled = NULL;
+		}
 	}
-}*/
+}
 
 void axis_controller_deinit(struct signal_processor * sigproc)
 {
@@ -255,11 +259,11 @@ struct signal_head * axis_controller_iterate_left(struct signal_processor * sigp
 	if (iter == NULL)
 		return &axctr->settings[0].controlled->sig;
 
-	for (int i = 0; i < axctr->dim - 1; ++i) 
+	for (int i = 0; i < axctr->dim - 1; ++i)
 	{
-		if (iter == &axctr->settings[i].controlled->sig) 
+		if (iter == &axctr->settings[i].controlled->sig)
 		{
-			return &axctr->settings[i+1].controlled->sig;
+			return &axctr->settings[i + 1].controlled->sig;
 		}
 	}
 
