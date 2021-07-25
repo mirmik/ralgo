@@ -1,5 +1,6 @@
 #include <ralgo/heimer2/command.h>
 
+#include <igris/util/numconvert.h>
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
@@ -47,7 +48,8 @@ int signal_processors_command_new(int argc, char ** argv, char * output,int maxs
 {
 	if (strcmp(argv[0], "axisctr") == 0)
 	{
-		create_axis_controller(argv[1]);	
+		int dim = atoi32(argv[2], 10, NULL);
+		create_axis_controller(argv[1], dim);	
 	}	
 }
 
