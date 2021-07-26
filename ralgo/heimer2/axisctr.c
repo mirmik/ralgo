@@ -70,11 +70,11 @@ void axis_controller_set_limits_external(struct axis_controller * axctr, double 
 	}
 }
 
-void axis_controller_set_controlled(struct axis_controller * axctr, struct axis_state * state)
+void axis_controller_set_controlled(struct axis_controller * axctr, struct axis_state ** state)
 {
 	for (int i = 0; i < axctr->dim; ++i)
 	{
-		axctr->settings[i].controlled = &state[i];
+		axctr->settings[i].controlled = state[i];
 		signal_head_get(&axctr->settings[i].controlled->sig);
 	}
 }
