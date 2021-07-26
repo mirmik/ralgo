@@ -215,10 +215,9 @@ int axis_controller_absmove(struct axis_controller * axctr, disctime_t current_t
 	{
 		double diff = pos_real[i] - axctr->settings[i].controlled->ctrpos / axctr->settings[i].gain;
 		extdist += diff * diff;
-		position_t dist = pos_real[i] * axctr->settings[i].gain;
-
+		
 		curpos[i] = axctr->settings[i].controlled->ctrpos;
-		tgtpos[i] = tgtpos[i] * axctr->settings[i].gain;
+		tgtpos[i] = pos_real[i] * axctr->settings[i].gain;
 
 		tgtpos[i] = CLAMP(tgtpos[i],
 		                  axctr->settings[i].backlim,
