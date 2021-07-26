@@ -2,7 +2,6 @@
 #define RALGO_HEIMER2_AXISCTR_H
 
 #include <ralgo/heimer2/axis_state.h>
-#include <ralgo/heimer2/distance.h>
 #include <ralgo/trajectory/linetraj.h>
 #include <ralgo/disctime.h>
 
