@@ -287,6 +287,16 @@ const struct signal_processor_operations axisctr_ops =
 	.iterate_left = axis_controller_iterate_left
 };
 
+void axis_settings_init(struct axis_settings * settings) 
+{
+	settings->controlled = NULL;
+	settings->backlim = 0; 
+	settings->forwlim = 0; 
+	settings->sfpos.spos = 0;
+	settings->sfpos.fpos = 0; 
+	settings->gain = 1;
+}
+
 void axis_controller_init(
     struct axis_controller * axctr,
     const char * name,
@@ -300,7 +310,8 @@ void axis_controller_init(
 	axctr->acc = 0;
 	axctr->dcc = 0;
 
-	memset(settings, 0, dim * sizeof(struct axis_settings));
+	for (int i = 0; i < dim; ++i)
+		axis_settings_init(&settings[i]);
 	axctr->settings = settings;
 	axctr->dim = dim;
 	
