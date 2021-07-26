@@ -36,9 +36,9 @@ TEST_CASE("axisctr")
 	sts = axis_controller_incmove(&axctr, 0, &tgt);
 	CHECK_EQ(sts, 0);
 
-	CHECK_EQ(axctr.vel, doctest::Approx(10.f / discrete_time_frequency() * 1000));
-	CHECK_EQ(axctr.acc, doctest::Approx(5.f / discrete_time_frequency() / discrete_time_frequency() * 1000));
-	CHECK_EQ(axctr.dcc, doctest::Approx(5.f / discrete_time_frequency() / discrete_time_frequency() * 1000));
+	//CHECK_EQ(axctr.vel, doctest::Approx(10.f / discrete_time_frequency() * 1000));
+	//CHECK_EQ(axctr.acc, doctest::Approx(5.f / discrete_time_frequency() / discrete_time_frequency() * 1000));
+	//CHECK_EQ(axctr.dcc, doctest::Approx(5.f / discrete_time_frequency() / discrete_time_frequency() * 1000));
 
 	CHECK_EQ(axctr.lintraj.ftim, 10 * discrete_time_frequency());
 

@@ -1,5 +1,6 @@
 #include <ralgo/heimer2/axisctr.h>
 #include <ralgo/heimer2/sigtypes.h>
+#include <ralgo/clinalg/vecops.h>
 #include <igris/math.h>
 #include <igris/util/bug.h>
 #include <igris/datastruct/sparse_array.h>
@@ -128,7 +129,8 @@ int __axis_controller_absmove(
     struct axis_controller * axctr,
     disctime_t curtim,
     position_t * curpos,
-    position_t * tgtpos)
+    position_t * tgtpos,
+    double extdist)
 {
 	for (int i = 0; i < axctr->dim; ++i)
 		if (axctr->settings[i].controlled->sig.current_controller)
@@ -139,8 +141,9 @@ int __axis_controller_absmove(
 	if (signal_processor_activate(&axctr->sigproc))
 		return -1;
 
-	position_t dist = tgtpos - curpos;
-	disctime_t tgttim = curtim + (float)(ABS(dist)) / axctr->vel;
+	
+	position_t dist = vecops_point_distance_d(tgtpos, curpos, axctr->dim);
+	disctime_t tgttim = curtim + (float)(ABS(extdist)) / axctr->vel;
 
 	if (dist == 0 || axctr->vel == 0)
 	{
@@ -173,9 +176,11 @@ int axis_controller_incmove(struct axis_controller * axctr, disctime_t current_t
 {
 	position_t curpos[axctr->dim];
 	position_t tgtpos[axctr->dim];
+	double extdist = 0;
 
 	for (int i = 0; i < axctr->dim; ++i)
 	{
+		extdist += dist_real[i] * dist_real[i];
 		position_t dist = dist_real[i] * axctr->settings[i].gain;
 
 		curpos[i] = axctr->settings[i].controlled->ctrpos;
@@ -186,7 +191,7 @@ int axis_controller_incmove(struct axis_controller * axctr, disctime_t current_t
 		                  axctr->settings[i].forwlim);
 	}
 
-	return __axis_controller_absmove(axctr, current_time, curpos, tgtpos);
+	return __axis_controller_absmove(axctr, current_time, curpos, tgtpos, sqrt(extdist));
 }
 
 int axis_controller_absmove(struct axis_controller * axctr, disctime_t current_time, double * pos_real)
@@ -194,9 +199,12 @@ int axis_controller_absmove(struct axis_controller * axctr, disctime_t current_t
 
 	position_t curpos[axctr->dim];
 	position_t tgtpos[axctr->dim];
+	double extdist = 0;
 
 	for (int i = 0; i < axctr->dim; ++i)
 	{
+		double diff = pos_real[i] - axctr->settings[i].controlled->ctrpos / axctr->settings[i].gain;
+		extdist += diff * diff;
 		position_t dist = pos_real[i] * axctr->settings[i].gain;
 
 		curpos[i] = axctr->settings[i].controlled->ctrpos;
@@ -207,7 +215,7 @@ int axis_controller_absmove(struct axis_controller * axctr, disctime_t current_t
 		                  axctr->settings[i].forwlim);
 	}
 
-	return __axis_controller_absmove(axctr, current_time, curpos, tgtpos);
+	return __axis_controller_absmove(axctr, current_time, curpos, tgtpos, sqrt(extdist));
 }
 
 /*float axis_controller_ctrpos_external(struct axis_controller * axctr)
@@ -282,7 +290,7 @@ const struct signal_processor_operations axisctr_ops =
 void axis_controller_init(
     struct axis_controller * axctr,
     const char * name,
-    struct axis_settings * setings,
+    struct axis_settings * settings,
     int dim
 )
 {
@@ -292,11 +300,10 @@ void axis_controller_init(
 	axctr->acc = 0;
 	axctr->dcc = 0;
 
-	//axctr->gain = 0;
-
-	//axctr->backlim = 0;
-	//axctr->forwlim = 0;
-
+	memset(settings, 0, dim * sizeof(struct axis_settings));
+	axctr->settings = settings;
+	axctr->dim = dim;
+	
 	axctr->operation_finished_flag = 0;
 
 	axctr->operation_start_handler = NULL;
