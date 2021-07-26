@@ -1,6 +1,7 @@
 #ifndef RALGO_HEIMER2_AXISCTR_H
 #define RALGO_HEIMER2_AXISCTR_H
 
+#include <ralgo/heimer2/axisctr_approval.h>
 #include <ralgo/heimer2/axis_state.h>
 #include <ralgo/trajectory/linetraj.h>
 #include <ralgo/disctime.h>
@@ -10,6 +11,7 @@
 struct axis_settings 
 {
 	struct axis_state * controlled;
+	int limits_enabled;
 	position_t backlim; 
 	position_t forwlim; 
 	sf_position_t sfpos; 
@@ -35,6 +37,9 @@ struct axis_controller
 
 	struct line_trajectory lintraj;
 	struct trajectory * curtraj;
+
+	struct axisctr_approval ** approvals;
+	int approvals_total;
 
 	int dim;
 	struct axis_settings * settings;

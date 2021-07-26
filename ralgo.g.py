@@ -27,9 +27,12 @@ licant.module("ralgo",
 		"ralgo/heimer2/axis_state.c",
 		"ralgo/heimer2/axstate_linear_processor.c",
 		"ralgo/heimer2/axstate_sincos_processor.c",
+		"ralgo/heimer2/convex_zone_approval.c",
 
 		"ralgo/clinalg/*.cpp",
 		"ralgo/clinalg/*.c",
+
+		"ralgo/lp/*.c",
 	],
 	include_paths=["."],
 	mdepends=[
