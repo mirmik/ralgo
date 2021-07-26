@@ -36,47 +36,48 @@ TEST_CASE("axisctr")
 	sts = axis_controller_incmove(&axctr, 0, &tgt);
 	CHECK_EQ(sts, 0);
 
-	//CHECK_EQ(axctr.vel, doctest::Approx(10.f / discrete_time_frequency() * 1000));
-	//CHECK_EQ(axctr.acc, doctest::Approx(5.f / discrete_time_frequency() / discrete_time_frequency() * 1000));
-	//CHECK_EQ(axctr.dcc, doctest::Approx(5.f / discrete_time_frequency() / discrete_time_frequency() * 1000));
+	// Вернуть, когда станет понятно с множителями.
+	CHECK_EQ(axctr.vel, doctest::Approx(10.f / discrete_time_frequency()));
+	CHECK_EQ(axctr.acc, doctest::Approx(5.f / discrete_time_frequency() / discrete_time_frequency()));
+	CHECK_EQ(axctr.dcc, doctest::Approx(5.f / discrete_time_frequency() / discrete_time_frequency()));
 
 	CHECK_EQ(axctr.lintraj.ftim, 10 * discrete_time_frequency());
 
 	axis_controller_serve(&axctr.sigproc, 0);
-	//CHECK_EQ(axis_controller_ctrvel_external(&axctr), 0);
-	//CHECK_EQ(axis_controller_ctrpos_external(&axctr), 0);
+	CHECK_EQ(axis_controller_ctrvel_external(&axctr, 0), 0);
+	CHECK_EQ(axis_controller_ctrpos_external(&axctr, 0), 0);
 	CHECK_EQ(a, 0);
 
 	axis_controller_serve(&axctr.sigproc, 1 * discrete_time_frequency());
-	//CHECK_EQ(axis_controller_ctrvel_external(&axctr), 5);
+	CHECK_EQ(axis_controller_ctrvel_external(&axctr, 0), 5);
 	CHECK_EQ(a, 0);
 
 	axis_controller_serve(&axctr.sigproc, 2 * discrete_time_frequency());
-	//CHECK_EQ(axis_controller_ctrvel_external(&axctr), 10);
+	CHECK_EQ(axis_controller_ctrvel_external(&axctr, 0), 10);
 	CHECK_EQ(a, 0);
 
 	axis_controller_serve(&axctr.sigproc, 5 * discrete_time_frequency());
-	//CHECK_EQ(axis_controller_ctrvel_external(&axctr), 10);
-	//CHECK_EQ(axis_controller_ctrpos_external(&axctr), 40);
+	CHECK_EQ(axis_controller_ctrvel_external(&axctr, 0), 10);
+	CHECK_EQ(axis_controller_ctrpos_external(&axctr, 0), 40);
 	CHECK_EQ(a, 0);
 
 	axis_controller_serve(&axctr.sigproc, 6 * discrete_time_frequency());
-	//CHECK_EQ(axis_controller_ctrvel_external(&axctr), 10);
-	//CHECK_EQ(axis_controller_ctrpos_external(&axctr), doctest::Approx(50));
+	CHECK_EQ(axis_controller_ctrvel_external(&axctr, 0), 10);
+	CHECK_EQ(axis_controller_ctrpos_external(&axctr, 0), doctest::Approx(50));
 	CHECK_EQ(a, 0);
 
 	axis_controller_serve(&axctr.sigproc, 10 * discrete_time_frequency());
-	//CHECK_EQ(axis_controller_ctrvel_external(&axctr), doctest::Approx(10));
-	//CHECK_EQ(axis_controller_ctrpos_external(&axctr), doctest::Approx(90));
+	CHECK_EQ(axis_controller_ctrvel_external(&axctr, 0), doctest::Approx(10));
+	CHECK_EQ(axis_controller_ctrpos_external(&axctr, 0), doctest::Approx(90));
 	CHECK_EQ(a, 0);
 
 	axis_controller_serve(&axctr.sigproc, 11 * discrete_time_frequency());
-	//CHECK_EQ(axis_controller_ctrvel_external(&axctr), doctest::Approx(5));
-	//CHECK_EQ(axis_controller_ctrpos_external(&axctr), doctest::Approx(97.5));
+	CHECK_EQ(axis_controller_ctrvel_external(&axctr, 0), doctest::Approx(5));
+	CHECK_EQ(axis_controller_ctrpos_external(&axctr, 0), doctest::Approx(97.5));
 	CHECK_EQ(a, 0);
 
 	signal_processor_serve(&axctr.sigproc, 12 * discrete_time_frequency());
-	//CHECK_EQ(axis_controller_ctrvel_external(&axctr), doctest::Approx(0));
-	//CHECK_EQ(axis_controller_ctrpos_external(&axctr), doctest::Approx(100));
+	CHECK_EQ(axis_controller_ctrvel_external(&axctr, 0), doctest::Approx(0));
+	CHECK_EQ(axis_controller_ctrpos_external(&axctr, 0), doctest::Approx(100));
 	CHECK_EQ(a, 1);
 }

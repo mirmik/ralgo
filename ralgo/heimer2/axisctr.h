@@ -75,9 +75,9 @@ int axis_controller_absmove(struct axis_controller * axctr, disctime_t current_t
 
 void axis_controller_serve(struct signal_processor * sigproc, disctime_t time);
 
-float axis_controller_feedpos_external(struct axis_controller * axctr);
-float axis_controller_ctrpos_external(struct axis_controller * axctr);
-float axis_controller_ctrvel_external(struct axis_controller * axctr);
+float axis_controller_feedpos_external(struct axis_controller * axctr, int axno);
+float axis_controller_ctrpos_external(struct axis_controller * axctr, int axno);
+float axis_controller_ctrvel_external(struct axis_controller * axctr, int axno);
 
 struct axis_controller * create_axis_controller(const char * name, int dim);
 
