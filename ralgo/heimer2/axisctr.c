@@ -218,20 +218,20 @@ int axis_controller_absmove(struct axis_controller * axctr, disctime_t current_t
 	return __axis_controller_absmove(axctr, current_time, curpos, tgtpos, sqrt(extdist));
 }
 
-/*float axis_controller_ctrpos_external(struct axis_controller * axctr)
+float axis_controller_ctrpos_external(struct axis_controller * axctr, int axno)
 {
-	return  axctr->controlled->ctrpos / axctr->gain;
+	return  axctr->settings[axno].controlled->ctrpos / axctr->settings[axno].gain;
 }
 
-float axis_controller_feedpos_external(struct axis_controller * axctr)
+float axis_controller_feedpos_external(struct axis_controller * axctr, int axno)
 {
-	return  axctr->controlled->feedpos / axctr->gain;
+	return  axctr->settings[axno].controlled->feedpos / axctr->settings[axno].gain;
 }
 
-float axis_controller_ctrvel_external(struct axis_controller * axctr)
+float axis_controller_ctrvel_external(struct axis_controller * axctr, int axno)
 {
-	return axctr->controlled->ctrvel * discrete_time_frequency() / axctr->gain;
-}*/
+	return axctr->settings[axno].controlled->ctrvel * discrete_time_frequency() / axctr->settings[axno].gain;
+}
 
 struct axis_controller * create_axis_controller(const char * name, int dim)
 {
