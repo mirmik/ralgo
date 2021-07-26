@@ -323,7 +323,6 @@ void axis_controller_init(
 
 	axctr->spattern_enabled = 0;
 	axctr->curtraj = NULL;
-	//axctr->controlled = NULL;
 
 	line_trajectory_init(&axctr->lintraj, 1,
 	                     &axctr->settings[0].sfpos,
