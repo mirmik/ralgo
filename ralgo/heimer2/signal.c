@@ -85,16 +85,16 @@ int signal_head_activate(struct signal_head * sig, struct signal_processor * pro
 
 int signal_head_deactivate(struct signal_head * sig, struct signal_processor * proc) 
 {
-	if (!sig->listener)
-		return -1;
-
 	if (proc != sig->current_controller)
-		return -1;
-
-	if (signal_processor_deactivate(sig->listener)) 
 		return -1;
 
 	sig->current_controller = NULL;
 	sig->active = -1;
+
+	if (sig->listener) 
+	{
+		return signal_processor_deactivate(sig->listener);
+	} 
+
 	return 0;
 }

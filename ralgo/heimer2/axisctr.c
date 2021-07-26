@@ -85,6 +85,7 @@ void axis_controller_finish_trajectory(struct axis_controller * axctr, disctime_
 	axctr->operation_finish_handler(axctr->operation_handlers_priv, axctr);
 	line_trajectory_set_point_hold(&axctr->lintraj, time, ctrpos);
 	axctr->curtraj = &axctr->lintraj.traj;
+	axctr->release_control_flag = 1;
 }
 
 void axis_controller_feedback(struct signal_processor * sigproc, disctime_t time)
@@ -97,6 +98,13 @@ void axis_controller_serve(struct signal_processor * sigproc, disctime_t time)
 	struct axis_controller * axctr =  mcast_out(sigproc, struct axis_controller, sigproc);
 	position_t ctrpos[axctr->dim];
 	velocity_t ctrvel[axctr->dim];
+
+	if (axctr->release_control_flag) 
+	{
+		axctr->release_control_flag = 0;
+		signal_processor_deactivate(sigproc);
+		return;
+	}
 
 	for (int i = 0; i < axctr->dim; ++i)
 	{
@@ -165,6 +173,8 @@ int __axis_controller_absmove(
 	                                  );
 
 	axctr->operation_finished_flag = 0;
+	axctr->release_control_flag = 0;
+	
 	if (axctr->operation_start_handler)
 		axctr->operation_start_handler(axctr->operation_handlers_priv, axctr);
 	axctr->curtraj = &axctr->lintraj.traj;
@@ -316,6 +326,7 @@ void axis_controller_init(
 	axctr->dim = dim;
 	
 	axctr->operation_finished_flag = 0;
+	axctr->release_control_flag = 0;
 
 	axctr->operation_start_handler = NULL;
 	axctr->operation_finish_handler = NULL;
