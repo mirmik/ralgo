@@ -34,6 +34,7 @@ void axis_controller_set_limits_internal(struct axis_controller * axctr, positio
 {
 	for (int i = 0; i < axctr->dim; ++i)
 	{
+		axctr->settings[i].limits_enabled = 1;
 		axctr->settings[i].backlim = back[i];
 		axctr->settings[i].forwlim = forw[i];
 	}
@@ -65,6 +66,7 @@ void axis_controller_set_limits_external(struct axis_controller * axctr, double 
 {
 	for (int i = 0; i < axctr->dim; ++i)
 	{
+		axctr->settings[i].limits_enabled = 1;
 		axctr->settings[i].backlim = back[i] * axctr->settings[i].gain;
 		axctr->settings[i].forwlim = forw[i] * axctr->settings[i].gain;
 	}
@@ -150,7 +152,7 @@ int __axis_controller_absmove(
 		return -1;
 
 	
-	position_t dist = vecops_point_distance_d(tgtpos, curpos, axctr->dim);
+	position_t dist = vecops_distance_d(tgtpos, curpos, axctr->dim);
 	disctime_t tgttim = curtim + (float)(ABS(extdist)) / axctr->vel;
 
 	if (dist == 0 || axctr->vel == 0)
@@ -196,7 +198,8 @@ int axis_controller_incmove(struct axis_controller * axctr, disctime_t current_t
 		curpos[i] = axctr->settings[i].controlled->ctrpos;
 		tgtpos[i] = curpos[i] + dist;
 
-		tgtpos[i] = CLAMP(tgtpos[i],
+		if (axctr->settings[i].limits_enabled)
+			tgtpos[i] = CLAMP(tgtpos[i],
 		                  axctr->settings[i].backlim,
 		                  axctr->settings[i].forwlim);
 	}
@@ -219,7 +222,8 @@ int axis_controller_absmove(struct axis_controller * axctr, disctime_t current_t
 		curpos[i] = axctr->settings[i].controlled->ctrpos;
 		tgtpos[i] = pos_real[i] * axctr->settings[i].gain;
 
-		tgtpos[i] = CLAMP(tgtpos[i],
+		if (axctr->settings[i].limits_enabled)
+			tgtpos[i] = CLAMP(tgtpos[i],
 		                  axctr->settings[i].backlim,
 		                  axctr->settings[i].forwlim);
 	}
@@ -304,6 +308,7 @@ void axis_settings_init(struct axis_settings * settings)
 	settings->sfpos.spos = 0;
 	settings->sfpos.fpos = 0; 
 	settings->gain = 1;
+	settings->limits_enabled = 0;
 }
 
 void axis_controller_init(
@@ -330,6 +335,9 @@ void axis_controller_init(
 	axctr->operation_start_handler = NULL;
 	axctr->operation_finish_handler = NULL;
 	axctr->operation_handlers_priv = NULL;
+
+	axctr->approvals = NULL;
+	axctr->approvals_total = 0;
 
 	axctr->spattern_enabled = 0;
 	axctr->curtraj = NULL;

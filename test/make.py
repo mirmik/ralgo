@@ -13,6 +13,7 @@ application("runtests",
 		"*.cpp",
 		"heimer/*.cpp",
 		"math/*.cpp",
+		"lp/*.cpp",
 	],
 
 	cxx_flags = "-g",
