@@ -67,7 +67,7 @@ void axis_controller_set_limits_internal(struct axis_controller * axctr, positio
 void axis_controller_set_velocity_internal(struct axis_controller * axctr, velocity_t vel);
 void axis_controller_set_accdcc_internal(struct axis_controller * axctr, acceleration_t acc, acceleration_t dcc);
 
-void axis_controller_set_controlled(struct axis_controller * axctr, struct axis_state * state);
+void axis_controller_set_controlled(struct axis_controller * axctr, struct axis_state ** state);
 void axis_controller_release_controlled(struct axis_controller * axctr);
 
 int axis_controller_incmove(struct axis_controller * axctr, disctime_t current_time, double * dist_real);

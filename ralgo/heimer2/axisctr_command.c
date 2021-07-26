@@ -9,7 +9,7 @@
 static inline
 int bind(struct axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
 {
-	axis_controller_release_controlled(axctr);
+/*	axis_controller_release_controlled(axctr);
 
 	struct signal_head * sig = signal_get_by_name(argv[1]);
 	if (!sig)
@@ -21,7 +21,7 @@ int bind(struct axis_controller * axctr, int argc, char ** argv, char * output, 
 		return -1;
 	}
 
-	axis_controller_set_controlled(axctr, mcast_out(sig, struct axis_state, sig));
+	axis_controller_set_controlled(axctr, mcast_out(sig, struct axis_state, sig));*/
 	return 0;
 }
 
