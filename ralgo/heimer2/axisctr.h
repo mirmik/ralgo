@@ -25,6 +25,7 @@ struct axis_controller
 	acceleration_t dcc;
 
 	int operation_finished_flag;
+	int release_control_flag;
 
 	void (* operation_start_handler)(void * priv, struct axis_controller * ax);
 	void (* operation_finish_handler)(void * priv, struct axis_controller * ax);

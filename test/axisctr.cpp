@@ -6,6 +6,7 @@
 
 static int a = 0;
 
+static inline
 void finish_handler(void * arg, struct axis_controller * ctr)
 {
 	++a;
