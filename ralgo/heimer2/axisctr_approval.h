@@ -10,11 +10,27 @@ struct axisctr_approval
 {
 	int (* check) (
 		struct axisctr_approval * approval, 
-		struct axisctr * ctr, 
 		int dim,
 		position_t * strt, 
 		position_t * fini
 	);
 };
+
+__BEGIN_DECLS
+
+static inline
+void axisctr_approval_init(struct axisctr_approval * approval, 	
+	int (* check) (
+		struct axisctr_approval * approval,
+		int dim,
+		position_t * strt, 
+		position_t * fini
+	)
+) 
+{
+	approval->check = check;
+}
+
+__END_DECLS
 
 #endif
