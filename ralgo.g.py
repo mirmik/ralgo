@@ -33,6 +33,8 @@ licant.module("ralgo",
 		"ralgo/clinalg/*.c",
 
 		"ralgo/lp/*.c",
+
+		"ralgo/util/index_brute_force.c",
 	],
 	include_paths=["."],
 	mdepends=[
