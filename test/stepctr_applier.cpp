@@ -1,5 +1,5 @@
 #include <doctest/doctest.h>
-#include <ralgo/heimer2/stepctr_applier.h>
+#include <ralgo/heimer/stepctr_applier.h>
 
 TEST_CASE("stepctr_applier") 
 {

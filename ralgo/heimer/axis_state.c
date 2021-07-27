@@ -1,8 +1,8 @@
-#include <ralgo/heimer2/axis_state.h>
+#include <ralgo/heimer/axis_state.h>
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <ralgo/heimer2/sigtypes.h>
+#include <ralgo/heimer/sigtypes.h>
 
 int axis_state_info(struct signal_head * sig, char * data, int maxsize) 
 {

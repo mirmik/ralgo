@@ -1,6 +1,6 @@
 #include <doctest/doctest.h>
-#include <ralgo/heimer2/command.h>
-#include <ralgo/heimer2/axstate_linear_processor.h>
+#include <ralgo/heimer/command.h>
+#include <ralgo/heimer/axstate_linear_processor.h>
 
 TEST_CASE("axstate_linear_processor") 
 {

@@ -2,7 +2,7 @@
 #define RALGO_TRAJECTORY_H
 
 #include <ralgo/trajectory/tsdeform.h>
-#include <ralgo/heimer2/heimer_types.h>
+#include <ralgo/heimer/heimer_types.h>
 #include <ralgo/disctime.h>
 
 typedef int (* trajectory_attime_t) (

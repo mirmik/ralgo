@@ -1,6 +1,6 @@
 #include <doctest/doctest.h>
-#include <ralgo/heimer2/command.h>
-#include <ralgo/heimer2/axis_state.h>
+#include <ralgo/heimer/command.h>
+#include <ralgo/heimer/axis_state.h>
 
 #include <string.h>
 #include <string_view>

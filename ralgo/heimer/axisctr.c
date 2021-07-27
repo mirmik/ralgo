@@ -1,5 +1,5 @@
-#include <ralgo/heimer2/axisctr.h>
-#include <ralgo/heimer2/sigtypes.h>
+#include <ralgo/heimer/axisctr.h>
+#include <ralgo/heimer/sigtypes.h>
 #include <ralgo/clinalg/vecops.h>
 #include <igris/math.h>
 #include <igris/util/bug.h>

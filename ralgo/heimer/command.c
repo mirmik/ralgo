@@ -1,4 +1,4 @@
-#include <ralgo/heimer2/command.h>
+#include <ralgo/heimer/command.h>
 
 #include <igris/util/numconvert.h>
 #include <string.h>
@@ -10,8 +10,8 @@
 
 #include <igris/dprint.h>
 
-#include <ralgo/heimer2/axis_state.h>
-#include <ralgo/heimer2/axisctr.h>
+#include <ralgo/heimer/axis_state.h>
+#include <ralgo/heimer/axisctr.h>
 
 
 

@@ -4,8 +4,8 @@
 #include <stdint.h>
 
 #include <igris/compiler.h>
-#include <ralgo/heimer2/heimer_types.h>
-#include <ralgo/heimer2/signal.h>
+#include <ralgo/heimer/heimer_types.h>
+#include <ralgo/heimer/signal.h>
 
 struct signal_processor;
 struct axis_state 

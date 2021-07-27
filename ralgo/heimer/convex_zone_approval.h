@@ -1,7 +1,7 @@
 #ifndef RALGO_HEIMER_CONVEX_ZONE_APPROVAL_H
 #define RALGO_HEIMER_CONVEX_ZONE_APPROVAL_H
 
-#include <ralgo/heimer2/axisctr_approval.h>
+#include <ralgo/heimer/axisctr_approval.h>
 
 struct convex_zone_approval
 {

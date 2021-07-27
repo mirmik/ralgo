@@ -3,7 +3,7 @@
 
 #include <igris/datastruct/sparse_array.h>
 #include <ralgo/trajectory/trajectory.h>
-#include <ralgo/heimer2/heimer_types.h>
+#include <ralgo/heimer/heimer_types.h>
 
 typedef struct sf_position 
 {

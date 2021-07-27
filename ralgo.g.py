@@ -17,17 +17,17 @@ licant.module("ralgo",
 		"ralgo/trajectory/linetraj.c",
 		"ralgo/robo/quadgen4_arduino.c",
 
-		"ralgo/heimer2/axisctr.c",
-		"ralgo/heimer2/axisctr_command.c",
-		"ralgo/heimer2/stepctr.c",
-		"ralgo/heimer2/stepctr_applier.c",
-		"ralgo/heimer2/signal_processor.c",
-		"ralgo/heimer2/signal.c",
-		"ralgo/heimer2/command.c",
-		"ralgo/heimer2/axis_state.c",
-		"ralgo/heimer2/axstate_linear_processor.c",
-		"ralgo/heimer2/axstate_sincos_processor.c",
-		"ralgo/heimer2/convex_zone_approval.c",
+		"ralgo/heimer/axisctr.c",
+		"ralgo/heimer/axisctr_command.c",
+		"ralgo/heimer/stepctr.c",
+		"ralgo/heimer/stepctr_applier.c",
+		"ralgo/heimer/signal_processor.c",
+		"ralgo/heimer/signal.c",
+		"ralgo/heimer/command.c",
+		"ralgo/heimer/axis_state.c",
+		"ralgo/heimer/axstate_linear_processor.c",
+		"ralgo/heimer/axstate_sincos_processor.c",
+		"ralgo/heimer/convex_zone_approval.c",
 
 		"ralgo/clinalg/*.cpp",
 		"ralgo/clinalg/*.c",
@@ -40,23 +40,9 @@ licant.module("ralgo",
 	mdepends=[
 		"ralgo.include",
 		"ralgo.log",
-		"ralgo.disctime",
-		"ralgo.heimer",
+		"ralgo.disctime"
 	],
 )
-
-licant.module("ralgo.heimer",
-	sources=[
-		"ralgo/heimer/protect.cpp",
-		"ralgo/heimer/control.cpp",
-		"ralgo/heimer/node.cpp",
-		"ralgo/heimer/command_center.cpp",
-		"ralgo/heimer/command_center_2.cpp",
-		"ralgo/heimer/servo_wishfeed_node.cpp",
-		"ralgo/heimer/signal.cpp",
-		"ralgo/heimer/command_center_console.cpp"
-	])
-
 
 licant.module("f2clib.internal",
 	sources = [

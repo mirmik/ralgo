@@ -1,6 +1,6 @@
 #include <doctest/doctest.h>
-#include <ralgo/heimer2/command.h>
-#include <ralgo/heimer2/axstate_sincos_processor.h>
+#include <ralgo/heimer/command.h>
+#include <ralgo/heimer/axstate_sincos_processor.h>
 
 #include <igris/math.h>
 

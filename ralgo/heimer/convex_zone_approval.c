@@ -3,7 +3,7 @@
 
 #include <igris/util/member.h>
 
-#include <ralgo/heimer2/convex_zone_approval.h>
+#include <ralgo/heimer/convex_zone_approval.h>
 #include <ralgo/lp/point_in_hexagon.h>
 
 int convex_zone_approval_check(

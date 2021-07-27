@@ -1,4 +1,4 @@
-#include <ralgo/heimer2/axstate_linear_processor.h>
+#include <ralgo/heimer/axstate_linear_processor.h>
 #include <ralgo/clinalg/matops.h>
 
 void axstate_linear_processor_serve(struct signal_processor * proc, disctime_t time) 
