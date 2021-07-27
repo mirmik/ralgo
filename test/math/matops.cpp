@@ -100,4 +100,18 @@ TEST_CASE("matops_test")
 		CHECK_EQ(b[2], 2);
 		CHECK_EQ(b[3], 4);
 	}
+
+	SUBCASE("matrix_view_co inline_transpose") 
+	{
+		double a[4] = { 1, 2, 3, 4 };
+
+		ralgo::matrix_view_ro<double> matrix_a (a, 2, 2);
+		ralgo::matops::square_inline_transpose(matrix_a);
+
+		CHECK_EQ(a[0], 1);
+		CHECK_EQ(a[1], 3);
+		CHECK_EQ(a[2], 2);
+		CHECK_EQ(a[3], 4);
+	}
+
 }

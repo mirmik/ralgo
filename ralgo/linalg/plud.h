@@ -13,7 +13,7 @@
 
 namespace ralgo
 {
-	template <class M, class TL, class TU, class TP>
+	template <class M, class TP, class TL, class TU>
 	class PLUD
 	{
 	public:
@@ -24,7 +24,12 @@ namespace ralgo
 
 		int status;
 
-		PLUD(const M & _mat) : a(_mat)
+		PLUD(const M & _mat) 
+			: PLUD(_mat, TP{}, TL{}, TU{})
+		{}
+
+		PLUD(const M & _mat, const TP & _p, const TL & _l, const TU & _u) 
+			: a(_mat), p(_p), l(_l), u(_u)
 		{
 			if (_mat.rows() != _mat.cols())
 			{
@@ -41,6 +46,7 @@ namespace ralgo
 			ralgo::matops::clean(p);
 			ralgo::matops::clean(l);
 			ralgo::matops::clean(u);
+	double U[n*n];
 
 			ralgo::matops::eye(p);
 			ralgo::matops::eye(l);
@@ -86,6 +92,8 @@ namespace ralgo
 					u(i, j) = 0;
 				}
 			}
+
+			ralgo::matops::square_inline_transpose(p);
 		}
 
 		template <class X, class B>
@@ -115,18 +123,34 @@ namespace ralgo
 
 	template <
 	    class M,
+	    class P = ralgo::matrix<typename M::value_type, ralgo::row_order<typename M::value_type>, std::allocator<typename M::value_type>>,
 	    class L = ralgo::matrix<typename M::value_type, ralgo::row_order<typename M::value_type>, std::allocator<typename M::value_type>>,
-	    class U = ralgo::matrix<typename M::value_type, ralgo::row_order<typename M::value_type>, std::allocator<typename M::value_type>>,
-	    class P = ralgo::matrix<typename M::value_type, ralgo::row_order<typename M::value_type>, std::allocator<typename M::value_type>>
+	    class U = ralgo::matrix<typename M::value_type, ralgo::row_order<typename M::value_type>, std::allocator<typename M::value_type>>
 	    >
-	PLUD<M, L, U, P> plud(const M & mat)
+	PLUD<M, P, L, U> plud(const M & mat)
 	{
 		return PLUD <
 		       M,
+		       P,
 		       L,
-		       U,
-		       P
+		       U
 		       > (mat);
+	}
+
+	template <
+	    class M,
+	    class P = ralgo::matrix<typename M::value_type, ralgo::row_order<typename M::value_type>, std::allocator<typename M::value_type>>,
+	    class L = ralgo::matrix<typename M::value_type, ralgo::row_order<typename M::value_type>, std::allocator<typename M::value_type>>,
+	    class U = ralgo::matrix<typename M::value_type, ralgo::row_order<typename M::value_type>, std::allocator<typename M::value_type>>
+	    >
+	PLUD<M, P, L, U> plud(const M & mat, const P & p, const L & l, const U & u)
+	{
+		return PLUD <
+		       M,
+		       P,
+		       L,
+		       U
+		       > (mat, p, l, u);
 	}
 }
 

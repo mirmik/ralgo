@@ -5,6 +5,25 @@
 
 __BEGIN_DECLS
 
+void point_in_hexagon__copy_rows_by_indexes_transposed(	
+	double * A, 
+	int dim, 
+	int points, 
+	int * indexes, 
+	int indexes_total, 
+	double * result_matrix);
+
+
+/**
+	Решает задачу о нахождении точки внутри симлекса - выпуклой оболочке n+1 точки n мерного пространства.
+*/
+int point_in_simplex_d(
+	double * A,
+	int dim,
+	double * target
+);
+
+
 /**
 	A[dim][points] - заданной набором точек.
 	dim - мерность пространства,

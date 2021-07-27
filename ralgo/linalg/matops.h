@@ -32,6 +32,18 @@ namespace ralgo
 			vecops::fill(arr, typename M::value_type {});
 		}
 
+		template<class M>
+		void square_inline_transpose(M& a)
+		{
+			for (int i = 0; i < a.rows(); ++i) 
+			{
+				for (int j = i+1; j < a.rows(); ++j) 
+				{
+					std::swap(a.at(i,j), a.at(j,i));
+				} 				
+			}
+		}
+
 		template <class T>
 		auto fill(int r, int c, T val) -> matrix<T>
 		{
