@@ -36,8 +36,6 @@ int point_in_simplex_d(
 	double exttgt[dim + 1];
 	double result[dim + 1];
 
-	memset(result, 0, sizeof(result))
-
 	for (int pnt = 0; pnt < dim + 1; ++pnt)
 	{
 		for (int i = 0; i < dim; ++i)
@@ -57,31 +55,7 @@ int point_in_simplex_d(
 	}
 	exttgt[dim] = 1;
 
-	for ( int i = 0; i < dim + 1; i++ )
-	{
-		for ( int j = 0; j < dim + 1; j++ )
-		{
-			dpr(*(matrix + i * (dim + 1) + j));
-			dpr(" ");
-		}
-		dln();
-	}
-
-	for ( int i = 0; i < dim + 1; i++ )
-	{
-		dpr(*(exttgt + i));
-		dpr(" ");
-	}
-	dln();
-
-	linalg_square_solve_d(A, dim+1, exttgt, result);
-
-	for ( int i = 0; i < dim + 1; i++ )
-	{
-		dpr(*(result + i));
-		dpr(" ");
-	}
-	dln();
+	linalg_square_solve_d(matrix, dim+1, exttgt, result);
 
 	for (int i = 0; i < dim + 1; ++i)
 	{
