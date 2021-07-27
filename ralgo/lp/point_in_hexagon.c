@@ -74,26 +74,24 @@ int point_in_hexagon_d(
     double * target
 )
 {
-	double matrix[(dim + 1) * (dim + 1)];
-	double xresult[dim + 1];
-	int base_coords[dim + 1];
-
+	double simplex[dim*(dim+1)];
+	int base_coords[dim+1];
 	index_brute_force_init(base_coords, dim + 1);
-
-	// Устанавливаем нижнюю строку матрицы базовых решений.
-	for (int i = 0; i < dim + 1; ++i)
-	{
-		*(matrix + (dim + 1) * (dim) + i) = 1;
-	}
 
 	do
 	{
-		point_in_hexagon__copy_rows_by_indexes_transposed(A, dim, points, base_coords, dim + 1, matrix);
+		for (int ii=0;ii<dim+1;++ii) 
+		{
+			int point = base_coords[ii];
 
-		//if (sts)
-		//	continue;
+			for (int j = 0; j < dim; ++j) 
+			{
+				*(simplex + ii*dim + j) = *(A + dim*point + j);
+			}
+		}
 
-		//for ()
+		if (point_in_simplex_d(simplex, dim, target)) 
+			return 1;
 	}
 	while (index_brute_force_next(base_coords, dim + 1, points) == 0);
 
