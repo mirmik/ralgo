@@ -51,7 +51,7 @@ TEST_CASE("point_in_simplex")
 	CHECK_EQ(point_in_simplex_d(A, 2, target4), 1);
 }
 
-/*TEST_CASE("point_in_hexagon") 
+TEST_CASE("point_in_hexagon") 
 {
 	double A[] = 
 	{
@@ -78,4 +78,4 @@ TEST_CASE("point_in_simplex")
 
 	double target5[] = { 1, 2.1 };
 	CHECK_EQ(point_in_hexagon_d(A, 2, 4, target5), 0);
-} */
+}
