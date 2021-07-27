@@ -15,7 +15,7 @@ application("sigtrans",
 	],
 	mdepends= [
 		"ralgo",
-		"ralgo.heimer"
+#		"ralgo.heimer"
 	],
 	defines = defines,
 	cxx_flags = "-Wextra -Wall",

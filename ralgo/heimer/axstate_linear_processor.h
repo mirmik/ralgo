@@ -4,8 +4,8 @@
 #define RALGO_HEIMER_AXSTATE_LINEAR_PROCESSOR_H
 
 #include <igris/compiler.h>
-#include <ralgo/heimer2/signal_processor.h>
-#include <ralgo/heimer2/axis_state.h>
+#include <ralgo/heimer/signal_processor.h>
+#include <ralgo/heimer/axis_state.h>
 
 /**
     Преобразователь реализует линейное преобразование путём умножения сигнала на матрицу.

@@ -3,8 +3,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <ralgo/heimer2/axisctr.h>
-#include <ralgo/heimer2/sigtypes.h>
+#include <ralgo/heimer/axisctr.h>
+#include <ralgo/heimer/sigtypes.h>
 
 static inline
 int bind(struct axis_controller * axctr, int argc, char ** argv, char * output, int outmax)

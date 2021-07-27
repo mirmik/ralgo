@@ -1,5 +1,5 @@
-#include <ralgo/heimer2/signal_processor.h>
-#include <ralgo/heimer2/signal.h>
+#include <ralgo/heimer/signal_processor.h>
+#include <ralgo/heimer/signal.h>
 #include <igris/shell/rshell.h>
 #include <string.h>
 #include <assert.h>

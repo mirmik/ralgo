@@ -1,4 +1,4 @@
-#include <ralgo/heimer2/axstate_sincos_processor.h>
+#include <ralgo/heimer/axstate_sincos_processor.h>
 
 void axstate_sincos_processor_serve(struct signal_processor * proc, disctime_t time)
 {

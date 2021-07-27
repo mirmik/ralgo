@@ -1,6 +1,6 @@
 #include <doctest/doctest.h>
-#include <ralgo/heimer2/axisctr.h>
-#include <ralgo/heimer2/command.h>
+#include <ralgo/heimer/axisctr.h>
+#include <ralgo/heimer/command.h>
 
 #include <nos/print.h>
 

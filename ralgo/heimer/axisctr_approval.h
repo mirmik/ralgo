@@ -2,7 +2,7 @@
 #define RALGO_HEIMER_AXISCTR_APPROVAL_H
 
 #include <igris/compiler.h>
-#include <ralgo/heimer2/heimer_types.h>
+#include <ralgo/heimer/heimer_types.h>
 
 struct axisctr;
 

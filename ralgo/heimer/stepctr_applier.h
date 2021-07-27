@@ -1,9 +1,9 @@
 #ifndef RALGO_HEIMER_STEPCTR_APPLIER
 #define RALGO_HEIMER_STEPCTR_APPLIER
 
-#include <ralgo/heimer2/stepctr.h>
-#include <ralgo/heimer2/axis_state.h>
-#include <ralgo/heimer2/signal_processor.h>
+#include <ralgo/heimer/stepctr.h>
+#include <ralgo/heimer/axis_state.h>
+#include <ralgo/heimer/signal_processor.h>
 
 struct stepctr_applier
 {
