@@ -47,6 +47,41 @@ TEST_CASE("plud")
 	
 }
 
+TEST_CASE("plud2") 
+{
+	ralgo::matrix<double> mat {
+		{0,2,0},
+		{0,0,2},
+		{1,1,1},
+	};
+
+	ralgo::matrix<double> p {
+		{0,1,0},
+		{0,0,1},
+		{1,0,0},
+	};
+
+	ralgo::matrix<double> l {
+		{1,0,0},
+		{0,1,0},
+		{0,0,1},
+	};
+
+	ralgo::matrix<double> u {
+		{1,1,1},
+		{0,2,0},
+		{0,0,2},
+	};
+
+	auto lu = ralgo::plud(mat);
+
+	CHECK_EQ(lu.p, p);
+	CHECK_EQ(lu.l, l);
+	CHECK_EQ(lu.u, u);
+	CHECK_EQ(ralgo::matops::multiply(lu.p, ralgo::matops::multiply(lu.l, lu.u)), mat);	
+}
+
+
 TEST_CASE("qrd") 
 {
 	ralgo::matrix<double> mat {
