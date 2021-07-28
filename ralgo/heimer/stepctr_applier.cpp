@@ -55,3 +55,9 @@ struct signal_head * stepctr_applier::iterate_left(struct signal_head *)
 {
 	return NULL;
 }
+
+struct signal_head * stepctr_applier::iterate_right(struct signal_head * iter) 
+{
+	if (iter) return NULL;
+	else return state;
+}
