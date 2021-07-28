@@ -47,6 +47,13 @@ namespace heimer
 		struct axis_settings * settings;
 
 	public:
+		axis_controller() = default;
+		axis_controller(
+		    const char * name,
+		    struct axis_settings * setings,
+		    int dim
+		);
+
 		int feedback(disctime_t time) override;
 		int serve(disctime_t time) override;
 		int command(int argc, char ** argv, char * output, int outmax) override;
