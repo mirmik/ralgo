@@ -22,7 +22,7 @@ int heimer::executor::order_sort()
 	for (int i = 0; i < order_table_size; ++i)
 	{
 		int j;
-		signal_processor * sigproc;
+		signal_processor * sigproc = order_table[i];
 
 		for (j = i; j < order_table_size; ++j)
 		{

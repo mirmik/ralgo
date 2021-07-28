@@ -30,10 +30,11 @@ licant.module("ralgo",
 		"ralgo/heimer/convex_zone_approval.cpp",
 		"ralgo/heimer/executor.cpp",
 
-		"ralgo/clinalg/*.cpp",
-		"ralgo/clinalg/*.c",
+		"ralgo/clinalg/matops_square_inverse.cpp",  
+		"ralgo/clinalg/solve.cpp",
 
-		"ralgo/lp/*.c",
+		"ralgo/lp/gradient.c",
+		"ralgo/lp/point_in_hexagon.c",
 
 		"ralgo/util/index_brute_force.c",
 	],
