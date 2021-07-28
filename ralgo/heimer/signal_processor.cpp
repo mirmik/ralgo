@@ -4,6 +4,8 @@
 #include <string.h>
 #include <assert.h>
 
+using namespace heimer;
+
 DLIST_HEAD(signal_processor_list);
 
 void signal_processor::init(const char * name)
@@ -19,12 +21,12 @@ void signal_processor::deinit()
 	dlist_del(&list_lnk);
 }
 
-int heimer_signal_processors_count()
+int heimer::heimer_signal_processors_count()
 {
 	return dlist_size(&signal_processor_list);
 }
 
-void signal_processors_list_reinit()
+void heimer::signal_processors_list_reinit()
 {
 	dlist_init(&signal_processor_list);
 }
@@ -33,7 +35,7 @@ int signal_processor::activate()
 {
 	int success = 1;
 
-	struct signal_head * iter = NULL;
+	signal_head * iter = NULL;
 	while (iter = iterate_left(iter))
 	{
 		int err = iter->activate(this);
@@ -59,7 +61,7 @@ int signal_processor::activate()
 
 int signal_processor::deactivate()
 {
-	struct signal_head * iter = NULL;
+	signal_head * iter = NULL;
 	while (iter = iterate_left(iter))
 	{
 		int err = iter->deactivate(this);

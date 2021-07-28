@@ -4,6 +4,8 @@
 #include <igris/math.h>
 #include <ralgo/disctime.h>
 
+using namespace heimer;
+
 void stepctr_controller::init(
 	void (*set_quaddgen_state)(void*, uint8_t),
 	void * priv,

@@ -1,5 +1,7 @@
 #include <ralgo/heimer/axstate_sincos_processor.h>
 
+using namespace heimer;
+
 int axstate_sincos_processor::serve(disctime_t time)
 {
 	struct axis_state * xl = leftside[0];
@@ -64,7 +66,7 @@ int  axstate_sincos_processor::command(int argc, char ** argv, char * output, in
 void axstate_sincos_processor::deinit()
 {}
 
-struct signal_head * axstate_sincos_processor::iterate_left(struct signal_head * iter)
+signal_head * axstate_sincos_processor::iterate_left(signal_head * iter)
 {
 	int dim = 3;
 	
@@ -85,7 +87,7 @@ struct signal_head * axstate_sincos_processor::iterate_left(struct signal_head *
 }
 
 
-struct signal_head * axstate_sincos_processor::iterate_right(struct signal_head * iter)
+signal_head * axstate_sincos_processor::iterate_right(signal_head * iter)
 {
 	int dim = 3;
 

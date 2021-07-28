@@ -4,6 +4,8 @@
 
 #include <nos/print.h>
 
+using namespace heimer;
+
 static int a = 0;
 
 static inline

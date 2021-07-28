@@ -10,10 +10,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+using namespace heimer;
+
 void axis_controller::set_handlers(
     void * operation_handlers_priv,
-    void (* operation_start_handler)(void * priv, struct axis_controller * ax),
-    void (* operation_finish_handler)(void * priv, struct axis_controller * ax)
+    void (* operation_start_handler)(void * priv, axis_controller * ax),
+    void (* operation_finish_handler)(void * priv, axis_controller * ax)
 )
 {
 	this->operation_handlers_priv = operation_handlers_priv;
@@ -245,9 +247,9 @@ float axis_controller::ctrvel_external(int axno)
 	return settings[axno].controlled->ctrvel * discrete_time_frequency() / settings[axno].gain;
 }
 
-struct axis_controller * create_axis_controller(const char * name, int dim)
+axis_controller * heimer::create_axis_controller(const char * name, int dim)
 {
-	struct axis_controller * ptr = new axis_controller;
+	axis_controller * ptr = new axis_controller;
 	struct axis_settings * settings = (struct axis_settings *) malloc(sizeof(struct axis_settings) * dim);
 	ptr->init(name, settings, dim);
 	return ptr;
@@ -270,7 +272,7 @@ void axis_controller::deinit()
 	release_controlled();
 }
 
-struct signal_head * axis_controller::iterate_left(struct signal_head * iter)
+signal_head * axis_controller::iterate_left(signal_head * iter)
 {
 	if (iter == NULL)
 		return settings[0].controlled;
@@ -286,7 +288,7 @@ struct signal_head * axis_controller::iterate_left(struct signal_head * iter)
 	return NULL;
 }
 
-struct signal_head * axis_controller::iterate_right(struct signal_head * iter) 
+signal_head * axis_controller::iterate_right(signal_head * iter) 
 {
 	return NULL;	
 }

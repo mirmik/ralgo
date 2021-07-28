@@ -5,8 +5,13 @@
 #include <pybind11/stl.h>
 #include <pybind11/chrono.h>
 
+#include <ralgo/heimer/axis_state.h>
 
-PYBIND11_MODULE(libheimer, m)
+namespace py = pybind11;
+
+void heimer_submodule(py::module & m)
 {
+	auto signal_head_cls = py::class_<signal_head>(m, "signal_head");
 
+	auto axis_state_cls = py::class_<axis_state>(m, "axis_state", signal_head_cls);
 }

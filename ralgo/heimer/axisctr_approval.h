@@ -4,33 +4,17 @@
 #include <igris/compiler.h>
 #include <ralgo/heimer/heimer_types.h>
 
-struct axisctr;
-
-struct axisctr_approval 
+namespace heimer
 {
-	int (* check) (
-		struct axisctr_approval * approval, 
-		int dim,
-		position_t * strt, 
-		position_t * fini
-	);
-};
-
-__BEGIN_DECLS
-
-static inline
-void axisctr_approval_init(struct axisctr_approval * approval, 	
-	int (* check) (
-		struct axisctr_approval * approval,
-		int dim,
-		position_t * strt, 
-		position_t * fini
-	)
-) 
-{
-	approval->check = check;
+	class axisctr_approval
+	{
+	public:
+		virtual int check (
+		    int dim,
+		    position_t * strt,
+		    position_t * fini
+		) = 0;
+	};
 }
-
-__END_DECLS
 
 #endif

@@ -5,6 +5,8 @@
 #include <ralgo/heimer/command.h>
 #include <ralgo/heimer/axstate_linear_processor.h>
 
+using namespace heimer;
+
 TEST_CASE("executor") 
 {
 	heimer_reinit();
