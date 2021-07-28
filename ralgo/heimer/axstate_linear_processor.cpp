@@ -105,4 +105,9 @@ void axstate_linear_processor::init(
 	this->rightside = rightside;
 	this->matrix = matrix;
 	this->invert_matrix = invert_matrix;
+
+	for (int i = 0; i < dim; ++i) 
+	{
+		this->rightside[i]->listener = this;
+	}
 }

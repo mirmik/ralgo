@@ -10,7 +10,7 @@ DLIST_HEAD(signals_list);
 void signal_head::init(const char * name, uint8_t type)
 {
 	refs = 0;
-	type = type;
+	this->type = type;
 	strncpy(this->name, name, SIGNAL_NAME_MAX_LENGTH);
 	dlist_add_tail(&signal_list_lnk, &signals_list);
 	current_controller = NULL;
