@@ -5,6 +5,8 @@
 #include <string.h>
 #include <string_view>
 
+using namespace heimer;
+
 TEST_CASE("heimer_command")
 {
 	char buf[96];

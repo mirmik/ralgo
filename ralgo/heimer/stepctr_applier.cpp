@@ -1,6 +1,8 @@
 #include <ralgo/heimer/stepctr_applier.h>
 #include <igris/math.h>
 
+using namespace heimer;
+
 void stepctr_applier::init(
     const char * name,
     struct stepctr_controller * stepctr,
@@ -55,12 +57,12 @@ int stepctr_applier::command(int argc, char ** argv, char * output, int outmax)
 	return 0;
 }
 
-struct signal_head * stepctr_applier::iterate_left(struct signal_head *) 
+signal_head * stepctr_applier::iterate_left(signal_head *) 
 {
 	return NULL;
 }
 
-struct signal_head * stepctr_applier::iterate_right(struct signal_head * iter) 
+signal_head * stepctr_applier::iterate_right(signal_head * iter) 
 {
 	if (iter) return NULL;
 	else return state;

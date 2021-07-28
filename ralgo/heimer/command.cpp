@@ -13,9 +13,9 @@
 #include <ralgo/heimer/axis_state.h>
 #include <ralgo/heimer/axisctr.h>
 
+using namespace heimer;
 
-
-int heimer_command_help(int argc, char ** argv, char * output, int maxsize)
+int heimer::heimer_command_help(int argc, char ** argv, char * output, int maxsize)
 {
 	snprintf(output, maxsize,
 	        "Command list:\r\n"
@@ -25,7 +25,7 @@ int heimer_command_help(int argc, char ** argv, char * output, int maxsize)
 	return 0;
 }
 
-int heimer_command_exec_safe(const char * str, char * output, int maxsize)
+int heimer::heimer_command_exec_safe(const char * str, char * output, int maxsize)
 {
 	char copydata[48];
 	char * argv[10];
@@ -37,14 +37,14 @@ int heimer_command_exec_safe(const char * str, char * output, int maxsize)
 	return heimer_command(argc, argv, output, maxsize);
 }
 
-void heimer_system_init()
+void heimer::heimer_system_init()
 {
 	signal_head_list_reinit();
 	signal_processors_list_reinit();
 }
 
 /// new command
-int signal_processors_command_new(int argc, char ** argv, char * output,int maxsize)
+int heimer::signal_processors_command_new(int argc, char ** argv, char * output,int maxsize)
 {
 	if (strcmp(argv[0], "axisctr") == 0)
 	{
@@ -62,7 +62,7 @@ static struct rshell_command heimer_signal_processors_commands[] =
 	{ NULL, NULL, NULL }
 };
 
-int heimer_command_signal_processors(int argc, char ** argv, char * output, int maxsize)
+int heimer::heimer_command_signal_processors(int argc, char ** argv, char * output, int maxsize)
 {
 	int ret;
 	int sts = rshell_execute_v(argc, argv, heimer_signal_processors_commands, &ret,
@@ -72,7 +72,7 @@ int heimer_command_signal_processors(int argc, char ** argv, char * output, int 
 }
 
 /// new command
-int signal_head_command_new(int argc, char ** argv, char * output, int maxsize) 
+int heimer::signal_head_command_new(int argc, char ** argv, char * output, int maxsize) 
 {
 	if (strcmp(argv[0], "axstate") == 0)
 	{
@@ -83,10 +83,10 @@ int signal_head_command_new(int argc, char ** argv, char * output, int maxsize)
 	return -1;
 }
 
-int heimer_command_signals(int argc, char ** argv, char * output, int maxsize) 
+int heimer::heimer_command_signals(int argc, char ** argv, char * output, int maxsize) 
 {
 	char * signame = argv[0];
-	struct signal_head * sig = signal_get_by_name(signame);
+	signal_head * sig = signal_get_by_name(signame);
 
 	if (sig == NULL) 
 	{
@@ -107,7 +107,7 @@ static struct rshell_command heimer_commands[] =
 	{ NULL, NULL, NULL }
 };
 
-int heimer_command(int argc, char ** argv, char * output, int maxsize)
+int heimer::heimer_command(int argc, char ** argv, char * output, int maxsize)
 {
 	int ret;
 	int sts = rshell_execute_v(argc, argv, heimer_commands, &ret,
@@ -117,7 +117,7 @@ int heimer_command(int argc, char ** argv, char * output, int maxsize)
 	return sts ? sts : ret;
 }
 
-void heimer_reinit() 
+void heimer::heimer_reinit() 
 {
 	signal_head_list_reinit();
 	signal_processors_list_reinit();

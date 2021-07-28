@@ -6,45 +6,42 @@
 #include <ralgo/heimer/convex_zone_approval.h>
 #include <ralgo/lp/point_in_hexagon.h>
 
-int convex_zone_approval_check(
-    struct axisctr_approval * approval,
+
+int heimer::convex_zone_approval::check(
     int dim,
     position_t * strt,
     position_t * fini)
 {
-	struct convex_zone_approval * cza = mcast_out(approval, struct convex_zone_approval, approval);
-	int in = point_in_hexagon_d(cza->table, dim, cza->points_total, fini);
+	int in = point_in_hexagon_d(table, dim, points_total, fini);
 	return in;
 }
 
-void convex_zone_approval_init(struct convex_zone_approval * cza, int dim)
+void heimer::convex_zone_approval::init(int dim)
 {
-	axisctr_approval_init(&cza->approval, &convex_zone_approval_check);
-
-	cza -> dim = dim;
-	cza -> table = NULL;
-	cza -> points_total = 0;
-	cza -> points_capacity = 0;
+	this->dim = dim;
+	table = NULL;
+	points_total = 0;
+	points_capacity = 0;
 }
 
-int convex_zone_approval_room(struct convex_zone_approval * cza) 
+int heimer::convex_zone_approval::room() 
 {
-	return cza->points_capacity - cza->points_total;
+	return points_capacity - points_total;
 }
 
-void convex_zone_approval_bind_table(struct convex_zone_approval * cza, position_t * table, int cap, int size) 
+void heimer::convex_zone_approval::bind_table(position_t * table, int cap, int size) 
 {
-	cza -> table = table;
-	cza -> points_capacity = cap;
-	cza -> points_total = size;
+	this->table = table;
+	this->points_capacity = cap;
+	this->points_total = size;
 }
 
-void convex_zone_approval_extend(struct convex_zone_approval * cza, position_t * pnt, int size) 
+void heimer::convex_zone_approval::extend(position_t * pnt, int size) 
 {
-	int room = convex_zone_approval_room(cza);
-	int toload = MIN(room, size);
+	int _room = room();
+	int toload = MIN(_room, size);
 
-	memcpy(cza->table + cza->points_total * cza->dim, pnt, toload * cza->dim * sizeof(position_t));
+	memcpy(table + points_total * dim, pnt, toload * dim * sizeof(position_t));
 
-	cza -> points_total += toload;
+	points_total += toload;
 }

@@ -5,7 +5,9 @@
 
 #include <igris/datastruct/nametbl.h>
 
-DLIST_HEAD(signals_list);
+using namespace heimer;
+
+DLIST_HEAD(heimer::signals_list);
 
 void signal_head::init(const char * name, uint8_t type)
 {
@@ -33,19 +35,19 @@ void signal_head::put()
 	--refs;
 }
 
-int heimer_signals_count()
+int heimer::heimer_signals_count()
 {
 	return dlist_size(&signals_list);
 }
 
-void signal_head_list_reinit()
+void heimer::signal_head_list_reinit()
 {
 	dlist_init(&signals_list);
 }
 
-struct signal_head * signal_get_by_name(const char * name)
+signal_head * heimer::signal_get_by_name(const char * name)
 {
-	struct signal_head * sig;
+	signal_head * sig;
 	dlist_for_each_entry(sig, &signals_list, signal_list_lnk)
 	{
 		if (strncmp(sig->name, name, SIGNAL_NAME_MAX_LENGTH) == 0)

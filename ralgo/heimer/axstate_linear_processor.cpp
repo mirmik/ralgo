@@ -1,6 +1,8 @@
 #include <ralgo/heimer/axstate_linear_processor.h>
 #include <ralgo/clinalg/matops.h>
 
+using namespace heimer;
+
 int axstate_linear_processor::serve(disctime_t time)
 {
 	for (int i = 0; i < dim; ++i)
@@ -47,7 +49,7 @@ int  axstate_linear_processor::command(int argc, char ** argv, char * output, in
 void axstate_linear_processor::deinit()
 {}
 
-struct signal_head * axstate_linear_processor::iterate_left(struct signal_head * iter)
+signal_head * axstate_linear_processor::iterate_left(signal_head * iter)
 {
 	if (iter == NULL)
 		return *leftside;
@@ -65,7 +67,7 @@ struct signal_head * axstate_linear_processor::iterate_left(struct signal_head *
 	return NULL;
 }
 
-struct signal_head * axstate_linear_processor::iterate_right(struct signal_head * iter)
+signal_head * axstate_linear_processor::iterate_right(signal_head * iter)
 {
 	if (iter == NULL)
 		return *rightside;

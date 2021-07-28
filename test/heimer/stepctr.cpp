@@ -1,6 +1,8 @@
 #include <doctest/doctest.h>
 #include <ralgo/heimer/stepctr.h>
 
+using namespace heimer;
+
 static int setted_state = 0; 
 
 void set_state(void * priv, uint8_t state) 
@@ -11,7 +13,7 @@ void set_state(void * priv, uint8_t state)
 
 TEST_CASE("stepctr")
 {
-	struct stepctr_controller stepctr;
+	stepctr_controller stepctr;
 
 	stepctr.init(set_state, nullptr, 2000, 0.7);
 	CHECK_EQ(setted_state, 0);

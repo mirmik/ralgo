@@ -6,12 +6,14 @@
 #include <ralgo/heimer/axisctr.h>
 #include <ralgo/heimer/sigtypes.h>
 
+using namespace heimer;
+
 static inline
-int bind(struct axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
+int bind(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
 {
 /*	axis_controller_release_controlled(axctr);
 
-	struct signal_head * sig = signal_get_by_name(argv[1]);
+	signal_head * sig = signal_get_by_name(argv[1]);
 	if (!sig)
 		return -1;
 
@@ -26,7 +28,7 @@ int bind(struct axis_controller * axctr, int argc, char ** argv, char * output, 
 }
 
 static inline
-int info(struct axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
+int info(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
 {
 //	if (!axctr->controlled) 
 //	{
@@ -62,7 +64,7 @@ int info(struct axis_controller * axctr, int argc, char ** argv, char * output, 
 }
 
 static inline
-int incmov(struct axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
+int incmov(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
 {
 	int dim = axctr->dim;
 	position_t dist[dim];
@@ -76,7 +78,7 @@ int incmov(struct axis_controller * axctr, int argc, char ** argv, char * output
 }
 
 static inline
-int absmov(struct axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
+int absmov(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
 {
 	int dim = axctr->dim;
 	position_t pos[dim];

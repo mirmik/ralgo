@@ -25,9 +25,12 @@ namespace py = pybind11;
 #define FLOAT4 float, float, float, float
 #define FLOAT3 float, float, float
 
+void heimer_submodule(py::module & m);
+
 PYBIND11_MODULE(libralgo, m)
 {
-	auto m2 = m.def_submodule("libheimer", "Heimer");
+	auto m2 = m.def_submodule("heimer", "Heimer");
+	heimer_submodule(m2);
 
 	/*auto regcdelta = py::class_<regulator_const_delta<double>>(m,
 	"regulator_const_delta"); py::class_<pi_regulator_const_delta<double>>(m,

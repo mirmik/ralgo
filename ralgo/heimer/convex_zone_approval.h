@@ -3,33 +3,30 @@
 
 #include <ralgo/heimer/axisctr_approval.h>
 
-struct convex_zone_approval
+namespace heimer
 {
-	struct axisctr_approval approval;
+	class convex_zone_approval : public axisctr_approval
+	{
+	public:
+		double * table;
+		int dim;
 
-	double * table;
-	int dim; 
+		int points_total;
+		int points_capacity;
 
-	int points_total;
-	int points_capacity;
-};
+		void init(int dim);
 
-__BEGIN_DECLS
+		int check(
+		    int dim,
+		    position_t * strt,
+		    position_t * fini) override;
 
-void convex_zone_approval_init(struct convex_zone_approval * cza, int dim);
+		int room();
 
-int convex_zone_approval_check(
-	struct axisctr_approval * approval,
-	int dim,
-	position_t * strt,
-	position_t * fini);
+		void bind_table(position_t * table, int cap, int size);
 
-int convex_zone_approval_room(struct convex_zone_approval * cza);
-
-void convex_zone_approval_bind_table(struct convex_zone_approval * cza, position_t * table, int cap, int size);
-
-void convex_zone_approval_extend(struct convex_zone_approval * cza, position_t * pnt, int size);
-
-__END_DECLS
+		void extend(position_t * pnt, int size);
+	};
+}
 
 #endif

@@ -4,6 +4,8 @@
 
 static int a = 0;
 
+using namespace heimer;
+
 static inline
 void finish_handler(void * arg, struct axis_controller * ctr)
 {
