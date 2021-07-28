@@ -72,7 +72,7 @@ int incmov(struct axis_controller * axctr, int argc, char ** argv, char * output
 		dist[i] = atof(argv[i]);
 	}
 
-	return axis_controller_incmove(axctr, discrete_time(), dist);
+	return axctr->incmove(discrete_time(), dist);
 }
 
 static inline
@@ -85,25 +85,24 @@ int absmov(struct axis_controller * axctr, int argc, char ** argv, char * output
 	{
 		pos[i] = atof(argv[i]);
 	}
-	return axis_controller_absmove(axctr, discrete_time(), pos);
+	return axctr->absmove(discrete_time(), pos);
 }
 
-int axis_controller_command(struct signal_processor * sigproc, int argc, char ** argv, char * output, int outmax)
+int axis_controller::command(int argc, char ** argv, char * output, int outmax)
 {
 	int status = ENOENT;
-	struct axis_controller * axctr = mcast_out(sigproc, struct axis_controller, sigproc);
 
 	if (strcmp("bind", argv[0]) == 0)
-		status = bind(axctr, argc - 1, argv + 1, output, outmax);
+		status = bind(this, argc - 1, argv + 1, output, outmax);
 
 	else if (strcmp("info", argv[0]) == 0)
-		status = info(axctr, argc - 1, argv + 1, output, outmax);
+		status = info(this, argc - 1, argv + 1, output, outmax);
 
 	else if (strcmp("absmov", argv[0]) == 0)
-		status = absmov(axctr, argc - 1, argv + 1, output, outmax);
+		status = absmov(this, argc - 1, argv + 1, output, outmax);
 
 	else if (strcmp("incmov", argv[0]) == 0)
-		status = incmov(axctr, argc - 1, argv + 1, output, outmax);
+		status = incmov(this, argc - 1, argv + 1, output, outmax);
 
 	return status;
 }

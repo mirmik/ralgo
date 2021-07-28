@@ -7,23 +7,21 @@
 #include <ralgo/heimer/heimer_types.h>
 #include <ralgo/heimer/signal.h>
 
-struct signal_processor;
-struct axis_state 
+class axis_state : public signal_head
 {
-	struct signal_head sig;
-
+public:
 	position_t ctrpos; /// Контрольная позиция в формате с фиксированной точкой	
 	velocity_t ctrvel; /// Сигнал управления по скорости.
 
 	position_t feedpos; /// Данные нижнего уровня о позиции
 	velocity_t feedvel; /// Данные нижнего уровня о скорости
+
+public:
+	void init(const char * name);
+	int info(char * data, int maxsize) override;
 };
 
 __BEGIN_DECLS
-
-void axis_state_init(struct axis_state * state, const char * name);
-
-int axis_state_info(struct signal_head * sig, char * data, int maxsize);
 
 struct axis_state * create_axis_state(const char * name);
 

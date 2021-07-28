@@ -13,33 +13,35 @@
     R = M * L
     L = M^-1 * R
 */
-struct axstate_linear_processor
+class axstate_linear_processor : public signal_processor
 {
-	struct signal_processor proc;
+//  struct signal_processor proc;
+private:
+    int dim;
 
-	int dim;
+    struct axis_state ** leftside;
+    struct axis_state ** rightside;
 
-	struct axis_state ** leftside;
-	struct axis_state ** rightside;
+    float * matrix;
+    float * invert_matrix;
 
-	float * matrix;
-	float * invert_matrix;
+public:
+    void feedback(disctime_t time) override;
+    void serve(disctime_t time) override;
+    int command(int argc, char ** argv, char * output, int outmax) override;
+    void deinit() override;
+    struct signal_head * iterate_left(struct signal_head *) override;
+
+    void init(
+        const char * name,
+        int dim,
+        struct axis_state ** leftside,
+        struct axis_state ** rightside,
+        float * matrix,
+        float * invert_matrix
+    );
+
+    void evaluate_invertion();
 };
-
-__BEGIN_DECLS
-
-void axstate_linear_processor_init(
-    struct axstate_linear_processor * lproc,
-    const char * name,
-    int dim,
-    struct axis_state ** leftside,
-    struct axis_state ** rightside,
-    float * matrix,
-    float * invert_matrix
-);
-
-void axstate_linear_processor_evaluate_invertion(struct axstate_linear_processor * lproc);
-
-__END_DECLS
 
 #endif

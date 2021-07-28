@@ -1,0 +1,162 @@
+#include <doctest/doctest.h>
+#include <ralgo/heimer/axisctr.h>
+#include <ralgo/heimer/command.h>
+
+#include <nos/print.h>
+
+static int a = 0;
+
+static inline
+void finish_handler(void * arg, struct axis_controller * ctr)
+{
+	++a;
+}
+
+TEST_CASE("axisctr")
+{
+	heimer_reinit();
+
+	int sts;
+
+	axis_state state;
+	axis_settings settings;
+	axis_controller axctr;
+
+	state.init("state");
+
+	axctr.init("axctr", &settings, 1);
+	axctr.set_handlers(nullptr, nullptr, finish_handler);
+	double gain = 1000; axctr.set_gain(&gain);
+	axctr.set_velocity_external(10);
+	axctr.set_accdcc_external(5, 5);
+	double forw = 100, back = -100;
+	axctr.set_limits_external(&back, &forw);
+
+	struct axis_state * state_ptr = &state;
+	axctr.set_controlled(&state_ptr);
+	double tgt = 100;
+	sts = axctr.incmove(0, &tgt);
+	CHECK_EQ(sts, 0);
+
+	CHECK_EQ(axctr.vel, doctest::Approx(10.f / discrete_time_frequency()));
+	CHECK_EQ(axctr.acc, doctest::Approx(5.f / discrete_time_frequency() / discrete_time_frequency()));
+	CHECK_EQ(axctr.dcc, doctest::Approx(5.f / discrete_time_frequency() / discrete_time_frequency()));
+
+	CHECK_EQ(axctr.lintraj.ftim, 10 * discrete_time_frequency());
+
+	axctr.serve(0);
+	CHECK_EQ(axctr.ctrvel_external(0), 0);
+	CHECK_EQ(axctr.ctrpos_external(0), 0);
+	CHECK_EQ(a, 0);
+
+	axctr.serve(1 * discrete_time_frequency());
+	CHECK_EQ(axctr.ctrvel_external(0), 5);
+	CHECK_EQ(a, 0);
+
+	axctr.serve(2 * discrete_time_frequency());
+	CHECK_EQ(axctr.ctrvel_external(0), 10);
+	CHECK_EQ(a, 0);
+
+	axctr.serve(5 * discrete_time_frequency());
+	CHECK_EQ(axctr.ctrvel_external(0), 10);
+	CHECK_EQ(axctr.ctrpos_external(0), 40);
+	CHECK_EQ(a, 0);
+
+	axctr.serve(6 * discrete_time_frequency());
+	CHECK_EQ(axctr.ctrvel_external(0), 10);
+	CHECK_EQ(axctr.ctrpos_external(0), doctest::Approx(50));
+	CHECK_EQ(a, 0);
+
+	axctr.serve(10 * discrete_time_frequency());
+	CHECK_EQ(axctr.ctrvel_external(0), doctest::Approx(10));
+	CHECK_EQ(axctr.ctrpos_external(0), doctest::Approx(90));
+	CHECK_EQ(a, 0);
+
+	axctr.serve(11 * discrete_time_frequency());
+	CHECK_EQ(axctr.ctrvel_external(0), doctest::Approx(5));
+	CHECK_EQ(axctr.ctrpos_external(0), doctest::Approx(97.5));
+	CHECK_EQ(a, 0);
+
+	axctr.serve(12 * discrete_time_frequency());
+	CHECK_EQ(axctr.ctrvel_external(0), doctest::Approx(0));
+	CHECK_EQ(axctr.ctrpos_external(0), doctest::Approx(100));
+	CHECK_EQ(a, 1);
+}
+
+
+
+TEST_CASE("axisctr_multiax")
+{
+	heimer_reinit();
+	a=0;
+
+	int sts;
+
+	struct axis_state state0;
+	struct axis_state state1;
+	struct axis_settings settings[2];
+	struct axis_controller axctr;
+
+	state0.init("state0");
+	state1.init("state1");
+
+	axctr.init("axctr", settings, 2);
+	axctr.set_handlers(nullptr, nullptr, finish_handler);
+	double gain = 1000; axctr.set_gain(&gain);
+	axctr.set_velocity_external(10);
+	axctr.set_accdcc_external(5, 5);
+	
+	double forw[2] = { 100,  100 }; 
+	double back[2] = {-100, -100 };
+	axctr.set_limits_external(back, forw);
+
+	struct axis_state * states[] = { &state0, &state1 };
+	axctr.set_controlled(states);
+	
+	double tgt[] = { 100, 100 };
+	sts = axctr.incmove(0, tgt);
+	CHECK_EQ(sts, 0);
+
+	CHECK_EQ(axctr.vel, doctest::Approx(10.f / discrete_time_frequency()));
+	CHECK_EQ(axctr.acc, doctest::Approx(5.f / discrete_time_frequency() / discrete_time_frequency()));
+	CHECK_EQ(axctr.dcc, doctest::Approx(5.f / discrete_time_frequency() / discrete_time_frequency()));
+
+	CHECK_EQ(axctr.lintraj.ftim, doctest::Approx(10 * sqrt(2) * discrete_time_frequency()));
+
+	axctr.serve(0);
+	CHECK_EQ(axctr.ctrvel_external(0), 0);
+	CHECK_EQ(axctr.ctrpos_external(0), 0);
+	CHECK_EQ(a, 0);
+
+	axctr.serve(1 * discrete_time_frequency());
+	CHECK_EQ(axctr.ctrvel_external(0), doctest::Approx(5 / sqrt(2)));
+	CHECK_EQ(a, 0);
+
+	axctr.serve(2 * discrete_time_frequency());
+	CHECK_EQ(axctr.ctrvel_external(0), doctest::Approx(10 / sqrt(2)));
+	CHECK_EQ(a, 0);
+
+	axctr.serve(5 * discrete_time_frequency());
+	CHECK_EQ(axctr.ctrvel_external(0), doctest::Approx(10 / sqrt(2)));
+	CHECK_EQ(axctr.ctrpos_external(0), doctest::Approx(40 / sqrt(2)));
+	CHECK_EQ(a, 0);
+
+	axctr.serve(6 * discrete_time_frequency());
+	CHECK_EQ(axctr.ctrvel_external(0), doctest::Approx(10 / sqrt(2)));
+	CHECK_EQ(axctr.ctrpos_external(0), doctest::Approx(50 / sqrt(2)));
+	CHECK_EQ(a, 0);
+
+	axctr.serve(10 * discrete_time_frequency());
+	CHECK_EQ(axctr.ctrvel_external(0), doctest::Approx(10 / sqrt(2)));
+	CHECK_EQ(axctr.ctrpos_external(0), doctest::Approx(90 / sqrt(2)));
+	CHECK_EQ(a, 0);
+
+	axctr.serve((16.142 - 1) * discrete_time_frequency());
+	CHECK_EQ(axctr.ctrvel_external(0), doctest::Approx(5  / sqrt(2)));
+	CHECK_EQ(a, 0);
+
+	axctr.serve(16.142 * discrete_time_frequency());
+	CHECK_EQ(axctr.ctrvel_external(0), doctest::Approx(0));
+	CHECK_EQ(axctr.ctrpos_external(0), doctest::Approx(100));
+	CHECK_EQ(a, 1);
+}
