@@ -90,12 +90,12 @@ void axis_controller::finish_trajectory(disctime_t time, position_t * ctrpos)
 	release_control_flag = 1;
 }
 
-void axis_controller::feedback(disctime_t time)
+int axis_controller::feedback(disctime_t time)
 {
-	//pass
+	return 0;
 }
 
-void axis_controller::serve(disctime_t time)
+int axis_controller::serve(disctime_t time)
 {
 	position_t ctrpos[dim];
 	velocity_t ctrvel[dim];
@@ -104,7 +104,7 @@ void axis_controller::serve(disctime_t time)
 	{
 		release_control_flag = 0;
 		deactivate();
-		return;
+		return SIGNAL_PROCESSOR_RETURN_NOT_ACTIVE;
 	}
 
 	for (int i = 0; i < dim; ++i)
@@ -113,11 +113,11 @@ void axis_controller::serve(disctime_t time)
 		    settings[i].controlled->current_controller &&
 		    settings[i].controlled->current_controller != this
 		)
-			return;
+			return SIGNAL_PROCESSOR_RETURN_NOT_ACTIVE;
 	}
 
 	if (!curtraj)
-		return;
+		return SIGNAL_PROCESSOR_RETURN_NOT_ACTIVE;
 
 	int sts = curtraj->attime(curtraj, time, ctrpos, ctrvel);
 	for (int i = 0; i < dim; ++i)
@@ -131,6 +131,8 @@ void axis_controller::serve(disctime_t time)
 	{
 		finish_trajectory(time, ctrpos);
 	}
+
+	return 0;
 }
 
 int axis_controller::_absmove(

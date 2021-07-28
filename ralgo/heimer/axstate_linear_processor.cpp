@@ -1,7 +1,7 @@
 #include <ralgo/heimer/axstate_linear_processor.h>
 #include <ralgo/clinalg/matops.h>
 
-void axstate_linear_processor::serve(disctime_t time)
+int axstate_linear_processor::serve(disctime_t time)
 {
 	for (int i = 0; i < dim; ++i)
 	{
@@ -16,9 +16,11 @@ void axstate_linear_processor::serve(disctime_t time)
 		leftside[i]->ctrpos = accpos;
 		leftside[i]->ctrvel = accvel;
 	}
+
+	return 0;
 }
 
-void axstate_linear_processor::feedback(disctime_t time)
+int axstate_linear_processor::feedback(disctime_t time)
 {
 	for (int i = 0; i < dim; ++i)
 	{
@@ -33,6 +35,8 @@ void axstate_linear_processor::feedback(disctime_t time)
 		rightside[i]->feedpos = accpos;
 		rightside[i]->feedvel = accvel;
 	}
+	
+	return 0;
 }
 
 int  axstate_linear_processor::command(int argc, char ** argv, char * output, int outmax)

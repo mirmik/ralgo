@@ -17,6 +17,11 @@ namespace heimer
 		int order_sort();
 
 		void append_processor(signal_processor * proc);
+
+		int serve(disctime_t curtime);
+		int feedback(disctime_t curtime);
+
+		int exec(disctime_t curtime);
 	};
 }
 

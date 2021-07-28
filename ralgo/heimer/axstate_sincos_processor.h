@@ -83,8 +83,8 @@ class axstate_sincos_processor : public signal_processor
 	float alpha_to_radian_scale;
 
 public:
-	void feedback(disctime_t time) override;
-	void serve(disctime_t time) override;
+	int feedback(disctime_t time) override;
+	int serve(disctime_t time) override;
 	int command(int argc, char ** argv, char * output, int outmax) override;
 	void deinit() override;
 	struct signal_head * iterate_left(struct signal_head *) override;
