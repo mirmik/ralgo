@@ -27,8 +27,8 @@ TEST_CASE("axstate_sincos_processor")
 		yr.ctrvel = heimvel(2);
 		ar.ctrvel = heimvel(1);
 
-		axstate_sincos_processor_init(&scproc, "axproc", left, right, heimdist(10.f));
-		signal_processor_serve(&scproc.proc, 0);
+		scproc.init("axproc", left, right, heimdist(10.f));
+		scproc.serve(0);
 
 		CHECK_EQ(heimpos_cos(ar.ctrpos), doctest::Approx(cosf(deg2rad(angle))));
 		CHECK_EQ(heimpos_sin(ar.ctrpos), doctest::Approx(sinf(deg2rad(angle))));
@@ -48,7 +48,7 @@ TEST_CASE("axstate_sincos_processor")
 		yl.feedvel = yl.ctrvel;
 		al.feedvel = al.ctrvel;
 
-		signal_processor_feedback(&scproc.proc, 0);
+		scproc.feedback(0);
 
 		CHECK_EQ(xr.feedpos, heimdist(10.f));
 		CHECK_EQ(yr.feedpos, heimdist(20.f));
@@ -80,15 +80,14 @@ TEST_CASE("axstate_sincos_processor")
 		yr.ctrvel = heimvel(2);
 		ar.ctrvel = heimvel(1);
 
-		axstate_sincos_processor_init(&scproc, "axproc", left, right, heimdist(10.f));
-		axstate_sincos_processor_set_offset(
-			&scproc,
+		scproc.init("axproc", left, right, heimdist(10.f));
+		scproc.set_offset(
 			heimdist(1),
 			heimdist(2),
 			heimdist(0.1),
 			heimdist(0.2)
 		);
-		signal_processor_serve(&scproc.proc, 0);
+		scproc.serve(0);
 
 		CHECK_EQ(heimpos_cos(ar.ctrpos), doctest::Approx(cosf(deg2rad(angle))));
 		CHECK_EQ(heimpos_sin(ar.ctrpos), doctest::Approx(sinf(deg2rad(angle))));
@@ -108,7 +107,7 @@ TEST_CASE("axstate_sincos_processor")
 		yl.feedvel = yl.ctrvel;
 		al.feedvel = al.ctrvel;
 
-		signal_processor_feedback(&scproc.proc, 0);
+		scproc.feedback(0);
 
 		CHECK_EQ(heimdist_restore(xr.feedpos), doctest::Approx(10.f));
 		CHECK_EQ(heimdist_restore(yr.feedpos), doctest::Approx(20.f));
