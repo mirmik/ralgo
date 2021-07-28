@@ -3,8 +3,6 @@
 
 void axstate_linear_processor::serve(disctime_t time)
 {
-	int dim = dim;
-
 	for (int i = 0; i < dim; ++i)
 	{
 		position_t accpos = 0;
@@ -22,8 +20,6 @@ void axstate_linear_processor::serve(disctime_t time)
 
 void axstate_linear_processor::feedback(disctime_t time)
 {
-	int dim = dim;
-
 	for (int i = 0; i < dim; ++i)
 	{
 		position_t accpos = 0;
@@ -89,9 +85,9 @@ void axstate_linear_processor::init(
 {
 	signal_processor::init(name);
 
-	dim = dim;
-	leftside = leftside;
-	rightside = rightside;
-	matrix = matrix;
-	invert_matrix = invert_matrix;
+	this->dim = dim;
+	this->leftside = leftside;
+	this->rightside = rightside;
+	this->matrix = matrix;
+	this->invert_matrix = invert_matrix;
 }

@@ -16,9 +16,9 @@ void axis_controller::set_handlers(
     void (* operation_finish_handler)(void * priv, struct axis_controller * ax)
 )
 {
-	operation_handlers_priv = operation_handlers_priv;
-	operation_start_handler = operation_start_handler;
-	operation_finish_handler = operation_finish_handler;
+	this->operation_handlers_priv = operation_handlers_priv;
+	this->operation_start_handler = operation_start_handler;
+	this->operation_finish_handler = operation_finish_handler;
 }
 
 void axis_controller::set_gain(double * gain)
@@ -51,14 +51,14 @@ void axis_controller::set_velocity_external(float speed)
 
 void axis_controller::set_accdcc_internal(velocity_t  acc, velocity_t  dcc)
 {
-	acc = acc;
-	dcc = dcc;
+	this->acc = acc;
+	this->dcc = dcc;
 }
 
 void axis_controller::set_accdcc_external(float acc, float dcc)
 {
-	acc = acc / discrete_time_frequency() / discrete_time_frequency();
-	dcc = dcc / discrete_time_frequency() / discrete_time_frequency();
+	this->acc = acc / discrete_time_frequency() / discrete_time_frequency();
+	this->dcc = dcc / discrete_time_frequency() / discrete_time_frequency();
 }
 
 void axis_controller::set_limits_external(double * back, double * forw)
@@ -83,7 +83,8 @@ void axis_controller::set_controlled(struct axis_state ** state)
 void axis_controller::finish_trajectory(disctime_t time, position_t * ctrpos)
 {
 	operation_finished_flag = 1;
-	operation_finish_handler(operation_handlers_priv, this);
+	if (operation_finish_handler)
+		operation_finish_handler(operation_handlers_priv, this);
 	line_trajectory_set_point_hold(&lintraj, time, ctrpos);
 	curtraj = &lintraj.traj;
 	release_control_flag = 1;
@@ -244,7 +245,7 @@ float axis_controller::ctrvel_external(int axno)
 
 struct axis_controller * create_axis_controller(const char * name, int dim)
 {
-	struct axis_controller * ptr = (struct axis_controller *) malloc(sizeof(struct axis_controller));
+	struct axis_controller * ptr = new axis_controller;
 	struct axis_settings * settings = (struct axis_settings *) malloc(sizeof(struct axis_settings) * dim);
 	ptr->init(name, settings, dim);
 	return ptr;

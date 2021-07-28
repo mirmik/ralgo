@@ -78,8 +78,6 @@ public:
 	int incmove(disctime_t current_time, double * dist_real);
 	int absmove(disctime_t current_time, double * pos_real);
 
-	void serve(struct signal_processor * sigproc, disctime_t time);
-
 	float feedpos_external(int axno);
 	float ctrpos_external(int axno);
 	float ctrvel_external(int axno);

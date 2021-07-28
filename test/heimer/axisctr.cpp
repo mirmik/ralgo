@@ -44,6 +44,7 @@ TEST_CASE("axisctr")
 
 	CHECK_EQ(axctr.lintraj.ftim, 10 * discrete_time_frequency());
 
+	CHECK_EQ(axctr.ctrpos_external(0), 0);
 	axctr.serve(0);
 	CHECK_EQ(axctr.ctrvel_external(0), 0);
 	CHECK_EQ(axctr.ctrpos_external(0), 0);

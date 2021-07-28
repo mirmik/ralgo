@@ -19,7 +19,7 @@ void axis_state::init(const char * name)
 
 struct axis_state * create_axis_state(const char * name) 
 {
-	struct axis_state * ptr = (struct axis_state *) malloc(sizeof(struct axis_state));
+	struct axis_state * ptr = new axis_state;
 	ptr->init(name);
 	return ptr;
 }
