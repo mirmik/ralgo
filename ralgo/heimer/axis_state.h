@@ -19,15 +19,12 @@ namespace heimer
 		velocity_t feedvel; /// Данные нижнего уровня о скорости
 
 	public:
+		axis_state() = default;
+		axis_state(const char * name);
+
 		void init(const char * name);
 		int info(char * data, int maxsize) override;
 	};
 }
-
-__BEGIN_DECLS
-
-heimer::axis_state * create_axis_state(const char * name);
-
-__END_DECLS
 
 #endif

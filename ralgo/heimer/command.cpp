@@ -76,7 +76,7 @@ int heimer::signal_head_command_new(int argc, char ** argv, char * output, int m
 {
 	if (strcmp(argv[0], "axstate") == 0)
 	{
-		create_axis_state(argv[1]);	
+		new axis_state(argv[1]); // Сохранение указателя происходит внутри конструктора.
 		return 0;
 	}
 

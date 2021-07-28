@@ -12,6 +12,15 @@
 
 using namespace heimer;
 
+axis_controller::axis_controller(
+    const char * name,
+    struct axis_settings * setings,
+    int dim
+)
+{
+	init(name, setings, dim);
+}
+
 void axis_controller::set_handlers(
     void * operation_handlers_priv,
     void (* operation_start_handler)(void * priv, axis_controller * ax),
@@ -102,7 +111,7 @@ int axis_controller::serve(disctime_t time)
 	position_t ctrpos[dim];
 	velocity_t ctrvel[dim];
 
-	if (release_control_flag) 
+	if (release_control_flag)
 	{
 		release_control_flag = 0;
 		deactivate();
@@ -152,7 +161,7 @@ int axis_controller::_absmove(
 	if (activate())
 		return -1;
 
-	
+
 	position_t dist = vecops_distance_d(tgtpos, curpos, dim);
 	disctime_t tgttim = curtim + (float)(ABS(extdist)) / vel;
 
@@ -177,7 +186,7 @@ int axis_controller::_absmove(
 
 	operation_finished_flag = 0;
 	release_control_flag = 0;
-	
+
 	if (operation_start_handler)
 		operation_start_handler(operation_handlers_priv, this);
 	curtraj = &lintraj.traj;
@@ -201,8 +210,8 @@ int axis_controller::incmove(disctime_t current_time, double * dist_real)
 
 		if (settings[i].limits_enabled)
 			tgtpos[i] = CLAMP(tgtpos[i],
-		                  settings[i].backlim,
-		                  settings[i].forwlim);
+			                  settings[i].backlim,
+			                  settings[i].forwlim);
 	}
 
 	return _absmove(current_time, curpos, tgtpos, sqrt(extdist));
@@ -219,14 +228,14 @@ int axis_controller::absmove(disctime_t current_time, double * pos_real)
 	{
 		double diff = pos_real[i] - settings[i].controlled->ctrpos / settings[i].gain;
 		extdist += diff * diff;
-		
+
 		curpos[i] = settings[i].controlled->ctrpos;
 		tgtpos[i] = pos_real[i] * settings[i].gain;
 
 		if (settings[i].limits_enabled)
 			tgtpos[i] = CLAMP(tgtpos[i],
-		                  settings[i].backlim,
-		                  settings[i].forwlim);
+			                  settings[i].backlim,
+			                  settings[i].forwlim);
 	}
 
 	return _absmove(current_time, curpos, tgtpos, sqrt(extdist));
@@ -288,19 +297,19 @@ signal_head * axis_controller::iterate_left(signal_head * iter)
 	return NULL;
 }
 
-signal_head * axis_controller::iterate_right(signal_head * iter) 
+signal_head * axis_controller::iterate_right(signal_head * iter)
 {
-	return NULL;	
+	return NULL;
 }
 
 
-void axis_settings_init(struct axis_settings * settings) 
+void axis_settings_init(struct axis_settings * settings)
 {
 	settings->controlled = NULL;
-	settings->backlim = 0; 
-	settings->forwlim = 0; 
+	settings->backlim = 0;
+	settings->forwlim = 0;
 	settings->sfpos.spos = 0;
-	settings->sfpos.fpos = 0; 
+	settings->sfpos.fpos = 0;
 	settings->gain = 1;
 	settings->limits_enabled = 0;
 }
@@ -321,7 +330,7 @@ void axis_controller::init(
 		axis_settings_init(&settings[i]);
 	this->settings = settings;
 	this->dim = dim;
-	
+
 	operation_finished_flag = 0;
 	release_control_flag = 0;
 
