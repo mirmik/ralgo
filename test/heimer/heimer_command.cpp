@@ -36,8 +36,7 @@ TEST_CASE("heimer_command")
 	CHECK_NE(strlen(buf), 0);
 
 	struct signal_head * sig = signal_get_by_name("x");
-	axis_state_info(
-		sig, 
+	sig->info(
 		buf, 
 		96);
 	CHECK_EQ(sts, 0);

@@ -10,7 +10,7 @@
 #else
 // Затычка для того, чтобы скомпилировать функцию (для тестов)
 // на машине отличной от Arduino
-static void digitalWrite(uint8_t pin, uint8_t val) {};
+static void digitalWrite(uint8_t pin, uint8_t val) {}
 #endif
 
 struct quadgen4_arduino

@@ -19,9 +19,6 @@ struct line_trajectory
     disctime_t stim;
     disctime_t ftim;
 
-    //position_t * spos;
-    //position_t * fpos;
-
     /// Специфика использования траекторного объекта такова,
     /// что данные о крайних точках удобно хранить в распределённой структуре (см. axisctr)
     /// sfpos ссылается на элементы sf_position_t 
