@@ -26,6 +26,7 @@ public:
 	virtual int  command(int argc, char ** argv, char * output, int outmax) = 0;
 	virtual void deinit() = 0;
 	virtual struct signal_head * iterate_left(struct signal_head *) = 0;
+	virtual struct signal_head * iterate_right(struct signal_head *) = 0;
 
 	void init(const char * name);
 	int activate();

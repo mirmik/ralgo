@@ -31,6 +31,14 @@ TEST_CASE("axstate_linear_processor")
 	linproc.evaluate_invertion();
 	CHECK_NE(inverse_matrix[0], 0);
 
+	CHECK_EQ(linproc.iterate_left(NULL), &a);
+	CHECK_EQ(linproc.iterate_left(&a), &b);
+	CHECK_EQ(linproc.iterate_left(&b), nullptr);
+
+	CHECK_EQ(linproc.iterate_right(NULL), &c);
+	CHECK_EQ(linproc.iterate_right(&c), &d);
+	CHECK_EQ(linproc.iterate_right(&d), nullptr);
+
 	c.ctrpos = 200;
 	d.ctrpos = 100;
 	c.ctrvel = 20;

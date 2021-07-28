@@ -62,16 +62,36 @@ void axstate_sincos_processor::deinit()
 
 struct signal_head * axstate_sincos_processor::iterate_left(struct signal_head * iter)
 {
+	int dim = 3;
+	
 	if (iter == NULL)
 		return *leftside;
 
-	if (iter == *(leftside + 2)) 
-		return NULL;
-
 	struct axis_state ** it = leftside;
-	for (; it != leftside + 2; ++it) 
+	for (; it != leftside + dim - 1  ; ++it)
 	{
-		if (*it == iter) 
+		if (*it == iter)
+		{
+			it++;
+			return *it;
+		}
+	}
+
+	return NULL;
+}
+
+
+struct signal_head * axstate_sincos_processor::iterate_right(struct signal_head * iter)
+{
+	int dim = 3;
+
+	if (iter == NULL)
+		return *rightside;
+
+	struct axis_state ** it = rightside;
+	for (; it != rightside + dim - 1  ; ++it)
+	{
+		if (*it == iter)
 		{
 			it++;
 			return *it;

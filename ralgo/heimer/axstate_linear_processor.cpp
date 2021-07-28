@@ -48,11 +48,26 @@ struct signal_head * axstate_linear_processor::iterate_left(struct signal_head *
 	if (iter == NULL)
 		return *leftside;
 
-	if (iter == *(leftside + dim - 1))
-		return NULL;
-
 	struct axis_state ** it = leftside;
 	for (; it != leftside + dim - 1  ; ++it)
+	{
+		if (*it == iter)
+		{
+			it++;
+			return *it;
+		}
+	}
+
+	return NULL;
+}
+
+struct signal_head * axstate_linear_processor::iterate_right(struct signal_head * iter)
+{
+	if (iter == NULL)
+		return *rightside;
+
+	struct axis_state ** it = rightside;
+	for (; it != rightside + dim - 1  ; ++it)
 	{
 		if (*it == iter)
 		{

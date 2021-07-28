@@ -284,6 +284,12 @@ struct signal_head * axis_controller::iterate_left(struct signal_head * iter)
 	return NULL;
 }
 
+struct signal_head * axis_controller::iterate_right(struct signal_head * iter) 
+{
+	return NULL;	
+}
+
+
 void axis_settings_init(struct axis_settings * settings) 
 {
 	settings->controlled = NULL;

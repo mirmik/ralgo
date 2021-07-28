@@ -31,6 +31,7 @@ public:
     int command(int argc, char ** argv, char * output, int outmax) override;
     void deinit() override;
     struct signal_head * iterate_left(struct signal_head *) override;
+    struct signal_head * iterate_right(struct signal_head *) override;
 
     void init(
         const char * name,
