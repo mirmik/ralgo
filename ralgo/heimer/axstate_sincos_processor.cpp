@@ -1,6 +1,6 @@
 #include <ralgo/heimer/axstate_sincos_processor.h>
 
-void axstate_sincos_processor::serve(disctime_t time)
+int axstate_sincos_processor::serve(disctime_t time)
 {
 	struct axis_state * xl = leftside[0];
 	struct axis_state * yl = leftside[1];
@@ -24,9 +24,11 @@ void axstate_sincos_processor::serve(disctime_t time)
 	xl->ctrvel = xr->ctrvel - radius * s * avelocity; 
 	yl->ctrvel = yr->ctrvel + radius * c * avelocity;
 	al->ctrvel = ar->ctrvel;
+
+	return 0;
 }
 
-void axstate_sincos_processor::feedback(disctime_t time)
+int axstate_sincos_processor::feedback(disctime_t time)
 {
 	struct axis_state * xl = leftside[0];
 	struct axis_state * yl = leftside[1];
@@ -50,6 +52,8 @@ void axstate_sincos_processor::feedback(disctime_t time)
 	xr->feedvel = xl->feedvel + radius * s * avelocity; 
 	yr->feedvel = yl->feedvel - radius * c * avelocity;
 	ar->feedvel = al->feedvel;
+	
+	return 0;
 }
 
 int  axstate_sincos_processor::command(int argc, char ** argv, char * output, int outmax)

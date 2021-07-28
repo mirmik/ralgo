@@ -33,13 +33,13 @@ int heimer::executor::order_sort()
 			signal_head * h = nullptr;
 			while ((h = sigproc->iterate_left(h)))
 			{
-				if (h->sorting_mark == 0) 
+				if (h->sorting_mark == 0)
 				{
 					has_unordered = 1;
 				}
 			}
 
-			if (has_unordered == 0) 
+			if (has_unordered == 0)
 			{
 				break;
 			}
@@ -68,4 +68,38 @@ void heimer::executor::append_processor(signal_processor * proc)
 		return;
 
 	order_table[order_table_size++] = proc;
+}
+
+int heimer::executor::serve(disctime_t curtime)
+{
+	int retcode;
+
+	for(int i = order_table_size - 1; i >= order_table_size; --i) 
+	{
+		retcode = order_table[i]->serve(curtime);
+	}
+
+	return 0;
+}
+
+int heimer::executor::feedback(disctime_t curtime)
+{
+	int retcode;
+
+	for(int i = 0; i < order_table_size; ++i) 
+	{
+		retcode = order_table[i]->feedback(curtime);
+	}
+
+	return 0;
+}
+
+int heimer::executor::exec(disctime_t curtime)
+{
+	int retcode;
+	
+	retcode = feedback(curtime);
+	retcode = serve(curtime);
+
+	return 0;
 }

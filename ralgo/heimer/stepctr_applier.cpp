@@ -20,7 +20,7 @@ void stepctr_applier::deinit()
 	state->put();
 }
 
-void stepctr_applier::serve(disctime_t time)
+int stepctr_applier::serve(disctime_t time)
 {
 	int64_t errpos = state->ctrpos - state->feedpos;
 
@@ -40,11 +40,15 @@ void stepctr_applier::serve(disctime_t time)
 	// сумма уставной скорости на
 	float compspd = state->ctrvel + compkoeff * errpos;
 	controlled_stepctr->set_speed(compspd);
+
+	return 0;
 }
 
 
-void stepctr_applier::feedback(disctime_t time)
-{}
+int stepctr_applier::feedback(disctime_t time)
+{
+	return 0;
+}
 
 int stepctr_applier::command(int argc, char ** argv, char * output, int outmax) 
 {

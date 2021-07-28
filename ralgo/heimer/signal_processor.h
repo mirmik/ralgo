@@ -6,6 +6,10 @@
 #include <igris/datastruct/dlist.h>
 #include <ralgo/disctime.h>
 
+#define SIGNAL_PROCESSOR_RETURN_OK 0
+#define SIGNAL_PROCESSOR_RETURN_NOT_ACTIVE 1
+#define SIGNAL_PROCESSOR_RETURN_RUNTIME_ERROR 2
+
 #define SIGNAL_PROCESSOR_NAME_MAX_LENGTH 8
 
 class signal_processor 
@@ -18,10 +22,10 @@ private:
 
 public:	
 	/// feedback отвечает за движение сигнала слева направо.  physical ----> virtual
-	virtual void feedback(disctime_t time) = 0;
+	virtual int feedback(disctime_t time) = 0;
 	
 	/// serve отвечает за движение сигнала справа налево. physical <---- virtual
-	virtual void serve(disctime_t time) = 0;
+	virtual int serve(disctime_t time) = 0;
 	
 	virtual int  command(int argc, char ** argv, char * output, int outmax) = 0;
 	virtual void deinit() = 0;
