@@ -6,6 +6,8 @@
 
 #define SIGNAL_NAME_MAX_LENGTH 8
 
+extern struct dlist_head signals_list;
+
 class signal_head
 {
 public:
@@ -30,6 +32,8 @@ public:
 	/// Если статус установлен, это значит, что сигнал получает команды свыше.
 	/// и ожидает деактивации в какой-то момент времени.
 	uint8_t active;
+
+	uint8_t sorting_mark; /// < Метка для алгоритма сортировки (см. executor)
 
 public:
 	virtual int info(char * buffer, int maxsize) = 0;
