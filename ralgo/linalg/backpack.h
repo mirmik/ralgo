@@ -112,7 +112,7 @@ namespace ralgo
 
 		// Нагрузка на стэк.
 		ralgo::linalg::solve(result, mat, target);
-	};
+	}
 
 	template <class C, class T, class M>
 	void svd_backpack(    
@@ -122,7 +122,7 @@ namespace ralgo
 	) 
 	{
 		ralgo::linalg::solve(coords, matrix, target);
-	};
+	}
 }
 
 #endif

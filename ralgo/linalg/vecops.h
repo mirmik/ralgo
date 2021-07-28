@@ -15,7 +15,7 @@
 
 namespace ralgo
 {
-	IGRIS_SIGNATURE_ATTRIBUTE_CHECKER(has_reserve, reserve);
+	IGRIS_SIGNATURE_ATTRIBUTE_CHECKER(has_reserve, reserve)
 
 	namespace vecops
 	{

@@ -6,22 +6,21 @@ TEST_CASE("axstate_linear_processor")
 {
 	heimer_reinit();
 
-	struct axis_state a, b, c, d;
-	struct axis_state * left[] = { &a, &b };
-	struct axis_state * right[] = { &c, &d };
+	axis_state a, b, c, d;
+	axis_state * left[] = { &a, &b };
+	axis_state * right[] = { &c, &d };
 
-	axis_state_init(&a, "a");
-	axis_state_init(&b, "b");
-	axis_state_init(&c, "c");
-	axis_state_init(&d, "d");
+	a.init("a");
+	b.init("b");
+	c.init("c");
+	d.init("d");
 
-	struct axstate_linear_processor linproc;
+	axstate_linear_processor linproc;
 
 	float matrix[] = { 2, 0.5, 0, 1 }; 
 	float inverse_matrix[4];
 
-	axstate_linear_processor_init(
-		&linproc,
+	linproc.init(
 		"linproc",
 		2,
 		left,
@@ -29,7 +28,7 @@ TEST_CASE("axstate_linear_processor")
 		matrix,
 		inverse_matrix
 	);
-	axstate_linear_processor_evaluate_invertion(&linproc);
+	linproc.evaluate_invertion();
 	CHECK_NE(inverse_matrix[0], 0);
 
 	c.ctrpos = 200;
@@ -37,7 +36,7 @@ TEST_CASE("axstate_linear_processor")
 	c.ctrvel = 20;
 	d.ctrvel = 10;
 
-	signal_processor_serve(&linproc.proc, 0);
+	linproc.serve(0);
 
 	CHECK_EQ(a.ctrpos, 450);
 	CHECK_EQ(b.ctrpos, 100);
@@ -49,15 +48,15 @@ TEST_CASE("axstate_linear_processor")
 	a.feedvel = a.ctrvel;
 	b.feedvel = b.ctrvel;
 
-	signal_processor_feedback(&linproc.proc, 0);
+	linproc.feedback(0);
 
 	CHECK_EQ(c.feedpos, 200);
 	CHECK_EQ(d.feedpos, 100);
 	CHECK_EQ(c.feedvel, 20);
 	CHECK_EQ(d.feedvel, 10);
 
-	signal_head_deinit(&a.sig);
-	signal_head_deinit(&b.sig);
-	signal_head_deinit(&c.sig);
-	signal_head_deinit(&d.sig);
+	a.deinit();
+	b.deinit();
+	c.deinit();
+	d.deinit();
 }

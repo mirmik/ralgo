@@ -50,7 +50,10 @@ int signal_processors_command_new(int argc, char ** argv, char * output,int maxs
 	{
 		int dim = atoi32(argv[2], 10, NULL);
 		create_axis_controller(argv[1], dim);	
+		return 0;
 	}	
+
+	return -1;
 }
 
 static struct rshell_command heimer_signal_processors_commands[] =
@@ -74,7 +77,10 @@ int signal_head_command_new(int argc, char ** argv, char * output, int maxsize)
 	if (strcmp(argv[0], "axstate") == 0)
 	{
 		create_axis_state(argv[1]);	
+		return 0;
 	}
+
+	return -1;
 }
 
 int heimer_command_signals(int argc, char ** argv, char * output, int maxsize) 
@@ -88,7 +94,7 @@ int heimer_command_signals(int argc, char ** argv, char * output, int maxsize)
 		return ENOENT;
 	}
 
-	return signal_command_v(sig, argc-1, argv+1, output, maxsize);
+	return sig->command_v(argc-1, argv+1, output, maxsize);
 }
 
 static struct rshell_command heimer_commands[] =

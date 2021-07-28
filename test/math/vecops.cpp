@@ -1,5 +1,5 @@
 #include <ralgo/linalg/vecops.h>
-#include <ralgo/gen.h>
+#include <ralgo/util/gen.h>
 #include <nos/print.h>
 
 #include <main.h>

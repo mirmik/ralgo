@@ -17,4 +17,4 @@ void linalg_square_solve_d(double * A, int n, double * b, double * x)
 
 	auto plud_decomposition = ralgo::plud(A_view, P_view, L_view, U_view);
 	plud_decomposition.solve(b_view, x_view);
-};
+}

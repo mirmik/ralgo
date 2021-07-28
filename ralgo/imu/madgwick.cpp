@@ -21,18 +21,18 @@ namespace ralgo
     linalg::vec<float, 3> madgwick::earth2body(const linalg::vec<float, 3> & vec)
     {
         return linalg::qrot(qinv(quat()), vec);
-    };
+    }
 
 
     linalg::vec<float, 3> madgwick::body2earth(const linalg::vec<float, 3> & vec)
     {
         return linalg::qrot(quat(), vec);
-    };
+    }
 
     linalg::vec<float, 3> madgwick::gravity_direction()
     {
         return earth2body({0, 0, -1});
-    };
+    }
 
 
     void madgwick::update(const linalg::vec<float, 3> & g, const linalg::vec<float, 3> & a, const linalg::vec<float, 3> & m) 

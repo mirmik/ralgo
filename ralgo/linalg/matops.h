@@ -285,7 +285,7 @@ namespace ralgo
 				}
 			}
 			return 0;
-		};
+		}
 
 		template <class M, class T>
 		void diag(M & mat, const igris::array_view<T> & arr)
