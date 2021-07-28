@@ -5,31 +5,27 @@
 #include <ralgo/heimer/axis_state.h>
 #include <ralgo/heimer/signal_processor.h>
 
-struct stepctr_applier
+class stepctr_applier : public signal_processor
 {
-	struct signal_processor sigproc;
-
-	struct stepctr_controller * controlled_stepctr;
-	struct axis_state * state;
+	stepctr_controller * controlled_stepctr;
+	axis_state * state;
 
 	int64_t deviation_error_limit;
 	float compkoeff; /// Коэффициент комплементарного фильтра.
 	float gain;
+
+public:
+	void feedback(disctime_t time) override;
+	void serve(disctime_t time) override;
+	int command(int argc, char ** argv, char * output, int outmax) override;
+	void deinit() override;
+	struct signal_head * iterate_left(struct signal_head *) override;
+
+	void init(
+	    const char * name,
+	    struct stepctr_controller * stepctr,
+	    struct axis_state * state
+	);
 };
-
-__BEGIN_DECLS
-
-void stepctr_applier_init(
-    struct stepctr_applier * applier,
-    const char * name,
-    struct stepctr_controller * stepctr,
-    struct axis_state * state
-);
-
-void stepctr_applier_deinit(struct stepctr_applier * applier);
-
-void stepctr_applier_serve(struct signal_processor * proc, disctime_t time);
-
-__END_DECLS
 
 #endif

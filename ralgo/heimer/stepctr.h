@@ -24,49 +24,42 @@ struct stepctr_controller
 
 	int64_t current_shift;
 	float setted_speed;
+
+public:
+	void init(
+	    void (*set_quaddgen_state)(void*, uint8_t),
+	    void * priv,
+	    int64_t units_in_step,
+	    float trigger_level
+	);
+
+	void set_position(int64_t pos);
+
+	void inc();
+
+	void dec();
+
+	int shift(int64_t shift);
+
+	// дискретное время дано с плавающей точкой,
+	// чтобы можно было передавать интервалы времени
+	// меньше disctime
+	int speed_apply(
+	    float speed,
+	    float delta
+	);
+
+	void set_speed(float speed)
+	{
+		setted_speed = speed;
+
+		if (fixed_frequency)
+		{
+		}
+		else
+		{
+		}
+	}
 };
-
-__BEGIN_DECLS
-
-void stepctr_controller_init(
-    struct stepctr_controller * ctr,
-    void (*set_quaddgen_state)(void*, uint8_t),
-    void * priv,
-    int64_t units_in_step,
-    float trigger_level
-);
-
-void stepctr_controller_set_position(struct stepctr_controller * ctr, int64_t pos);
-
-void stepctr_controller_inc(struct stepctr_controller * ctr);
-
-void stepctr_controller_dec(struct stepctr_controller * ctr);
-
-int stepctr_controller_shift(struct stepctr_controller * ctr, int64_t shift);
-
-int stepctr_controller_speed_apply(struct stepctr_controller * ctr,
-                                   float speed,
-                                   float delta
-                                   // дискретное время дано с плавающей точкой,
-                                   // чтобы можно было передавать интервалы времени
-                                   // меньше disctime
-
-                                  );
-
-static inline
-void stepctr_controller_set_speed(struct stepctr_controller * ctr, float speed)
-{
-	ctr->setted_speed = speed;
-
-	if (ctr->fixed_frequency)
-	{
-
-	}
-	else
-	{
-	}
-}
-
-__END_DECLS
 
 #endif
