@@ -14,13 +14,12 @@ namespace heimer
 
 	public:
 		void set_order_table(signal_processor ** order_table, int capacity, int size);
-		int order_sort();
-
 		void append_processor(signal_processor * proc);
+
+		int order_sort();
 
 		int serve(disctime_t curtime);
 		int feedback(disctime_t curtime);
-
 		int exec(disctime_t curtime);
 	};
 }
