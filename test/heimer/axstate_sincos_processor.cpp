@@ -28,6 +28,17 @@ TEST_CASE("axstate_sincos_processor")
 		ar.ctrvel = heimvel(1);
 
 		scproc.init("axproc", left, right, heimdist(10.f));
+
+		CHECK_EQ(scproc.iterate_left(NULL), &xl);
+		CHECK_EQ(scproc.iterate_left(&xl), &yl);
+		CHECK_EQ(scproc.iterate_left(&yl), &al);
+		CHECK_EQ(scproc.iterate_left(&al), nullptr);
+
+		CHECK_EQ(scproc.iterate_right(NULL), &xr);
+		CHECK_EQ(scproc.iterate_right(&xr), &yr);
+		CHECK_EQ(scproc.iterate_right(&yr), &ar);
+		CHECK_EQ(scproc.iterate_right(&ar), nullptr);
+
 		scproc.serve(0);
 
 		CHECK_EQ(heimpos_cos(ar.ctrpos), doctest::Approx(cosf(deg2rad(angle))));
@@ -82,10 +93,10 @@ TEST_CASE("axstate_sincos_processor")
 
 		scproc.init("axproc", left, right, heimdist(10.f));
 		scproc.set_offset(
-			heimdist(1),
-			heimdist(2),
-			heimdist(0.1),
-			heimdist(0.2)
+		    heimdist(1),
+		    heimdist(2),
+		    heimdist(0.1),
+		    heimdist(0.2)
 		);
 		scproc.serve(0);
 
@@ -93,7 +104,7 @@ TEST_CASE("axstate_sincos_processor")
 		CHECK_EQ(heimpos_sin(ar.ctrpos), doctest::Approx(sinf(deg2rad(angle))));
 		CHECK_EQ(heimdist_restore(xl.ctrpos), doctest::Approx(10.f + 1 + 10.f * cosf(deg2rad(angle) + 0.2)));
 		CHECK_EQ(heimdist_restore(yl.ctrpos), doctest::Approx(20.f + 2 + 10.f * sinf(deg2rad(angle) + 0.2)));
-		CHECK_EQ(heimdist_restore(al.ctrpos), doctest::Approx(deg2rad(angle)+0.2+0.1));
+		CHECK_EQ(heimdist_restore(al.ctrpos), doctest::Approx(deg2rad(angle) + 0.2 + 0.1));
 
 		CHECK_EQ(heimvel_restore(xl.ctrvel), doctest::Approx(1. - (10.) * sinf(deg2rad(angle) + 0.2)));
 		CHECK_EQ(heimvel_restore(yl.ctrvel), doctest::Approx(2. + (10.) * cosf(deg2rad(angle) + 0.2)));
