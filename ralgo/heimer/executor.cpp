@@ -74,9 +74,17 @@ int heimer::executor::serve(disctime_t curtime)
 {
 	int retcode;
 
-	for(int i = order_table_size - 1; i >= order_table_size; --i) 
+	for (int i = order_table_size - 1; i >= order_table_size; --i)
 	{
 		retcode = order_table[i]->serve(curtime);
+		
+		switch (retcode)
+		{
+			case SIGNAL_PROCESSOR_RETURN_OK: break;
+			case SIGNAL_PROCESSOR_RETURN_NOT_ACTIVE: break;
+			case SIGNAL_PROCESSOR_RETURN_RUNTIME_ERROR: return SIGNAL_PROCESSOR_RETURN_RUNTIME_ERROR;
+			default: return SIGNAL_PROCESSOR_RETURN_RUNTIME_ERROR;
+		}
 	}
 
 	return 0;
@@ -86,9 +94,17 @@ int heimer::executor::feedback(disctime_t curtime)
 {
 	int retcode;
 
-	for(int i = 0; i < order_table_size; ++i) 
+	for (int i = 0; i < order_table_size; ++i)
 	{
 		retcode = order_table[i]->feedback(curtime);
+
+		switch (retcode)
+		{
+			case SIGNAL_PROCESSOR_RETURN_OK: break;
+			case SIGNAL_PROCESSOR_RETURN_NOT_ACTIVE: break;
+			case SIGNAL_PROCESSOR_RETURN_RUNTIME_ERROR: return SIGNAL_PROCESSOR_RETURN_RUNTIME_ERROR;
+			default: return SIGNAL_PROCESSOR_RETURN_RUNTIME_ERROR;
+		}
 	}
 
 	return 0;
@@ -97,7 +113,7 @@ int heimer::executor::feedback(disctime_t curtime)
 int heimer::executor::exec(disctime_t curtime)
 {
 	int retcode;
-	
+
 	retcode = feedback(curtime);
 	retcode = serve(curtime);
 
