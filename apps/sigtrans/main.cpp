@@ -25,10 +25,12 @@ int DEBUG = 0;
 std::unique_ptr<heimer::executor> executor;
 std::unique_ptr<std::thread> execute_thread;
 int started = 0;
-int cancel_token;
+int cancel_token = 0;
 
 crow::udpgate udpgate;
 crow::hostaddr crowaddr;
+
+
 
 void execute_routine() 
 {
@@ -36,6 +38,7 @@ void execute_routine()
 	{
 		if (cancel_token) return;
 		executor->exec(ralgo::discrete_time());
+		executor->notify();
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
 }
@@ -59,6 +62,7 @@ void start_routine()
 		executor->append_processor(proc);
 	}
 	executor->order_sort();
+	executor->notification_prepare("sigtrans/feedpos", crowaddr);
 
 	execute_thread.reset(new std::thread(execute_routine));
 }
@@ -94,8 +98,8 @@ void execinfo()
 void exec(const std::string & line)
 {
 	int sts;
-	char output[256];
-	memset(output, 0, 256);
+	char output[512];
+	memset(output, 0, 512);
 
 	if (line.size() == 0)
 		return;
@@ -119,7 +123,7 @@ void exec(const std::string & line)
 	}
 
 	int ret;
-	sts = heimer::command_exec_safe(line.c_str(), output, 256, &ret);
+	sts = heimer::command_exec_safe(line.c_str(), output, 512, &ret);
 
 	if (sts == ENOENT)
 	{
@@ -163,6 +167,8 @@ int main(int argc, char ** argv)
 		}
 	}
 
+	udpgate.open();
+	udpgate.bind(CROW_UDPGATE_NO);
 	crow::start_spin();
 
 	while (1)

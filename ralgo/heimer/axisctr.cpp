@@ -1,6 +1,8 @@
 #include <ralgo/heimer/axisctr.h>
 #include <ralgo/heimer/sigtypes.h>
 #include <ralgo/clinalg/vecops.h>
+#include <ralgo/log.h>
+
 #include <igris/math.h>
 #include <igris/util/bug.h>
 #include <igris/datastruct/sparse_array.h>
@@ -101,10 +103,12 @@ int axis_controller::serve(disctime_t time)
 	for (int i = 0; i < dim; ++i)
 	{
 		if (
-		    settings[i].controlled->current_controller &&
+		    !settings[i].controlled->current_controller ||
 		    settings[i].controlled->current_controller != this
 		)
+		{
 			return SIGNAL_PROCESSOR_RETURN_NOT_ACTIVE;
+		}
 	}
 
 	if (!curtraj)

@@ -13,7 +13,7 @@ namespace heimer
 	class signal_head
 	{
 	public:
-		struct dlist_head signal_list_lnk;
+		struct dlist_head list_lnk;
 		char name[SIGNAL_NAME_MAX_LENGTH];
 		uint8_t type;
 

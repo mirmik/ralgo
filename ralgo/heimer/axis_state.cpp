@@ -11,8 +11,8 @@ heimer::axis_state::axis_state(const char * name)
 
 int heimer::axis_state::info(char * data, int maxsize) 
 {
-	snprintf(data, maxsize, "(ctrpos:%f,ctrvel:%f,feedpos:%f,feedspd:%f)\r\n", 
-		ctrpos, ctrvel, feedpos, feedvel);
+	snprintf(data, maxsize, "(ctrpos:%f,ctrvel:%f,feedpos:%f,feedspd:%f,controller:%016lx)\r\n", 
+		ctrpos, ctrvel, feedpos, feedvel, (uintptr_t)current_controller);
 	return 0;
 }
 

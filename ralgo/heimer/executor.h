@@ -16,6 +16,8 @@ namespace heimer
 		int order_table_size = 0;
 		int order_table_capacity = 0;
 
+		int count_of_axstates = 0;
+
 		union 
 		{
 			uint8_t flags = 0;
@@ -41,6 +43,9 @@ namespace heimer
 		int serve(disctime_t curtime);
 		int feedback(disctime_t curtime);
 		int exec(disctime_t curtime);
+
+		void notification_prepare(const char * theme, crow::hostaddr_view addrview);
+		void notify();
 
 		~executor();
 	};
