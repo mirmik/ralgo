@@ -64,7 +64,7 @@ int signal_head::command_v(int argc, char ** argv, char * output, int maxsize)
 	if (strcmp(opsname, "info") == 0) 
 		return info(output, maxsize);
 
-	return -1; 
+	return ENOENT; 
 }
 
 

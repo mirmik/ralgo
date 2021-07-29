@@ -28,14 +28,22 @@ namespace heimer
 		acceleration_t acc;
 		acceleration_t dcc;
 
-		int operation_finished_flag;
-		int release_control_flag;
+		union
+		{
+			uint8_t flags;
+			struct
+			{
+				uint8_t operation_finished_flag : 1;
+				uint8_t release_control_flag : 1;
+				uint8_t dynamic_resources : 1;
+				uint8_t spattern_enabled : 1;
+			} f;
+		};
+
 
 		void (* operation_start_handler)(void * priv, axis_controller * ax);
 		void (* operation_finish_handler)(void * priv, axis_controller * ax);
 		void * operation_handlers_priv;
-
-		int spattern_enabled;
 
 		struct line_trajectory lintraj;
 		struct trajectory * curtraj;

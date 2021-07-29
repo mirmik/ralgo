@@ -6,11 +6,11 @@
 
 using namespace heimer;
 
-DLIST_HEAD(signal_processor_list);
+DLIST_HEAD(heimer::signal_processor_list);
 
 void signal_processor::init(const char * name)
 {
-	strncpy(this->name, name, SIGNAL_PROCESSOR_NAME_MAX_LENGTH);
+	strncpy(this->_name, name, SIGNAL_PROCESSOR_NAME_MAX_LENGTH);
 	dlist_add_tail(&list_lnk, &signal_processor_list);
 	this->active = 0;
 }
@@ -70,4 +70,25 @@ int signal_processor::deactivate()
 	active = 0;
 
 	return 0;
+}
+
+signal_processor * heimer::signal_processor_get_by_name(const char * name)
+{
+	signal_processor * sig;
+	dlist_for_each_entry(sig, &signal_processor_list, list_lnk)
+	{
+		if (strncmp(sig->name().data(), name, SIGNAL_NAME_MAX_LENGTH) == 0)
+			return sig;
+	}
+	return NULL;
+}
+
+igris::buffer signal_processor::name() 
+{
+	return { _name,  SIGNAL_PROCESSOR_NAME_MAX_LENGTH};
+}
+
+bool signal_processor::is_active()
+{
+	return active;
 }
