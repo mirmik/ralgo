@@ -77,7 +77,7 @@ int heimer::executor::serve(disctime_t curtime)
 	for (int i = order_table_size - 1; i >= order_table_size; --i)
 	{
 		retcode = order_table[i]->serve(curtime);
-		
+
 		switch (retcode)
 		{
 			case SIGNAL_PROCESSOR_RETURN_OK: break;
@@ -118,4 +118,18 @@ int heimer::executor::exec(disctime_t curtime)
 	retcode = serve(curtime);
 
 	return retcode;
+}
+
+heimer::executor::~executor() 
+{
+	if (f.dynamic)
+		delete[] order_table;
+}
+
+void heimer::executor::allocate_order_table(int size) 
+{
+	order_table = new signal_processor * [size];
+	order_table_size = 0;
+	order_table_capacity = size;
+	f.dynamic = 1;
 }

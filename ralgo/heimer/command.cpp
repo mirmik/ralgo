@@ -12,6 +12,8 @@
 
 #include <ralgo/heimer/axis_state.h>
 #include <ralgo/heimer/axisctr.h>
+#include <ralgo/heimer/axstate_linear_processor.h>
+#include <ralgo/heimer/axstate_sincos_processor.h>
 
 using namespace heimer;
 
@@ -63,6 +65,32 @@ int ctrnew(int argc, char ** argv, char * output, int maxsize)
 
 		int dim = atoi32(argv[2], 10, NULL);
 		create_axis_controller(argv[1], dim);
+		return 0;
+	}
+
+	if (strcmp(argv[0], "axisctr") == 0)
+	{
+		if (argc < 3)
+		{
+			snprintf(output, maxsize, "usage: ctrnew axlinear NAME DIM\r\n");
+			return -1;
+		}
+
+		int dim = atoi32(argv[2], 10, NULL);
+		new heimer::axstate_linear_processor(argv[1], dim);
+		return 0;
+	}
+
+	if (strcmp(argv[0], "axisctr") == 0)
+	{
+		if (argc < 3)
+		{
+			snprintf(output, maxsize, "usage: ctrnew axsincos NAME\r\n");
+			return -1;
+		}
+
+		int dim = atoi32(argv[2], 10, NULL);
+		new heimer::axstate_sincos_processor(argv[1]);
 		return 0;
 	}
 

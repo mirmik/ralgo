@@ -22,13 +22,16 @@ namespace heimer
     private:
         int dim;
 
-        struct axis_state ** leftside;
-        struct axis_state ** rightside;
+        struct axis_state ** leftside = nullptr;
+        struct axis_state ** rightside = nullptr;
 
-        float * matrix;
-        float * invert_matrix;
+        float * matrix = nullptr;
+        float * invert_matrix = nullptr;
 
     public:
+        axstate_linear_processor() = default;
+        axstate_linear_processor(const char * name, int dim);
+
         int feedback(disctime_t time) override;
         int serve(disctime_t time) override;
         int command(int argc, char ** argv, char * output, int outmax) override;

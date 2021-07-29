@@ -29,6 +29,9 @@ namespace heimer
 		uint8_t active;
 
 	public:
+		signal_processor() = default;
+		signal_processor(const char * name);
+
 		/// feedback отвечает за движение сигнала слева направо.  physical ----> virtual
 		virtual int feedback(disctime_t time) = 0;
 
@@ -49,7 +52,7 @@ namespace heimer
 		bool is_active();
 	};
 
-	int heimer_signal_processors_count();
+	int signal_processors_count();
 	void signal_processors_list_reinit();
 	int command_signal_processors(int argc, char ** argv, char * output, int maxsize);
 

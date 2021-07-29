@@ -89,6 +89,23 @@ int bind(axis_controller * axctr, int argc, char ** argv, char * output, int out
 }
 
 static inline
+int setgain(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
+{
+	if (argc != axctr->dim)
+	{
+		snprintf(output, outmax, "Can't bind %d symbols for %d dim axisctr", argc, axctr->dim);
+		return -1;
+	}
+
+	for (int i = 0; i < argc; ++i)
+	{
+		axctr->settings[i].gain = atof(argv[i]);
+	}
+
+	return 0;
+}
+
+static inline
 int info(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
 {
 	(void) argc;
@@ -115,7 +132,7 @@ int info(axis_controller * axctr, int argc, char ** argv, char * output, int out
 		snprintf(buf, bufsize, "%s,", axctr->settings[i].controlled->name);
 		strncat(output, buf, outmax);
 	}
-	snprintf(buf, bufsize, "%s\r\n", axctr->settings[axctr->dim-1].controlled->name);
+	snprintf(buf, bufsize, "%s\r\n", axctr->settings[axctr->dim - 1].controlled->name);
 	strncat(output, buf, outmax);
 
 	memset(buf, 0, bufsize);
@@ -123,11 +140,11 @@ int info(axis_controller * axctr, int argc, char ** argv, char * output, int out
 	strncat(output, buf, outmax);
 
 	memset(buf, 0, bufsize);
-	snprintf(buf, bufsize, "flags: opfinished:%d, releaseflag:%d, dynamic:%d, spattern:%d\r\n", 
-		axctr->f.operation_finished_flag, 
-		axctr->f.release_control_flag, 
-		axctr->f.dynamic_resources, 
-		(uint8_t)axctr->f.spattern_enabled);
+	snprintf(buf, bufsize, "flags: opfinished:%d, releaseflag:%d, dynamic:%d, spattern:%d\r\n",
+	         axctr->f.operation_finished_flag,
+	         axctr->f.release_control_flag,
+	         axctr->f.dynamic_resources,
+	         (uint8_t)axctr->f.spattern_enabled);
 	strncat(output, buf, outmax);
 
 	return 0;
@@ -192,6 +209,9 @@ int axis_controller::command(int argc, char ** argv, char * output, int outmax)
 
 	else if (strcmp("setdcc", argv[0]) == 0)
 		status = setdcc(this, argc - 1, argv + 1, output, outmax);
+
+	else if (strcmp("setgain", argv[0]) == 0)
+		status = setgain(this, argc - 1, argv + 1, output, outmax);
 
 	return status;
 }

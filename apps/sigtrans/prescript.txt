@@ -2,16 +2,25 @@ signew axstate x
 signew axstate y
 signew axstate z
 
+signew axstate yvirt
+signew axstate zvirt
+
 ctrnew axisctr xctr 1
 ctrnew axisctr yzctr 2
+ctrnew axlinear 2 1 1 0 1
+
+ctr.axlinear bindleft y z
+ctr.axlinear bindright yvirt zvirt
 
 ctr xctr bind x
-ctr yzctr bind y z
-
 ctr xctr setvel 1
 ctr xctr setacc 1 1
+ctr xctr setgain 1000
+
+ctr yzctr bind yvirt zvirt
 ctr yzctr setvel 2
 ctr yzctr setacc 1 1
+ctr yzctr setgain 1000 1000
 
 siglist
 ctrlist
