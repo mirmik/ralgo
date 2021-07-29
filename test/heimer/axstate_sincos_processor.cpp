@@ -30,6 +30,8 @@ TEST_CASE("axstate_sincos_processor")
 		ar.ctrvel = heimvel(1);
 
 		scproc.init("axproc", heimdist(10.f));
+		CHECK_EQ(scproc.name().size(), 6);
+		CHECK_EQ(std::string(scproc.name().data(), scproc.name().size()), std::string("axproc"));
 
 		scproc.set_leftside(left);
 		scproc.set_rightside(right);
@@ -87,7 +89,7 @@ TEST_CASE("axstate_sincos_processor")
 		struct axstate_sincos_processor scproc;
 
 		float angle = 60.f;
-		
+
 		scproc.set_leftside(left);
 		scproc.set_rightside(right);
 

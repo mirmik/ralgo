@@ -27,6 +27,7 @@ TEST_CASE("axisctr")
 	state.init("state");
 
 	axctr.init("axctr", &settings, 1);
+	CHECK_EQ(axctr.name(), "axctr");
 	axctr.set_handlers(nullptr, nullptr, finish_handler);
 	double gain = 1000; axctr.set_gain(&gain);
 	axctr.set_velocity_external(10);

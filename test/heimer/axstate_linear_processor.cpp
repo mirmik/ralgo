@@ -30,6 +30,8 @@ TEST_CASE("axstate_linear_processor")
 		matrix,
 		inverse_matrix
 	);
+	CHECK_EQ(linproc.name(), "linproc");
+
 	linproc.evaluate_invertion();
 	CHECK_NE(inverse_matrix[0], 0);
 

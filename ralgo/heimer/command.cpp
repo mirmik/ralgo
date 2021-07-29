@@ -154,8 +154,9 @@ int ctrlist(int, char **, char * output, int maxsize)
 	signal_processor * it;
 	dlist_for_each_entry(it, &signal_processor_list, list_lnk)
 	{
-		char buf[11];
-		snprintf(buf, 11, "%*s\r\n", SIGNAL_PROCESSOR_NAME_MAX_LENGTH, it->name().data());
+		char buf[SIGNAL_PROCESSOR_NAME_MAX_LENGTH+4];
+		snprintf(buf, SIGNAL_PROCESSOR_NAME_MAX_LENGTH+4, 
+			"%*s\r\n", SIGNAL_PROCESSOR_NAME_MAX_LENGTH, it->name().data());
 		strncat(output, buf, maxsize);
 	}
 
@@ -168,8 +169,9 @@ int siglist(int, char **, char * output, int maxsize)
 	signal_head * it;
 	dlist_for_each_entry(it, &signals_list, signal_list_lnk)
 	{
-		char buf[11];
-		snprintf(buf, 11, "%*s\r\n", SIGNAL_PROCESSOR_NAME_MAX_LENGTH, it->name);
+		char buf[SIGNAL_PROCESSOR_NAME_MAX_LENGTH+4];
+		snprintf(buf, SIGNAL_PROCESSOR_NAME_MAX_LENGTH+4, 
+			"%*s\r\n", SIGNAL_PROCESSOR_NAME_MAX_LENGTH, it->name);
 		strncat(output, buf, maxsize);
 	}
 
