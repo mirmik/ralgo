@@ -9,68 +9,127 @@
 using namespace heimer;
 
 static inline
-int bind(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
+int setvel(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
 {
-	(void) axctr;
-	(void) argc;
-	(void) argv;
-	(void) output;
-	(void) outmax;
-
-/*	axis_controller_release_controlled(axctr);
-
-	signal_head * sig = signal_get_by_name(argv[1]);
-	if (!sig)
-		return -1;
-
-	if (sig->type != SIGNAL_TYPE_AXIS_STATE)
+	if (argc < 1)
 	{
-		snprintf(output, outmax, "Wrong signal type");
+		snprintf(output, outmax, "Need argument");
 		return -1;
 	}
 
-	axis_controller_set_controlled(axctr, mcast_out(sig, struct axis_state, sig));*/
+	axctr->vel = atof(argv[0]);
+	return 0;
+}
+
+static inline
+int setacc(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
+{
+	if (argc < 1)
+	{
+		snprintf(output, outmax, "Need argument");
+		return -1;
+	}
+
+	axctr->acc = atof(argv[0]);
+
+	if (argc > 1)
+		axctr->dcc = atof(argv[1]);
+	return 0;
+}
+
+static inline
+int setdcc(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
+{
+	if (argc < 1)
+	{
+		snprintf(output, outmax, "Need argument");
+		return -1;
+	}
+
+	axctr->dcc = atof(argv[0]);
+	return 0;
+}
+
+static inline
+int bind(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
+{
+	if (argc != axctr->dim)
+	{
+		snprintf(output, outmax, "Can't bind %d symbols for %d dim axisctr", argc, axctr->dim);
+		return -1;
+	}
+
+	{
+		axis_state * arr[argc];
+
+		for (int i = 0; i < argc; ++i)
+		{
+			signal_head * sig = signal_get_by_name(argv[i]);
+
+			if (!sig)
+			{
+				snprintf(output, outmax, "Wrong signal name '%s' (type 'siglist' for display)", argv[i]);
+				return -1;
+			}
+
+			if (sig->type != SIGNAL_TYPE_AXIS_STATE)
+			{
+				snprintf(output, outmax, "Wrong signal type. name:(%s)", sig->name);
+				return -1;
+			}
+
+			arr[i] = static_cast<axis_state *>(sig);
+		}
+
+		axctr->release_controlled();
+		axctr->set_controlled(arr);
+	}
+
 	return 0;
 }
 
 static inline
 int info(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
 {
-	(void) axctr;
 	(void) argc;
 	(void) argv;
-	(void) output;
-	(void) outmax;
-//	if (!axctr->controlled) 
-//	{
-//		snprintf(output, outmax, "Constrolled axis is not binded");
-//		return 0; 		
-//	}
 
-/*	int64_t ctrpos_int = axctr->controlled->ctrpos; 
-	int64_t feedpos_int = axctr->controlled->feedpos;
+	int bufsize = 96;
+	char buf[bufsize];
 
-	float ctrpos_ext =  axis_controller_ctrpos_external(axctr); 
-	float feedpos_ext = axis_controller_feedpos_external(axctr);
+	memset(buf, 0, bufsize);
+	snprintf(buf, bufsize, "isactive:%d, ", axctr->is_active());
+	strncat(output, buf, outmax);
 
-	float ctrvel = axctr->controlled->ctrvel; 
-	float feedvel= axctr->controlled->feedvel;
+	memset(buf, 0, bufsize);
+	snprintf(buf, bufsize, "dim:%d, ", axctr->dim);
+	strncat(output, buf, outmax);
 
-	snprintf(output, outmax, 
-		"ctrpos_ext :%f\r\n"
-		"ctrpos_int :%ld\r\n" 
-		"feedpos_ext:%f\r\n"
-		"feedpos_int:%ld\r\n"
-		"ctrvel     :%f\r\n"
-		"feedvel    :%f\r\n",
-		ctrpos_ext,
-		ctrpos_int,
-		feedpos_ext,
-		feedpos_int,
-		ctrvel,
-		feedvel
-	);
-*/
+	memset(buf, 0, bufsize);
+	snprintf(buf, bufsize, "signals:");
+	strncat(output, buf, outmax);
+
+	memset(buf, 0, bufsize);
+	for (int i = 0; i < axctr->dim - 1; ++i)
+	{
+		snprintf(buf, bufsize, "%s,", axctr->settings[i].controlled->name);
+		strncat(output, buf, outmax);
+	}
+	snprintf(buf, bufsize, "%s\r\n", axctr->settings[axctr->dim-1].controlled->name);
+	strncat(output, buf, outmax);
+
+	memset(buf, 0, bufsize);
+	snprintf(buf, bufsize, "vel:%f, acc:%f, dcc:%f\r\n", axctr->vel, axctr->acc, axctr->dcc);
+	strncat(output, buf, outmax);
+
+	memset(buf, 0, bufsize);
+	snprintf(buf, bufsize, "flags: opfinished:%d, releaseflag:%d, dynamic:%d, spattern:%d\r\n", 
+		axctr->f.operation_finished_flag, 
+		axctr->f.release_control_flag, 
+		axctr->f.dynamic_resources, 
+		(uint8_t)axctr->f.spattern_enabled);
+	strncat(output, buf, outmax);
+
 	return 0;
 }
 
@@ -84,7 +143,7 @@ int incmov(axis_controller * axctr, int argc, char ** argv, char * output, int o
 	int dim = axctr->dim;
 	position_t dist[dim];
 
-	for (int i = 0; i < dim; ++i) 
+	for (int i = 0; i < dim; ++i)
 	{
 		dist[i] = atof(argv[i]);
 	}
@@ -98,11 +157,11 @@ int absmov(axis_controller * axctr, int argc, char ** argv, char * output, int o
 	(void) argc;
 	(void) output;
 	(void) outmax;
-	
+
 	int dim = axctr->dim;
 	position_t pos[dim];
 
-	for (int i = 0; i < dim; ++i) 
+	for (int i = 0; i < dim; ++i)
 	{
 		pos[i] = atof(argv[i]);
 	}
@@ -124,6 +183,15 @@ int axis_controller::command(int argc, char ** argv, char * output, int outmax)
 
 	else if (strcmp("incmov", argv[0]) == 0)
 		status = incmov(this, argc - 1, argv + 1, output, outmax);
+
+	else if (strcmp("setvel", argv[0]) == 0)
+		status = setvel(this, argc - 1, argv + 1, output, outmax);
+
+	else if (strcmp("setacc", argv[0]) == 0)
+		status = setacc(this, argc - 1, argv + 1, output, outmax);
+
+	else if (strcmp("setdcc", argv[0]) == 0)
+		status = setdcc(this, argc - 1, argv + 1, output, outmax);
 
 	return status;
 }

@@ -82,8 +82,8 @@ TEST_CASE("axisctr_concurent")
 	CHECK_EQ(axctr1.ctrpos_external(0), 100);
 	CHECK_EQ(a, 1);
 
-	CHECK_EQ(axctr0.release_control_flag, 1);
-	CHECK_EQ(axctr1.release_control_flag, 0);
+	CHECK_EQ(axctr0.f.release_control_flag, 1);
+	CHECK_EQ(axctr1.f.release_control_flag, 0);
 	
 	CHECK_EQ(state.current_controller, &axctr0);
 	
@@ -97,8 +97,8 @@ TEST_CASE("axisctr_concurent")
 	axctr0.serve(12.1 * discrete_time_frequency());
 	axctr1.serve(12.1 * discrete_time_frequency());
 
-	CHECK_EQ(axctr0.release_control_flag, 0);
-	CHECK_EQ(axctr1.release_control_flag, 0);
+	CHECK_EQ(axctr0.f.release_control_flag, 0);
+	CHECK_EQ(axctr1.f.release_control_flag, 0);
 
 	CHECK_EQ(state.current_controller, nullptr);
 	

@@ -20,7 +20,8 @@ application("sigtrans",
 #		"ralgo.heimer"
 	],
 	defines = defines,
-	cxx_flags = "",
+	cxx_flags = "-g",
+	cc_flags = "-g",
 	libs = ["pthread", "readline", "igris", "nos"],
 	cxxstd = "c++17"
 )

@@ -93,12 +93,12 @@ void axis_controller::set_controlled(struct axis_state ** state)
 
 void axis_controller::finish_trajectory(disctime_t time, position_t * ctrpos)
 {
-	operation_finished_flag = 1;
+	f.operation_finished_flag = 1;
 	if (operation_finish_handler)
 		operation_finish_handler(operation_handlers_priv, this);
 	line_trajectory_set_point_hold(&lintraj, time, ctrpos);
 	curtraj = &lintraj.traj;
-	release_control_flag = 1;
+	f.release_control_flag = 1;
 }
 
 int axis_controller::feedback(disctime_t time)
@@ -112,9 +112,9 @@ int axis_controller::serve(disctime_t time)
 	position_t ctrpos[dim];
 	velocity_t ctrvel[dim];
 
-	if (release_control_flag)
+	if (f.release_control_flag)
 	{
-		release_control_flag = 0;
+		f.release_control_flag = 0;
 		deactivate();
 		return SIGNAL_PROCESSOR_RETURN_NOT_ACTIVE;
 	}
@@ -139,7 +139,7 @@ int axis_controller::serve(disctime_t time)
 		settings[i].controlled->ctrvel = ctrvel[i];
 	}
 
-	if (sts && !operation_finished_flag)
+	if (sts && !f.operation_finished_flag)
 	{
 		finish_trajectory(time, ctrpos);
 	}
@@ -182,11 +182,11 @@ int axis_controller::_absmove(
 	                                   tgtpos,
 	                                   acc_time,
 	                                   dcc_time,
-	                                   spattern_enabled
+	                                   f.spattern_enabled
 	                                  );
 
-	operation_finished_flag = 0;
-	release_control_flag = 0;
+	f.operation_finished_flag = 0;
+	f.release_control_flag = 0;
 
 	if (operation_start_handler)
 		operation_start_handler(operation_handlers_priv, this);
@@ -262,6 +262,7 @@ axis_controller * heimer::create_axis_controller(const char * name, int dim)
 	axis_controller * ptr = new axis_controller;
 	struct axis_settings * settings = (struct axis_settings *) malloc(sizeof(struct axis_settings) * dim);
 	ptr->init(name, settings, dim);
+	ptr->f.dynamic_resources = 1;
 	return ptr;
 }
 
@@ -333,8 +334,7 @@ void axis_controller::init(
 	this->settings = settings;
 	this->dim = dim;
 
-	operation_finished_flag = 0;
-	release_control_flag = 0;
+	flags = 0;
 
 	operation_start_handler = NULL;
 	operation_finish_handler = NULL;
@@ -343,7 +343,6 @@ void axis_controller::init(
 	approvals = NULL;
 	approvals_total = 0;
 
-	spattern_enabled = 0;
 	curtraj = NULL;
 
 	line_trajectory_init(&lintraj, 1,

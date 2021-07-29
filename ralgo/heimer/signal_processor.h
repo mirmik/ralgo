@@ -4,6 +4,8 @@
 #define RALGO_HEIMER_SIGNAL_PROCESSOR_H
 
 #include <igris/datastruct/dlist.h>
+#include <igris/buffer.h>
+
 #include <ralgo/heimer/signal.h>
 #include <ralgo/disctime.h>
 
@@ -15,12 +17,15 @@
 
 namespace heimer
 {
+	extern struct dlist_head signal_processor_list;
+
 	class signal_processor
 	{
-	private:
+	public:
 		struct dlist_head list_lnk;
-		char name[SIGNAL_PROCESSOR_NAME_MAX_LENGTH];
-		const struct signal_processor_operations * ops;
+	
+	private:
+		char _name[SIGNAL_PROCESSOR_NAME_MAX_LENGTH];
 		uint8_t active;
 
 	public:
@@ -36,13 +41,19 @@ namespace heimer
 		virtual signal_head * iterate_right(signal_head *) = 0;
 
 		void init(const char * name);
+		
 		int activate();
 		int deactivate();
+		
+		igris::buffer name();
+		bool is_active();
 	};
 
 	int heimer_signal_processors_count();
 	void signal_processors_list_reinit();
 	int command_signal_processors(int argc, char ** argv, char * output, int maxsize);
+
+	signal_processor * signal_processor_get_by_name(const char * name);
 }
 
 #endif

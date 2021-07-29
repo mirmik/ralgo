@@ -8,20 +8,11 @@
 
 namespace heimer
 {
-	int command_signal_processors(int argc, char ** argv, char * output, int maxsize);
-	int command_signals(int argc, char ** argv, char * output, int maxsize);
-	int command(int argc, char ** argv, char * output, int maxsize);
-
-	int command_exec_safe(const char * str, char * output, int maxsize);
+	int command(int argc, char ** argv, char * output, int maxsize, int * ret);
+	int command_exec_safe(const char * str, char * output, int maxsize, int * ret);
 
 	void heimer_reinit();
-
 	void heimer_system_init();
-
-	int command_help(int argc, char ** argv, char * output, int maxsize);
-
-	int signal_processors_command_new(int argc, char ** argv, char * output,int maxsize);
-	int signal_head_command_new(int argc, char ** argv, char * output, int maxsize);
 }
 
 #endif
