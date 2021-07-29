@@ -4,7 +4,7 @@
 #include <igris/compiler.h>
 #include <igris/datastruct/dlist.h>
 
-#define SIGNAL_NAME_MAX_LENGTH 8
+#define SIGNAL_NAME_MAX_LENGTH 12
 
 namespace heimer
 {

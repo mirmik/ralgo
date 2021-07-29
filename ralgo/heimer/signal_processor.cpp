@@ -1,6 +1,7 @@
 #include <ralgo/heimer/signal_processor.h>
 #include <ralgo/heimer/signal.h>
 #include <igris/shell/rshell.h>
+#include <igris/math.h>
 #include <string.h>
 #include <assert.h>
 
@@ -10,7 +11,9 @@ DLIST_HEAD(heimer::signal_processor_list);
 
 void signal_processor::init(const char * name)
 {
-	strncpy(this->_name, name, SIGNAL_PROCESSOR_NAME_MAX_LENGTH);
+	int len = MIN(strlen(name), SIGNAL_PROCESSOR_NAME_MAX_LENGTH);
+	memset(_name, 0, SIGNAL_PROCESSOR_NAME_MAX_LENGTH);
+	memcpy(_name, name, len);
 	dlist_add_tail(&list_lnk, &signal_processor_list);
 	this->active = 0;
 }
@@ -89,7 +92,7 @@ signal_processor * heimer::signal_processor_get_by_name(const char * name)
 
 igris::buffer signal_processor::name()
 {
-	return { _name,  SIGNAL_PROCESSOR_NAME_MAX_LENGTH};
+	return { _name, strlen(_name) };
 }
 
 bool signal_processor::is_active()
