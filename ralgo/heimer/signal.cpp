@@ -14,14 +14,14 @@ void signal_head::init(const char * name, uint8_t type)
 	refs = 0;
 	this->type = type;
 	strncpy(this->name, name, SIGNAL_NAME_MAX_LENGTH);
-	dlist_add_tail(&signal_list_lnk, &signals_list);
+	dlist_add_tail(&list_lnk, &signals_list);
 	current_controller = NULL;
 	listener = NULL;
 }
 
 void signal_head::deinit() 
 {
-	dlist_del(&signal_list_lnk);	
+	dlist_del(&list_lnk);	
 }
 
 
@@ -48,7 +48,7 @@ void heimer::signal_head_list_reinit()
 signal_head * heimer::signal_get_by_name(const char * name)
 {
 	signal_head * sig;
-	dlist_for_each_entry(sig, &signals_list, signal_list_lnk)
+	dlist_for_each_entry(sig, &signals_list, list_lnk)
 	{
 		if (strncmp(sig->name, name, SIGNAL_NAME_MAX_LENGTH) == 0)
 			return sig;

@@ -20,17 +20,20 @@ namespace heimer
     {
 //  struct signal_processor proc;
     private:
-        int dim;
+        int _dim;
 
-        struct axis_state ** leftside = nullptr;
-        struct axis_state ** rightside = nullptr;
-
+    public:
         float * matrix = nullptr;
         float * invert_matrix = nullptr;
+        struct axis_state ** leftside = nullptr;
+        struct axis_state ** rightside = nullptr;
 
     public:
         axstate_linear_processor() = default;
         axstate_linear_processor(const char * name, int dim);
+
+        void set_leftside(axis_state ** arr);
+        void set_rightside(axis_state ** arr);
 
         int feedback(disctime_t time) override;
         int serve(disctime_t time) override;
@@ -38,6 +41,8 @@ namespace heimer
         void deinit() override;
         signal_head * iterate_left(signal_head *) override;
         signal_head * iterate_right(signal_head *) override;
+
+        int dim();
 
         void init(
             const char * name,
@@ -49,6 +54,7 @@ namespace heimer
         );
 
         void evaluate_invertion();
+        void allocate_resources();
     };
 }
 

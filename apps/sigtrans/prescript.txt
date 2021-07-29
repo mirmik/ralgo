@@ -5,13 +5,12 @@ signew axstate z
 signew axstate yvirt
 signew axstate zvirt
 
-ctrnew axsincos sincos
-ctrnew axlinear linear 2 1 1 0 1
+ctrnew axlinear linear 2
 ctrnew axisctr xctr 1
 ctrnew axisctr yzctr 2
 
-ctr axlinear bindleft y z
-ctr axlinear bindright yvirt zvirt
+ctr linear bindleft y z
+ctr linear bindright yvirt zvirt
 
 ctr xctr bind x
 ctr xctr setvel 1
@@ -28,3 +27,5 @@ ctrlist
 
 ctr xctr info
 ctr yzctr info
+
+ctr linear info

@@ -77,7 +77,8 @@ int ctrnew(int argc, char ** argv, char * output, int maxsize)
 		}
 
 		int dim = atoi32(argv[2], 10, NULL);
-		new heimer::axstate_linear_processor(argv[1], dim);
+		auto ptr = new heimer::axstate_linear_processor(argv[1], dim);
+		ptr->allocate_resources();
 		return 0;
 	}
 
@@ -168,7 +169,7 @@ static
 int siglist(int, char **, char * output, int maxsize)
 {
 	signal_head * it;
-	dlist_for_each_entry(it, &signals_list, signal_list_lnk)
+	dlist_for_each_entry(it, &signals_list, list_lnk)
 	{
 		char buf[SIGNAL_PROCESSOR_NAME_MAX_LENGTH + 4];
 		snprintf(buf, SIGNAL_PROCESSOR_NAME_MAX_LENGTH + 4,

@@ -9,7 +9,7 @@ import os
 
 licant.include("ralgo", "../../ralgo.g.py")
 
-defines = ["NOTRACE=1"]
+defines = ["NOTRACE=1", "HEIMER_CROW_SUPPORT_ENABLED=1"]
 
 application("sigtrans", 
 	sources = [
@@ -22,7 +22,7 @@ application("sigtrans",
 	cxx_flags = "-g",
 	cc_flags = "-g",
 	libs = ["pthread", "readline", "igris", "nos", "crow"],
-	cxxstd = "c++17"
+	cxxstd = "c++17",
 )
 
 

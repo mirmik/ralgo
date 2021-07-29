@@ -147,6 +147,20 @@ int info(axis_controller * axctr, int argc, char ** argv, char * output, int out
 	         (uint8_t)axctr->f.spattern_enabled);
 	strncat(output, buf, outmax);
 
+	for (int i = 0; i < axctr->dim; ++i) 
+	{
+		memset(buf, 0, bufsize);
+		snprintf(buf, bufsize, "axsets: lims: %d,%f,%f sfpos: %f,%f gain: %f\r\n", 
+			axctr->settings[i].limits_enabled,
+			axctr->settings[i].backlim,
+			axctr->settings[i].forwlim,
+			axctr->settings[i].sfpos.spos,
+			axctr->settings[i].sfpos.fpos,
+			axctr->settings[i].gain
+		);
+	strncat(output, buf, outmax);
+	}
+
 	return 0;
 }
 

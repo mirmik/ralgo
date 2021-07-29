@@ -1,5 +1,8 @@
 #include <ralgo/heimer/executor.h>
 #include <ralgo/heimer/signal.h>
+#include <ralgo/heimer/axis_state.h>
+#include <ralgo/heimer/sigtypes.h>
+#include <ralgo/log.h>
 
 #include <igris/dprint.h>
 
@@ -14,7 +17,7 @@ void heimer::executor::set_order_table(signal_processor ** order_table, int capa
 int heimer::executor::order_sort()
 {
 	signal_head * it;
-	dlist_for_each_entry(it, &signals_list, signal_list_lnk)
+	dlist_for_each_entry(it, &signals_list, list_lnk)
 	{
 		it->sorting_mark = it->listener == nullptr;
 	}
@@ -74,7 +77,7 @@ int heimer::executor::serve(disctime_t curtime)
 {
 	int retcode;
 
-	for (int i = order_table_size - 1; i >= order_table_size; --i)
+	for (int i = order_table_size - 1; i >= 0; --i)
 	{
 		retcode = order_table[i]->serve(curtime);
 
@@ -112,24 +115,69 @@ int heimer::executor::feedback(disctime_t curtime)
 
 int heimer::executor::exec(disctime_t curtime)
 {
+	char buf[16];
 	int retcode;
 
 	retcode = feedback(curtime);
+	if (retcode) 
+	{
+		sprintf(buf, "%d", retcode);
+		ralgo::warn("executor: feedback set retcode ", buf);
+	}
+
 	retcode = serve(curtime);
+	if (retcode) 
+	{
+		sprintf(buf, "%d", retcode);
+		ralgo::warn("executor: feedback set retcode ", buf);
+	}
 
 	return retcode;
 }
 
-heimer::executor::~executor() 
+heimer::executor::~executor()
 {
 	if (f.dynamic)
 		delete[] order_table;
 }
 
-void heimer::executor::allocate_order_table(int size) 
+void heimer::executor::allocate_order_table(int size)
 {
 	order_table = new signal_processor * [size];
 	order_table_size = 0;
 	order_table_capacity = size;
 	f.dynamic = 1;
+}
+
+void heimer::executor::notification_prepare(const char * theme, crow::hostaddr_view addrview) 
+{
+	count_of_axstates = 0;
+
+	signal_head * sig;
+	dlist_for_each_entry(sig, &signals_list, list_lnk) 
+	{
+		if (sig->type == SIGNAL_TYPE_AXIS_STATE) 
+		{
+			++count_of_axstates;
+		}
+	}
+
+	coordinate_publisher.init(addrview, theme, 0, 50);
+}
+
+void heimer::executor::notify()
+{
+	float arr[count_of_axstates];
+	float * it = arr;
+
+	signal_head * sig;
+	dlist_for_each_entry(sig, &signals_list, list_lnk) 
+	{
+		if (sig->type == SIGNAL_TYPE_AXIS_STATE) 
+		{
+			*it++ = static_cast<heimer::axis_state*>(sig)->feedpos;
+		}
+	}
+
+	coordinate_publisher.publish({(void*)arr, sizeof(arr)});
 }
