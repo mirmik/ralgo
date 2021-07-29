@@ -35,7 +35,7 @@ void signal_head::put()
 	--refs;
 }
 
-int heimer::heimer_signals_count()
+int heimer::signals_count()
 {
 	return dlist_size(&signals_list);
 }
