@@ -69,8 +69,8 @@ namespace ralgo
 
 		void decompose()
 		{
-			int m = a.rows();
-			int n = a.cols();
+			//int m = a.rows();
+			//int n = a.cols();
 
 			ralgo::matops::assign(a, q);
 
@@ -89,7 +89,7 @@ namespace ralgo
 					r.at(i, j) = ralgo::vecops::inner_product(q.col(i), a.col(j));
 
 					// вычитаем слагаемое из компонент вектора.
-					for (int k = 0; k < v.size(); ++k)
+					for (unsigned int k = 0; k < v.size(); ++k)
 						v[k] -= r.at(i, j) * q.at(k, i);
 				}
 

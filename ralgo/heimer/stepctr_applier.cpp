@@ -24,6 +24,8 @@ void stepctr_applier::deinit()
 
 int stepctr_applier::serve(disctime_t time)
 {
+	(void) time;
+
 	int64_t errpos = state->ctrpos - state->feedpos;
 
 	if (ABS(errpos) > deviation_error_limit)
@@ -40,6 +42,7 @@ int stepctr_applier::serve(disctime_t time)
 
 	// Скорость вычисляется как
 	// сумма уставной скорости на
+	// Возможно, в этом выражение должно быть время.
 	float compspd = state->ctrvel + compkoeff * errpos;
 	controlled_stepctr->set_speed(compspd);
 
@@ -49,10 +52,11 @@ int stepctr_applier::serve(disctime_t time)
 
 int stepctr_applier::feedback(disctime_t time)
 {
+	(void) time;
 	return 0;
 }
 
-int stepctr_applier::command(int argc, char ** argv, char * output, int outmax) 
+int stepctr_applier::command(int, char **, char *, int) 
 {
 	return 0;
 }

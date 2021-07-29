@@ -7,9 +7,6 @@ TEST_CASE("line trajectory")
 	position_t pos;
 	velocity_t   vel;
 
-	position_t spos_buffer;
-	position_t fpos_buffer;
-
 	sf_position_t sfpos;
 	position_t spos = 300;
 	position_t fpos = 400;

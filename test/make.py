@@ -16,8 +16,8 @@ application("runtests",
 		"lp/*.cpp",
 	],
 
-	cxx_flags = "-g -pedantic -Wno-vla",
-	cc_flags = "-g -Werror=incompatible-pointer-types",
+	cxx_flags = "-g -pedantic -Wno-vla -Werror=extra -Werror=all",
+	cc_flags = "-g -Werror=incompatible-pointer-types -pedantic -Werror=extra -Werror=all",
 	ld_flags = "-L/usr/local/lib/",
 
 	include_paths = ["."],

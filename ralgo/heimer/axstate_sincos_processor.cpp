@@ -4,6 +4,8 @@ using namespace heimer;
 
 int axstate_sincos_processor::serve(disctime_t time)
 {
+	(void) time;
+
 	struct axis_state * xl = leftside[0];
 	struct axis_state * yl = leftside[1];
 	struct axis_state * al = leftside[2];
@@ -32,6 +34,8 @@ int axstate_sincos_processor::serve(disctime_t time)
 
 int axstate_sincos_processor::feedback(disctime_t time)
 {
+	(void) time;
+
 	struct axis_state * xl = leftside[0];
 	struct axis_state * yl = leftside[1];
 	struct axis_state * al = leftside[2];
@@ -60,6 +64,11 @@ int axstate_sincos_processor::feedback(disctime_t time)
 
 int  axstate_sincos_processor::command(int argc, char ** argv, char * output, int outmax)
 {
+	(void) argc;
+	(void) argv;
+	(void) output;
+	(void) outmax;
+
 	return 0;
 }
 

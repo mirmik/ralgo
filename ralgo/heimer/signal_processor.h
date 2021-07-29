@@ -42,7 +42,7 @@ namespace heimer
 
 	int heimer_signal_processors_count();
 	void signal_processors_list_reinit();
-	int heimer_command_signal_processors(int argc, char ** argv, char * output, int maxsize);
+	int command_signal_processors(int argc, char ** argv, char * output, int maxsize);
 }
 
 #endif

@@ -11,6 +11,12 @@ using namespace heimer;
 static inline
 int bind(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
 {
+	(void) axctr;
+	(void) argc;
+	(void) argv;
+	(void) output;
+	(void) outmax;
+
 /*	axis_controller_release_controlled(axctr);
 
 	signal_head * sig = signal_get_by_name(argv[1]);
@@ -30,6 +36,11 @@ int bind(axis_controller * axctr, int argc, char ** argv, char * output, int out
 static inline
 int info(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
 {
+	(void) axctr;
+	(void) argc;
+	(void) argv;
+	(void) output;
+	(void) outmax;
 //	if (!axctr->controlled) 
 //	{
 //		snprintf(output, outmax, "Constrolled axis is not binded");
@@ -66,6 +77,10 @@ int info(axis_controller * axctr, int argc, char ** argv, char * output, int out
 static inline
 int incmov(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
 {
+	(void) argc;
+	(void) output;
+	(void) outmax;
+
 	int dim = axctr->dim;
 	position_t dist[dim];
 
@@ -80,6 +95,10 @@ int incmov(axis_controller * axctr, int argc, char ** argv, char * output, int o
 static inline
 int absmov(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
 {
+	(void) argc;
+	(void) output;
+	(void) outmax;
+	
 	int dim = axctr->dim;
 	position_t pos[dim];
 

@@ -85,7 +85,7 @@ namespace ralgo
         float s0, s1, s2, s3;
         float qDot1, qDot2, qDot3, qDot4;
         //float hx, hy;
-        float _2q0mx, _2q0my, _2q0mz, _2q1mx, _2bx, _2bz, _4bx, _4bz, _2q0, _2q1, _2q2, _2q3, _2q0q2, _2q2q3, q0q0, q0q1, q0q2, q0q3, q1q1, q1q2, q1q3, q2q2, q2q3, q3q3;
+        float _2bx, _2bz, _4bx, _4bz, _2q0, _2q1, _2q2, _2q3, _2q0q2, _2q2q3, q0q1, q0q2, q0q3, q1q1, q1q2, q1q3, q2q2, q2q3, q3q3;
 
         // Rate of change of quaternion from gyroscope
         qDot1 = 0.5f * (-q1 * gx - q2 * gy - q3 * gz);
@@ -94,17 +94,17 @@ namespace ralgo
         qDot4 = 0.5f * (q0 * gz + q1 * gy - q2 * gx);
 
         // Auxiliary variables to avoid repeated arithmetic
-        _2q0mx = 2.0f * q0 * mx;
-        _2q0my = 2.0f * q0 * my;
-        _2q0mz = 2.0f * q0 * mz;
-        _2q1mx = 2.0f * q1 * mx;
+//        _2q0mx = 2.0f * q0 * mx;
+//        _2q0my = 2.0f * q0 * my;
+//        _2q0mz = 2.0f * q0 * mz;
+//        _2q1mx = 2.0f * q1 * mx;
         _2q0 = 2.0f * q0;
         _2q1 = 2.0f * q1;
         _2q2 = 2.0f * q2;
         _2q3 = 2.0f * q3;
         _2q0q2 = 2.0f * q0 * q2;
         _2q2q3 = 2.0f * q2 * q3;
-        q0q0 = q0 * q0;
+        //q0q0 = q0 * q0;
         q0q1 = q0 * q1;
         q0q2 = q0 * q2;
         q0q3 = q0 * q3;

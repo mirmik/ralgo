@@ -1,7 +1,7 @@
 /** @file */
 
-#ifndef RALGO_HEIMER_COMMAND_CENTER_H
-#define RALGO_HEIMER_COMMAND_CENTER_H
+#ifndef RALGO_command_CENTER_H
+#define RALGO_command_CENTER_H
 
 #include <ralgo/heimer/axisctr.h>
 #include <ralgo/heimer/linintctr.h>

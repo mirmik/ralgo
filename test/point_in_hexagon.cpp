@@ -1,31 +1,6 @@
 #include <doctest/doctest.h>
 #include <ralgo/lp/point_in_hexagon.h>
 
-TEST_CASE("point_in_hexagon__copy_rows_by_indexes_transposed") 
-{
-	double A[] = 
-	{
-		1, 2,
-		5, 6,
-		8, 9,
-		11, 12,
-		14, 15,
-	};
-
-	double target[6]; 
-	int idxarr[] = {1, 3, 4};
-
-	point_in_hexagon__copy_rows_by_indexes_transposed(A, 2, 5, idxarr, 3, target);	
-
-	CHECK_EQ(target[0], 5);
-	CHECK_EQ(target[1], 11);
-	CHECK_EQ(target[2], 14);
-
-	CHECK_EQ(target[3], 6);
-	CHECK_EQ(target[4], 12);
-	CHECK_EQ(target[5], 15);
-}
-
 TEST_CASE("point_in_simplex") 
 {
 	double A[] = 

@@ -25,8 +25,8 @@ namespace ralgo
 	{
 	public:
 		size_t halfsize;
+		size_t cursor;
 		T* dataarr;
-		int cursor;
 
 	public:
 		sliding_array(size_t size) : cursor(0), dataarr(nullptr)

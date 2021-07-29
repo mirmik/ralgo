@@ -1,7 +1,7 @@
 /** @file */
 
-#ifndef RALGO_HEIMER_COMMAND_CENTER_INPUT_H
-#define RALGO_HEIMER_COMMAND_CENTER_INPUT_H
+#ifndef RALGO_command_CENTER_INPUT_H
+#define RALGO_command_CENTER_INPUT_H
 
 #include <ralgo/heimer/command_center_2.h>
 

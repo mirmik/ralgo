@@ -7,6 +7,8 @@ from licant.cxx_modules import application
 from licant.libs import include
 import os
 
+licant.include("ralgo", "../../ralgo.g.py")
+
 defines = ["NOTRACE=1"]
 
 application("sigtrans", 
@@ -18,7 +20,7 @@ application("sigtrans",
 #		"ralgo.heimer"
 	],
 	defines = defines,
-	cxx_flags = "-Wextra -Wall",
+	cxx_flags = "",
 	libs = ["pthread", "readline", "igris", "nos"],
 	cxxstd = "c++17"
 )

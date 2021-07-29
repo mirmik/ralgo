@@ -21,7 +21,7 @@ int line_trajectory_attime (void * priv,
 	float posmod = tsdeform_posmod(&traj->tsd, time_unit);
 	float spdmod = tsdeform_spdmod(&traj->tsd, time_unit);
 
-	for (unsigned int i = 0; i < traj->traj.dim; ++i)
+	for (int i = 0; i < traj->traj.dim; ++i)
 	{
 		sf_position_t * pair = sparse_array_ptr(&traj->sfpos, i, sf_position_t);
 		position_t spos = pair->spos;
@@ -69,7 +69,7 @@ void line_trajectory_init_nominal_speed(
 	lintraj->stim = stim;
 	lintraj->ftim = ftim;
 
-	for (unsigned int i = 0; i < lintraj->traj.dim; ++i)
+	for (int i = 0; i < lintraj->traj.dim; ++i)
 	{
 		sf_position_t * pair = sparse_array_ptr(&lintraj->sfpos, i, sf_position_t);
 
@@ -97,7 +97,7 @@ void line_trajectory_set_point_hold(
 	traj->ftim = ftim;
 	traj->stim = ftim - 1;
 
-	for (unsigned int i = 0; i < traj->traj.dim; ++i)
+	for (int i = 0; i < traj->traj.dim; ++i)
 	{
 		sf_position_t * pair = sparse_array_ptr(&traj->sfpos, i, sf_position_t);
 

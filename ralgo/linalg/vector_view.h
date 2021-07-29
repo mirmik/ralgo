@@ -35,12 +35,12 @@ namespace ralgo
 
 		bool operator != (const vector_view_iterator & oth) const
 		{
-			return dat != oth.dat || stride != stride; 
+			return dat != oth.dat || stride != oth.stride; 
 		}
 
 		bool operator == (const vector_view_iterator & oth) const
 		{
-			return dat == oth.dat && stride == stride; 
+			return dat == oth.dat && stride == oth.stride; 
 		}
 
 	};

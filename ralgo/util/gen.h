@@ -13,7 +13,7 @@ namespace ralgo
 		public:
 			range_iterator(int val, int step) : val(val), step(step) {}
 			range_iterator operator++() { val += step; return *this; }
-			range_iterator operator++(int i) { range_iterator ret = *this; ++(*this); return ret; }
+			range_iterator operator++(int) { range_iterator ret = *this; ++(*this); return ret; }
 
 			int operator*() { return val; }
 			bool operator!=(const range_iterator& oth) { return val != oth.val; }

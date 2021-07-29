@@ -30,7 +30,6 @@ namespace ralgo
 	{
 		ralgo::resize(x, ralgo::size(b));
 
-		typename M::value_type acc;
 		for (int i = 0; i < a.rows(); ++i)
 		{
 			for (int j = 0; j < a.cols(); ++j)

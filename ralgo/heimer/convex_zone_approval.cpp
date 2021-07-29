@@ -12,6 +12,8 @@ int heimer::convex_zone_approval::check(
     position_t * strt,
     position_t * fini)
 {
+	(void) strt;
+
 	int in = point_in_hexagon_d(table, dim, points_total, fini);
 	return in;
 }

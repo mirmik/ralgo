@@ -117,5 +117,5 @@ int heimer::executor::exec(disctime_t curtime)
 	retcode = feedback(curtime);
 	retcode = serve(curtime);
 
-	return 0;
+	return retcode;
 }
