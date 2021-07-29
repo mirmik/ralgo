@@ -6,23 +6,57 @@
 #include <igris/util/string.h>
 
 #include <ralgo/heimer/command.h>
+#include <ralgo/heimer/executor.h>
 
 #include <nos/io/file.h>
 #include <nos/fprint.h>
 #include <nos/print.h>
 
+#include <chrono>
+#include <thread>
+#include <memory>
+
 int DEBUG = 0;
+
+std::unique_ptr<heimer::executor> executor;
+std::unique_ptr<std::thread> execute_thread;
+
+void start_routine() 
+{
+	nos::println("start_routine");
+	executor.reset(new heimer::executor);
+
+}
+
+void stop_routine() 
+{
+	nos::println("stop_routine");
+
+}
 
 void exec(const std::string & line)
 {
+	int sts;
 	char output[256];
 	memset(output, 0, 256);
 
 	if (line.size() == 0)
 		return;
 
+	if (igris::trim(line) == "start") 
+	{
+		start_routine();
+		return;
+	}
+
+	if (igris::trim(line) == "stop") 
+	{
+		stop_routine();
+		return;
+	}
+
 	int ret;
-	int sts = heimer::command_exec_safe(line.c_str(), output, 256, &ret);
+	sts = heimer::command_exec_safe(line.c_str(), output, 256, &ret);
 
 	if (sts == ENOENT)
 	{
