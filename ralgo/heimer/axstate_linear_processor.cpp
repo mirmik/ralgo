@@ -126,3 +126,9 @@ void axstate_linear_processor::init(
 		this->rightside[i]->listener = this;
 	}
 }
+
+heimer::axstate_linear_processor::axstate_linear_processor(const char * name, int dim) 
+	: signal_processor(name)
+{
+	this->dim = dim;
+}

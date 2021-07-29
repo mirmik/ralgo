@@ -73,19 +73,22 @@ namespace heimer
 	*/
 	class axstate_sincos_processor : public signal_processor
 	{
-		struct axis_state ** leftside;   // order: x y a
-		struct axis_state ** rightside;  // order: x y a
+		struct axis_state ** leftside = nullptr;   // order: x y a
+		struct axis_state ** rightside = nullptr;  // order: x y a
 
 		position_t radius;
 
-		position_t x_offset;
-		position_t y_offset;
-		position_t a_left_offset;
-		position_t a_right_offset;
+		position_t x_offset = 0;
+		position_t y_offset = 0;
+		position_t a_left_offset = 0;
+		position_t a_right_offset = 0;
 
-		float alpha_to_radian_scale;
+		float alpha_to_radian_scale = 1;
 
 	public:
+		axstate_sincos_processor() = default;
+		axstate_sincos_processor(const char * name);
+
 		int feedback(disctime_t time) override;
 		int serve(disctime_t time) override;
 		int command(int argc, char ** argv, char * output, int outmax) override;

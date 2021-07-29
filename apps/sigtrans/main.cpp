@@ -20,18 +20,68 @@ int DEBUG = 0;
 
 std::unique_ptr<heimer::executor> executor;
 std::unique_ptr<std::thread> execute_thread;
+int started = 0;
+int cancel_token;
+
+void execute_routine() 
+{
+	while(1) 
+	{
+		if (cancel_token) return;
+		executor->exec(ralgo::discrete_time());
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+}
 
 void start_routine() 
 {
-	nos::println("start_routine");
+	if (started) 
+	{
+		nos::println("It has start early");
+		return;
+	}
+	
+	started = 1;
+	cancel_token = 0;
 	executor.reset(new heimer::executor);
+	executor->allocate_order_table(heimer::signal_processors_count());
 
+	heimer::signal_processor * proc;
+	dlist_for_each_entry(proc, &heimer::signal_processor_list, list_lnk) 
+	{
+		executor->append_processor(proc);
+	}
+	executor->order_sort();
+
+	execute_thread.reset(new std::thread(execute_routine));
 }
 
 void stop_routine() 
 {
-	nos::println("stop_routine");
+	if (!started)  
+	{
+		nos::println("Is not started yet");
+		return;
+	}
 
+	started = 0;
+	cancel_token = 1;
+	execute_thread->join();
+}
+
+void execinfo() 
+{
+	if (!started) 
+	{
+		nos::println("Is not started yet");
+		return;
+	}
+
+	for (int i = 0; i < executor->order_table_size; ++i) 
+	{
+		heimer::signal_processor * proc = executor->order_table[i];
+		nos::println(std::string_view(proc->name().data(), proc->name().size()));
+	}
 }
 
 void exec(const std::string & line)
@@ -52,6 +102,12 @@ void exec(const std::string & line)
 	if (igris::trim(line) == "stop") 
 	{
 		stop_routine();
+		return;
+	}
+
+	if (igris::trim(line) == "execinfo") 
+	{
+		execinfo();
 		return;
 	}
 

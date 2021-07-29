@@ -15,13 +15,17 @@ void signal_processor::init(const char * name)
 	this->active = 0;
 }
 
+signal_processor::signal_processor(const char * name)
+{
+	init(name);
+}
 
 void signal_processor::deinit()
 {
 	dlist_del(&list_lnk);
 }
 
-int heimer::heimer_signal_processors_count()
+int heimer::signal_processors_count()
 {
 	return dlist_size(&signal_processor_list);
 }
@@ -83,7 +87,7 @@ signal_processor * heimer::signal_processor_get_by_name(const char * name)
 	return NULL;
 }
 
-igris::buffer signal_processor::name() 
+igris::buffer signal_processor::name()
 {
 	return { _name,  SIGNAL_PROCESSOR_NAME_MAX_LENGTH};
 }

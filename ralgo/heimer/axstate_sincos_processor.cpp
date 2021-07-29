@@ -25,7 +25,7 @@ int axstate_sincos_processor::serve(disctime_t time)
 	yl->ctrpos = yr->ctrpos + y_offset + radius * s;
 	al->ctrpos = a + a_left_offset;
 
-	xl->ctrvel = xr->ctrvel - radius * s * avelocity; 
+	xl->ctrvel = xr->ctrvel - radius * s * avelocity;
 	yl->ctrvel = yr->ctrvel + radius * c * avelocity;
 	al->ctrvel = ar->ctrvel;
 
@@ -55,10 +55,10 @@ int axstate_sincos_processor::feedback(disctime_t time)
 	yr->feedpos = yl->feedpos - y_offset - radius * s;
 	ar->feedpos = a - a_right_offset;
 
-	xr->feedvel = xl->feedvel + radius * s * avelocity; 
+	xr->feedvel = xl->feedvel + radius * s * avelocity;
 	yr->feedvel = yl->feedvel - radius * c * avelocity;
 	ar->feedvel = al->feedvel;
-	
+
 	return 0;
 }
 
@@ -78,7 +78,7 @@ void axstate_sincos_processor::deinit()
 signal_head * axstate_sincos_processor::iterate_left(signal_head * iter)
 {
 	int dim = 3;
-	
+
 	if (iter == NULL)
 		return *leftside;
 
@@ -124,10 +124,10 @@ void axstate_sincos_processor::set_alpha_scale(
 }
 
 void axstate_sincos_processor::set_offset(
-	position_t xoff, 
-	position_t yoff, 
-	position_t aloff, 
-	position_t aroff)
+    position_t xoff,
+    position_t yoff,
+    position_t aloff,
+    position_t aroff)
 {
 	x_offset = xoff;
 	y_offset = yoff;
@@ -169,10 +169,10 @@ void axstate_sincos_processor::init(
 	this->rightside = rightside;
 
 	this->radius = radius;
-	x_offset = 0;
-	y_offset = 0;
-	a_right_offset = 0;
-	a_left_offset = 0;
+}
 
-	alpha_to_radian_scale = 1;
+axstate_sincos_processor::axstate_sincos_processor(const char * name) 
+	: signal_processor(name)
+{
+
 }
