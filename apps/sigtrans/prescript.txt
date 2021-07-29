@@ -5,9 +5,10 @@ signew axstate z
 signew axstate yvirt
 signew axstate zvirt
 
+ctrnew axsincos sincos
+ctrnew axlinear linear 2 1 1 0 1
 ctrnew axisctr xctr 1
 ctrnew axisctr yzctr 2
-ctrnew axlinear 2 1 1 0 1
 
 ctr axlinear bindleft y z
 ctr axlinear bindright yvirt zvirt

@@ -1,6 +1,9 @@
 #include <doctest/doctest.h>
 #include <ralgo/heimer/command.h>
 #include <ralgo/heimer/axis_state.h>
+#include <ralgo/heimer/axisctr.h>
+#include <ralgo/heimer/axstate_linear_processor.h>
+#include <ralgo/heimer/axstate_sincos_processor.h>
 
 #include <string.h>
 #include <string_view>
@@ -46,4 +49,24 @@ TEST_CASE("command")
 		96);
 	CHECK_EQ(sts, 0);
 	CHECK_NE(strlen(buf), 0);
+}
+
+TEST_CASE("command")
+{
+	heimer_system_init();
+
+	heimer::axis_settings set0[2];	
+	heimer::axis_settings set1[3];
+
+	heimer::axis_controller axctr0("axisctr0", set0, 2);
+	heimer::axstate_linear_processor linear("linear", 3);
+	heimer::axis_controller axctr1("axisctr0", set1, 3);
+	heimer::axstate_sincos_processor sincos("sincos");
+
+	CHECK_EQ(axctr0.name(), "axisctr0");
+	CHECK_EQ(linear.name(), "linear");
+	CHECK_EQ(axctr1.name(), "axisctr0");
+	CHECK_EQ(sincos.name(), "sincos");
+
+	CHECK_EQ(heimer::signal_processors_count(), 4);
 }

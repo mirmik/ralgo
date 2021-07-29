@@ -32,6 +32,8 @@ TEST_CASE("axstate_sincos_processor")
 		scproc.init("axproc", heimdist(10.f));
 		CHECK_EQ(scproc.name().size(), 6);
 		CHECK_EQ(std::string(scproc.name().data(), scproc.name().size()), std::string("axproc"));
+		CHECK_EQ(heimer::signal_processors_count(), 1);
+
 
 		scproc.set_leftside(left);
 		scproc.set_rightside(right);
