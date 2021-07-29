@@ -7,7 +7,7 @@
 
 using namespace heimer;
 
-TEST_CASE("heimer_command")
+TEST_CASE("command")
 {
 	char buf[96];
 	int sts;
@@ -17,23 +17,23 @@ TEST_CASE("heimer_command")
 	CHECK_EQ(heimer_signals_count(), 0);
 	CHECK_EQ(heimer_signal_processors_count(), 0);
 
-	heimer_command_exec_safe("signew axstate x", NULL, 0);
+	heimer::command_exec_safe("signew axstate x", NULL, 0);
 
 	CHECK_EQ(heimer_signals_count(), 1);
 	CHECK_EQ(heimer_signal_processors_count(), 0);
 
-	heimer_command_exec_safe("ctrnew axisctr xctr", NULL, 0);
+	heimer::command_exec_safe("ctrnew axisctr xctr", NULL, 0);
 
 	CHECK_EQ(heimer_signals_count(), 1);
 	CHECK_EQ(heimer_signal_processors_count(), 1);
 
-	sts = heimer_command_exec_safe("sig k info", buf, 96);
+	sts = heimer::command_exec_safe("sig k info", buf, 96);
 	CHECK_NE(sts, 0);
 
-	sts = heimer_command_exec_safe("sig x Info", buf, 96);
+	sts = heimer::command_exec_safe("sig x Info", buf, 96);
 	CHECK_NE(sts, 0);
 
-	sts = heimer_command_exec_safe("sig x info", buf, 96);
+	sts = heimer::command_exec_safe("sig x info", buf, 96);
 	CHECK_EQ(sts, 0);
 	CHECK_NE(strlen(buf), 0);
 

@@ -4,25 +4,6 @@
 #include <ralgo/clinalg/solve.h>
 #include <igris/dprint.h>
 
-void point_in_hexagon__copy_rows_by_indexes_transposed(
-    double * A,
-    int dim,
-    int points,
-    int * indexes,
-    int indexes_total,
-    double * result_matrix)
-{
-	for (int ii = 0; ii < indexes_total; ++ii)
-	{
-		int index = indexes[ii];
-
-		for (int j = 0; j < dim; ++j)
-		{
-			*(result_matrix + j * (indexes_total) + ii) = *(A + index * dim + j);
-		}
-	}
-}
-
 /**
 	Решает задачу о нахождении точки внутри симлекса - выпуклой оболочке n+1 точки n мерного пространства.
 */

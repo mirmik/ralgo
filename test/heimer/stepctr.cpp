@@ -7,7 +7,7 @@ static int setted_state = 0;
 
 void set_state(void * priv, uint8_t state) 
 {
-	struct stepctr_controller * stepctr = (struct stepctr_controller *) priv;
+	(void) priv;
 	setted_state = state;
 }
 

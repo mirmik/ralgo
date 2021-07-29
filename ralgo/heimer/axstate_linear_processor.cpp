@@ -5,6 +5,8 @@ using namespace heimer;
 
 int axstate_linear_processor::serve(disctime_t time)
 {
+	(void) time;
+
 	for (int i = 0; i < dim; ++i)
 	{
 		position_t accpos = 0;
@@ -24,6 +26,8 @@ int axstate_linear_processor::serve(disctime_t time)
 
 int axstate_linear_processor::feedback(disctime_t time)
 {
+	(void) time;
+
 	for (int i = 0; i < dim; ++i)
 	{
 		position_t accpos = 0;
@@ -43,6 +47,11 @@ int axstate_linear_processor::feedback(disctime_t time)
 
 int  axstate_linear_processor::command(int argc, char ** argv, char * output, int outmax)
 {
+	(void) argc;
+	(void) argv;
+	(void) output;
+	(void) outmax;
+
 	return 0;
 }
 

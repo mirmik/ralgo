@@ -58,6 +58,7 @@ signal_head * heimer::signal_get_by_name(const char * name)
 
 int signal_head::command_v(int argc, char ** argv, char * output, int maxsize)
 {	
+	(void) argc;
 	char * opsname = argv[0];
 
 	if (strcmp(opsname, "info") == 0) 

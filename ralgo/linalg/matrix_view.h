@@ -23,9 +23,9 @@ namespace ralgo
 		using value_type = T;
 		static T& at(T* data, int i, int j, int stride) { return *(data + i * stride + j); }
 		static int stride(int rows, int cols) { (void) rows; return cols; }
-		static vector_view<T> sect(T* data, int i, int rows, int cols) { return { data + i * cols, cols, 1    }; }
-		static vector_view<T> row(T* data, int i, int rows, int cols, int stride) { return {  data + i * cols, cols, 1    }; }
-		static vector_view<T> col(T* data, int i, int rows, int cols, int stride) { return {  data + i,        rows, stride }; }
+		static vector_view<T> sect(T* data, int i, int rows, int cols) { (void)rows; return { data + i * cols, cols, 1    }; }
+		static vector_view<T> row(T* data, int i, int rows, int cols, int stride) { (void)rows; (void)stride; return {  data + i * cols, cols, 1    }; }
+		static vector_view<T> col(T* data, int i, int rows, int cols, int stride) { (void)cols; return {  data + i,        rows, stride }; }
 	};
 
 	template <class T>

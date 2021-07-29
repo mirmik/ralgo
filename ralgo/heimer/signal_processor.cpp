@@ -36,7 +36,7 @@ int signal_processor::activate()
 	int success = 1;
 
 	signal_head * iter = NULL;
-	while (iter = iterate_left(iter))
+	while ((iter = iterate_left(iter)))
 	{
 		int err = iter->activate(this);
 		if (err)
@@ -62,7 +62,7 @@ int signal_processor::activate()
 int signal_processor::deactivate()
 {
 	signal_head * iter = NULL;
-	while (iter = iterate_left(iter))
+	while ((iter = iterate_left(iter)))
 	{
 		int err = iter->deactivate(this);
 		(void) err;

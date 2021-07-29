@@ -75,7 +75,7 @@ namespace ralgo
 		template<class A, class B>
 		void swap(A && a, B && b)
 		{
-			for (int i = 0; i < a.size(); ++i)
+			for (unsigned int i = 0; i < a.size(); ++i)
 			{
 				std::swap(a[i], b[i]);
 			}
@@ -159,7 +159,7 @@ namespace ralgo
 		value_t<A> inner_product (A&& a, B&& b)
 		{
 			value_t<A> acc;
-			for (int i = 0; i < a.size(); i++)
+			for (unsigned int i = 0; i < a.size(); i++)
 			{
 				acc += a[i] * b[i];
 			}
@@ -297,7 +297,7 @@ namespace ralgo
 
 			template <class V> void clean(V& v)
 			{
-				elementwise(v, [](auto & a) {return typename V::value_type();});
+				elementwise(v, [](auto &) { return typename V::value_type();});
 			}
 
 			template <class V, class S> V& add(V& vec, S m) { for (auto& val : vec) val += m; return vec; }

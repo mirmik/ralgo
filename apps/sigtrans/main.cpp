@@ -1,17 +1,24 @@
-#include <ralgo/heimer/command_center_2.h>
-#include <ralgo/heimer/command_center_console.h>
-
 #include <string>
+#include <iostream>
 
-//heimer::command_center_2 command_center;
-//heimer::command_center_console command_center_console(&command_center);
+#include <igris/getopt/cliopts.h>
+#include <ralgo/heimer/command.h>
 
-int main() 
+int DEBUG = 0;
+
+
+int main(int argc, char ** argv) 
 {
+	igris::cliopts cli;
+	cli.add_option("debug", 'd');
+	cli.parse(argc, argv);
+
+	DEBUG = cli.get_option("debug");
+
 	while(1) 
 	{
-//		std::string str;
-//		std::getline(std::cin, str);
-//		command_center_console.input((char *)str.c_str());
+		std::string line;
+		std::getline(std::cin, line);
+		heimer::command(line.c_str(), line.size());
 	}
 }

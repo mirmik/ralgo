@@ -24,11 +24,11 @@ namespace ralgo
 
 		int status;
 
-		PLUD(const M & _mat) 
+		PLUD(const M & _mat)
 			: PLUD(_mat, TP{}, TL{}, TU{})
 		{}
 
-		PLUD(const M & _mat, const TP & _p, const TL & _l, const TU & _u) 
+		PLUD(const M & _mat, const TP & _p, const TL & _l, const TU & _u)
 			: a(_mat), p(_p), l(_l), u(_u)
 		{
 			if (_mat.rows() != _mat.cols())
@@ -46,7 +46,6 @@ namespace ralgo
 			ralgo::matops::clean(p);
 			ralgo::matops::clean(l);
 			ralgo::matops::clean(u);
-	double U[n*n];
 
 			ralgo::matops::eye(p);
 			ralgo::matops::eye(l);
@@ -97,7 +96,7 @@ namespace ralgo
 		}
 
 		template <class X, class B>
-		void solve(const B& b, X&& x) 
+		void solve(const B& b, X&& x)
 		{
 			vector_value_t<B> ybuf[b.size()];
 			vector_view y(ybuf, b.size());
@@ -112,12 +111,12 @@ namespace ralgo
 			U_triangle_solve(u, y, x);
 		}
 
-		template <class X=void, class B>
-		defvec_t<X,B> solve(B && b) 
+		template <class X = void, class B>
+		defvec_t<X, B> solve(B && b)
 		{
-			defvec_t<X,B> x;
+			defvec_t<X, B> x;
 			solve(b, x);
-			return x;	
+			return x;
 		}
 	};
 

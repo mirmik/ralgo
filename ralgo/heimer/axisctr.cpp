@@ -103,6 +103,7 @@ void axis_controller::finish_trajectory(disctime_t time, position_t * ctrpos)
 
 int axis_controller::feedback(disctime_t time)
 {
+	(void) time;
 	return 0;
 }
 
@@ -299,6 +300,7 @@ signal_head * axis_controller::iterate_left(signal_head * iter)
 
 signal_head * axis_controller::iterate_right(signal_head * iter)
 {
+	(void) iter;
 	return NULL;
 }
 

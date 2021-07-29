@@ -9,6 +9,8 @@ void ralgo::log(ralgo::LogLevel lvl,
 	const char * c
 ) 
 {
+	(void) lvl;
+
 	write(STDOUT_FILENO, a, strlen(a));
 	
 	if (b)

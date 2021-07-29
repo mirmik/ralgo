@@ -1,5 +1,5 @@
-#ifndef HEIMER_COMMAND_CENTER_2_H
-#define HEIMER_COMMAND_CENTER_2_H
+#ifndef command_CENTER_2_H
+#define command_CENTER_2_H
 
 /**
 	@file
