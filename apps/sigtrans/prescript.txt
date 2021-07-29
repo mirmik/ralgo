@@ -2,30 +2,30 @@ signew axstate x
 signew axstate y
 signew axstate z
 
-signew axstate yvirt
-signew axstate zvirt
-
-ctrnew axlinear linear 2
 ctrnew axisctr xctr 1
-ctrnew axisctr yzctr 2
+ctrnew axisctr yctr 1
+ctrnew axisctr zctr 1
 
-ctr linear bindleft y z
-ctr linear bindright yvirt zvirt
+ctrnew axstub xstub
+ctrnew axstub ystub
+ctrnew axstub zstub
 
+ctr xstub bind x
 ctr xctr bind x
 ctr xctr setvel 1
 ctr xctr setacc 1 1
 ctr xctr setgain 1000
 
-ctr yzctr bind yvirt zvirt
-ctr yzctr setvel 2
-ctr yzctr setacc 1 1
-ctr yzctr setgain 1000 1000
+ctr ystub bind y
+ctr yctr bind y
+ctr yctr setvel 1
+ctr yctr setacc 1 1
+ctr yctr setgain 1000
 
-siglist
-ctrlist
+ctr zstub bind z
+ctr zctr bind z
+ctr zctr setvel 1
+ctr zctr setacc 1 1
+ctr zctr setgain 1000
 
-ctr xctr info
-ctr yzctr info
-
-ctr linear info
+start
