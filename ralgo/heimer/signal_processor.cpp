@@ -92,7 +92,7 @@ signal_processor * heimer::signal_processor_get_by_name(const char * name)
 
 igris::buffer signal_processor::name()
 {
-	return { _name, strlen(_name) };
+	return { _name, strnlen(_name, SIGNAL_PROCESSOR_NAME_MAX_LENGTH) };
 }
 
 bool signal_processor::is_active()

@@ -12,6 +12,10 @@
 #include <nos/fprint.h>
 #include <nos/print.h>
 
+#include <crow/gates/udpgate.h>
+#include <crow/address.h>
+#include <crow/tower.h>
+
 #include <chrono>
 #include <thread>
 #include <memory>
@@ -22,6 +26,9 @@ std::unique_ptr<heimer::executor> executor;
 std::unique_ptr<std::thread> execute_thread;
 int started = 0;
 int cancel_token;
+
+crow::udpgate udpgate;
+crow::hostaddr crowaddr;
 
 void execute_routine() 
 {
@@ -132,6 +139,8 @@ void exec(const std::string & line)
 
 int main(int argc, char ** argv)
 {
+	crowaddr = crow::crowker_address();
+
 	igris::cliopts cli;
 	cli.add_option("debug", 'd');
 	cli.add_string("script", 's', "");
@@ -154,6 +163,8 @@ int main(int argc, char ** argv)
 		}
 	}
 
+	crow::start_spin();
+
 	while (1)
 	{
 		std::string line;
@@ -161,4 +172,6 @@ int main(int argc, char ** argv)
 
 		exec(line);
 	}
+
+	crow::stop_spin();
 }

@@ -31,6 +31,7 @@ TEST_CASE("axstate_linear_processor")
 		inverse_matrix
 	);
 	CHECK_EQ(linproc.name(), "linproc");
+	CHECK_EQ(heimer::signal_processors_count(), 1);
 
 	linproc.evaluate_invertion();
 	CHECK_NE(inverse_matrix[0], 0);

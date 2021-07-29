@@ -17,12 +17,11 @@ application("sigtrans",
 	],
 	mdepends= [
 		"ralgo",
-#		"ralgo.heimer"
 	],
 	defines = defines,
 	cxx_flags = "-g",
 	cc_flags = "-g",
-	libs = ["pthread", "readline", "igris", "nos"],
+	libs = ["pthread", "readline", "igris", "nos", "crow"],
 	cxxstd = "c++17"
 )
 
