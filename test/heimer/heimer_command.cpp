@@ -15,18 +15,18 @@ TEST_CASE("command")
 
 	heimer_system_init();
 
-	CHECK_EQ(heimer_signals_count(), 0);
-	CHECK_EQ(heimer_signal_processors_count(), 0);
+	CHECK_EQ(heimer::signals_count(), 0);
+	CHECK_EQ(heimer::signal_processors_count(), 0);
 
 	heimer::command_exec_safe("signew axstate x", NULL, 0, &ret);
 
-	CHECK_EQ(heimer_signals_count(), 1);
-	CHECK_EQ(heimer_signal_processors_count(), 0);
+	CHECK_EQ(heimer::signals_count(), 1);
+	CHECK_EQ(heimer::signal_processors_count(), 0);
 
 	heimer::command_exec_safe("ctrnew axisctr xctr 1", NULL, 0, &ret);
 
-	CHECK_EQ(heimer_signals_count(), 1);
-	CHECK_EQ(heimer_signal_processors_count(), 1);
+	CHECK_EQ(heimer::signals_count(), 1);
+	CHECK_EQ(heimer::signal_processors_count(), 1);
 
 	sts = heimer::command_exec_safe("sig k info", buf, 96, &ret);
 	CHECK_EQ(sts, 0);

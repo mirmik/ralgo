@@ -77,20 +77,10 @@ void axstate_sincos_processor::deinit()
 
 signal_head * axstate_sincos_processor::iterate_left(signal_head * iter)
 {
-	int dim = 3;
-
-	if (iter == NULL)
-		return *leftside;
-
-	struct axis_state ** it = leftside;
-	for (; it != leftside + dim - 1  ; ++it)
-	{
-		if (*it == iter)
-		{
-			it++;
-			return *it;
-		}
-	}
+	if (iter == NULL) return leftside[0];
+	if (iter == leftside[0]) return leftside[1];
+	if (iter == leftside[1]) return leftside[2];
+	if (iter == leftside[2]) return NULL;	
 
 	return NULL;
 }
@@ -98,20 +88,10 @@ signal_head * axstate_sincos_processor::iterate_left(signal_head * iter)
 
 signal_head * axstate_sincos_processor::iterate_right(signal_head * iter)
 {
-	int dim = 3;
-
-	if (iter == NULL)
-		return *rightside;
-
-	struct axis_state ** it = rightside;
-	for (; it != rightside + dim - 1  ; ++it)
-	{
-		if (*it == iter)
-		{
-			it++;
-			return *it;
-		}
-	}
+	if (iter == NULL) return rightside[0];
+	if (iter == rightside[0]) return rightside[1];
+	if (iter == rightside[1]) return rightside[2];
+	if (iter == rightside[2]) return NULL;	
 
 	return NULL;
 }
@@ -158,21 +138,27 @@ void axstate_sincos_processor::set_a_right_offset(position_t aoff)
 
 void axstate_sincos_processor::init(
     const char* name,
-    struct axis_state ** leftside,
-    struct axis_state ** rightside,
     position_t radius
 )
 {
 	signal_processor::init(name);
-
-	this->leftside = leftside;
-	this->rightside = rightside;
-
 	this->radius = radius;
 }
 
-axstate_sincos_processor::axstate_sincos_processor(const char * name) 
+axstate_sincos_processor::axstate_sincos_processor(const char * name)
 	: signal_processor(name)
 {
 
+}
+
+void axstate_sincos_processor::set_leftside(axis_state ** side) 
+{
+	for (int i = 0; i < 3; ++i)
+		leftside[i] = side[i];
+}
+
+void axstate_sincos_processor::set_rightside(axis_state ** side) 
+{
+	for (int i = 0; i < 3; ++i)
+		rightside[i] = side[i];
 }

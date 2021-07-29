@@ -68,7 +68,7 @@ int ctrnew(int argc, char ** argv, char * output, int maxsize)
 		return 0;
 	}
 
-	if (strcmp(argv[0], "axisctr") == 0)
+	if (strcmp(argv[0], "axlinear") == 0)
 	{
 		if (argc < 3)
 		{
@@ -81,7 +81,7 @@ int ctrnew(int argc, char ** argv, char * output, int maxsize)
 		return 0;
 	}
 
-	if (strcmp(argv[0], "axisctr") == 0)
+	if (strcmp(argv[0], "axsincos") == 0)
 	{
 		if (argc < 3)
 		{
@@ -89,7 +89,6 @@ int ctrnew(int argc, char ** argv, char * output, int maxsize)
 			return -1;
 		}
 
-		int dim = atoi32(argv[2], 10, NULL);
 		new heimer::axstate_sincos_processor(argv[1]);
 		return 0;
 	}

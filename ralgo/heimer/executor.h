@@ -18,10 +18,10 @@ namespace heimer
 
 		union 
 		{
-			uint8_t flags;
+			uint8_t flags = 0;
 			struct 
 			{
-				uint8_t dynamic;
+				uint8_t dynamic : 1;
 			} f;
 		};
 
@@ -30,6 +30,7 @@ namespace heimer
 #endif
 
 	public:
+		executor() = default;
 		void set_order_table(signal_processor ** order_table, int capacity, int size);
 
 		void allocate_order_table(int size);

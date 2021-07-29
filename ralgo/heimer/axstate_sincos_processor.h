@@ -73,10 +73,10 @@ namespace heimer
 	*/
 	class axstate_sincos_processor : public signal_processor
 	{
-		struct axis_state ** leftside = nullptr;   // order: x y a
-		struct axis_state ** rightside = nullptr;  // order: x y a
+		struct axis_state * leftside[3] = { nullptr, nullptr, nullptr };   // order: x y a
+		struct axis_state * rightside[3] = { nullptr, nullptr, nullptr };  // order: x y a
 
-		position_t radius;
+		position_t radius = 0;
 
 		position_t x_offset = 0;
 		position_t y_offset = 0;
@@ -96,10 +96,11 @@ namespace heimer
 		signal_head * iterate_left(signal_head *) override;
 		signal_head * iterate_right(signal_head *) override;
 
+		void set_leftside(axis_state **);
+		void set_rightside(axis_state **);
+
 		void init(
 		    const char* name,
-		    struct axis_state ** leftside,
-		    struct axis_state ** rightside,
 		    position_t radius
 		);
 

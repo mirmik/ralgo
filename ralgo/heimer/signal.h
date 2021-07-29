@@ -52,7 +52,7 @@ namespace heimer
 		int deactivate(signal_processor * proc);
 	};
 
-	int heimer_signals_count();
+	int signals_count();
 	void signal_head_list_reinit();
 	signal_head * signal_get_by_name(const char * name);
 }
