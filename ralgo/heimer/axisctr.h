@@ -88,10 +88,6 @@ namespace heimer
 		void set_velocity_external(float vel);
 		void set_accdcc_external(float acc, float dcc);
 
-		void set_limits_internal(position_t * back, position_t * forw);
-		void set_velocity_internal(velocity_t vel);
-		void set_accdcc_internal(acceleration_t acc, acceleration_t dcc);
-
 		void set_controlled(struct axis_state ** state);
 		void release_controlled();
 

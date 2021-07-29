@@ -40,30 +40,9 @@ void axis_controller::set_gain(double * gain)
 	}
 }
 
-void axis_controller::set_limits_internal(position_t * back, position_t * forw)
-{
-	for (int i = 0; i < dim; ++i)
-	{
-		settings[i].limits_enabled = 1;
-		settings[i].backlim = back[i];
-		settings[i].forwlim = forw[i];
-	}
-}
-
-void axis_controller::set_velocity_internal(velocity_t speed)
-{
-	vel = speed;
-}
-
 void axis_controller::set_velocity_external(float speed)
 {
 	vel = speed / discrete_time_frequency();
-}
-
-void axis_controller::set_accdcc_internal(velocity_t  acc, velocity_t  dcc)
-{
-	this->acc = acc;
-	this->dcc = dcc;
 }
 
 void axis_controller::set_accdcc_external(float acc, float dcc)
@@ -77,8 +56,8 @@ void axis_controller::set_limits_external(double * back, double * forw)
 	for (int i = 0; i < dim; ++i)
 	{
 		settings[i].limits_enabled = 1;
-		settings[i].backlim = back[i] * settings[i].gain;
-		settings[i].forwlim = forw[i] * settings[i].gain;
+		settings[i].backlim = back[i];
+		settings[i].forwlim = forw[i];
 	}
 }
 
@@ -211,8 +190,8 @@ int axis_controller::incmove(disctime_t current_time, double * dist_real)
 
 		if (settings[i].limits_enabled)
 			tgtpos[i] = CLAMP(tgtpos[i],
-			                  settings[i].backlim,
-			                  settings[i].forwlim);
+			                  settings[i].backlim * settings[i].gain,
+			                  settings[i].forwlim * settings[i].gain);
 	}
 
 	return _absmove(current_time, curpos, tgtpos, sqrt(extdist));
@@ -235,8 +214,8 @@ int axis_controller::absmove(disctime_t current_time, double * pos_real)
 
 		if (settings[i].limits_enabled)
 			tgtpos[i] = CLAMP(tgtpos[i],
-			                  settings[i].backlim,
-			                  settings[i].forwlim);
+			                  settings[i].backlim * settings[i].gain,
+			                  settings[i].forwlim * settings[i].gain);
 	}
 
 	return _absmove(current_time, curpos, tgtpos, sqrt(extdist));
