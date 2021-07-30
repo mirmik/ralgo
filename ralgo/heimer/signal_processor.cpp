@@ -56,6 +56,7 @@ int signal_processor::activate()
 	if (success)
 	{
 		active = 1;
+		on_activate();
 		return 0;
 	}
 
@@ -74,7 +75,7 @@ int signal_processor::deactivate()
 	iter = NULL;
 	while ((iter = iterate_right(iter)))
 	{
-		if (iter->current_controller) 
+		if (iter->current_controller)
 			all_right_deactivated = 0;
 	}
 
@@ -112,3 +113,6 @@ bool signal_processor::is_active()
 {
 	return active;
 }
+ 
+void signal_processor::on_activate() 
+{}

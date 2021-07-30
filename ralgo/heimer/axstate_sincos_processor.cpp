@@ -162,3 +162,12 @@ void axstate_sincos_processor::set_rightside(axis_state ** side)
 	for (int i = 0; i < 3; ++i)
 		rightside[i] = side[i];
 }
+
+void heimer::axstate_sincos_processor::on_activate() 
+{
+	for (int i = 0; i < 3; ++i)
+	{
+		rightside[i]->ctrpos = rightside[i]->feedpos; 
+		rightside[i]->ctrvel = rightside[i]->feedvel;
+	}
+}

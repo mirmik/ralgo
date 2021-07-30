@@ -43,6 +43,8 @@ namespace heimer
 		virtual signal_head * iterate_left(signal_head *) = 0;
 		virtual signal_head * iterate_right(signal_head *) = 0;
 
+		virtual void on_activate();	
+
 		void init(const char * name);
 		
 		int activate();
