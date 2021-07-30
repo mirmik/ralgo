@@ -19,30 +19,31 @@ ctrnew axisctr vyctr 1
 ctrnew axlinear tand 2
 ctr tand bindleft x y
 ctr tand bindright vx vy
+ctr tand matrix 1 1 0 1
 
 ctrnew axstub xstub
 ctrnew axstub ystub
 
 ctr xstub bind x
 ctr xctr bind x
-ctr xctr setvel 1
-ctr xctr setacc 1 1
+ctr xctr setvel 5
+ctr xctr setacc 2 2
 ctr xctr setgain 1000
 
 ctr ystub bind y
 ctr yctr bind y
-ctr yctr setvel 1
-ctr yctr setacc 1 1
+ctr yctr setvel 5
+ctr yctr setacc 2 2
 ctr yctr setgain 1000
 
 ctr vxctr bind vx
-ctr vxctr setvel 1
-ctr vxctr setacc 1 1
+ctr vxctr setvel 5
+ctr vxctr setacc 2 2
 ctr vxctr setgain 1000
 
 ctr vyctr bind vy
-ctr vyctr setvel 1
-ctr vyctr setacc 1 1
+ctr vyctr setvel 5
+ctr vyctr setacc 2 2
 ctr vyctr setgain 1000
 
 start
