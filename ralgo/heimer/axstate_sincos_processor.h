@@ -95,6 +95,7 @@ namespace heimer
 		void deinit() override;
 		signal_head * iterate_left(signal_head *) override;
 		signal_head * iterate_right(signal_head *) override;
+        void on_activate() override;
 
 		void set_leftside(axis_state **);
 		void set_rightside(axis_state **);

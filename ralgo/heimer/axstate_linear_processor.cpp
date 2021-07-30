@@ -12,18 +12,18 @@ int axstate_linear_processor::serve(disctime_t time)
 {
 	(void) time;
 
-	for (int i = 0; i < _dim; ++i)
+	for (int i = 0; i < leftdim(); ++i)
 	{
 		position_t accpos = 0;
 		velocity_t accvel = 0;
-		for (int j = 0; j < _dim; ++j)
+		for (int j = 0; j < dim(); ++j)
 		{
-			accpos += *(matrix + i * _dim + j) * rightside[j]->ctrpos;
-			accvel += *(matrix + i * _dim + j) * rightside[j]->ctrvel;
+			accpos += *(matrix + i * dim() + j) * rightax(j)->ctrpos;
+			accvel += *(matrix + i * dim() + j) * rightax(j)->ctrvel;
 		}
 
-		leftside[i]->ctrpos = accpos;
-		leftside[i]->ctrvel = accvel;
+		leftax(i)->ctrpos = accpos;
+		leftax(i)->ctrvel = accvel;
 	}
 
 	return 0;
@@ -33,51 +33,21 @@ int axstate_linear_processor::feedback(disctime_t time)
 {
 	(void) time;
 
-	for (int i = 0; i < _dim; ++i)
+	for (int i = 0; i < dim(); ++i)
 	{
 		position_t accpos = 0;
 		velocity_t accvel = 0;
-		for (int j = 0; j < _dim; ++j)
+		for (int j = 0; j < dim(); ++j)
 		{
-			accpos += *(invert_matrix + i * _dim + j) * leftside[j]->feedpos;
-			accvel += *(invert_matrix + i * _dim + j) * leftside[j]->feedvel;
+			accpos += *(invert_matrix + i * dim() + j) * leftax(j)->feedpos;
+			accvel += *(invert_matrix + i * dim() + j) * leftax(j)->feedvel;
 		}
 
-		rightside[i]->feedpos = accpos;
-		rightside[i]->feedvel = accvel;
+		rightax(i)->feedpos = accpos;
+		rightax(i)->feedvel = accvel;
 	}
 
 	return 0;
-}
-
-void axstate_linear_processor::set_leftside(axis_state ** arr)
-{
-	if (!leftside)
-	{
-		ralgo::warn("axlinear leftside is not allocated");
-		return;
-	}
-
-	for (int i = 0; i < _dim; ++i)
-	{
-		leftside[i] = arr[i];
-		leftside[i] -> attach_possible_controller(this);
-	}
-}
-
-void axstate_linear_processor::set_rightside(axis_state ** arr)
-{
-	if (!rightside)
-	{
-		ralgo::warn("axlinear rightside is not allocated");
-		return;
-	}
-
-	for (int i = 0; i < _dim; ++i)
-	{
-		rightside[i] = arr[i];
-		rightside[i] -> attach_listener(this);
-	}
 }
 
 static inline
@@ -190,10 +160,10 @@ int info(axstate_linear_processor * axctr, int argc, char ** argv, char * output
 	memset(buf, 0, bufsize);
 	for (int i = 0; i < axctr->dim() - 1; ++i)
 	{
-		snprintf(buf, bufsize, "%s,", axctr->leftside[i]->name);
+		snprintf(buf, bufsize, "%s,", axctr->leftax(i)->name);
 		strncat(output, buf, outmax);
 	}
-	snprintf(buf, bufsize, "%s\r\n", axctr->leftside[axctr->dim() - 1]->name);
+	snprintf(buf, bufsize, "%s\r\n", axctr->leftax(axctr->dim() - 1)->name);
 	strncat(output, buf, outmax);
 
 	memset(buf, 0, bufsize);
@@ -203,10 +173,10 @@ int info(axstate_linear_processor * axctr, int argc, char ** argv, char * output
 	memset(buf, 0, bufsize);
 	for (int i = 0; i < axctr->dim() - 1; ++i)
 	{
-		snprintf(buf, bufsize, "%s,", axctr->rightside[i]->name);
+		snprintf(buf, bufsize, "%s,", axctr->rightax(i)->name);
 		strncat(output, buf, outmax);
 	}
-	snprintf(buf, bufsize, "%s\r\n", axctr->rightside[axctr->dim() - 1]->name);
+	snprintf(buf, bufsize, "%s\r\n", axctr->rightax(axctr->dim() - 1)->name);
 	strncat(output, buf, outmax);
 
 	memset(buf, 0, bufsize);
@@ -256,67 +226,19 @@ int  axstate_linear_processor::command(int argc, char ** argv, char * output, in
 
 void axstate_linear_processor::deinit()
 {
-	for (int i = 0; i < _dim; ++i)
+	for (int i = 0; i < dim(); ++i)
 	{
-		leftside[i] -> deattach_possible_controller(this);
-		rightside[i] -> deattach_listener(this);
+		leftax(i) -> deattach_possible_controller(this);
+		rightax(i) -> deattach_listener(this);
 	}
-}
-
-signal_head * axstate_linear_processor::iterate_left(signal_head * iter)
-{
-	if (!leftside)
-	{
-		ralgo::warn("axlinear leftside is not allocated");
-		return nullptr;
-	}
-
-	if (iter == NULL)
-		return *leftside;
-
-	struct axis_state ** it = leftside;
-	for (; it != leftside + _dim - 1  ; ++it)
-	{
-		if (*it == iter)
-		{
-			it++;
-			return *it;
-		}
-	}
-
-	return NULL;
-}
-
-signal_head * axstate_linear_processor::iterate_right(signal_head * iter)
-{
-	if (!rightside)
-	{
-		ralgo::warn("axlinear leftside is not allocated");
-		return nullptr;
-	}
-
-	if (iter == NULL)
-		return *rightside;
-
-	struct axis_state ** it = rightside;
-	for (; it != rightside + _dim - 1  ; ++it)
-	{
-		if (*it == iter)
-		{
-			it++;
-			return *it;
-		}
-	}
-
-	return NULL;
 }
 
 void axstate_linear_processor::evaluate_invertion()
 {
 	matops_square_inverse_f(
 	    matrix, // in
-	    _dim,  //size, n==m
-	    _dim,  //stride
+	    dim(),  //size, n==m
+	    dim(),  //stride
 	    invert_matrix //out
 	);
 }
@@ -332,45 +254,50 @@ void axstate_linear_processor::init(
 {
 	signal_processor::init(name);
 
-	this->_dim = _dim;
-	this->leftside = leftside;
-	this->rightside = rightside;
+	attach_leftside_table(leftside, _dim);
+	attach_rightside_table(rightside, _dim);
+
 	this->matrix = matrix;
 	this->invert_matrix = invert_matrix;
 
 	for (int i = 0; i < _dim; ++i)
 	{
-		this->rightside[i]->listener = this;
+		this->rightax(i)->listener = this;
 	}
 }
 
 heimer::axstate_linear_processor::axstate_linear_processor(const char * name, int _dim)
-	: signal_processor(name)
+	: axstate_signal_processor(name)
 {
-	this->_dim = _dim;
+	attach_leftside_table(nullptr, _dim);
+	attach_rightside_table(nullptr, _dim);
 }
 
 int heimer::axstate_linear_processor::dim()
 {
-	return _dim;
+	return leftdim();
 }
 
 void heimer::axstate_linear_processor::allocate_resources()
 {
-	this->leftside = new axis_state * [_dim];
-	this->rightside = new axis_state * [_dim];
-	this->matrix = new float[_dim * _dim];
-	this->invert_matrix = new float[_dim * _dim];
+	this->attach_leftside_table(new axis_state * [dim()], dim());
+	this->attach_rightside_table(new axis_state * [dim()], dim());
+	this->matrix = new float[dim() * dim()];
+	this->invert_matrix = new float[dim() * dim()];
 
-	ralgo::matrix_view_ro<float> A(this->matrix, _dim, _dim);
-	ralgo::matrix_view_ro<float> B(this->invert_matrix, _dim, _dim);
+	ralgo::matrix_view_ro<float> A(this->matrix, dim(), dim());
+	ralgo::matrix_view_ro<float> B(this->invert_matrix, dim(), dim());
 
 	ralgo::matops::eye(A);
 	ralgo::matops::eye(B);
+}
 
-	for (int i = 0; i < _dim; ++i)
+
+void heimer::axstate_linear_processor::on_activate() 
+{
+	for (int i = 0; i < dim(); ++i)
 	{
-		leftside[i] = nullptr;
-		rightside[i] = nullptr;
+		rightax(i)->ctrpos = rightax(i)->feedpos; 
+		rightax(i)->ctrvel = rightax(i)->feedvel;
 	}
 }
