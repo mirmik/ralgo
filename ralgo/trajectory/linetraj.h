@@ -61,6 +61,14 @@ void line_trajectory_set_point_hold(
     disctime_t time,
     position_t * pos);
 
+
+void line_trajectory_set_stop_pattern(
+    struct line_trajectory * lintraj,
+    position_t * curpos, 
+    velocity_t * curspd, 
+    disctime_t curtime, 
+    disctime_t stoptime);
+
 __END_DECLS
 
 #endif
