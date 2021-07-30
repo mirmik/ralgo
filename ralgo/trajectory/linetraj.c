@@ -25,7 +25,7 @@ int line_trajectory_attime (void * priv,
 	{
 		sf_position_t * pair = sparse_array_ptr(&traj->sfpos, i, sf_position_t);
 		position_t spos = pair->spos;
-		position_t fpos = pair->fpos;		
+		position_t fpos = pair->fpos;
 
 		// Положение вычисляется по формуле линейной интерполяции.
 		pos[i] = fpos * posmod + spos * (1 - posmod);
@@ -42,8 +42,8 @@ int line_trajectory_attime (void * priv,
 }
 
 void line_trajectory_init(
-	struct line_trajectory * lintraj, 
-	int dim, 
+    struct line_trajectory * lintraj,
+    int dim,
     sf_position_t  * sfpos_array,
     int sfpos_stride
 )
@@ -107,3 +107,37 @@ void line_trajectory_set_point_hold(
 
 	tsdeform_set_stop_pattern(&traj->tsd);
 }
+
+/*void line_trajectory_set_stop_pattern(
+	position_t * curpos, 
+	velocity_t * curvel, 
+	acceleration_t dccval,
+	disctime_t stim)
+{
+	// скоростной деформатор работает с точным выведением в позицию, и изменяет время,
+	// поэтому подменяем время в два раза, чтобы соответствовать равнозамедленному паттерну.
+
+	float realdiff = ralgo::vecops::length(curspd) / dccval;
+	ftim = stim + realdiff / 2.0;
+
+	std::copy(std::begin(curpos), std::end(curpos), std::begin(this->spos));
+	if (ftim > stim)
+	{
+		for (unsigned int i = 0; i < Dim ; ++i)
+			fpos[i] = spos[i] + curspd[i] * realdiff / 2;
+
+		for (unsigned int i = 0; i < Dim ; ++i)
+			setted_speed[i] = curspd[i] / ralgo::discrete_time_frequency();
+	}
+	else
+	{
+		ftim = stim + 1; //prevent zero division
+		for (unsigned int i = 0; i < Dim ; ++i)
+			fpos[i] = spos[i];
+
+		ralgo::vecops::fill(setted_speed, 0);
+	}
+
+	tsdeform_set_stop_pattern(&spddeform);
+}
+*/

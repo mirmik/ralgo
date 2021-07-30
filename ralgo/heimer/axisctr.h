@@ -90,19 +90,24 @@ namespace heimer
 		void set_acceleration_external(float acc);
 		void set_decceleration_external(float dcc);
 
-		float velocity();
-		float acceleration();
-		float decceleration();
+		float external_velocity();
+		float external_acceleration();
+		float external_decceleration();
 
 		void set_controlled(struct axis_state ** state);
 		void release_controlled();
 
 		int incmove(disctime_t current_time, double * dist_real);
 		int absmove(disctime_t current_time, double * pos_real);
+		int stop(disctime_t);
+		int hardstop(disctime_t);
 
 		float feedpos_external(int axno);
 		float ctrpos_external(int axno);
 		float ctrvel_external(int axno);
+
+		void collect_feedpos(position_t * pos);
+		void collect_feedvel(velocity_t * pos);
 
 		int command(
 		    struct signal_processor * sigproc,

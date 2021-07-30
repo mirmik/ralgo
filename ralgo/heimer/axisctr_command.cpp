@@ -136,8 +136,8 @@ int info(axis_controller * axctr, int argc, char ** argv, char * output, int out
 	strncat(output, buf, outmax);
 
 	memset(buf, 0, bufsize);
-	snprintf(buf, bufsize, "vel:%f, acc:%f, dcc:%f\r\n", 
-		axctr->velocity(), axctr->acceleration(), axctr->decceleration());
+	snprintf(buf, bufsize, "external: vel:%f, acc:%f, dcc:%f\r\n", 
+		axctr->external_velocity(), axctr->external_acceleration(), axctr->external_decceleration());
 	strncat(output, buf, outmax);
 
 	memset(buf, 0, bufsize);
@@ -168,9 +168,11 @@ int info(axis_controller * axctr, int argc, char ** argv, char * output, int out
 static inline
 int incmov(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
 {
-	(void) argc;
-	(void) output;
-	(void) outmax;
+	if (argc != axctr->dim)
+	{
+		snprintf(output, outmax, "Can't use %d coord for %d dim axisctr", argc, axctr->dim);
+		return -1;
+	}
 
 	int dim = axctr->dim;
 	position_t dist[dim];
@@ -186,9 +188,11 @@ int incmov(axis_controller * axctr, int argc, char ** argv, char * output, int o
 static inline
 int absmov(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
 {
-	(void) argc;
-	(void) output;
-	(void) outmax;
+	if (argc != axctr->dim)
+	{
+		snprintf(output, outmax, "Can't use %d coord for %d dim axisctr", argc, axctr->dim);
+		return -1;
+	}
 
 	int dim = axctr->dim;
 	position_t pos[dim];
@@ -198,6 +202,12 @@ int absmov(axis_controller * axctr, int argc, char ** argv, char * output, int o
 		pos[i] = atof(argv[i]);
 	}
 	return axctr->absmove(discrete_time(), pos);
+}
+
+static inline
+int stop(axis_controller * axctr, int, char **, char *, int)
+{
+	return axctr->stop(discrete_time());
 }
 
 int axis_controller::command(int argc, char ** argv, char * output, int outmax)
@@ -215,6 +225,9 @@ int axis_controller::command(int argc, char ** argv, char * output, int outmax)
 
 	else if (strcmp("incmove", argv[0]) == 0)
 		status = incmov(this, argc - 1, argv + 1, output, outmax);
+
+	else if (strcmp("stop", argv[0]) == 0)
+		status = ::stop(this, argc - 1, argv + 1, output, outmax);
 
 	else if (strcmp("setvel", argv[0]) == 0)
 		status = setvel(this, argc - 1, argv + 1, output, outmax);

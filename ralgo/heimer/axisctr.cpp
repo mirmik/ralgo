@@ -346,6 +346,70 @@ void axis_controller::init(
 }
 
 
-float axis_controller::velocity() { return vel * ralgo::discrete_time_frequency(); }
-float axis_controller::acceleration() { return acc * ralgo::discrete_time_frequency() * ralgo::discrete_time_frequency(); }
-float axis_controller::decceleration() { return dcc * ralgo::discrete_time_frequency() * ralgo::discrete_time_frequency(); }
+float axis_controller::external_velocity() { return vel * ralgo::discrete_time_frequency(); }
+float axis_controller::external_acceleration() { return acc * ralgo::discrete_time_frequency() * ralgo::discrete_time_frequency(); }
+float axis_controller::external_decceleration() { return dcc * ralgo::discrete_time_frequency() * ralgo::discrete_time_frequency(); }
+
+void axis_controller::collect_feedpos(position_t * pos)
+{
+	for (int i = 0; i < dim; ++i)
+		pos[i] = settings[i].controlled->feedpos;
+}
+
+void axis_controller::collect_feedvel(velocity_t * pos)
+{
+	for (int i = 0; i < dim; ++i)
+		pos[i] = settings[i].controlled->feedvel;
+}
+
+int axis_controller::stop(disctime_t)
+{
+/*	if (!is_active())
+	{
+		ralgo::warn(name().data(), ": not active");
+		return -1;
+	}
+
+	position_t feedpos[dim];
+	velocity_t feedspd[dim];
+
+	collect_feedpos(feedpos);
+	collect_feedvel(feedspd);
+
+	if (curtraj == nullptr)
+		return 0;
+
+	//float speed_multiplier =
+	//    evaluate_speed_multiplier_by_curspd(feedspd);
+
+	line_trajectory_set_stop_pattern(
+		&lintraj
+	    feedpos,
+	    feedspd,
+	    curtime);
+
+	operation_finished_flag = false;
+	curtraj = & lintraj;
+
+	return 0;*/
+
+	return 0;
+}
+
+int axis_controller::hardstop(disctime_t time)
+{
+	position_t curpos[dim];
+	for (int i = 0; i < dim; ++i)
+	{
+		curpos[i] = settings[i].controlled->feedpos;
+	}
+
+	for (int i = 0; i < dim; ++i)
+	{
+		settings[i].controlled->ctrvel = 0;
+		settings[i].controlled->ctrpos = curpos[i];
+	}
+
+	finish_trajectory(time, curpos);
+	return 0;
+}

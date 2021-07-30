@@ -41,9 +41,9 @@ TEST_CASE("axisctr")
 	sts = axctr.incmove(0, &tgt);
 	CHECK_EQ(sts, 0);
 
-	CHECK_EQ(axctr.velocity(), doctest::Approx(10.f));
-	CHECK_EQ(axctr.acceleration(), doctest::Approx(5.f));
-	CHECK_EQ(axctr.decceleration(), doctest::Approx(5.f));
+	CHECK_EQ(axctr.external_velocity(), doctest::Approx(10.f));
+	CHECK_EQ(axctr.external_acceleration(), doctest::Approx(5.f));
+	CHECK_EQ(axctr.external_decceleration(), doctest::Approx(5.f));
 
 	CHECK_EQ(axctr.lintraj.ftim, 10 * discrete_time_frequency());
 
