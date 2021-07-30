@@ -124,6 +124,8 @@ namespace heimer
 
 		void finish_trajectory(disctime_t time, position_t * ctrpos);
 
+		acceleration_t _restore_velocity_from_axstates();
+
 	};
 
 	axis_controller * create_axis_controller(const char * name, int dim);

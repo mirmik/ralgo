@@ -1,3 +1,4 @@
+/** @file */ 
 #ifndef RALGO_HEIMER_AXIS_STATE
 #define RALGO_HEIMER_AXIS_STATE
 
@@ -9,14 +10,21 @@
 
 namespace heimer
 {
+
+	/**
+		Внимание: Данные не в единицах системы си.
+
+		Данные по положению даются в условных едицах.
+		Данные по скорости в условных единицах делённых на дискрет времени системы.
+	*/
+
 	class axis_state : public signal_head
 	{
 	public:
-		position_t ctrpos; /// Контрольная позиция в формате с фиксированной точкой
-		velocity_t ctrvel; /// Сигнал управления по скорости.
-
-		position_t feedpos; /// Данные нижнего уровня о позиции
-		velocity_t feedvel; /// Данные нижнего уровня о скорости
+		position_t ctrpos;
+		velocity_t ctrvel;
+		position_t feedpos;
+		velocity_t feedvel;
 
 	public:
 		axis_state() = default;

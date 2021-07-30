@@ -1,6 +1,6 @@
 #include <ralgo/heimer/axisctr.h>
 #include <ralgo/heimer/sigtypes.h>
-#include <ralgo/clinalg/vecops.h>
+#include <ralgo/linalg/vecops.h>
 #include <ralgo/log.h>
 
 #include <igris/math.h>
@@ -155,7 +155,6 @@ int axis_controller::_absmove(
 		return -1;
 
 
-	//position_t dist = vecops_distance_d(tgtpos, curpos, dim);
 	disctime_t tgttim = curtim + (float)(ABS(extdist)) / vel;
 
 	if (extdist == 0 || vel == 0)
@@ -179,7 +178,6 @@ int axis_controller::_absmove(
 
 	f.operation_finished_flag = 0;
 	f.release_control_flag = 0;
-
 	if (operation_start_handler)
 		operation_start_handler(operation_handlers_priv, this);
 	curtraj = &lintraj.traj;
@@ -362,9 +360,9 @@ void axis_controller::collect_feedvel(velocity_t * pos)
 		pos[i] = settings[i].controlled->feedvel;
 }
 
-int axis_controller::stop(disctime_t)
+int axis_controller::stop(disctime_t curtim)
 {
-/*	if (!is_active())
+	if (!is_active())
 	{
 		ralgo::warn(name().data(), ": not active");
 		return -1;
@@ -379,21 +377,35 @@ int axis_controller::stop(disctime_t)
 	if (curtraj == nullptr)
 		return 0;
 
-	//float speed_multiplier =
-	//    evaluate_speed_multiplier_by_curspd(feedspd);
+	float stoptime = _restore_velocity_from_axstates() / dcc; 
 
 	line_trajectory_set_stop_pattern(
-		&lintraj
+	    &lintraj,
 	    feedpos,
 	    feedspd,
-	    curtime);
+	    curtim,
+	    stoptime);
 
-	operation_finished_flag = false;
-	curtraj = & lintraj;
-
-	return 0;*/
+	f.operation_finished_flag = 0;
+	f.release_control_flag = 0;
+	if (operation_start_handler)
+		operation_start_handler(operation_handlers_priv, this);
+	curtraj = &lintraj.traj;
 
 	return 0;
+}
+
+velocity_t axis_controller::_restore_velocity_from_axstates()
+{
+	velocity_t acc;
+
+	for (int i = 0; i < dim; ++i)
+	{
+		velocity_t vel = settings[i].controlled->feedvel / settings[i].gain;
+		acc += vel * vel;
+	}
+
+	return sqrt(acc);
 }
 
 int axis_controller::hardstop(disctime_t time)

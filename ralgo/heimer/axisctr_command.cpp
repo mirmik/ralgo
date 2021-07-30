@@ -210,6 +210,12 @@ int stop(axis_controller * axctr, int, char **, char *, int)
 	return axctr->stop(discrete_time());
 }
 
+static inline
+int hardstop(axis_controller * axctr, int, char **, char *, int)
+{
+	return axctr->hardstop(discrete_time());
+}
+
 int axis_controller::command(int argc, char ** argv, char * output, int outmax)
 {
 	int status = ENOENT;
@@ -228,6 +234,9 @@ int axis_controller::command(int argc, char ** argv, char * output, int outmax)
 
 	else if (strcmp("stop", argv[0]) == 0)
 		status = ::stop(this, argc - 1, argv + 1, output, outmax);
+
+	else if (strcmp("hardstop", argv[0]) == 0)
+		status = ::hardstop(this, argc - 1, argv + 1, output, outmax);
 
 	else if (strcmp("setvel", argv[0]) == 0)
 		status = setvel(this, argc - 1, argv + 1, output, outmax);
