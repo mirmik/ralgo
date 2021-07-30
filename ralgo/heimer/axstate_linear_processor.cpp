@@ -52,26 +52,32 @@ int axstate_linear_processor::feedback(disctime_t time)
 
 void axstate_linear_processor::set_leftside(axis_state ** arr)
 {
-	if (!leftside) 
+	if (!leftside)
 	{
 		ralgo::warn("axlinear leftside is not allocated");
 		return;
 	}
 
 	for (int i = 0; i < _dim; ++i)
+	{
 		leftside[i] = arr[i];
+		leftside[i] -> attach_possible_controller(this);
+	}
 }
 
 void axstate_linear_processor::set_rightside(axis_state ** arr)
 {
-	if (!rightside) 
+	if (!rightside)
 	{
 		ralgo::warn("axlinear rightside is not allocated");
 		return;
 	}
 
 	for (int i = 0; i < _dim; ++i)
+	{
 		rightside[i] = arr[i];
+		rightside[i] -> attach_listener(this);
+	}
 }
 
 static inline
@@ -158,7 +164,7 @@ int matrix(axstate_linear_processor * axctr, int argc, char ** argv, char * outp
 		return -1;
 	}
 
-	for (int i = 0; i < argc; ++i) 
+	for (int i = 0; i < argc; ++i)
 	{
 		axctr->matrix[i] = atof(argv[i]);
 	}
@@ -249,11 +255,17 @@ int  axstate_linear_processor::command(int argc, char ** argv, char * output, in
 }
 
 void axstate_linear_processor::deinit()
-{}
+{
+	for (int i = 0; i < _dim; ++i)
+	{
+		leftside[i] -> deattach_possible_controller(this);
+		rightside[i] -> deattach_listener(this);
+	}
+}
 
 signal_head * axstate_linear_processor::iterate_left(signal_head * iter)
 {
-	if (!leftside) 
+	if (!leftside)
 	{
 		ralgo::warn("axlinear leftside is not allocated");
 		return nullptr;
@@ -277,7 +289,7 @@ signal_head * axstate_linear_processor::iterate_left(signal_head * iter)
 
 signal_head * axstate_linear_processor::iterate_right(signal_head * iter)
 {
-	if (!rightside) 
+	if (!rightside)
 	{
 		ralgo::warn("axlinear leftside is not allocated");
 		return nullptr;
@@ -343,20 +355,20 @@ int heimer::axstate_linear_processor::dim()
 	return _dim;
 }
 
-void heimer::axstate_linear_processor::allocate_resources() 
+void heimer::axstate_linear_processor::allocate_resources()
 {
 	this->leftside = new axis_state * [_dim];
 	this->rightside = new axis_state * [_dim];
-	this->matrix = new float[_dim*_dim];
-	this->invert_matrix = new float[_dim*_dim];
+	this->matrix = new float[_dim * _dim];
+	this->invert_matrix = new float[_dim * _dim];
 
 	ralgo::matrix_view_ro<float> A(this->matrix, _dim, _dim);
 	ralgo::matrix_view_ro<float> B(this->invert_matrix, _dim, _dim);
-	
+
 	ralgo::matops::eye(A);
 	ralgo::matops::eye(B);
 
-	for(int i = 0; i < _dim; ++i) 
+	for (int i = 0; i < _dim; ++i)
 	{
 		leftside[i] = nullptr;
 		rightside[i] = nullptr;
