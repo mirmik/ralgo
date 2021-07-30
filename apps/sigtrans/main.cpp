@@ -95,37 +95,37 @@ void execinfo()
 	}
 }
 
-void exec(const std::string & line)
+int exec(const std::string & line)
 {
 	int sts;
 	char output[512];
 	memset(output, 0, 512);
 
 	if (line.size() == 0)
-		return;
+		return 0;
 
 	if (igris::trim(line) == "start") 
 	{
 		start_routine();
-		return;
+		return 0;
 	}
 
 	if (igris::trim(line) == "stop") 
 	{
 		stop_routine();
-		return;
+		return 0;
 	}
 
 	if (igris::trim(line) == "execinfo") 
 	{
 		execinfo();
-		return;
+		return 0;
 	}
 
 	if (igris::trim(line) == "time") 
 	{
 		nos::println(ralgo::discrete_time(), ralgo::discrete_time_frequency());
-		return;
+		return 0;
 	}
 
 	int ret;
@@ -134,6 +134,7 @@ void exec(const std::string & line)
 	if (sts == ENOENT)
 	{
 		nos::println("Command not found.");
+		return -1;
 	}
 
 	else
@@ -144,11 +145,18 @@ void exec(const std::string & line)
 		}
 
 		nos::print(output);
+		return ret;
 	}
+}
+
+void sigint_handler(int) 
+{
+	quick_exit(0);
 }
 
 int main(int argc, char ** argv)
 {
+	signal(SIGINT, &sigint_handler);
 	crowaddr = crow::crowker_address();
 
 	igris::cliopts cli;
@@ -164,12 +172,25 @@ int main(int argc, char ** argv)
 		std::string str;
 		nos::file fl(script_path.c_str(), O_RDONLY);
 
+		if (!fl.good()) 
+		{
+			nos::println("Script file is not exists?");
+			exit(0);
+		}
+
 		while (( str = fl.readline() ).size())
 		{
 			str = igris::trim(str);
 
+			if (str[0] == '/')
+				continue;
+
 			nos::println("script:", str);
-			exec(str);
+			int sts = exec(str);
+			if (sts) 
+			{
+				exit(0);
+			}
 		}
 	}
 

@@ -150,6 +150,25 @@ int bindright(axstate_linear_processor * axctr, int argc, char ** argv, char * o
 
 
 static inline
+int matrix(axstate_linear_processor * axctr, int argc, char ** argv, char * output, int outmax)
+{
+	if (argc != axctr->dim() * axctr->dim())
+	{
+		snprintf(output, outmax, "Wrong matrix size");
+		return -1;
+	}
+
+	for (int i = 0; i < argc; ++i) 
+	{
+		axctr->matrix[i] = atof(argv[i]);
+	}
+
+	axctr->evaluate_invertion();
+
+	return 0;
+}
+
+static inline
 int info(axstate_linear_processor * axctr, int argc, char ** argv, char * output, int outmax)
 {
 	(void) argc;
@@ -219,6 +238,9 @@ int  axstate_linear_processor::command(int argc, char ** argv, char * output, in
 
 	if (strcmp("bindright", argv[0]) == 0)
 		status = bindright(this, argc - 1, argv + 1, output, outmax);
+
+	if (strcmp("matrix", argv[0]) == 0)
+		status = ::matrix(this, argc - 1, argv + 1, output, outmax);
 
 	if (strcmp("info", argv[0]) == 0)
 		status = info(this, argc - 1, argv + 1, output, outmax);
