@@ -4,7 +4,7 @@
 #define RALGO_HEIMER_H
 
 #include <igris/compiler.h>
-#include <ralgo/heimer/signal_processor.h>
+#include <ralgo/heimer/axstate_signal_processor.h>
 #include <ralgo/heimer/axis_state.h>
 
 namespace heimer
@@ -71,10 +71,10 @@ namespace heimer
 	dar/dt = dal/dt
 
 	*/
-	class axstate_sincos_processor : public signal_processor
+	class axstate_sincos_processor : public axstate_signal_processor
 	{
-		struct axis_state * leftside[3] = { nullptr, nullptr, nullptr };   // order: x y a
-		struct axis_state * rightside[3] = { nullptr, nullptr, nullptr };  // order: x y a
+		axis_state * leftside[3] = { nullptr, nullptr, nullptr };   // order: x y a
+		axis_state * rightside[3] = { nullptr, nullptr, nullptr };  // order: x y a
 
 		position_t radius = 0;
 
@@ -93,12 +93,7 @@ namespace heimer
 		int serve(disctime_t time) override;
 		int command(int argc, char ** argv, char * output, int outmax) override;
 		void deinit() override;
-		signal_head * iterate_left(signal_head *) override;
-		signal_head * iterate_right(signal_head *) override;
         void on_activate() override;
-
-		void set_leftside(axis_state **);
-		void set_rightside(axis_state **);
 
 		void init(
 		    const char* name,

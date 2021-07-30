@@ -75,27 +75,6 @@ int  axstate_sincos_processor::command(int argc, char ** argv, char * output, in
 void axstate_sincos_processor::deinit()
 {}
 
-signal_head * axstate_sincos_processor::iterate_left(signal_head * iter)
-{
-	if (iter == NULL) return leftside[0];
-	if (iter == leftside[0]) return leftside[1];
-	if (iter == leftside[1]) return leftside[2];
-	if (iter == leftside[2]) return NULL;	
-
-	return NULL;
-}
-
-
-signal_head * axstate_sincos_processor::iterate_right(signal_head * iter)
-{
-	if (iter == NULL) return rightside[0];
-	if (iter == rightside[0]) return rightside[1];
-	if (iter == rightside[1]) return rightside[2];
-	if (iter == rightside[2]) return NULL;	
-
-	return NULL;
-}
-
 void axstate_sincos_processor::set_alpha_scale(
     float ascale
 )
@@ -143,24 +122,15 @@ void axstate_sincos_processor::init(
 {
 	signal_processor::init(name);
 	this->radius = radius;
+	attach_leftside_table(leftside, 3);
+	attach_rightside_table(rightside, 3);
 }
 
 axstate_sincos_processor::axstate_sincos_processor(const char * name)
-	: signal_processor(name)
+	: axstate_signal_processor(name)
 {
-
-}
-
-void axstate_sincos_processor::set_leftside(axis_state ** side) 
-{
-	for (int i = 0; i < 3; ++i)
-		leftside[i] = side[i];
-}
-
-void axstate_sincos_processor::set_rightside(axis_state ** side) 
-{
-	for (int i = 0; i < 3; ++i)
-		rightside[i] = side[i];
+	attach_leftside_table(leftside, 3);
+	attach_rightside_table(rightside, 3);
 }
 
 void heimer::axstate_sincos_processor::on_activate() 
