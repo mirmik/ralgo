@@ -145,15 +145,21 @@ int axis_controller::_absmove(
     position_t * tgtpos,
     double extdist)
 {
+	if (is_active()) 
+	{
+		return stop(curtim);
+	}
+
 	for (int i = 0; i < dim; ++i)
 		if (settings[i].controlled->current_controller)
 		{
 			return -1;
 		}
 
-	if (activate())
+	if (activate()) 
+	{
 		return -1;
-
+	}
 
 	disctime_t tgttim = curtim + (float)(ABS(extdist)) / vel;
 
