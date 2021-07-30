@@ -53,6 +53,16 @@ void axis_controller::set_accdcc_external(float acc, float dcc)
 	this->dcc = dcc / discrete_time_frequency() / discrete_time_frequency();
 }
 
+void axis_controller::set_acceleration_external(float acc)
+{
+	this->acc = acc / discrete_time_frequency() / discrete_time_frequency();
+}
+
+void axis_controller::set_decceleration_external(float dcc)
+{
+	this->dcc = dcc / discrete_time_frequency() / discrete_time_frequency();
+}
+
 void axis_controller::set_limits_external(double * back, double * forw)
 {
 	for (int i = 0; i < dim; ++i)
@@ -194,7 +204,7 @@ int axis_controller::incmove(disctime_t current_time, double * dist_real)
 			tgtpos[i] = CLAMP(tgtpos[i],
 			                  settings[i].backlim * settings[i].gain,
 			                  settings[i].forwlim * settings[i].gain);
-	
+
 		double extdist = (tgtpos[i] - curpos[i]) / settings[i].gain;
 		extdist_accumulator += extdist * extdist;
 	}
@@ -210,7 +220,7 @@ int axis_controller::absmove(disctime_t current_time, double * pos_real)
 	double extdist_accumulator = 0;
 
 	for (int i = 0; i < dim; ++i)
-	{	
+	{
 		curpos[i] = settings[i].controlled->feedpos;
 		tgtpos[i] = pos_real[i] * settings[i].gain;
 
@@ -218,7 +228,7 @@ int axis_controller::absmove(disctime_t current_time, double * pos_real)
 			tgtpos[i] = CLAMP(tgtpos[i],
 			                  settings[i].backlim * settings[i].gain,
 			                  settings[i].forwlim * settings[i].gain);
-	
+
 		double extdist = (tgtpos[i] - curpos[i]) / settings[i].gain;
 		extdist_accumulator += extdist * extdist;
 	}
@@ -334,3 +344,8 @@ void axis_controller::init(
 	                     dim
 	                    );
 }
+
+
+float axis_controller::velocity() { return vel * ralgo::discrete_time_frequency(); }
+float axis_controller::acceleration() { return acc * ralgo::discrete_time_frequency() * ralgo::discrete_time_frequency(); }
+float axis_controller::decceleration() { return dcc * ralgo::discrete_time_frequency() * ralgo::discrete_time_frequency(); }

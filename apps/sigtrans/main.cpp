@@ -122,6 +122,12 @@ void exec(const std::string & line)
 		return;
 	}
 
+	if (igris::trim(line) == "time") 
+	{
+		nos::println(ralgo::discrete_time(), ralgo::discrete_time_frequency());
+		return;
+	}
+
 	int ret;
 	sts = heimer::command_exec_safe(line.c_str(), output, 512, &ret);
 

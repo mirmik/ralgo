@@ -23,11 +23,11 @@ namespace heimer
 
 	class axis_controller : public signal_processor
 	{
-	public:
-		velocity_t     vel; // скорость в единицах
+		velocity_t     vel;
 		acceleration_t acc;
 		acceleration_t dcc;
 
+	public:
 		union
 		{
 			uint8_t flags;
@@ -87,6 +87,12 @@ namespace heimer
 		void set_limits_external(double * back, double * forw);
 		void set_velocity_external(float vel);
 		void set_accdcc_external(float acc, float dcc);
+		void set_acceleration_external(float acc);
+		void set_decceleration_external(float dcc);
+
+		float velocity();
+		float acceleration();
+		float decceleration();
 
 		void set_controlled(struct axis_state ** state);
 		void release_controlled();
