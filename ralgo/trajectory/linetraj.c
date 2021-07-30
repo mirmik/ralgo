@@ -1,4 +1,5 @@
 #include <ralgo/trajectory/linetraj.h>
+#include <igris/dprint.h>
 
 int line_trajectory_attime (void * priv,
                             disctime_t time,
@@ -20,6 +21,9 @@ int line_trajectory_attime (void * priv,
 
 	float posmod = tsdeform_posmod(&traj->tsd, time_unit);
 	float spdmod = tsdeform_spdmod(&traj->tsd, time_unit);
+
+	DPRINT(posmod);
+	DPRINT(spdmod);
 
 	for (int i = 0; i < traj->traj.dim; ++i)
 	{
@@ -115,23 +119,24 @@ void line_trajectory_set_stop_pattern(
     disctime_t curtime,
     disctime_t stoptime)
 {
-	disctime_t stim = curtime;
-	disctime_t ftim = curtime + stoptime;
-
 	// скоростной деформатор работает с точным выведением в позицию, и изменяет время,
 	// поэтому подменяем время в два раза, чтобы соответствовать равнозамедленному паттерну.
-	if (ftim > stim)
+	
+	traj->stim = curtime;
+	traj->ftim = curtime + stoptime / 2; // Время измеяется из-за паттерна деформации.
+	
+	if (traj->ftim > traj->stim)
 	{
 		for (int i = 0; i < traj->traj.dim ; ++i)
 		{
 			sf_position_t * pair = sparse_array_ptr(&traj->sfpos, i, sf_position_t);
 			pair->spos = curpos[i];
-			pair->fpos = curpos[i] + curspd[i] * stoptime / 2;
+			pair->fpos = curpos[i] + curspd[i] * stoptime / 2; // аналогичное сжатие времени.
 		}
 	}
 	else
 	{
-		ftim = stim + 1; //prevent zero division
+		traj->ftim = traj->stim + 1; //prevent zero division
 		for (int i = 0; i < traj->traj.dim ; ++i) 
 		{
 			sf_position_t * pair = sparse_array_ptr(&traj->sfpos, i, sf_position_t);
@@ -140,5 +145,6 @@ void line_trajectory_set_stop_pattern(
 		}
 	}
 
+	// Паттерн подменяет прямоугольное движение на треугольное растянутое во времени в два раза.
 	tsdeform_set_stop_pattern(&traj->tsd);
 }
