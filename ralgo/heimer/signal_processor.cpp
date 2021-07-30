@@ -68,7 +68,20 @@ int signal_processor::activate()
 
 int signal_processor::deactivate()
 {
-	signal_head * iter = NULL;
+	signal_head * iter;
+	int all_right_deactivated = 1;
+
+	iter = NULL;
+	while ((iter = iterate_right(iter)))
+	{
+		if (iter->current_controller) 
+			all_right_deactivated = 0;
+	}
+
+	if (!all_right_deactivated)
+		return 0;
+
+	iter = NULL;
 	while ((iter = iterate_left(iter)))
 	{
 		int err = iter->deactivate(this);
