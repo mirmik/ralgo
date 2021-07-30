@@ -94,7 +94,7 @@ TEST_CASE("axisctr")
 TEST_CASE("axisctr_multiax")
 {
 	heimer_reinit();
-	a=0;
+	a = 0;
 
 	int sts;
 
@@ -111,14 +111,14 @@ TEST_CASE("axisctr_multiax")
 	double gain = 1000; axctr.set_gain(&gain);
 	axctr.set_velocity_external(10);
 	axctr.set_accdcc_external(5, 5);
-	
-	double forw[2] = { 100,  100 }; 
-	double back[2] = {-100, -100 };
+
+	double forw[2] = { 100,  100 };
+	double back[2] = { -100, -100 };
 	axctr.set_limits_external(back, forw);
 
 	struct axis_state * states[] = { &state0, &state1 };
 	axctr.set_controlled(states);
-	
+
 	double tgt[] = { 100, 100 };
 	sts = axctr.incmove(0, tgt);
 	CHECK_EQ(sts, 0);
@@ -160,5 +160,82 @@ TEST_CASE("axisctr_multiax")
 	axctr.serve(16.142 * discrete_time_frequency());
 	CHECK_EQ(axctr.ctrvel_external(0), doctest::Approx(0));
 	CHECK_EQ(axctr.ctrpos_external(0), doctest::Approx(100));
+	CHECK_EQ(a, 1);
+}
+
+
+TEST_CASE("axisctr_stop")
+{
+	heimer_reinit();
+	a = 0;
+
+	int sts;
+
+	struct axis_state state;
+	struct axis_settings settings[1];
+	struct axis_controller axctr;
+
+	state.init("state");
+
+	axctr.init("axctr", settings, 1);
+	axctr.set_handlers(nullptr, nullptr, finish_handler);
+	double gain = 1000; axctr.set_gain(&gain);
+	axctr.set_velocity_external(10);
+	axctr.set_accdcc_external(5, 5);
+
+	double forw[2] = { 100,  100 };
+	double back[2] = { -100, -100 };
+	axctr.set_limits_external(back, forw);
+
+	struct axis_state * states[] = { &state };
+	axctr.set_controlled(states);
+
+	double tgt[] = { 100, 100 };
+	sts = axctr.incmove(0, tgt);
+	CHECK_EQ(sts, 0);
+
+	CHECK_EQ(axctr.lintraj.ftim, doctest::Approx(10 * discrete_time_frequency()));
+
+	axctr.serve(0);
+	CHECK_EQ(axctr.ctrvel_external(0), 0);
+	CHECK_EQ(axctr.ctrpos_external(0), 0);
+	CHECK_EQ(a, 0);
+
+	axctr.serve(1 * discrete_time_frequency());
+	CHECK_EQ(axctr.ctrvel_external(0), doctest::Approx(5));
+	CHECK_EQ(a, 0);
+
+	axctr.serve(2 * discrete_time_frequency());
+	CHECK_EQ(axctr.ctrvel_external(0), doctest::Approx(10));
+	CHECK_EQ(a, 0);
+
+	axctr.serve(5 * discrete_time_frequency());
+	CHECK_EQ(axctr.ctrvel_external(0), doctest::Approx(10));
+	CHECK_EQ(axctr.ctrpos_external(0), doctest::Approx(40));
+	CHECK_EQ(a, 0);
+
+	state.feedvel = state.ctrvel;
+	state.feedpos = state.ctrpos;
+
+	sts = axctr.stop(5 * discrete_time_frequency());
+	CHECK_EQ(sts, 0);
+	CHECK_EQ(axctr.ctrvel_external(0), doctest::Approx(10));
+	CHECK_EQ(axctr.ctrpos_external(0), doctest::Approx(40));
+	CHECK_EQ(a, 0);
+
+	axctr.serve(5 * discrete_time_frequency());
+	CHECK_EQ(axctr.restore_internal_velocity_from_axstates(), doctest::Approx( 10 / ralgo::discrete_time_frequency()));
+	CHECK_EQ(axctr.ctrvel_external(0), doctest::Approx(10));
+	CHECK_EQ(axctr.ctrpos_external(0), doctest::Approx(40));
+	CHECK_EQ(a, 0);
+
+	axctr.serve(6 * discrete_time_frequency());
+	CHECK_EQ(axctr.ctrvel_external(0), doctest::Approx(5));
+	CHECK_EQ(axctr.ctrpos_external(0), doctest::Approx(47.5));
+	CHECK_EQ(a, 0);
+
+	axctr.serve(7 * discrete_time_frequency());
+	CHECK_EQ(axctr.ctrvel_external(0), doctest::Approx(0));
+	CHECK_EQ(axctr.ctrpos_external(0), doctest::Approx(50));
 	CHECK_EQ(a, 1);
 }
