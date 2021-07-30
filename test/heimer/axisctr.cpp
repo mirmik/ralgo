@@ -41,9 +41,9 @@ TEST_CASE("axisctr")
 	sts = axctr.incmove(0, &tgt);
 	CHECK_EQ(sts, 0);
 
-	CHECK_EQ(axctr.vel, doctest::Approx(10.f / discrete_time_frequency()));
-	CHECK_EQ(axctr.acc, doctest::Approx(5.f / discrete_time_frequency() / discrete_time_frequency()));
-	CHECK_EQ(axctr.dcc, doctest::Approx(5.f / discrete_time_frequency() / discrete_time_frequency()));
+	CHECK_EQ(axctr.velocity(), doctest::Approx(10.f));
+	CHECK_EQ(axctr.acceleration(), doctest::Approx(5.f));
+	CHECK_EQ(axctr.decceleration(), doctest::Approx(5.f));
 
 	CHECK_EQ(axctr.lintraj.ftim, 10 * discrete_time_frequency());
 
@@ -120,10 +120,6 @@ TEST_CASE("axisctr_multiax")
 	double tgt[] = { 100, 100 };
 	sts = axctr.incmove(0, tgt);
 	CHECK_EQ(sts, 0);
-
-	CHECK_EQ(axctr.vel, doctest::Approx(10.f / discrete_time_frequency()));
-	CHECK_EQ(axctr.acc, doctest::Approx(5.f / discrete_time_frequency() / discrete_time_frequency()));
-	CHECK_EQ(axctr.dcc, doctest::Approx(5.f / discrete_time_frequency() / discrete_time_frequency()));
 
 	CHECK_EQ(axctr.lintraj.ftim, doctest::Approx(10 * sqrt(2) * discrete_time_frequency()));
 

@@ -17,7 +17,7 @@ int setvel(axis_controller * axctr, int argc, char ** argv, char * output, int o
 		return -1;
 	}
 
-	axctr->vel = atof(argv[0]);
+	axctr->set_velocity_external(atof(argv[0]));
 	return 0;
 }
 
@@ -30,10 +30,10 @@ int setacc(axis_controller * axctr, int argc, char ** argv, char * output, int o
 		return -1;
 	}
 
-	axctr->acc = atof(argv[0]);
+	axctr->set_acceleration_external(atof(argv[0]));
 
 	if (argc > 1)
-		axctr->dcc = atof(argv[1]);
+		axctr->set_decceleration_external(atof(argv[1]));
 	return 0;
 }
 
@@ -46,7 +46,7 @@ int setdcc(axis_controller * axctr, int argc, char ** argv, char * output, int o
 		return -1;
 	}
 
-	axctr->dcc = atof(argv[0]);
+	axctr->set_acceleration_external(atof(argv[0]));
 	return 0;
 }
 
@@ -136,7 +136,8 @@ int info(axis_controller * axctr, int argc, char ** argv, char * output, int out
 	strncat(output, buf, outmax);
 
 	memset(buf, 0, bufsize);
-	snprintf(buf, bufsize, "vel:%f, acc:%f, dcc:%f\r\n", axctr->vel, axctr->acc, axctr->dcc);
+	snprintf(buf, bufsize, "vel:%f, acc:%f, dcc:%f\r\n", 
+		axctr->velocity(), axctr->acceleration(), axctr->decceleration());
 	strncat(output, buf, outmax);
 
 	memset(buf, 0, bufsize);
