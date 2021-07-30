@@ -377,7 +377,7 @@ int axis_controller::stop(disctime_t curtim)
 	if (curtraj == nullptr)
 		return 0;
 
-	float stoptime = _restore_velocity_from_axstates() / dcc; 
+	float stoptime = restore_internal_velocity_from_axstates() / dcc; 
 
 	line_trajectory_set_stop_pattern(
 	    &lintraj,
@@ -395,9 +395,9 @@ int axis_controller::stop(disctime_t curtim)
 	return 0;
 }
 
-velocity_t axis_controller::_restore_velocity_from_axstates()
+velocity_t axis_controller::restore_internal_velocity_from_axstates()
 {
-	velocity_t acc;
+	velocity_t acc = 0;
 
 	for (int i = 0; i < dim; ++i)
 	{

@@ -122,19 +122,21 @@ void line_trajectory_set_stop_pattern(
 	// поэтому подменяем время в два раза, чтобы соответствовать равнозамедленному паттерну.
 	if (ftim > stim)
 	{
-		for (unsigned int i = 0; i < traj->traj.dim ; ++i)
+		for (int i = 0; i < traj->traj.dim ; ++i)
 		{
 			sf_position_t * pair = sparse_array_ptr(&traj->sfpos, i, sf_position_t);
-			pair->fpos = pair->spos + curspd[i] * stoptime / 2;
+			pair->spos = curpos[i];
+			pair->fpos = curpos[i] + curspd[i] * stoptime / 2;
 		}
 	}
 	else
 	{
 		ftim = stim + 1; //prevent zero division
-		for (unsigned int i = 0; i < traj->traj.dim ; ++i) 
+		for (int i = 0; i < traj->traj.dim ; ++i) 
 		{
 			sf_position_t * pair = sparse_array_ptr(&traj->sfpos, i, sf_position_t);
-			pair->fpos = pair->spos;
+			pair->spos = curpos[i];
+			pair->fpos = curpos[i];
 		}
 	}
 

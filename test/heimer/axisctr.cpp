@@ -63,6 +63,8 @@ TEST_CASE("axisctr")
 
 	axctr.serve(5 * discrete_time_frequency());
 	CHECK_EQ(axctr.ctrvel_external(0), 10);
+	state.feedvel = state.ctrvel;
+	CHECK_EQ(axctr.restore_internal_velocity_from_axstates(), doctest::Approx(10 / ralgo::discrete_time_frequency()));
 	CHECK_EQ(axctr.ctrpos_external(0), 40);
 	CHECK_EQ(a, 0);
 
