@@ -60,8 +60,8 @@ TEST_CASE("axisctr_concurent")
 	sts = axctr0.incmove(0, &tgt);
 	CHECK_EQ(sts, 0);
 
-	sts = axctr0.incmove(0, &tgt);
-	CHECK_EQ(sts, -1);
+	//sts = axctr0.incmove(0, &tgt);
+	//CHECK_EQ(sts, -1);
 
 	sts = axctr1.incmove(0, &tgt);
 	CHECK_EQ(sts, -1);
@@ -89,9 +89,6 @@ TEST_CASE("axisctr_concurent")
 	
 	tgt = 200;
 	sts = axctr1.incmove(12.1 * discrete_time_frequency(), &tgt);
-	CHECK_EQ(sts, -1);
-
-	sts = axctr0.incmove(12.1 * discrete_time_frequency(), &tgt);
 	CHECK_EQ(sts, -1);
 
 	axctr0.serve(12.1 * discrete_time_frequency());
