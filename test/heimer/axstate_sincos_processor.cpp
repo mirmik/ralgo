@@ -92,6 +92,7 @@ TEST_CASE("axstate_sincos_processor")
 
 		float angle = 60.f;
 
+		scproc.init("axproc", heimdist(10.f));
 		scproc.set_leftside(left);
 		scproc.set_rightside(right);
 
@@ -103,7 +104,6 @@ TEST_CASE("axstate_sincos_processor")
 		yr.ctrvel = heimvel(2);
 		ar.ctrvel = heimvel(1);
 
-		scproc.init("axproc", heimdist(10.f));
 		scproc.set_offset(
 		    heimdist(1),
 		    heimdist(2),
