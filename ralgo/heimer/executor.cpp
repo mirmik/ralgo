@@ -79,6 +79,10 @@ int heimer::executor::serve(disctime_t curtime)
 
 	for (int i = order_table_size - 1; i >= 0; --i)
 	{
+		if (!order_table[i]->is_active())
+			continue;
+
+		// serve исполняется только если контроллер включен.
 		retcode = order_table[i]->serve(curtime);
 
 		switch (retcode)
@@ -149,6 +153,7 @@ void heimer::executor::allocate_order_table(int size)
 	f.dynamic = 1;
 }
 
+#if HEIMER_CROW_SUPPORT
 void heimer::executor::notification_prepare(const char * theme, crow::hostaddr_view addrview) 
 {
 	count_of_axstates = 0;
@@ -181,3 +186,4 @@ void heimer::executor::notify()
 
 	coordinate_publisher.publish({(void*)arr, sizeof(arr)});
 }
+#endif

@@ -43,8 +43,10 @@ namespace heimer
 		void init(const char * name, uint8_t type);
 		void deinit();
 
-		void get();
-		void put();
+		int attach_listener(signal_processor * );
+		void attach_possible_controller(signal_processor * );
+		int deattach_listener(signal_processor * );
+		void deattach_possible_controller(signal_processor * );
 
 		int command_v(int argc, char ** argv, char * output, int maxsize);
 

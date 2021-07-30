@@ -209,10 +209,10 @@ int axis_controller::command(int argc, char ** argv, char * output, int outmax)
 	else if (strcmp("info", argv[0]) == 0)
 		status = info(this, argc - 1, argv + 1, output, outmax);
 
-	else if (strcmp("absmov", argv[0]) == 0)
+	else if (strcmp("absmove", argv[0]) == 0)
 		status = absmov(this, argc - 1, argv + 1, output, outmax);
 
-	else if (strcmp("incmov", argv[0]) == 0)
+	else if (strcmp("incmove", argv[0]) == 0)
 		status = incmov(this, argc - 1, argv + 1, output, outmax);
 
 	else if (strcmp("setvel", argv[0]) == 0)

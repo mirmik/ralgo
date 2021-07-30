@@ -9,9 +9,10 @@ import os
 
 licant.include("ralgo", "../../ralgo.g.py")
 
-defines = ["NOTRACE=1", "HEIMER_CROW_SUPPORT_ENABLED=1"]
+defines = ["NOTRACE=1", "HEIMER_CROW_SUPPORT=1"]
 
 application("sigtrans", 
+	builddir = "build" if __name__ == "__main__" else "build/sigtrans",
 	sources = [
 		"main.cpp"
 	],

@@ -14,6 +14,7 @@
 #include <ralgo/heimer/axisctr.h>
 #include <ralgo/heimer/axstate_linear_processor.h>
 #include <ralgo/heimer/axstate_sincos_processor.h>
+#include <ralgo/heimer/axis_stub_processor.h>
 
 using namespace heimer;
 
@@ -94,7 +95,19 @@ int ctrnew(int argc, char ** argv, char * output, int maxsize)
 		return 0;
 	}
 
-	snprintf(output, maxsize, "Unresolved TYPE. Possible types: axisctr\r\n");
+	if (strcmp(argv[0], "axstub") == 0)
+	{
+		if (argc < 2)
+		{
+			snprintf(output, maxsize, "usage: ctrnew axstub NAME\r\n");
+			return -1;
+		}
+
+		new heimer::axis_stub_processor(argv[1]);
+		return 0;
+	}
+
+	snprintf(output, maxsize, "Unresolved TYPE. Possible types: axisctr, axlinear, axsincos, axstub\r\n");
 	return -1;
 }
 

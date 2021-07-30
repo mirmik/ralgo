@@ -13,13 +13,13 @@ void stepctr_applier::init(
 	controlled_stepctr = stepctr;
 	this->state = state;
 
-	state->get();
+	state->attach_listener(this);
 }
 
 void stepctr_applier::deinit()
 {
 	signal_processor::deinit();
-	state->put();
+	state->deattach_listener(this);
 }
 
 int stepctr_applier::serve(disctime_t time)
