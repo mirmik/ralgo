@@ -3,7 +3,7 @@
 
 #include <ralgo/heimer/signal_processor.h>
 
-#if HEIMER_CROW_SUPPORT_ENABLED
+#if HEIMER_CROW_SUPPORT
 #include <crow/pubsub/publisher.h>
 #endif
 
@@ -27,7 +27,7 @@ namespace heimer
 			} f;
 		};
 
-#if HEIMER_CROW_SUPPORT_ENABLED
+#if HEIMER_CROW_SUPPORT
 		crow::publisher coordinate_publisher;
 #endif
 
@@ -44,8 +44,10 @@ namespace heimer
 		int feedback(disctime_t curtime);
 		int exec(disctime_t curtime);
 
+#if HEIMER_CROW_SUPPORT
 		void notification_prepare(const char * theme, crow::hostaddr_view addrview);
 		void notify();
+#endif
 
 		~executor();
 	};

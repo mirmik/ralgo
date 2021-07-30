@@ -19,20 +19,41 @@ void signal_head::init(const char * name, uint8_t type)
 	listener = NULL;
 }
 
-void signal_head::deinit() 
+void signal_head::deinit()
 {
-	dlist_del(&list_lnk);	
+	dlist_del(&list_lnk);
 }
 
-
-void signal_head::get()
+int signal_head::attach_listener(signal_processor * proc) 
 {
-	++refs;
+	if (listener)
+		return -1;
+
+	listener = proc;
+	refs++;
+
+	return 0;
 }
 
-void signal_head::put()
+void signal_head::attach_possible_controller(signal_processor *) 
 {
-	--refs;
+	refs++;
+}
+
+int signal_head::deattach_listener(signal_processor * proc) 
+{
+	if (listener != proc)
+		return -1;
+
+	listener = nullptr;
+	refs--;
+	
+	return 0;
+}
+
+void signal_head::deattach_possible_controller(signal_processor *) 
+{
+	refs--;
 }
 
 int heimer::signals_count()
@@ -57,22 +78,22 @@ signal_head * heimer::signal_get_by_name(const char * name)
 }
 
 int signal_head::command_v(int argc, char ** argv, char * output, int maxsize)
-{	
+{
 	(void) argc;
 	char * opsname = argv[0];
 
-	if (strcmp(opsname, "info") == 0) 
+	if (strcmp(opsname, "info") == 0)
 		return info(output, maxsize);
 
-	return ENOENT; 
+	return ENOENT;
 }
 
 
-int signal_head::activate(struct signal_processor * proc) 
+int signal_head::activate(struct signal_processor * proc)
 {
 //	if (!listener)
 //		return -1;
-	
+
 	if (listener && listener->activate())
 		return -1;
 
@@ -81,7 +102,7 @@ int signal_head::activate(struct signal_processor * proc)
 	return 0;
 }
 
-int signal_head::deactivate(struct signal_processor * proc) 
+int signal_head::deactivate(struct signal_processor * proc)
 {
 	if (proc != current_controller)
 		return -1;
@@ -89,10 +110,10 @@ int signal_head::deactivate(struct signal_processor * proc)
 	current_controller = NULL;
 	active = -1;
 
-	if (listener) 
+	if (listener)
 	{
 		return listener->deactivate();
-	} 
+	}
 
 	return 0;
 }

@@ -101,7 +101,8 @@ TEST_CASE("axisctr_concurent")
 	CHECK_EQ(axctr1.f.release_control_flag, 0);
 
 	CHECK_EQ(state.current_controller, nullptr);
-	
+
+	state.feedpos = state.ctrpos;	
 	tgt = 200;
 	sts = axctr1.absmove(12.1 * discrete_time_frequency(), &tgt);
 	CHECK_EQ(sts, 0);
@@ -109,13 +110,23 @@ TEST_CASE("axisctr_concurent")
 	sts = axctr0.incmove(12.1 * discrete_time_frequency(), &tgt);
 	CHECK_EQ(sts, -1);
 
+	CHECK_EQ(settings0.controlled, &state);
+	CHECK_EQ(settings1.controlled, &state);
+
 	CHECK_EQ(axctr1.ctrpos_external(0), 100);
+	CHECK_EQ(axctr1.feedpos_external(0), 100);
 
 	axctr0.serve(12.1 * discrete_time_frequency());
+	CHECK_EQ(axctr0.ctrpos_external(0), 100);
+	CHECK_EQ(axctr1.ctrpos_external(0), 100);
+
 	axctr1.serve(12.1 * discrete_time_frequency());
 	CHECK_EQ(axctr0.ctrvel_external(0), 0);
 	CHECK_EQ(axctr1.ctrvel_external(0), 0);
+	CHECK_EQ(axctr0.feedpos_external(0), 100);
+	CHECK_EQ(axctr1.feedpos_external(0), 100);
 	CHECK_EQ(axctr0.ctrpos_external(0), 100);
+	CHECK_EQ(axctr1.ctrpos_external(0), 100);
 	CHECK_EQ(a, 1);
 
 

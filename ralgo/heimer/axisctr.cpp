@@ -68,7 +68,7 @@ void axis_controller::set_controlled(struct axis_state ** state)
 	for (int i = 0; i < dim; ++i)
 	{
 		settings[i].controlled = state[i];
-		settings[i].controlled->get();
+		settings[i].controlled->attach_possible_controller(this);
 	}
 }
 
@@ -82,9 +82,8 @@ void axis_controller::finish_trajectory(disctime_t time, position_t * ctrpos)
 	f.release_control_flag = 1;
 }
 
-int axis_controller::feedback(disctime_t time)
+int axis_controller::feedback(disctime_t)
 {
-	(void) time;
 	return 0;
 }
 
@@ -146,10 +145,10 @@ int axis_controller::_absmove(
 		return -1;
 
 
-	position_t dist = vecops_distance_d(tgtpos, curpos, dim);
+	//position_t dist = vecops_distance_d(tgtpos, curpos, dim);
 	disctime_t tgttim = curtim + (float)(ABS(extdist)) / vel;
 
-	if (dist == 0 || vel == 0)
+	if (extdist == 0 || vel == 0)
 	{
 		finish_trajectory(curtim, curpos);
 		return 0;
@@ -182,23 +181,25 @@ int axis_controller::incmove(disctime_t current_time, double * dist_real)
 {
 	position_t curpos[dim];
 	position_t tgtpos[dim];
-	double extdist = 0;
+	double extdist_accumulator = 0;
 
 	for (int i = 0; i < dim; ++i)
 	{
-		extdist += dist_real[i] * dist_real[i];
 		position_t dist = dist_real[i] * settings[i].gain;
 
-		curpos[i] = settings[i].controlled->ctrpos;
+		curpos[i] = settings[i].controlled->feedpos;
 		tgtpos[i] = curpos[i] + dist;
 
 		if (settings[i].limits_enabled)
 			tgtpos[i] = CLAMP(tgtpos[i],
 			                  settings[i].backlim * settings[i].gain,
 			                  settings[i].forwlim * settings[i].gain);
+	
+		double extdist = (tgtpos[i] - curpos[i]) / settings[i].gain;
+		extdist_accumulator += extdist * extdist;
 	}
 
-	return _absmove(current_time, curpos, tgtpos, sqrt(extdist));
+	return _absmove(current_time, curpos, tgtpos, sqrt(extdist_accumulator));
 }
 
 int axis_controller::absmove(disctime_t current_time, double * pos_real)
@@ -206,23 +207,23 @@ int axis_controller::absmove(disctime_t current_time, double * pos_real)
 
 	position_t curpos[dim];
 	position_t tgtpos[dim];
-	double extdist = 0;
+	double extdist_accumulator = 0;
 
 	for (int i = 0; i < dim; ++i)
-	{
-		double diff = pos_real[i] - settings[i].controlled->ctrpos / settings[i].gain;
-		extdist += diff * diff;
-
-		curpos[i] = settings[i].controlled->ctrpos;
+	{	
+		curpos[i] = settings[i].controlled->feedpos;
 		tgtpos[i] = pos_real[i] * settings[i].gain;
 
 		if (settings[i].limits_enabled)
 			tgtpos[i] = CLAMP(tgtpos[i],
 			                  settings[i].backlim * settings[i].gain,
 			                  settings[i].forwlim * settings[i].gain);
+	
+		double extdist = (tgtpos[i] - curpos[i]) / settings[i].gain;
+		extdist_accumulator += extdist * extdist;
 	}
 
-	return _absmove(current_time, curpos, tgtpos, sqrt(extdist));
+	return _absmove(current_time, curpos, tgtpos, sqrt(extdist_accumulator));
 }
 
 float axis_controller::ctrpos_external(int axno)
@@ -255,7 +256,7 @@ void axis_controller::release_controlled()
 	{
 		if (settings[i].controlled)
 		{
-			settings[i].controlled->put();
+			settings[i].controlled->deattach_possible_controller(this);
 			settings[i].controlled = NULL;
 		}
 	}
