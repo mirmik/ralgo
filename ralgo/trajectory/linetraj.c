@@ -8,10 +8,6 @@ int line_trajectory_attime (void * priv,
 {
 	struct line_trajectory * traj = (struct line_trajectory *) priv;
 
-	// Умножение на коэффициент времени перерасщитывает скорость
-	// взятую на дискретную единицу времени в скорость взятую
-	// на единицу времени рабочего пространства.
-
 	int local_time = time - traj->stim;
 	int full_time = traj->ftim - traj->stim;
 
@@ -116,16 +112,12 @@ void line_trajectory_set_stop_pattern(
     disctime_t curtime,
     disctime_t stoptime)
 {
-	DPRINT(stoptime);
-	DPRINT(curpos[0]);
-	DPRINT(curspd[0]);
-
 	// скоростной деформатор работает с точным выведением в позицию, и изменяет время,
 	// поэтому подменяем время в два раза, чтобы соответствовать равнозамедленному паттерну.
-	
+
 	traj->stim = curtime;
 	traj->ftim = curtime + stoptime / 2; // Время измеяется из-за паттерна деформации.
-	
+
 	if (traj->ftim > traj->stim)
 	{
 		for (int i = 0; i < traj->traj.dim ; ++i)
@@ -133,15 +125,12 @@ void line_trajectory_set_stop_pattern(
 			sf_position_t * pair = sparse_array_ptr(&traj->sfpos, i, sf_position_t);
 			pair->spos = curpos[i];
 			pair->fpos = curpos[i] + curspd[i] * stoptime / 2; // аналогичное сжатие времени.
-
-			DPRINT(pair->spos);
-			DPRINT(pair->fpos);
 		}
 	}
 	else
 	{
 		traj->ftim = traj->stim + 1; //prevent zero division
-		for (int i = 0; i < traj->traj.dim ; ++i) 
+		for (int i = 0; i < traj->traj.dim ; ++i)
 		{
 			sf_position_t * pair = sparse_array_ptr(&traj->sfpos, i, sf_position_t);
 			pair->spos = curpos[i];

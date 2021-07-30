@@ -19,7 +19,12 @@ int heimer::executor::order_sort()
 	signal_head * it;
 	dlist_for_each_entry(it, &signals_list, list_lnk)
 	{
-		it->sorting_mark = it->listener == nullptr;
+		it->sorting_mark = 0;
+		if (it->listener == nullptr)
+		{
+			ralgo::warn("signal without listener");
+			return -1;
+		}
 	}
 
 	for (int i = 0; i < order_table_size; ++i)
@@ -38,7 +43,7 @@ int heimer::executor::order_sort()
 			{
 				if (h->sorting_mark == 0)
 				{
-					has_unordered = 1;
+					has_unordered++;
 				}
 			}
 
@@ -49,13 +54,13 @@ int heimer::executor::order_sort()
 		}
 
 		if (j == order_table_size)
-			return -1;
+			break;
 
 		order_table[j] = order_table[i];
 		order_table[i] = sigproc;
 
 		signal_head * h = nullptr;
-		while ((h = sigproc->iterate_left(h)))
+		while ((h = sigproc->iterate_right(h)))
 		{
 			h->sorting_mark = 1;
 		}
@@ -123,14 +128,14 @@ int heimer::executor::exec(disctime_t curtime)
 	int retcode;
 
 	retcode = feedback(curtime);
-	if (retcode) 
+	if (retcode)
 	{
 		sprintf(buf, "%d", retcode);
 		ralgo::warn("executor: feedback set retcode ", buf);
 	}
 
 	retcode = serve(curtime);
-	if (retcode) 
+	if (retcode)
 	{
 		sprintf(buf, "%d", retcode);
 		ralgo::warn("executor: feedback set retcode ", buf);
@@ -154,14 +159,14 @@ void heimer::executor::allocate_order_table(int size)
 }
 
 #if HEIMER_CROW_SUPPORT
-void heimer::executor::notification_prepare(const char * theme, crow::hostaddr_view addrview) 
+void heimer::executor::notification_prepare(const char * theme, crow::hostaddr_view addrview)
 {
 	count_of_axstates = 0;
 
 	signal_head * sig;
-	dlist_for_each_entry(sig, &signals_list, list_lnk) 
+	dlist_for_each_entry(sig, &signals_list, list_lnk)
 	{
-		if (sig->type == SIGNAL_TYPE_AXIS_STATE) 
+		if (sig->type == SIGNAL_TYPE_AXIS_STATE)
 		{
 			++count_of_axstates;
 		}
@@ -176,9 +181,9 @@ void heimer::executor::notify()
 	float * it = arr;
 
 	signal_head * sig;
-	dlist_for_each_entry(sig, &signals_list, list_lnk) 
+	dlist_for_each_entry(sig, &signals_list, list_lnk)
 	{
-		if (sig->type == SIGNAL_TYPE_AXIS_STATE) 
+		if (sig->type == SIGNAL_TYPE_AXIS_STATE)
 		{
 			*it++ = static_cast<heimer::axis_state*>(sig)->feedpos;
 		}
