@@ -322,7 +322,8 @@ void axis_controller::init(
 )
 {
 	signal_processor::init(name);
-
+	set_need_activation(1);
+	
 	vel = 0;
 	acc = 0;
 	dcc = 0;

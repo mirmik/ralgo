@@ -84,7 +84,7 @@ int heimer::executor::serve(disctime_t curtime)
 
 	for (int i = order_table_size - 1; i >= 0; --i)
 	{
-		if (!order_table[i]->is_active())
+		if (order_table[i]->need_activation() && !order_table[i]->is_active())
 			continue;
 
 		// serve исполняется только если контроллер включен.

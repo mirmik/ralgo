@@ -23,10 +23,19 @@ namespace heimer
 	{
 	public:
 		struct dlist_head list_lnk;
-	
+
 	private:
 		char _name[SIGNAL_PROCESSOR_NAME_MAX_LENGTH];
-		uint8_t active;
+
+		union
+		{
+			uint8_t flags;
+			struct
+			{
+				uint8_t active : 1;
+				uint8_t need_activation : 1;
+			} f;
+		};
 
 	public:
 		signal_processor() = default;
@@ -43,15 +52,17 @@ namespace heimer
 		virtual signal_head * iterate_left(signal_head *) = 0;
 		virtual signal_head * iterate_right(signal_head *) = 0;
 
-		virtual void on_activate(disctime_t);	
+		virtual void on_activate(disctime_t);
 
 		void init(const char * name);
-		
+
 		int activate(disctime_t);
 		int deactivate();
-		
+
 		igris::buffer name();
 		bool is_active();
+		bool need_activation();
+		void set_need_activation(bool en);
 	};
 
 	int signal_processors_count();
