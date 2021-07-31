@@ -1,7 +1,7 @@
 #include <ralgo/heimer/axis_stub_processor.h>
 #include <ralgo/heimer/sigtypes.h>
 
-heimer::axis_stub_processor::axis_stub_processor(const char* name) 
+heimer::axis_stub_processor::axis_stub_processor(const char* name)
 	: signal_processor(name)
 {
 
@@ -11,11 +11,11 @@ int heimer::axis_stub_processor::feedback(disctime_t)
 {
 	_axstate->feedpos = pos;
 	_axstate->feedvel = vel;
-	
+
 	return 0;
 }
 
-int heimer::axis_stub_processor::serve(disctime_t)
+int heimer::axis_stub_processor::serve(disctime_t time)
 {
 	if (_axstate == nullptr || !is_active())
 		return SIGNAL_PROCESSOR_RETURN_NOT_ACTIVE;
@@ -23,13 +23,20 @@ int heimer::axis_stub_processor::serve(disctime_t)
 	pos = _axstate->ctrpos;
 	vel = _axstate->ctrvel;
 
+	if (_apply_speed_mode)
+	{
+		disctime_t delta = time - lasttime;
+		pos = pos + vel * delta;
+	}
+
+	lasttime = time;
 	return 0;
 }
 
 static inline
 int bind(heimer::axis_stub_processor * axctr, int argc, char ** argv, char * output, int outmax)
 {
-	if (argc < 1) 
+	if (argc < 1)
 	{
 		snprintf(output, outmax, "Need argument");
 		return -1;
@@ -90,4 +97,14 @@ void heimer::axis_stub_processor::bind(heimer::axis_state * iter)
 {
 	_axstate = iter;
 	_axstate->attach_listener(this);
+}
+
+void heimer::axis_stub_processor::apply_speed_mode(bool en)
+{
+	_apply_speed_mode = en;
+}
+
+void heimer::axis_stub_processor::on_activate(disctime_t time)
+{
+	lasttime = time;
 }

@@ -7,14 +7,16 @@
 
 #include <igris/datastruct/argvc.h>
 #include <igris/shell/rshell.h>
-
 #include <igris/dprint.h>
 
 #include <ralgo/heimer/axis_state.h>
+#include <ralgo/heimer/scalar_signal.h>
+
 #include <ralgo/heimer/axisctr.h>
 #include <ralgo/heimer/axstate_linear_processor.h>
 #include <ralgo/heimer/axstate_sincos_processor.h>
 #include <ralgo/heimer/axis_stub_processor.h>
+#include <ralgo/heimer/axstate_pid_processor.h>
 
 using namespace heimer;
 
@@ -107,6 +109,18 @@ int ctrnew(int argc, char ** argv, char * output, int maxsize)
 		return 0;
 	}
 
+	if (strcmp(argv[0], "axpid") == 0)
+	{
+		if (argc < 2)
+		{
+			snprintf(output, maxsize, "usage: ctrnew axstub NAME\r\n");
+			return -1;
+		}
+
+		new heimer::axstate_pid_processor(argv[1]);
+		return 0;
+	}
+
 	snprintf(output, maxsize, "Unresolved TYPE. Possible types: axisctr, axlinear, axsincos, axstub\r\n");
 	return -1;
 }
@@ -142,6 +156,12 @@ int signew(int argc, char ** argv, char * output, int maxsize)
 		return 0;
 	}
 
+	if (strcmp(argv[0], "scalar") == 0)
+	{
+		const char * name = argv[1];
+		new scalar_signal(name);
+		return 0;
+	}
 
 	snprintf(output, maxsize, "Unresolved TYPE. Possible types: axstate\r\n");
 	return -1;
