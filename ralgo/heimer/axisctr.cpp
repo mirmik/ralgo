@@ -158,6 +158,7 @@ int axis_controller::_absmove(
 
 	if (activate(curtim)) 
 	{
+		ralgo::warn("axisctr activation is fault");
 		return -1;
 	}
 

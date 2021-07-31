@@ -136,3 +136,134 @@ TEST_CASE("executor: tandem sort")
 	CHECK_EQ(str(executor_table[5]->name()), str(vxctr.name()));
 	CHECK_EQ(str(executor_table[6]->name()), str(vyctr.name()));
 }
+
+
+TEST_CASE("executor: tandem activate") 
+{
+	heimer_reinit();
+
+	axis_state x("x");
+	axis_state y("y");	
+	axis_state vx("vx");
+	axis_state vy("vy");
+
+	axis_stub_processor xstub("xstub");
+	axis_stub_processor ystub("ystub");
+	xstub.bind(&x);
+	ystub.bind(&y);
+
+	axis_settings xctr_sett[1];
+	axis_settings yctr_sett[1];
+	axis_settings vxctr_sett[1];
+	axis_settings vyctr_sett[1];
+
+	axis_controller xctr("xctr", xctr_sett, 1);
+	axis_controller yctr("yctr", yctr_sett, 1);
+	axis_controller vxctr("vxctr", vxctr_sett, 1);
+	axis_controller vyctr("vyctr", vyctr_sett, 1);
+
+	axis_state * axctr_states[] = { &x, &y, &vx, &vy };
+
+	xctr.set_controlled(&axctr_states[0]);
+	yctr.set_controlled(&axctr_states[1]);
+	vxctr.set_controlled(&axctr_states[2]);
+	vyctr.set_controlled(&axctr_states[3]);
+
+	axis_state * linproc_left[] =  { &x,  &y};
+	axis_state * linproc_right[] = {&vx, &vy};
+	float linproc_matrix[4] = { 1, 0, 0, 1 };
+	float linproc_inverse_matrix[4];
+	axstate_linear_processor linproc;
+	linproc.init("linproc", 2, linproc_left, linproc_right, 
+		linproc_matrix, linproc_inverse_matrix);
+
+	signal_processor * executor_table[10];
+
+	heimer::executor executor;	
+	executor.set_order_table(executor_table, 10, 0);
+	executor.append_processor(&xctr);
+	executor.append_processor(&yctr);
+	executor.append_processor(&vxctr);
+	executor.append_processor(&vyctr);
+
+	executor.append_processor(&xstub);
+	executor.append_processor(&ystub);
+
+	executor.append_processor(&linproc);
+	
+	CHECK_EQ(executor.order_table_size, 7);
+	CHECK_EQ(dlist_size(&signals_list), 4);
+
+	executor.order_sort();
+
+	SUBCASE("vxctr move") 
+	{
+		double tgt = 1;
+		vxctr.incmove(0, &tgt);
+		xctr.incmove(0, &tgt);
+		CHECK_EQ(vxctr.is_active(), true);
+		CHECK_EQ(vyctr.is_active(), false);
+		CHECK_EQ(xctr.is_active(), false);
+		CHECK_EQ(yctr.is_active(), false);
+		CHECK_EQ(linproc.is_active(), true);
+		CHECK_EQ(vx.listener, &linproc);
+		CHECK_EQ(vx.current_controller, &vxctr);
+		CHECK_EQ(xstub.is_active(), true);
+		CHECK_EQ(ystub.is_active(), true);
+		CHECK_EQ(x.listener, &xstub);
+		CHECK_EQ(x.current_controller, &linproc);
+		CHECK_EQ(y.listener, &ystub);
+		CHECK_EQ(y.current_controller, &linproc);
+
+		vxctr.serve(1000000000);
+		CHECK_EQ(vxctr.is_active(), false);
+		CHECK_EQ(vyctr.is_active(), false);
+		CHECK_EQ(xctr.is_active(), false);
+		CHECK_EQ(yctr.is_active(), false);
+		CHECK_EQ(linproc.is_active(), false);
+		CHECK_EQ(vx.listener, &linproc);
+		CHECK_EQ(vx.current_controller, nullptr);
+		CHECK_EQ(xstub.is_active(), false);
+		CHECK_EQ(ystub.is_active(), false);
+		CHECK_EQ(x.listener, &xstub);
+		CHECK_EQ(x.current_controller, nullptr);
+		CHECK_EQ(y.listener, &ystub);
+		CHECK_EQ(y.current_controller, nullptr);
+	}
+
+
+	SUBCASE("xctr move") 
+	{
+		double tgt = 1;
+		xctr.incmove(0, &tgt);
+		vxctr.incmove(0, &tgt);
+		CHECK_EQ(vxctr.is_active(), false);
+		CHECK_EQ(vyctr.is_active(), false);
+		CHECK_EQ(xctr.is_active(), true);
+		CHECK_EQ(yctr.is_active(), false);
+		CHECK_EQ(linproc.is_active(), false);
+		CHECK_EQ(vx.listener, &linproc);
+		CHECK_EQ(vx.current_controller, nullptr);
+		CHECK_EQ(xstub.is_active(), true);
+		CHECK_EQ(ystub.is_active(), false);
+		CHECK_EQ(x.listener, &xstub);
+		CHECK_EQ(x.current_controller, &xctr);
+		CHECK_EQ(y.listener, &ystub);
+		CHECK_EQ(y.current_controller, nullptr);
+
+		xctr.serve(1000000000);
+		CHECK_EQ(vxctr.is_active(), false);
+		CHECK_EQ(vyctr.is_active(), false);
+		CHECK_EQ(xctr.is_active(), false);
+		CHECK_EQ(yctr.is_active(), false);
+		CHECK_EQ(linproc.is_active(), false);
+		CHECK_EQ(vx.listener, &linproc);
+		CHECK_EQ(vx.current_controller, nullptr);
+		CHECK_EQ(xstub.is_active(), false);
+		CHECK_EQ(ystub.is_active(), false);
+		CHECK_EQ(x.listener, &xstub);
+		CHECK_EQ(x.current_controller, nullptr);
+		CHECK_EQ(y.listener, &ystub);
+		CHECK_EQ(y.current_controller, nullptr);
+	}
+}
