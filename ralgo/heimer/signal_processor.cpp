@@ -1,7 +1,10 @@
 #include <ralgo/heimer/signal_processor.h>
 #include <ralgo/heimer/signal.h>
+#include <ralgo/log.h>
+
 #include <igris/shell/rshell.h>
 #include <igris/math.h>
+
 #include <string.h>
 #include <assert.h>
 
@@ -48,6 +51,7 @@ int signal_processor::activate(disctime_t curtim)
 		int err = iter->activate(this, curtim);
 		if (err)
 		{
+			ralgo::warn("activation is unsucess");
 			success = 0;
 			break;
 		}

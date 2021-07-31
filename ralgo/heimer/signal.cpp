@@ -1,5 +1,6 @@
 #include <ralgo/heimer/signal.h>
 #include <ralgo/heimer/signal_processor.h>
+#include <ralgo/log.h>
 #include <igris/shell/rshell.h>
 #include <string.h>
 
@@ -91,14 +92,24 @@ int signal_head::command_v(int argc, char ** argv, char * output, int maxsize)
 
 int signal_head::activate(struct signal_processor * proc, disctime_t tim)
 {
-//	if (!listener)
-//		return -1;
+	if (current_controller) 
+	{
+		// Если это вторичная попытка активации того же контроллера, передаём, что продолжаем работу штатно. 
+		if (current_controller == proc) 
+		{
+			ralgo::warn("signal is reactivated from curcontroller", name);
+			return 0;
+		}
+
+		// Но, если это другой контрорллер, отдаём отказ. 
+		else
+			return -1;
+	}
 
 	if (listener && listener->activate(tim))
 		return -1;
 
 	current_controller = proc;
-	active = 1;
 	return 0;
 }
 
@@ -108,8 +119,7 @@ int signal_head::deactivate(struct signal_processor * proc)
 		return -1;
 
 	current_controller = NULL;
-	active = -1;
-
+	
 	if (listener)
 	{
 		return listener->deactivate();
