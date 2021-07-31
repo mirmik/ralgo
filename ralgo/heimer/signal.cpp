@@ -89,12 +89,12 @@ int signal_head::command_v(int argc, char ** argv, char * output, int maxsize)
 }
 
 
-int signal_head::activate(struct signal_processor * proc)
+int signal_head::activate(struct signal_processor * proc, disctime_t tim)
 {
 //	if (!listener)
 //		return -1;
 
-	if (listener && listener->activate())
+	if (listener && listener->activate(tim))
 		return -1;
 
 	current_controller = proc;
@@ -116,4 +116,9 @@ int signal_head::deactivate(struct signal_processor * proc)
 	}
 
 	return 0;
+}
+
+signal_head::signal_head(const char * name, uint8_t type) 
+{
+	init(name, type);
 }

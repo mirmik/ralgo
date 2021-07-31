@@ -133,7 +133,7 @@ axstate_sincos_processor::axstate_sincos_processor(const char * name)
 	attach_rightside_table(rightside, 3);
 }
 
-void heimer::axstate_sincos_processor::on_activate() 
+void heimer::axstate_sincos_processor::on_activate(disctime_t) 
 {
 	for (int i = 0; i < 3; ++i)
 	{

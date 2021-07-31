@@ -4,6 +4,8 @@
 #include <igris/compiler.h>
 #include <igris/datastruct/dlist.h>
 
+#include <ralgo/disctime.h>
+
 #define SIGNAL_NAME_MAX_LENGTH 12
 
 namespace heimer
@@ -38,6 +40,9 @@ namespace heimer
 		uint8_t sorting_mark; /// < Метка для алгоритма сортировки (см. executor)
 
 	public:
+		signal_head() = default;
+		signal_head(const char * name, uint8_t type);
+
 		virtual int info(char * buffer, int maxsize) = 0;
 
 		void init(const char * name, uint8_t type);
@@ -50,7 +55,7 @@ namespace heimer
 
 		int command_v(int argc, char ** argv, char * output, int maxsize);
 
-		int activate(signal_processor * proc);
+		int activate(signal_processor * proc, disctime_t);
 		int deactivate(signal_processor * proc);
 	};
 
