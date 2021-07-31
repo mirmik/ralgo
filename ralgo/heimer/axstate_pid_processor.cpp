@@ -38,7 +38,10 @@ int heimer::axstate_pid_processor::feedback(disctime_t)
 
 int heimer::axstate_pid_processor::serve(disctime_t time) 
 {
+	double error = target->value - state->feedpos;
 
+	state->ctrvel = error * compcoeff;
+	state->ctrpos = state->feedpos; 
 
 	last_serve_time = time;
 	return 0;
