@@ -38,14 +38,14 @@ void heimer::signal_processors_list_reinit()
 	dlist_init(&signal_processor_list);
 }
 
-int signal_processor::activate()
+int signal_processor::activate(disctime_t curtim)
 {
 	int success = 1;
 
 	signal_head * iter = NULL;
 	while ((iter = iterate_left(iter)))
 	{
-		int err = iter->activate(this);
+		int err = iter->activate(this, curtim);
 		if (err)
 		{
 			success = 0;
@@ -56,7 +56,7 @@ int signal_processor::activate()
 	if (success)
 	{
 		active = 1;
-		on_activate();
+		on_activate(curtim);
 		return 0;
 	}
 
@@ -114,5 +114,5 @@ bool signal_processor::is_active()
 	return active;
 }
  
-void signal_processor::on_activate() 
+void signal_processor::on_activate(disctime_t) 
 {}

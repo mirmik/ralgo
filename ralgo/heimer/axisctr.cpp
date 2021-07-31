@@ -156,7 +156,7 @@ int axis_controller::_absmove(
 			return -1;
 		}
 
-	if (activate()) 
+	if (activate(curtim)) 
 	{
 		return -1;
 	}

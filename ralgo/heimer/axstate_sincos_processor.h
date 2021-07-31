@@ -93,7 +93,7 @@ namespace heimer
 		int serve(disctime_t time) override;
 		int command(int argc, char ** argv, char * output, int outmax) override;
 		void deinit() override;
-        void on_activate() override;
+        void on_activate(disctime_t) override;
 
 		void init(
 		    const char* name,

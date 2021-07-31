@@ -43,11 +43,11 @@ namespace heimer
 		virtual signal_head * iterate_left(signal_head *) = 0;
 		virtual signal_head * iterate_right(signal_head *) = 0;
 
-		virtual void on_activate();	
+		virtual void on_activate(disctime_t);	
 
 		void init(const char * name);
 		
-		int activate();
+		int activate(disctime_t);
 		int deactivate();
 		
 		igris::buffer name();

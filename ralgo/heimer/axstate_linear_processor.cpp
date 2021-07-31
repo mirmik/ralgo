@@ -293,7 +293,7 @@ void heimer::axstate_linear_processor::allocate_resources()
 }
 
 
-void heimer::axstate_linear_processor::on_activate() 
+void heimer::axstate_linear_processor::on_activate(disctime_t) 
 {
 	for (int i = 0; i < dim(); ++i)
 	{

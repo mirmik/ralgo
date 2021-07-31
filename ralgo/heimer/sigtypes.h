@@ -2,5 +2,6 @@
 #define RALGO_HEIMER_SIGNAL_TYPES_H
 
 #define SIGNAL_TYPE_AXIS_STATE 1
+#define SIGNAL_TYPE_SCALAR 2
 
 #endif
