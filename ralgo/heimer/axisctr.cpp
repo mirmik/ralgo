@@ -124,6 +124,7 @@ int axis_controller::serve(disctime_t time)
 		return SIGNAL_PROCESSOR_RETURN_NOT_ACTIVE;
 
 	int sts = curtraj->attime(curtraj, time, ctrpos, ctrvel);
+
 	for (int i = 0; i < dim; ++i)
 	{
 		// Установить текущие целевые параметры.
@@ -145,18 +146,20 @@ int axis_controller::_absmove(
     position_t * tgtpos,
     double extdist)
 {
-	if (is_active()) 
+	if (is_active())
 	{
+		ralgo::warn("stop instead");
 		return stop(curtim);
 	}
 
 	for (int i = 0; i < dim; ++i)
 		if (settings[i].controlled->current_controller)
 		{
+			ralgo::warn("already controlled");
 			return -1;
 		}
 
-	if (activate(curtim)) 
+	if (activate(curtim))
 	{
 		ralgo::warn("axisctr activation is fault");
 		return -1;
@@ -324,7 +327,7 @@ void axis_controller::init(
 {
 	signal_processor::init(name);
 	set_need_activation(1);
-	
+
 	vel = 0;
 	acc = 0;
 	dcc = 0;
@@ -385,7 +388,7 @@ int axis_controller::stop(disctime_t curtim)
 	if (curtraj == nullptr)
 		return 0;
 
-	float stoptime = restore_internal_velocity_from_axstates() / dcc; 
+	float stoptime = restore_internal_velocity_from_axstates() / dcc;
 
 	line_trajectory_set_stop_pattern(
 	    &lintraj,

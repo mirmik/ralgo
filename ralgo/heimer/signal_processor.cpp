@@ -45,6 +45,9 @@ int signal_processor::activate(disctime_t curtim)
 {
 	int success = 1;
 
+	if (is_active())
+		return 0;
+
 	signal_head * iter = NULL;
 	while ((iter = iterate_left(iter)))
 	{

@@ -8,10 +8,8 @@
 
 using namespace heimer;
 
-int axstate_linear_processor::serve(disctime_t time)
+int axstate_linear_processor::serve(disctime_t)
 {
-	(void) time;
-
 	for (int i = 0; i < leftdim(); ++i)
 	{
 		position_t accpos = 0;
@@ -29,10 +27,8 @@ int axstate_linear_processor::serve(disctime_t time)
 	return 0;
 }
 
-int axstate_linear_processor::feedback(disctime_t time)
+int axstate_linear_processor::feedback(disctime_t)
 {
-	(void) time;
-
 	for (int i = 0; i < dim(); ++i)
 	{
 		position_t accpos = 0;
@@ -270,6 +266,7 @@ void axstate_linear_processor::init(
 heimer::axstate_linear_processor::axstate_linear_processor(const char * name, int _dim)
 	: axstate_signal_processor(name)
 {
+	set_need_activation(1);
 	attach_leftside_table(nullptr, _dim);
 	attach_rightside_table(nullptr, _dim);
 }
