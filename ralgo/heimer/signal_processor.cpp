@@ -15,7 +15,7 @@ void signal_processor::init(const char * name)
 	memset(_name, 0, SIGNAL_PROCESSOR_NAME_MAX_LENGTH);
 	memcpy(_name, name, len);
 	dlist_add_tail(&list_lnk, &signal_processor_list);
-	this->active = 0;
+	this->flags = 0;
 }
 
 signal_processor::signal_processor(const char * name)
@@ -55,7 +55,7 @@ int signal_processor::activate(disctime_t curtim)
 
 	if (success)
 	{
-		active = 1;
+		f.active = 1;
 		on_activate(curtim);
 		return 0;
 	}
@@ -88,7 +88,7 @@ int signal_processor::deactivate()
 		int err = iter->deactivate(this);
 		(void) err;
 	}
-	active = 0;
+	f.active = 0;
 
 	return 0;
 }
@@ -111,8 +111,18 @@ igris::buffer signal_processor::name()
 
 bool signal_processor::is_active()
 {
-	return active;
+	return f.active;
 }
  
+bool signal_processor::need_activation()
+{
+	return f.need_activation;
+}
+
 void signal_processor::on_activate(disctime_t) 
 {}
+
+void signal_processor::set_need_activation(bool en) 
+{
+	f.need_activation = en;
+}

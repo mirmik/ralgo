@@ -253,6 +253,7 @@ void axstate_linear_processor::init(
 )
 {
 	signal_processor::init(name);
+	set_need_activation(1);
 
 	attach_leftside_table(leftside, _dim);
 	attach_rightside_table(rightside, _dim);

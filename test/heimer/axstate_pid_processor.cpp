@@ -30,23 +30,7 @@ TEST_CASE("axstate_pid_processor")
 	CHECK_EQ(x.feedpos, 0);
 	CHECK_EQ(x.ctrvel, doctest::Approx(1));
 
-	xstub.feedback(1);
-	proc.serve(1);
-	xstub.serve(1);
-	CHECK_NE(x.feedpos, 0);
-	CHECK_NE(x.feedvel, 0);
-
-	xstub.feedback(2);
-	proc.serve(2);
-	xstub.serve(2);
-	CHECK_NE(x.feedpos, 0);
-	CHECK_NE(x.ctrvel, 0);
-
-	xstub.feedback(3);
-	proc.serve(3);
-	xstub.serve(3);
-
-	int i = 4;
+	int i = 1;
 	for (; i < 200; ++i)
 	{
 		xstub.feedback(i);
