@@ -97,7 +97,7 @@ int signal_head::activate(struct signal_processor * proc, disctime_t tim)
 		// Если это вторичная попытка активации того же контроллера, передаём, что продолжаем работу штатно. 
 		if (current_controller == proc) 
 		{
-			ralgo::warn("signal is reactivated from curcontroller", name);
+			ralgo::warn("signal is reactivated from curcontroller name: ", name);
 			return 0;
 		}
 

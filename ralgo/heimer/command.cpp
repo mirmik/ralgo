@@ -191,7 +191,7 @@ int ctrlist(int, char **, char * output, int maxsize)
 	dlist_for_each_entry(it, &signal_processor_list, list_lnk)
 	{
 		snprintf(buf, 48,
-		         "%*s\r\n", SIGNAL_PROCESSOR_NAME_MAX_LENGTH, it->name().data());
+		         "%*s is_active:%d\r\n", SIGNAL_PROCESSOR_NAME_MAX_LENGTH, it->name().data(), it->is_active());
 		strncat(output, buf, maxsize);
 	}
 
@@ -204,9 +204,9 @@ int siglist(int, char **, char * output, int maxsize)
 	signal_head * it;
 	dlist_for_each_entry(it, &signals_list, list_lnk)
 	{
-		char buf[SIGNAL_PROCESSOR_NAME_MAX_LENGTH + 4];
-		snprintf(buf, SIGNAL_PROCESSOR_NAME_MAX_LENGTH + 4,
-		         "%*s\r\n", SIGNAL_PROCESSOR_NAME_MAX_LENGTH, it->name);
+		char buf[48];
+		snprintf(buf, 48,
+		         "%*s controlled: %d\r\n", SIGNAL_PROCESSOR_NAME_MAX_LENGTH, it->name, it->current_controller != nullptr);
 		strncat(output, buf, maxsize);
 	}
 

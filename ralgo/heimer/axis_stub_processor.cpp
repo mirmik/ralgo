@@ -62,12 +62,22 @@ int bind(heimer::axis_stub_processor * axctr, int argc, char ** argv, char * out
 }
 
 
+static inline
+int info(heimer::axis_stub_processor * axctr, int argc, char ** argv, char * output, int outmax)
+{
+	snprintf(output, outmax, "is_active: %d\r\n", axctr->is_active());
+	return 0;
+}
+
 int heimer::axis_stub_processor::command(int argc, char ** argv, char * output, int outmax)
 {
 	int status = ENOENT;
 
 	if (strcmp("bind", argv[0]) == 0)
 		status = ::bind(this, argc - 1, argv + 1, output, outmax);
+
+	if (strcmp("info", argv[0]) == 0)
+		status = ::info(this, argc - 1, argv + 1, output, outmax);
 
 	return status;
 }

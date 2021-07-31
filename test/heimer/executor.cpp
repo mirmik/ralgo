@@ -266,4 +266,43 @@ TEST_CASE("executor: tandem activate")
 		CHECK_EQ(y.listener, &ystub);
 		CHECK_EQ(y.current_controller, nullptr);
 	}
+
+
+	SUBCASE("vxctr and vyctr move") 
+	{
+		double tgt = 1;
+		vxctr.incmove(0, &tgt);
+		vyctr.incmove(0, &tgt);
+		CHECK_EQ(vxctr.is_active(), true);
+		CHECK_EQ(vyctr.is_active(), true);
+		CHECK_EQ(xctr.is_active(), false);
+		CHECK_EQ(yctr.is_active(), false);
+		CHECK_EQ(linproc.is_active(), true);
+		CHECK_EQ(vx.listener, &linproc);
+		CHECK_EQ(vx.current_controller, &vxctr);
+		CHECK_EQ(vy.listener, &linproc);
+		CHECK_EQ(vy.current_controller, &vyctr);
+		CHECK_EQ(xstub.is_active(), true);
+		CHECK_EQ(ystub.is_active(), true);
+		CHECK_EQ(x.listener, &xstub);
+		CHECK_EQ(x.current_controller, &linproc);
+		CHECK_EQ(y.listener, &ystub);
+		CHECK_EQ(y.current_controller, &linproc);
+
+		vxctr.serve(1000000000);
+		vyctr.serve(1000000000);
+		CHECK_EQ(vxctr.is_active(), false);
+		CHECK_EQ(vyctr.is_active(), false);
+		CHECK_EQ(xctr.is_active(), false);
+		CHECK_EQ(yctr.is_active(), false);
+		CHECK_EQ(linproc.is_active(), false);
+		CHECK_EQ(vx.listener, &linproc);
+		CHECK_EQ(vx.current_controller, nullptr);
+		CHECK_EQ(xstub.is_active(), false);
+		CHECK_EQ(ystub.is_active(), false);
+		CHECK_EQ(x.listener, &xstub);
+		CHECK_EQ(x.current_controller, nullptr);
+		CHECK_EQ(y.listener, &ystub);
+		CHECK_EQ(y.current_controller, nullptr);
+	}
 }
