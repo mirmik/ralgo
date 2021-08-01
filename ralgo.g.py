@@ -41,6 +41,7 @@ licant.module("ralgo",
 		"ralgo/lp/point_in_hexagon.c",
 
 		"ralgo/util/index_brute_force.c",
+		"ralgo/kinematic/kinchain.cpp",
 	],
 	include_paths=["."],
 	mdepends=[

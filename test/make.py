@@ -22,7 +22,7 @@ application("runtests",
 
 	include_paths = ["."],
 	mdepends = ["ralgo"],
-	libs = ["igris", "nos"],
+	libs = ["igris", "nos", "rabbit"],
 )
 
 licant.ex("runtests")
