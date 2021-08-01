@@ -11,7 +11,20 @@ namespace heimer
 		rabbit::screw3<double> * local_sentivities; // links_count
 		int links_count;
 
+		pose3<position_t> control_position; 
+		double compensation_coefficient;
+
+		pose3<position_t> evaluate_target_position(); 
+		screw3<position_t> evaluate_target_velocity();
+
+		screw3<position_t> evaluate_position_error();
+
+
+
+		void evaluate_error()
+
 		void evaluate_output_sensivities(rabbit::screw3<double> * sensivities);
+		void backpack(rabbit::screw3<double> * sensivities) {  }
 	}
 }
 
