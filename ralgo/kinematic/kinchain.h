@@ -12,8 +12,6 @@ namespace ralgo
 	 		P_1^n = prod(i=[1,n], C_i W_i(x_i)) C_{n+1}
 
 			P_1^5 = C1 W1(x1) C2 W2(x2) C3 W3(x3) C4 W4(x4) C5
-			P_1^5 = C1 W1(x1) C2 W2(x2) C3 W3(x3) C4 W4(x4) C5
-
 			P_1^5 = P_1^2 W2(x2) P_3^5
 
 			Угловая скорость дифференцируется по формуле Жилина,
@@ -21,12 +19,6 @@ namespace ralgo
 
 			d(|R r|)     = |dR/dx dr/dx| = |S*R S*r+d'r/dx| = |S v||R r|
 			 (|0 1|)/dx    |    0     0|   |  0          0|   |0 0||0 1|
-
-			P_1^5 = P_1^2 S_x2 W2 P_3^5
-
-			P_1^5 = P_1^2 (P_5^2* S_x2^-1)^-1
-			P_1^5 = P_1^2 P_5^2* S_x2
-			h_2 = P_1^2 P_5^2* w_2
 
 			dP_1^n/dt = summ P_1^i dW_i(x_i)/dx_i P_{i+1}^n
 			dP_1^n/dt = summ P_1^i S_xi W_i P_{i+1}^n
