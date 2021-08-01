@@ -35,6 +35,9 @@ namespace heimer
 		void set_leftside(axis_state ** arr);
 		void set_rightside(axis_state ** arr);
 	};
+
+	int axstate_signal_processor_bindleft(axstate_signal_processor * axctr, int argc, char ** argv, char * output, int outmax);
+	int axstate_signal_processor_bindright(axstate_signal_processor * axctr, int argc, char ** argv, char * output, int outmax);
 }
 
 #endif

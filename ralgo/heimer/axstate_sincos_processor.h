@@ -110,7 +110,10 @@ namespace heimer
 		void set_y_offset(position_t yoff);
 		void set_a_left_offset(position_t aoff);
 		void set_a_right_offset(position_t aoff);
+		void set_radius(position_t p);
 	};
+
+
 }
 
 #endif

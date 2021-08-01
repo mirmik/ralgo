@@ -63,7 +63,7 @@ int bind(heimer::axis_stub_processor * axctr, int argc, char ** argv, char * out
 
 
 static inline
-int info(heimer::axis_stub_processor * axctr, int argc, char ** argv, char * output, int outmax)
+int info(heimer::axis_stub_processor * axctr, int, char **, char * output, int outmax)
 {
 	snprintf(output, outmax, "is_active: %d\r\n", axctr->is_active());
 	return 0;
