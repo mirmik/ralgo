@@ -1,6 +1,4 @@
 #include <ralgo/kinematic/kinchain.h>
-#include <nos/print.h>
-#include <igris/dprint.h>
 
 void ralgo::kinematic_chain_sensivities(
     rabbit::pose3<double> * constants,
