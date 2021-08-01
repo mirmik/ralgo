@@ -6,23 +6,14 @@
 //             |
 //            yctr
 
-signew axstate x
-signew axstate y
-signew axstate vx
-signew axstate vy
-
-ctrnew axisctr xctr 1
-ctrnew axisctr yctr 1
-ctrnew axisctr vxctr 1
-ctrnew axisctr vyctr 1
+signew axstate x y vx vy 
+ctrnew axisctr 1 xctr yctr vxctr vyctr
+ctrnew axstub xstub ystub
 
 ctrnew axlinear tand 2
 ctr tand bindleft x y
 ctr tand bindright vx vy
 ctr tand matrix 1 1 0 1
-
-ctrnew axstub xstub
-ctrnew axstub ystub
 
 ctr xstub bind x
 ctr xctr bind x

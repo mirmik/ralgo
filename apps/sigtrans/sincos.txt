@@ -9,7 +9,7 @@
 //           actr yctr
 
 
-signew axstate x y z vx vy vz
+signew axstate x y a vx vy va
 
 ctrnew axisctr 1 xctr yctr actr vxctr vyctr vactr
 
@@ -53,3 +53,5 @@ ctr vactr bind va
 ctr vactr setvel 5
 ctr vactr setacc 2 2
 ctr vactr setgain 1000
+
+start
