@@ -33,11 +33,11 @@ int help(int, char **, char * output, int maxsize)
 
 int heimer::command_exec_safe(const char * str, char * output, int maxsize, int * ret)
 {
-	char copydata[48];
+	char copydata[96];
 	char * argv[10];
 	int    argc;
 
-	strncpy(copydata, str, 48);
+	strncpy(copydata, str, 96);
 
 	argc = argvc_internal_split(copydata, argv, 10);
 	return command(argc, argv, output, maxsize, ret);
@@ -66,8 +66,11 @@ int ctrnew(int argc, char ** argv, char * output, int maxsize)
 			return -1;
 		}
 
-		int dim = atoi32(argv[2], 10, NULL);
-		create_axis_controller(argv[1], dim);
+		int dim = atoi32(argv[1], 10, NULL);
+		for (int i = 2; i < argc; ++i)
+		{
+			create_axis_controller(argv[i], dim);
+		}
 		return 0;
 	}
 
@@ -105,7 +108,10 @@ int ctrnew(int argc, char ** argv, char * output, int maxsize)
 			return -1;
 		}
 
-		new heimer::axis_stub_processor(argv[1]);
+		for (int i = 1; i < argc; ++i)
+		{
+			new heimer::axis_stub_processor(argv[i]);
+		}
 		return 0;
 	}
 
@@ -151,15 +157,21 @@ int signew(int argc, char ** argv, char * output, int maxsize)
 
 	if (strcmp(argv[0], "axstate") == 0)
 	{
-		const char * name = argv[1];
-		new axis_state(name); // Сохранение указателя происходит внутри конструктора.
+		for (int i = 1; i < argc; ++i)
+		{
+			const char * name = argv[i];
+			new axis_state(name); // Сохранение указателя происходит внутри конструктора.
+		}
 		return 0;
 	}
 
 	if (strcmp(argv[0], "scalar") == 0)
 	{
-		const char * name = argv[1];
-		new scalar_signal(name);
+		for (int i = 1; i < argc; ++i)
+		{
+			const char * name = argv[i];
+			new scalar_signal(name);
+		}
 		return 0;
 	}
 

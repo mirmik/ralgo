@@ -22,7 +22,7 @@ int heimer::executor::order_sort()
 		it->sorting_mark = 0;
 		if (it->listener == nullptr)
 		{
-			ralgo::warn("signal without listener");
+			ralgo::warn("signal without listener. name: ", it->name);
 			return -1;
 		}
 	}
