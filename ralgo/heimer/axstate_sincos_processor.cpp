@@ -62,14 +62,48 @@ int axstate_sincos_processor::feedback(disctime_t time)
 	return 0;
 }
 
+static inline
+int info(axstate_signal_processor *, int, char **, char *, int)
+{
+	return 0;
+}
+
+static inline
+int radius(axstate_sincos_processor * proc, int argc, char ** argv, char *, int)
+{
+	if (argc < 1)
+		return -1;
+
+	proc->set_radius(atof(argv[0]));
+	return 0;
+}
+
 int  axstate_sincos_processor::command(int argc, char ** argv, char * output, int outmax)
 {
-	(void) argc;
-	(void) argv;
-	(void) output;
-	(void) outmax;
+	int status = ENOENT;
 
-	return 0;
+	if (strcmp("bindleft", argv[0]) == 0)
+		status = heimer::axstate_signal_processor_bindleft(this, argc - 1, argv + 1, output, outmax);
+
+	if (strcmp("bindright", argv[0]) == 0)
+		status = heimer::axstate_signal_processor_bindright(this, argc - 1, argv + 1, output, outmax);
+
+	if (strcmp("info", argv[0]) == 0)
+		status = info(this, argc - 1, argv + 1, output, outmax);
+
+	if (strcmp("radius", argv[0]) == 0)
+		status = ::radius(this, argc - 1, argv + 1, output, outmax);
+
+	if (strcmp("ascale", argv[0]) == 0)
+	{
+		if (argc < 1)
+			return -1;
+
+		set_alpha_scale(atof(argv[1]));
+		return 0;
+	}
+
+	return status;
 }
 
 void axstate_sincos_processor::deinit()
@@ -124,6 +158,7 @@ void axstate_sincos_processor::init(
 	this->radius = radius;
 	attach_leftside_table(leftside, 3);
 	attach_rightside_table(rightside, 3);
+	set_need_activation(true);
 }
 
 axstate_sincos_processor::axstate_sincos_processor(const char * name)
@@ -133,11 +168,16 @@ axstate_sincos_processor::axstate_sincos_processor(const char * name)
 	attach_rightside_table(rightside, 3);
 }
 
-void heimer::axstate_sincos_processor::on_activate(disctime_t) 
+void heimer::axstate_sincos_processor::on_activate(disctime_t)
 {
 	for (int i = 0; i < 3; ++i)
 	{
-		rightside[i]->ctrpos = rightside[i]->feedpos; 
+		rightside[i]->ctrpos = rightside[i]->feedpos;
 		rightside[i]->ctrvel = rightside[i]->feedvel;
 	}
+}
+
+void heimer::axstate_sincos_processor::set_radius(position_t p)
+{
+	radius = p;
 }

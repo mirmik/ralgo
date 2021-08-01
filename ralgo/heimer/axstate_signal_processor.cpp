@@ -1,5 +1,6 @@
 #include <ralgo/heimer/axstate_signal_processor.h>
 #include <ralgo/log.h>
+#include <ralgo/heimer/sigtypes.h>
 
 heimer::signal_head * heimer::axstate_signal_processor::iterate_left(signal_head * iter)
 {
@@ -108,4 +109,77 @@ void heimer::axstate_signal_processor::set_rightside(heimer::axis_state ** arr)
 		_rightside[i] = arr[i];
 		_rightside[i] -> attach_listener(this);
 	}
+}
+
+
+int heimer::axstate_signal_processor_bindleft(axstate_signal_processor * axctr, int argc, char ** argv, char * output, int outmax)
+{
+	if (argc != axctr->leftdim())
+	{
+		snprintf(output, outmax, "Can't bind %d symbols for %d _dim axisctr", argc, axctr->leftdim());
+		return -1;
+	}
+
+	{
+		axis_state * arr[argc];
+
+		for (int i = 0; i < argc; ++i)
+		{
+			signal_head * sig = signal_get_by_name(argv[i]);
+
+			if (!sig)
+			{
+				snprintf(output, outmax, "Wrong signal name '%s ' (type 'siglist' for display)", argv[i]);
+				return -1;
+			}
+
+			if (sig->type != SIGNAL_TYPE_AXIS_STATE)
+			{
+				snprintf(output, outmax, "Wrong signal type. name:(%s)", sig->name);
+				return -1;
+			}
+
+			arr[i] = static_cast<axis_state *>(sig);
+		}
+
+		axctr->set_leftside(arr);
+	}
+
+	return 0;
+}
+
+int heimer::axstate_signal_processor_bindright(axstate_signal_processor * axctr, int argc, char ** argv, char * output, int outmax)
+{
+	if (argc != axctr->rightdim())
+	{
+		snprintf(output, outmax, "Can't bind %d symbols for %d _dim axisctr", argc, axctr->rightdim());
+		return -1;
+	}
+
+	{
+		axis_state * arr[argc];
+
+		for (int i = 0; i < argc; ++i)
+		{
+			signal_head * sig = signal_get_by_name(argv[i]);
+
+			if (!sig)
+			{
+				snprintf(output, outmax, "Wrong signal name '%s' (type 'siglist' for display)", argv[i]);
+				return -1;
+			}
+
+			if (sig->type != SIGNAL_TYPE_AXIS_STATE)
+			{
+				snprintf(output, outmax, "Wrong signal type. name:(%s)", sig->name);
+				return -1;
+			}
+
+			arr[i] = static_cast<axis_state *>(sig);
+		}
+
+		axctr->set_rightside(arr);
+	}
+
+	return 0;
 }

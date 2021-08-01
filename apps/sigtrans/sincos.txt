@@ -17,9 +17,10 @@ ctrnew axstub xstub ystub astub
 
 ctrnew axsincos sincos
 
-ctr sincos radius 10
-ctr sincos left   x  y  a
-ctr sincos right vx vy va
+ctr sincos radius 4000
+ctr sincos ascale 0.01
+ctr sincos bindleft   x  y  a
+ctr sincos bindright vx vy va
 
 ctr xstub bind x
 ctr xctr bind x
@@ -37,7 +38,7 @@ ctr astub bind a
 ctr actr bind a
 ctr actr setvel 5
 ctr actr setacc 2 2
-ctr actr setgain 1000
+ctr actr setgain 100
 
 ctr vxctr bind vx
 ctr vxctr setvel 5
@@ -52,6 +53,6 @@ ctr vyctr setgain 1000
 ctr vactr bind va
 ctr vactr setvel 5
 ctr vactr setacc 2 2
-ctr vactr setgain 1000
+ctr vactr setgain 100
 
 start

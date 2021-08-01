@@ -47,81 +47,6 @@ int axstate_linear_processor::feedback(disctime_t)
 }
 
 static inline
-int bindleft(axstate_linear_processor * axctr, int argc, char ** argv, char * output, int outmax)
-{
-	if (argc != axctr->dim())
-	{
-		snprintf(output, outmax, "Can't bind %d symbols for %d _dim axisctr", argc, axctr->dim());
-		return -1;
-	}
-
-	{
-		axis_state * arr[argc];
-
-		for (int i = 0; i < argc; ++i)
-		{
-			signal_head * sig = signal_get_by_name(argv[i]);
-
-			if (!sig)
-			{
-				snprintf(output, outmax, "Wrong signal name '%s ' (type 'siglist' for display)", argv[i]);
-				return -1;
-			}
-
-			if (sig->type != SIGNAL_TYPE_AXIS_STATE)
-			{
-				snprintf(output, outmax, "Wrong signal type. name:(%s)", sig->name);
-				return -1;
-			}
-
-			arr[i] = static_cast<axis_state *>(sig);
-		}
-
-		axctr->set_leftside(arr);
-	}
-
-	return 0;
-}
-
-static inline
-int bindright(axstate_linear_processor * axctr, int argc, char ** argv, char * output, int outmax)
-{
-	if (argc != axctr->dim())
-	{
-		snprintf(output, outmax, "Can't bind %d symbols for %d _dim axisctr", argc, axctr->dim());
-		return -1;
-	}
-
-	{
-		axis_state * arr[argc];
-
-		for (int i = 0; i < argc; ++i)
-		{
-			signal_head * sig = signal_get_by_name(argv[i]);
-
-			if (!sig)
-			{
-				snprintf(output, outmax, "Wrong signal name '%s' (type 'siglist' for display)", argv[i]);
-				return -1;
-			}
-
-			if (sig->type != SIGNAL_TYPE_AXIS_STATE)
-			{
-				snprintf(output, outmax, "Wrong signal type. name:(%s)", sig->name);
-				return -1;
-			}
-
-			arr[i] = static_cast<axis_state *>(sig);
-		}
-
-		axctr->set_rightside(arr);
-	}
-
-	return 0;
-}
-
-
-static inline
 int matrix(axstate_linear_processor * axctr, int argc, char ** argv, char * output, int outmax)
 {
 	if (argc != axctr->dim() * axctr->dim())
@@ -202,14 +127,13 @@ int info(axstate_linear_processor * axctr, int argc, char ** argv, char * output
 
 int  axstate_linear_processor::command(int argc, char ** argv, char * output, int outmax)
 {
-
 	int status = ENOENT;
 
 	if (strcmp("bindleft", argv[0]) == 0)
-		status = bindleft(this, argc - 1, argv + 1, output, outmax);
+		status = heimer::axstate_signal_processor_bindleft(this, argc - 1, argv + 1, output, outmax);
 
 	if (strcmp("bindright", argv[0]) == 0)
-		status = bindright(this, argc - 1, argv + 1, output, outmax);
+		status = heimer::axstate_signal_processor_bindright(this, argc - 1, argv + 1, output, outmax);
 
 	if (strcmp("matrix", argv[0]) == 0)
 		status = ::matrix(this, argc - 1, argv + 1, output, outmax);
