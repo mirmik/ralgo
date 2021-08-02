@@ -12,7 +12,11 @@ namespace heimer
 	{
 		rabbit::pose3<double> constant_transform;
 		rabbit::screw3<double> local_sensivities;
-	
+		rabbit::axis_state * state;
+	};
+
+	class axstate_pose3_chain_temporary 
+	{
 		// runtime
 		rabbit::pose3<double> leftmatrix;
 		rabbit::pose3<double> rightmatrix;
@@ -23,17 +27,20 @@ namespace heimer
 		Порядок правых осей: x y z .
 	*/
 	class axstate_pose3_chain_processor : public signal_processor
-	{
-		
+	{		
+		rabbit::pose3<double> C0_constant_transform;
 		heimer::dof6_signal * rightside; 
+		axstate_pose3_chain_settings * settings;
+		axstate_pose3_chain_temporary * temporary;
 
-		int links_count;
+		int _leftdim;
 
 		rabbit::pose3<position_t> control_position;
-		double compensation_coefficient;
 
 	public:
 		axstate_pose3_chain_processor(const char * name, int leftdim);
+		void set_resources(axstate_pose3_chain_settings * settings, axstate_pose3_chain_temporary * tsettings);
+		void set_resources(axstate_pose3_chain_settings * settings, axstate_pose3_chain_temporary * tsettings);
 		
 		rabbit::pose3<position_t> evaluate_current_position();
 		
@@ -46,7 +53,6 @@ namespace heimer
 		int command(int argc, char ** argv, char * output, int outmax) override;
 		void deinit() override;
 		void on_activate(disctime_t) override;
-
 
 		void evaluate_error();
 		void evaluate_output_sensivities(rabbit::screw3<double> * sensivities);
