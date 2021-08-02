@@ -13,7 +13,10 @@ ctrnew axstub xstub ystub
 ctrnew axlinear tand 2
 ctr tand bindleft x y
 ctr tand bindright vx vy
-ctr tand matrix 1 1 0 1
+
+// x = 1*vx + 0.5*vy
+// y = 0*vx +   1*vy
+ctr tand matrix 1 0.5 0 1  
 
 ctr xstub bind x
 ctr xctr bind x

@@ -5,7 +5,7 @@
 //   stub_b ----------b----------------------- |            |
 //                        |   |   |   |        |            |
 //   stub_c --------------c------------------- |            |
-//                            |   |   |        |  chainctr  |--------- P ------- posectr 
+//                            |   |   |        |  chainctr  | --------- P ------- posectr 
 //   stub_d ------------------d--------------- |            |
 //                                |   |        |            |
 //   stub_e ----------------------e----------- |            |
@@ -53,5 +53,7 @@ ctr stub_e bind e
 ctr stub_f bind f
 
 pose6ctr bind P
+pose6ctr setvel 3
+pose6ctr setacc 3
 
 start
