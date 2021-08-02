@@ -17,7 +17,7 @@ namespace heimer
 		heimer::dof6_signal * rightside; 
 
 		rabbit::pose3<double> * constant_transforms; // links_count + 1
-		rabbit::screw3<double> * local_sentivities; // links_count
+		rabbit::screw3<double> * local_sensivities; // links_count
 		int links_count;
 
 		rabbit::pose3<position_t> control_position;
@@ -25,7 +25,9 @@ namespace heimer
 
 	public:
 		axstate_pose3_chain_processor(const char * name, int leftdim);
-
+		
+		rabbit::pose3<position_t> evaluate_current_position();
+		
 		rabbit::pose3<position_t> evaluate_target_position();
 		rabbit::screw3<position_t> evaluate_target_velocity();
 		rabbit::screw3<position_t> evaluate_position_error();

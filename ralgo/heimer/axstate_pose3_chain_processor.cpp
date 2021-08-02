@@ -60,3 +60,13 @@ void heimer::axstate_pose3_chain_processor::backpack(rabbit::screw3<double> * se
 {
 
 }
+
+rabbit::pose3<position_t> evaluate_current_position() 
+{
+	rabbit::pose3<position_t> pose;
+	for (int i = 0; i < leftdim(); ++i) 
+	{
+		pose *= (local_sensivities[i] * leftax(i)->feedpos).to_pose();
+		pose *= constant_transform[i+1];
+	}
+}
