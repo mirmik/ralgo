@@ -32,7 +32,7 @@ licant.module("ralgo",
 		"ralgo/heimer/axstate_signal_processor.cpp",
 		"ralgo/heimer/axstate_linear_processor.cpp",
 		"ralgo/heimer/axstate_sincos_processor.cpp",
-		"ralgo/heimer/axstate_pose3_chain_processor.cpp",
+		#"ralgo/heimer/axstate_pose3_chain_processor.cpp",
 		"ralgo/heimer/convex_zone_approval.cpp",
 		"ralgo/heimer/executor.cpp",
 
