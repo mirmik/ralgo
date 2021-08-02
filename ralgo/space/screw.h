@@ -56,6 +56,8 @@ namespace ralgo
 
 		screw rotate_by(const htrans3<T>&);
 
+		/// |w v||E r| = |w w*r+v|
+		/// |0 0||0 1|   |0     0|
 		screw kinematic_carry(const linalg::vec<T, 3>& arm)
 		{
 			return screw(
