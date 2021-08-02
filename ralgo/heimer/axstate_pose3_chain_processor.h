@@ -8,16 +8,25 @@
 
 namespace heimer
 {
+	class axstate_pose3_chain_settings 
+	{
+		rabbit::pose3<double> constant_transform;
+		rabbit::screw3<double> local_sensivities;
+	
+		// runtime
+		rabbit::pose3<double> leftmatrix;
+		rabbit::pose3<double> rightmatrix;
+		rabbit::screw3<double> result_screw;
+	};
+
 	/**
 		Порядок правых осей: x y z .
 	*/
 	class axstate_pose3_chain_processor : public signal_processor
 	{
-		heimer::axis_state ** leftside;
+		
 		heimer::dof6_signal * rightside; 
 
-		rabbit::pose3<double> * constant_transforms; // links_count + 1
-		rabbit::screw3<double> * local_sensivities; // links_count
 		int links_count;
 
 		rabbit::pose3<position_t> control_position;
