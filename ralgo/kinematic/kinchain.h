@@ -1,8 +1,8 @@
 #ifndef RALGO_HEIMER_KINEMATIC_CHAIN_H
 #define RALGO_HEIMER_KINEMATIC_CHAIN_H
 
-#include <rabbit/space/pose3.h>
-#include <rabbit/space/screw.h>
+#include <ralgo/space/pose3.h>
+#include <ralgo/space/screw.h>
 
 namespace ralgo 
 {
@@ -38,11 +38,11 @@ namespace ralgo
 		@param dim - количество степеней свободы кинематической цепи.
 	*/
 	void kinematic_chain_sensivities(
-		rabbit::pose3<double> * constants,
-		rabbit::screw3<double> * locsenses,
+		ralgo::pose3<double> * constants,
+		ralgo::screw3<double> * locsenses,
     	double * coords,
 		int dim,
-		rabbit::screw3<double> * outsenses
+		ralgo::screw3<double> * outsenses
 	);
 }
 

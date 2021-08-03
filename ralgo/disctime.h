@@ -2,6 +2,7 @@
 #define RALGO_DISCRETE_TIME_H
 
 #include <stdint.h>
+#include <igris/compiler.h>
 
 #if __has_include(<asm/heimer_types.h>)
 #include <asm/heimer_types.h>
