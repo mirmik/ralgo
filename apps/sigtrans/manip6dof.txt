@@ -52,7 +52,7 @@ ctr stub_d bind d
 ctr stub_e bind e
 ctr stub_f bind f
 
-ctr posectr bind P
+ctr posectr bindleft P
 ctr posectr setvel 3
 ctr posectr setacc 3
 

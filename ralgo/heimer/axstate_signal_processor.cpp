@@ -14,7 +14,7 @@ heimer::signal_head * heimer::axstate_signal_processor::iterate_left(signal_head
 		return *_leftside;
 
 	heimer::axis_state ** it = _leftside;
-	for (; it != _leftside + _leftdim - 1  ; ++it)
+	for (; it != _leftside + leftdim() - 1  ; ++it)
 	{
 		if (*it == iter)
 		{
@@ -38,7 +38,7 @@ heimer::signal_head * heimer::axstate_signal_processor::iterate_right(signal_hea
 		return *_rightside;
 
 	heimer::axis_state ** it = _rightside;
-	for (; it != _rightside + _rightdim - 1  ; ++it)
+	for (; it != _rightside + rightdim() - 1  ; ++it)
 	{
 		if (*it == iter)
 		{
@@ -50,35 +50,21 @@ heimer::signal_head * heimer::axstate_signal_processor::iterate_right(signal_hea
 	return NULL;
 }
 
-heimer::axstate_signal_processor::axstate_signal_processor(const char * name)
-	: heimer::signal_processor(name)
+heimer::axstate_signal_processor::axstate_signal_processor(const char * name, int ldim, int rdim)
+	: heimer::signal_processor(name, ldim, rdim)
 {
 
 }
 
 
-void heimer::axstate_signal_processor::attach_leftside_table(axis_state ** table, int dim)
+void heimer::axstate_signal_processor::attach_leftside_table(axis_state ** table)
 {
-	_leftdim = dim;
 	_leftside = table;
-
-	/*if (_leftside)
-		for (int i = 0; i < dim; ++i)
-		{
-			_leftside[i] = nullptr;
-		}*/
 }
 
-void heimer::axstate_signal_processor::attach_rightside_table(axis_state ** table, int dim)
+void heimer::axstate_signal_processor::attach_rightside_table(axis_state ** table)
 {
-	_rightdim = dim;
 	_rightside = table;
-
-	/*if (_rightside)
-		for (int i = 0; i < dim; ++i)
-		{
-			_rightside[i] = nullptr;
-		}*/
 }
 
 void heimer::axstate_signal_processor::set_leftside(heimer::axis_state ** arr)

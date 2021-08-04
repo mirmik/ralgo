@@ -148,24 +148,16 @@ void axstate_sincos_processor::set_a_right_offset(position_t aoff)
 	a_right_offset = aoff;
 }
 
-
-void axstate_sincos_processor::init(
-    const char* name,
-    position_t radius
-)
-{
-	signal_processor::init(name);
-	this->radius = radius;
-	attach_leftside_table(leftside, 3);
-	attach_rightside_table(rightside, 3);
-	set_need_activation(true);
-}
-
 axstate_sincos_processor::axstate_sincos_processor(const char * name)
-	: axstate_signal_processor(name)
+	: axstate_signal_processor(name, 3, 3)
 {
-	attach_leftside_table(leftside, 3);
-	attach_rightside_table(rightside, 3);
+	attach_leftside_table(leftside);
+	attach_rightside_table(rightside);
+
+	this->radius = 0;
+	attach_leftside_table(leftside);
+	attach_rightside_table(rightside);
+	set_need_activation(true);
 }
 
 void heimer::axstate_sincos_processor::on_activate(disctime_t)

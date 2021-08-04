@@ -24,7 +24,11 @@ namespace heimer
 
     public:
         axstate_linear_processor() = default;
-        axstate_linear_processor(const char * name, int dim);
+        axstate_linear_processor(const char * name, int dim,
+            struct axis_state ** leftside,
+            struct axis_state ** rightside,
+            float * matrix,
+            float * invert_matrix);
 
         int dim();
 
@@ -34,15 +38,6 @@ namespace heimer
         void deinit() override;
 
         void on_activate(disctime_t) override;
-
-        void init(
-            const char * name,
-            int dim,
-            struct axis_state ** leftside,
-            struct axis_state ** rightside,
-            float * matrix,
-            float * invert_matrix
-        );
 
         void evaluate_invertion();
         void allocate_resources();

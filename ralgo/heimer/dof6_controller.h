@@ -8,7 +8,7 @@ namespace heimer
 {
 	class dof6_controller : public signal_processor
 	{
-		dof6_signal * controlled;
+		dof6_signal * controlled = nullptr;
 
 	public:
 		dof6_controller() = default;
@@ -22,6 +22,10 @@ namespace heimer
 		void deinit() override;
 		signal_head * iterate_left(signal_head *) override;
 		signal_head * iterate_right(signal_head *) override;
+
+		int leftsigtype(int i) override;
+		signal_head * leftsig(int i) override;
+		void set_leftsig(int i, signal_head * sig) override;
 	};
 }
 

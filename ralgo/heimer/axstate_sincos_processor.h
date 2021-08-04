@@ -95,11 +95,6 @@ namespace heimer
 		void deinit() override;
         void on_activate(disctime_t) override;
 
-		void init(
-		    const char* name,
-		    position_t radius
-		);
-
 		void set_alpha_scale(float ascale);
 		void set_offset(
 		    position_t xoff,

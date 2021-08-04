@@ -53,9 +53,9 @@ int setdcc(axis_controller * axctr, int argc, char ** argv, char * output, int o
 static inline
 int bind(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
 {
-	if (argc != axctr->dim)
+	if (argc != axctr->leftdim())
 	{
-		snprintf(output, outmax, "Can't bind %d symbols for %d dim axisctr", argc, axctr->dim);
+		snprintf(output, outmax, "Can't bind %d symbols for %d leftdim() axisctr", argc, axctr->leftdim());
 		return -1;
 	}
 
@@ -91,9 +91,9 @@ int bind(axis_controller * axctr, int argc, char ** argv, char * output, int out
 static inline
 int setgain(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
 {
-	if (argc != axctr->dim)
+	if (argc != axctr->leftdim())
 	{
-		snprintf(output, outmax, "Can't bind %d symbols for %d dim axisctr", argc, axctr->dim);
+		snprintf(output, outmax, "Can't bind %d symbols for %d leftdim() axisctr", argc, axctr->leftdim());
 		return -1;
 	}
 
@@ -119,7 +119,7 @@ int info(axis_controller * axctr, int argc, char ** argv, char * output, int out
 	strncat(output, buf, outmax);
 
 	memset(buf, 0, bufsize);
-	snprintf(buf, bufsize, "dim:%d, ", axctr->dim);
+	snprintf(buf, bufsize, "leftdim():%d, ", axctr->leftdim());
 	strncat(output, buf, outmax);
 
 	memset(buf, 0, bufsize);
@@ -127,12 +127,12 @@ int info(axis_controller * axctr, int argc, char ** argv, char * output, int out
 	strncat(output, buf, outmax);
 
 	memset(buf, 0, bufsize);
-	for (int i = 0; i < axctr->dim - 1; ++i)
+	for (int i = 0; i < axctr->leftdim() - 1; ++i)
 	{
 		snprintf(buf, bufsize, "%s,", axctr->settings[i].controlled->name);
 		strncat(output, buf, outmax);
 	}
-	snprintf(buf, bufsize, "%s\r\n", axctr->settings[axctr->dim - 1].controlled->name);
+	snprintf(buf, bufsize, "%s\r\n", axctr->settings[axctr->leftdim() - 1].controlled->name);
 	strncat(output, buf, outmax);
 
 	memset(buf, 0, bufsize);
@@ -148,7 +148,7 @@ int info(axis_controller * axctr, int argc, char ** argv, char * output, int out
 	         (uint8_t)axctr->f.spattern_enabled);
 	strncat(output, buf, outmax);
 
-	for (int i = 0; i < axctr->dim; ++i) 
+	for (int i = 0; i < axctr->leftdim(); ++i) 
 	{
 		memset(buf, 0, bufsize);
 		snprintf(buf, bufsize, "axsets: lims: %d,%f,%f sfpos: %f,%f gain: %f\r\n", 
@@ -168,13 +168,13 @@ int info(axis_controller * axctr, int argc, char ** argv, char * output, int out
 static inline
 int incmov(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
 {
-	if (argc != axctr->dim)
+	if (argc != axctr->leftdim())
 	{
-		snprintf(output, outmax, "Can't use %d coord for %d dim axisctr", argc, axctr->dim);
+		snprintf(output, outmax, "Can't use %d coord for %d leftdim() axisctr", argc, axctr->leftdim());
 		return -1;
 	}
 
-	int dim = axctr->dim;
+	int dim = axctr->leftdim();
 	position_t dist[dim];
 
 	for (int i = 0; i < dim; ++i)
@@ -188,13 +188,13 @@ int incmov(axis_controller * axctr, int argc, char ** argv, char * output, int o
 static inline
 int absmov(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
 {
-	if (argc != axctr->dim)
+	if (argc != axctr->leftdim())
 	{
-		snprintf(output, outmax, "Can't use %d coord for %d dim axisctr", argc, axctr->dim);
+		snprintf(output, outmax, "Can't use %d coord for %d leftdim() axisctr", argc, axctr->leftdim());
 		return -1;
 	}
 
-	int dim = axctr->dim;
+	int dim = axctr->leftdim();
 	position_t pos[dim];
 
 	for (int i = 0; i < dim; ++i)

@@ -10,10 +10,10 @@
 
 namespace heimer
 {
-	struct axis_settings
+	class axis_settings
 	{
 	public:
-		struct axis_state * controlled;
+		axis_state * controlled;
 		int limits_enabled;
 		position_t backlim;
 		position_t forwlim;
@@ -51,11 +51,9 @@ namespace heimer
 		struct axisctr_approval ** approvals;
 		int approvals_total;
 
-		int dim;
 		struct axis_settings * settings;
 
 	public:
-		axis_controller() = default;
 		axis_controller(
 		    const char * name,
 		    struct axis_settings * setings,
@@ -69,11 +67,6 @@ namespace heimer
 		signal_head * iterate_left(signal_head *) override;
 		signal_head * iterate_right(signal_head *) override;
 
-		void init(
-		    const char * name,
-		    struct axis_settings * setings,
-		    int dim
-		);
 		void deinit(struct signal_processor * sigproc);
 
 		void set_handlers(

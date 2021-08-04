@@ -4,10 +4,8 @@
 using namespace heimer;
 
 axstate_pose3_chain_processor::axstate_pose3_chain_processor(const char * name, int leftdim)
-	: signal_processor(name)
-{
-
-}
+	: signal_processor(name, leftdim, 1)
+{}
 
 ralgo::pose3<position_t> axstate_pose3_chain_processor::evaluate_target_position()
 {
@@ -35,7 +33,7 @@ int axstate_pose3_chain_processor::serve(disctime_t time)
 }
 
 static inline
-int bind(axstate_pose3_chain_processor * axctr, int argc, char ** argv, char * output, int outmax)
+int bindleft(axstate_pose3_chain_processor * axctr, int argc, char ** argv, char * output, int outmax)
 {
 	if (argc != axctr->leftdim())
 	{
@@ -83,7 +81,7 @@ int setconstant(axstate_pose3_chain_processor * axctr, int argc, char ** argv, c
 {
 	if (argc != 7)
 	{
-		snprintf(output, outmax, "Need seven arguments", argc, axctr->leftdim());
+		snprintf(output, outmax, "Need seven arguments");
 		return -1;
 	}
 
@@ -100,12 +98,31 @@ int setconstant(axstate_pose3_chain_processor * axctr, int argc, char ** argv, c
 	return 0;
 }
 
+static inline
+int setsensivity(axstate_pose3_chain_processor * axctr, int argc, char ** argv, char * output, int outmax)
+{
+	if (argc != 7)
+	{
+		snprintf(output, outmax, "Need seven arguments");
+		return -1;
+	}
+
+	axctr->set_sensivity(
+	    atoi(argv[0]),
+	    atof(argv[1]),
+	    atof(argv[2]),
+	    atof(argv[3]),
+	    atof(argv[4]),
+	    atof(argv[5]),
+	    atof(argv[6])
+	);
+
+	return 0;
+}
+
 int axstate_pose3_chain_processor::command(int argc, char ** argv, char * output, int outmax)
 {
 	int status = ENOENT;
-
-	if (strcmp("bind", argv[0]) == 0)
-		status = ::bind(this, argc - 1, argv + 1, output, outmax);
 
 	if (strcmp("info", argv[0]) == 0)
 		status = ::info(this, argc - 1, argv + 1, output, outmax);
@@ -113,7 +130,13 @@ int axstate_pose3_chain_processor::command(int argc, char ** argv, char * output
 	if (strcmp("setconstant", argv[0]) == 0)
 		status = ::setconstant(this, argc - 1, argv + 1, output, outmax);
 
-	return status;
+	if (strcmp("setsensivity", argv[0]) == 0)
+		status = ::setsensivity(this, argc - 1, argv + 1, output, outmax);
+
+	if (status != ENOENT)
+		return status;
+
+	return signal_processor::command(argc, argv, output, outmax);
 }
 
 void axstate_pose3_chain_processor::deinit()
@@ -153,31 +176,10 @@ ralgo::pose3<position_t> axstate_pose3_chain_processor::evaluate_feedback_positi
 	for (int i = 0; i < leftdim(); ++i)
 	{
 		pose *= settings[i].constant_transform;
-		pose *= ralgo::pose3<position_t>::from_screw(settings[i].local_sensivities * leftax(i)->feedpos);
+		pose *= ralgo::pose3<position_t>::from_screw(settings[i].local_sensivity * leftax(i)->feedpos);
 	}
 	pose *= last_constant_transform;
 	return pose;
-}
-
-signal_head * axstate_pose3_chain_processor::iterate_left(signal_head * iter)
-{
-	if (iter == NULL)
-		return settings[0].controlled;
-
-	for (int i = 0; i < _leftdim - 1; ++i)
-	{
-		if (iter == settings[i].controlled)
-		{
-			return settings[i + 1].controlled;
-		}
-	}
-
-	return NULL;
-}
-
-signal_head * axstate_pose3_chain_processor::iterate_right(signal_head * iter)
-{
-	return iter == nullptr ? rightside : nullptr;
 }
 
 void axstate_pose3_chain_processor::allocate_resources()
@@ -196,27 +198,46 @@ axis_state * axstate_pose3_chain_processor::leftax(int i)
 
 void axstate_pose3_chain_processor::set_leftside(axis_state ** arr)
 {
-	for (int i = 0; i < _leftdim; ++i)
+	for (int i = 0; i < leftdim(); ++i)
 	{
 		settings[i].controlled = arr[i];
 	}
 }
 
-void axstate_pose3_chain_processor::set_constant(int i, float a, float b, float c, float d, float e, float f) 
+void axstate_pose3_chain_processor::set_constant(int i, float a, float b, float c, float d, float e, float f)
 {
 	ralgo::pose3<double> * constant;
 
-	if (i == 0) 
+	if (i == 0)
 	{
 		constant = &last_constant_transform;
 	}
 
-	else 
+	else
 	{
-		constant = &settings[i].constant_transform;		
+		constant = &settings[i - 1].constant_transform;
 	}
 
-	*constant = 
-		ralgo::pose3<double>::translation({a,b,c});
-		ralgo::pose3<double>::euler_rotation({d,e,f});
+	*constant =
+	    ralgo::pose3<double>::translation({a, b, c});
+	ralgo::pose3<double>::euler_rotation({d, e, f});
 }
+
+
+void axstate_pose3_chain_processor::set_sensivity(int i, float a, float b, float c, float d, float e, float f)
+{
+	ralgo::screw3<double> * sensivity;
+	sensivity = &settings[i].local_sensivity;
+
+	*sensivity = {{a, b, c}, {d, e, f}};
+}
+
+int axstate_pose3_chain_processor::leftsigtype(int i) { return SIGNAL_TYPE_AXIS_STATE; }
+
+int axstate_pose3_chain_processor::rightsigtype(int i) { return SIGNAL_TYPE_DOF6; }
+
+signal_head * axstate_pose3_chain_processor::leftsig(int i) { return settings[i].controlled; }
+signal_head * axstate_pose3_chain_processor::rightsig(int i) { return rightside; }
+
+void axstate_pose3_chain_processor::set_leftsig(int i, signal_head * sig) { settings[i].controlled = static_cast<axis_state*>(sig); }
+void axstate_pose3_chain_processor::set_rightsig(int i, signal_head * sig) { rightside = static_cast<dof6_signal*>(sig) ; }
