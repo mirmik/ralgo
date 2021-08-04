@@ -52,8 +52,8 @@ ctr stub_d bind d
 ctr stub_e bind e
 ctr stub_f bind f
 
-pose6ctr bind P
-pose6ctr setvel 3
-pose6ctr setacc 3
+ctr posectr bind P
+ctr posectr setvel 3
+ctr posectr setacc 3
 
 start

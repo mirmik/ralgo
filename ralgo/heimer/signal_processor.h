@@ -34,6 +34,7 @@ namespace heimer
 			{
 				uint8_t active : 1;
 				uint8_t need_activation : 1;
+				uint8_t dynamic_resources : 1;
 			} f;
 		};
 
@@ -63,6 +64,11 @@ namespace heimer
 		bool is_active();
 		bool need_activation();
 		void set_need_activation(bool en);
+
+		bool is_dynamic_resources();
+		void set_dynamic_resources_flag(bool en);
+
+		void release_signals();
 	};
 
 	int signal_processors_count();
