@@ -27,6 +27,9 @@ namespace heimer
 	private:
 		char _name[SIGNAL_PROCESSOR_NAME_MAX_LENGTH];
 
+		uint8_t _leftdim;
+		uint8_t _rightdim;
+
 		union
 		{
 			uint8_t flags;
@@ -39,8 +42,10 @@ namespace heimer
 		};
 
 	public:
-		signal_processor() = default;
-		signal_processor(const char * name);
+		signal_processor(const char * name, int ldim, int rdim);
+
+		uint8_t leftdim();
+		uint8_t rightdim();
 
 		/// feedback отвечает за движение сигнала слева направо.  physical ----> virtual
 		virtual int feedback(disctime_t time) = 0;
@@ -48,14 +53,23 @@ namespace heimer
 		/// serve отвечает за движение сигнала справа налево. physical <---- virtual
 		virtual int serve(disctime_t time) = 0;
 
-		virtual int  command(int argc, char ** argv, char * output, int outmax) = 0;
+		virtual int  command(int argc, char ** argv, char * output, int outmax);
 		virtual void deinit() = 0;
-		virtual signal_head * iterate_left(signal_head *) = 0;
-		virtual signal_head * iterate_right(signal_head *) = 0;
+		virtual signal_head * iterate_left(signal_head *);
+		virtual signal_head * iterate_right(signal_head *);
+
+		virtual signal_head * leftsig(int i);
+		virtual signal_head * rightsig(int i);
+		virtual void set_leftsig(int i, signal_head *);
+		virtual void set_rightsig(int i, signal_head *);
+
+		virtual int leftsigtype(int i);
+		virtual int rightsigtype(int i);
+
+		void set_leftside(signal_head ** arr);
+		void set_rightside(signal_head ** arr);
 
 		virtual void on_activate(disctime_t);
-
-		void init(const char * name);
 
 		int activate(disctime_t);
 		int deactivate();

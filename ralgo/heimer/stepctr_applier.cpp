@@ -3,13 +3,13 @@
 
 using namespace heimer;
 
-void stepctr_applier::init(
+stepctr_applier::stepctr_applier(
     const char * name,
     struct stepctr_controller * stepctr,
     struct axis_state * state
 )
+	: signal_processor(name, 0, 1)
 {
-	signal_processor::init(name);
 	controlled_stepctr = stepctr;
 	this->state = state;
 

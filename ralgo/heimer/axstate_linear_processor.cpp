@@ -163,36 +163,21 @@ void axstate_linear_processor::evaluate_invertion()
 	);
 }
 
-void axstate_linear_processor::init(
-    const char * name,
-    int _dim,
-    struct axis_state ** leftside,
-    struct axis_state ** rightside,
-    float * matrix,
-    float * invert_matrix
-)
+
+heimer::axstate_linear_processor::axstate_linear_processor(const char * name, int _dim,
+            struct axis_state ** leftside,
+            struct axis_state ** rightside,
+            float * matrix,
+            float * invert_matrix)
+	: axstate_signal_processor(name, _dim, _dim)
 {
-	signal_processor::init(name);
 	set_need_activation(1);
 
-	attach_leftside_table(leftside, _dim);
-	attach_rightside_table(rightside, _dim);
+	attach_leftside_table(leftside);
+	attach_rightside_table(rightside);
 
 	this->matrix = matrix;
 	this->invert_matrix = invert_matrix;
-
-	for (int i = 0; i < _dim; ++i)
-	{
-		this->rightax(i)->listener = this;
-	}
-}
-
-heimer::axstate_linear_processor::axstate_linear_processor(const char * name, int _dim)
-	: axstate_signal_processor(name)
-{
-	set_need_activation(1);
-	attach_leftside_table(nullptr, _dim);
-	attach_rightside_table(nullptr, _dim);
 }
 
 int heimer::axstate_linear_processor::dim()
@@ -202,8 +187,8 @@ int heimer::axstate_linear_processor::dim()
 
 void heimer::axstate_linear_processor::allocate_resources()
 {
-	this->attach_leftside_table(new axis_state * [dim()], dim());
-	this->attach_rightside_table(new axis_state * [dim()], dim());
+	this->attach_leftside_table(new axis_state * [dim()]);
+	this->attach_rightside_table(new axis_state * [dim()]);
 	this->matrix = new float[dim() * dim()];
 	this->invert_matrix = new float[dim() * dim()];
 

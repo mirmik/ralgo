@@ -24,7 +24,7 @@ namespace heimer
 		signal_head * iterate_left(signal_head *) override;
 		signal_head * iterate_right(signal_head *) override;
 
-		void init(
+		stepctr_applier(
 		    const char * name,
 		    struct stepctr_controller * stepctr,
 		    struct axis_state * state

@@ -2,7 +2,7 @@
 #include <ralgo/heimer/sigtypes.h>
 
 heimer::axis_stub_processor::axis_stub_processor(const char* name)
-	: signal_processor(name)
+	: signal_processor(name, 1, 0)
 {
 
 }

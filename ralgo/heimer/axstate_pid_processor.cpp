@@ -1,7 +1,7 @@
 #include <ralgo/heimer/axstate_pid_processor.h>
 
 heimer::axstate_pid_processor::axstate_pid_processor(const char * name)
-	: signal_processor(name)
+	: signal_processor(name, 1, 1)
 {
 
 }

@@ -26,11 +26,11 @@ namespace heimer
 
 		/// Процессор, который сейчас контолирует этот сигнал.
 		/// Активируется при активации контроллера и отключается в ином случае.
-		struct signal_processor * current_controller;
+		struct signal_processor * current_controller = nullptr;
 
 		/// Процессор, который слушает этот сигнал.
 		/// Устанавливается во время биндинга и потом не меняется.
-		struct signal_processor * listener;
+		struct signal_processor * listener = nullptr;
 
 		/// Статус активации.
 		/// Если статус установлен, это значит, что сигнал получает команды свыше.

@@ -14,14 +14,6 @@
 
 using namespace heimer;
 
-axis_controller::axis_controller(
-    const char * name,
-    struct axis_settings * setings,
-    int dim
-)
-{
-	init(name, setings, dim);
-}
 
 void axis_controller::set_handlers(
     void * operation_handlers_priv,
@@ -36,7 +28,7 @@ void axis_controller::set_handlers(
 
 void axis_controller::set_gain(double * gain)
 {
-	for (int i = 0; i < dim; ++i)
+	for (int i = 0; i < leftdim(); ++i)
 	{
 		settings[i].gain = gain[i];
 	}
@@ -65,7 +57,7 @@ void axis_controller::set_decceleration_external(float dcc)
 
 void axis_controller::set_limits_external(double * back, double * forw)
 {
-	for (int i = 0; i < dim; ++i)
+	for (int i = 0; i < leftdim(); ++i)
 	{
 		settings[i].limits_enabled = 1;
 		settings[i].backlim = back[i];
@@ -73,9 +65,9 @@ void axis_controller::set_limits_external(double * back, double * forw)
 	}
 }
 
-void axis_controller::set_controlled(struct axis_state ** state)
+void axis_controller::set_controlled(axis_state ** state)
 {
-	for (int i = 0; i < dim; ++i)
+	for (int i = 0; i < leftdim(); ++i)
 	{
 		settings[i].controlled = state[i];
 		settings[i].controlled->attach_possible_controller(this);
@@ -99,8 +91,8 @@ int axis_controller::feedback(disctime_t)
 
 int axis_controller::serve(disctime_t time)
 {
-	position_t ctrpos[dim];
-	velocity_t ctrvel[dim];
+	position_t ctrpos[leftdim()];
+	velocity_t ctrvel[leftdim()];
 
 	if (f.release_control_flag)
 	{
@@ -109,7 +101,7 @@ int axis_controller::serve(disctime_t time)
 		return SIGNAL_PROCESSOR_RETURN_NOT_ACTIVE;
 	}
 
-	for (int i = 0; i < dim; ++i)
+	for (int i = 0; i < leftdim(); ++i)
 	{
 		if (
 		    !settings[i].controlled->current_controller ||
@@ -125,7 +117,7 @@ int axis_controller::serve(disctime_t time)
 
 	int sts = curtraj->attime(curtraj, time, ctrpos, ctrvel);
 
-	for (int i = 0; i < dim; ++i)
+	for (int i = 0; i < leftdim(); ++i)
 	{
 		// Установить текущие целевые параметры.
 		settings[i].controlled->ctrpos = ctrpos[i];
@@ -152,7 +144,7 @@ int axis_controller::_absmove(
 		return stop(curtim);
 	}
 
-	for (int i = 0; i < dim; ++i)
+	for (int i = 0; i < leftdim(); ++i)
 		if (settings[i].controlled->current_controller)
 		{
 			ralgo::warn("already controlled");
@@ -197,11 +189,11 @@ int axis_controller::_absmove(
 
 int axis_controller::incmove(disctime_t current_time, double * dist_real)
 {
-	position_t curpos[dim];
-	position_t tgtpos[dim];
+	position_t curpos[leftdim()];
+	position_t tgtpos[leftdim()];
 	double extdist_accumulator = 0;
 
-	for (int i = 0; i < dim; ++i)
+	for (int i = 0; i < leftdim(); ++i)
 	{
 		position_t dist = dist_real[i] * settings[i].gain;
 
@@ -223,11 +215,11 @@ int axis_controller::incmove(disctime_t current_time, double * dist_real)
 int axis_controller::absmove(disctime_t current_time, double * pos_real)
 {
 
-	position_t curpos[dim];
-	position_t tgtpos[dim];
+	position_t curpos[leftdim()];
+	position_t tgtpos[leftdim()];
 	double extdist_accumulator = 0;
 
-	for (int i = 0; i < dim; ++i)
+	for (int i = 0; i < leftdim(); ++i)
 	{
 		curpos[i] = settings[i].controlled->feedpos;
 		tgtpos[i] = pos_real[i] * settings[i].gain;
@@ -261,16 +253,15 @@ float axis_controller::ctrvel_external(int axno)
 
 axis_controller * heimer::create_axis_controller(const char * name, int dim)
 {
-	axis_controller * ptr = new axis_controller;
-	struct axis_settings * settings = (struct axis_settings *) malloc(sizeof(struct axis_settings) * dim);
-	ptr->init(name, settings, dim);
+	axis_settings * settings = (struct axis_settings *) malloc(sizeof(axis_settings) * dim);
+	axis_controller * ptr = new heimer::axis_controller(name, settings, dim);
 	ptr->f.dynamic_resources = 1;
 	return ptr;
 }
 
 void axis_controller::release_controlled()
 {
-	for (int i = 0; i < dim; ++i)
+	for (int i = 0; i < leftdim(); ++i)
 	{
 		if (settings[i].controlled)
 		{
@@ -290,7 +281,7 @@ signal_head * axis_controller::iterate_left(signal_head * iter)
 	if (iter == NULL)
 		return settings[0].controlled;
 
-	for (int i = 0; i < dim - 1; ++i)
+	for (int i = 0; i < leftdim() - 1; ++i)
 	{
 		if (iter == settings[i].controlled)
 		{
@@ -308,7 +299,7 @@ signal_head * axis_controller::iterate_right(signal_head * iter)
 }
 
 
-void axis_settings_init(struct axis_settings * settings)
+void axis_settings_init(axis_settings * settings)
 {
 	settings->controlled = NULL;
 	settings->backlim = 0;
@@ -319,55 +310,19 @@ void axis_settings_init(struct axis_settings * settings)
 	settings->limits_enabled = 0;
 }
 
-void axis_controller::init(
-    const char * name,
-    struct axis_settings * settings,
-    int dim
-)
-{
-	signal_processor::init(name);
-	set_need_activation(1);
-
-	vel = 0;
-	acc = 0;
-	dcc = 0;
-
-	for (int i = 0; i < dim; ++i)
-		axis_settings_init(&settings[i]);
-	this->settings = settings;
-	this->dim = dim;
-
-	flags = 0;
-
-	operation_start_handler = NULL;
-	operation_finish_handler = NULL;
-	operation_handlers_priv = NULL;
-
-	approvals = NULL;
-	approvals_total = 0;
-
-	curtraj = NULL;
-
-	line_trajectory_init(&lintraj, 1,
-	                     &settings[0].sfpos,
-	                     dim
-	                    );
-}
-
-
 float axis_controller::external_velocity() { return vel * ralgo::discrete_time_frequency(); }
 float axis_controller::external_acceleration() { return acc * ralgo::discrete_time_frequency() * ralgo::discrete_time_frequency(); }
 float axis_controller::external_decceleration() { return dcc * ralgo::discrete_time_frequency() * ralgo::discrete_time_frequency(); }
 
 void axis_controller::collect_feedpos(position_t * pos)
 {
-	for (int i = 0; i < dim; ++i)
+	for (int i = 0; i < leftdim(); ++i)
 		pos[i] = settings[i].controlled->feedpos;
 }
 
 void axis_controller::collect_feedvel(velocity_t * pos)
 {
-	for (int i = 0; i < dim; ++i)
+	for (int i = 0; i < leftdim(); ++i)
 		pos[i] = settings[i].controlled->feedvel;
 }
 
@@ -379,8 +334,8 @@ int axis_controller::stop(disctime_t curtim)
 		return -1;
 	}
 
-	position_t feedpos[dim];
-	velocity_t feedspd[dim];
+	position_t feedpos[leftdim()];
+	velocity_t feedspd[leftdim()];
 
 	collect_feedpos(feedpos);
 	collect_feedvel(feedspd);
@@ -410,7 +365,7 @@ velocity_t axis_controller::restore_internal_velocity_from_axstates()
 {
 	velocity_t acc = 0;
 
-	for (int i = 0; i < dim; ++i)
+	for (int i = 0; i < leftdim(); ++i)
 	{
 		velocity_t vel = settings[i].controlled->feedvel / settings[i].gain;
 		acc += vel * vel;
@@ -421,13 +376,13 @@ velocity_t axis_controller::restore_internal_velocity_from_axstates()
 
 int axis_controller::hardstop(disctime_t time)
 {
-	position_t curpos[dim];
-	for (int i = 0; i < dim; ++i)
+	position_t curpos[leftdim()];
+	for (int i = 0; i < leftdim(); ++i)
 	{
 		curpos[i] = settings[i].controlled->feedpos;
 	}
 
-	for (int i = 0; i < dim; ++i)
+	for (int i = 0; i < leftdim(); ++i)
 	{
 		settings[i].controlled->ctrvel = 0;
 		settings[i].controlled->ctrpos = curpos[i];
@@ -435,4 +390,44 @@ int axis_controller::hardstop(disctime_t time)
 
 	finish_trajectory(time, curpos);
 	return 0;
+}
+
+
+axis_controller::axis_controller(
+    const char * name,
+    axis_settings * settings,
+    int dim
+)
+	: signal_processor(name, dim, dim), settings(settings)
+{
+	set_need_activation(1);
+
+	vel = 0;
+	acc = 0;
+	dcc = 0;
+
+	if (settings)
+	{
+		for (int i = 0; i < dim; ++i)
+		{
+			axis_settings_init(&settings[i]);
+		}
+	}
+
+	flags = 0;
+
+	operation_start_handler = NULL;
+	operation_finish_handler = NULL;
+	operation_handlers_priv = NULL;
+
+	approvals = NULL;
+	approvals_total = 0;
+
+	curtraj = NULL;
+
+	line_trajectory_init(&lintraj, 1,
+	                     &settings[0].sfpos,
+	                     dim
+	                    );
+
 }

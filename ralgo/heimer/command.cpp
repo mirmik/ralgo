@@ -86,7 +86,7 @@ int ctrnew(int argc, char ** argv, char * output, int maxsize)
 		}
 
 		int dim = atoi32(argv[2], 10, NULL);
-		auto ptr = new heimer::axstate_linear_processor(argv[1], dim);
+		auto ptr = new heimer::axstate_linear_processor(argv[1], dim, nullptr, nullptr, nullptr, nullptr);
 		ptr->allocate_resources();
 		return 0;
 	}
