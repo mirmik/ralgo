@@ -133,3 +133,30 @@ void signal_processor::set_need_activation(bool en)
 {
 	f.need_activation = en;
 }
+
+bool signal_processor::is_dynamic_resources() 
+{
+	return f.dynamic_resources;
+}
+
+void signal_processor::set_dynamic_resources_flag(bool en) 
+{
+	f.dynamic_resources = en;
+}
+
+void signal_processor::release_signals() 
+{
+	signal_head * iter; 
+
+	iter = nullptr;
+	while((iter = iterate_left(iter))) 
+	{
+		iter->deattach_possible_controller(this);
+	}
+
+	iter = nullptr;
+	while((iter = iterate_left(iter))) 
+	{
+		iter->deattach_listener(this);
+	}
+}

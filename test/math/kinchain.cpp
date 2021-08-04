@@ -8,10 +8,10 @@ namespace linalg { using linalg::ostream_overloads::operator <<; }
 
 TEST_CASE("kinchain.1")
 {
-	rabbit::pose3<double> constants[3] = { {}, {}, {} };
-	rabbit::screw3<double> locsenses[2] = { {{0,0,0}, {0,0,1}}, {{0,0,0}, {0,0,0}} };
+	ralgo::pose3<double> constants[3] = { {}, {}, {} };
+	ralgo::screw3<double> locsenses[2] = { {{0,0,0}, {0,0,1}}, {{0,0,0}, {0,0,0}} };
 	double coords[2] = { 0, 0 };
-	rabbit::screw3<double> outsenses[2];
+	ralgo::screw3<double> outsenses[2];
 
 	ralgo::kinematic_chain_sensivities(
 	    constants,
@@ -29,10 +29,10 @@ TEST_CASE("kinchain.1")
 
 TEST_CASE("kinchain.2")
 {
-	rabbit::pose3<double> constants[3] = { rabbit::mov3<double>({1,1,1}), {}, {} };
-	rabbit::screw3<double> locsenses[2] = { {{0,0,0}, {0,0,1}}, {{0,0,0}, {0,0,0}} };
+	ralgo::pose3<double> constants[3] = { ralgo::mov3<double>({1,1,1}), {}, {} };
+	ralgo::screw3<double> locsenses[2] = { {{0,0,0}, {0,0,1}}, {{0,0,0}, {0,0,0}} };
 	double coords[2] = { 0, 0 };
-	rabbit::screw3<double> outsenses[2];
+	ralgo::screw3<double> outsenses[2];
 
 	ralgo::kinematic_chain_sensivities(
 	    constants,
@@ -50,10 +50,10 @@ TEST_CASE("kinchain.2")
 
 TEST_CASE("kinchain.3")
 {
-	rabbit::pose3<double> constants[2] = { rabbit::mov3<double>({0,0,0}), rabbit::mov3<double>({1,0,0}) };
-	rabbit::screw3<double> locsenses[1] = { {{0,0,1}, {0,0,0}} };
+	ralgo::pose3<double> constants[2] = { ralgo::mov3<double>({0,0,0}), ralgo::mov3<double>({1,0,0}) };
+	ralgo::screw3<double> locsenses[1] = { {{0,0,1}, {0,0,0}} };
 	double coords[1] = { 0 };
-	rabbit::screw3<double> outsenses[1];
+	ralgo::screw3<double> outsenses[1];
 
 	ralgo::kinematic_chain_sensivities(
 	    constants,
@@ -69,10 +69,10 @@ TEST_CASE("kinchain.3")
 
 TEST_CASE("kinchain.4")
 {
-	rabbit::pose3<double> constants[2] = { rabbit::mov3<double>({0,0,0}), rabbit::mov3<double>({1,0,0}) };
-	rabbit::screw3<double> locsenses[1] = { {{0,0,1}, {0,0,0}} };
+	ralgo::pose3<double> constants[2] = { ralgo::mov3<double>({0,0,0}), ralgo::mov3<double>({1,0,0}) };
+	ralgo::screw3<double> locsenses[1] = { {{0,0,1}, {0,0,0}} };
 	double coords[1] = { M_PI/2 };
-	rabbit::screw3<double> outsenses[1];
+	ralgo::screw3<double> outsenses[1];
 
 	ralgo::kinematic_chain_sensivities(
 	    constants,
@@ -90,10 +90,10 @@ TEST_CASE("kinchain.4")
 
 TEST_CASE("kinchain.5")
 {
-	rabbit::pose3<double> constants[2] = { rabbit::rot3<double>({0,0,1},M_PI/2), rabbit::mov3<double>({1,0,0}) };
-	rabbit::screw3<double> locsenses[1] = { {{0,0,1}, {0,0,0}} };
+	ralgo::pose3<double> constants[2] = { ralgo::rot3<double>({0,0,1},M_PI/2), ralgo::mov3<double>({1,0,0}) };
+	ralgo::screw3<double> locsenses[1] = { {{0,0,1}, {0,0,0}} };
 	double coords[1] = { M_PI/2 };
-	rabbit::screw3<double> outsenses[1];
+	ralgo::screw3<double> outsenses[1];
 
 	ralgo::kinematic_chain_sensivities(
 	    constants,
@@ -111,16 +111,16 @@ TEST_CASE("kinchain.5")
 
 TEST_CASE("kinchain.6")
 {
-	rabbit::pose3<double> constants[3] = { 
-		rabbit::mov3<double>({1,0,0}), 
-		rabbit::mov3<double>({1,0,0}), 
-		rabbit::mov3<double>({1,0,0}) 
+	ralgo::pose3<double> constants[3] = { 
+		ralgo::mov3<double>({1,0,0}), 
+		ralgo::mov3<double>({1,0,0}), 
+		ralgo::mov3<double>({1,0,0}) 
 	};
 	
-	rabbit::screw3<double> locsenses[2] = { {{0,0,1}, {0,0,0}}, {{0,0,1}, {0,0,0}} };
+	ralgo::screw3<double> locsenses[2] = { {{0,0,1}, {0,0,0}}, {{0,0,1}, {0,0,0}} };
 	
 	double coords[2] = { M_PI/4, M_PI/4 };
-	rabbit::screw3<double> outsenses[2];
+	ralgo::screw3<double> outsenses[2];
 
 	ralgo::kinematic_chain_sensivities(
 	    constants,

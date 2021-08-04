@@ -6,8 +6,9 @@
 namespace ralgo
 {
 	template <class T>
-	struct pose3
+	class pose3
 	{
+	public:
 		linalg::vec<T, 4> ang;
 		linalg::vec<T, 3> lin;
 
@@ -40,7 +41,8 @@ namespace ralgo
 		static
 		pose3 from_screw(const screw<T, 3> & scr);
 
-		//ssize_t print_to(nos::ostream& out) const;
+		static pose3<T> translation(linalg::vec<T, 3> vec);
+		static pose3<T> euler_rotation(linalg::vec<T, 3> vec);
 	};
 
 	template <class T>
@@ -50,7 +52,7 @@ namespace ralgo
 	pose3<T> mov3(linalg::vec<T, 3> vec);
 }
 
-
+using namespace ralgo;
 
 template <class T>
 ralgo::pose3<T> ralgo::rot3(linalg::vec<T, 3> vec, T angle)
@@ -161,12 +163,12 @@ ralgo::screw<T, 3> ralgo::pose3<T>::to_screw() const
 }
 
 template <class T>
-ralgo::pose3<T> ralgo::pose3<T>::from_screw(const ralgo::screw<T, 3> & scr) 
+ralgo::pose3<T> ralgo::pose3<T>::from_screw(const ralgo::screw<T, 3> & scr)
 {
 	auto angle = linalg::length(scr.ang);
 	auto axis = scr.ang / angle;
 
-	if (angle == 0) 
+	if (angle == 0)
 	{
 		axis = {0, 0, 0};
 	}
@@ -199,7 +201,20 @@ linalg::vec<T, 3> ralgo::pose3<T>::operator()(linalg::vec<T, 3> arg) const
 	return transform(arg);
 }
 
+template <class T>
+pose3<T> ralgo::pose3<T>::translation(linalg::vec<T, 3> vec)
+{
+	return {{}, vec};
+}
 
+template <class T>
+pose3<T> ralgo::pose3<T>::euler_rotation(linalg::vec<T, 3> vec)
+{
+	return 
+		pose3<T> {linalg::rotation_quat<T>({0, 0, 1}, vec.z), {}} * 
+		pose3<T> {linalg::rotation_quat<T>({0, 1, 0}, vec.y), {}} * 
+		pose3<T> {linalg::rotation_quat<T>({1, 0, 0}, vec.x), {}};
+}
 
 
 

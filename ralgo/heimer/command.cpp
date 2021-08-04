@@ -11,12 +11,15 @@
 
 #include <ralgo/heimer/axis_state.h>
 #include <ralgo/heimer/scalar_signal.h>
+#include <ralgo/heimer/dof6_signal.h>
 
 #include <ralgo/heimer/axisctr.h>
 #include <ralgo/heimer/axstate_linear_processor.h>
 #include <ralgo/heimer/axstate_sincos_processor.h>
 #include <ralgo/heimer/axis_stub_processor.h>
 #include <ralgo/heimer/axstate_pid_processor.h>
+#include <ralgo/heimer/dof6_controller.h>
+#include <ralgo/heimer/axstate_pose3_chain_processor.h>
 
 using namespace heimer;
 
@@ -119,7 +122,7 @@ int ctrnew(int argc, char ** argv, char * output, int maxsize)
 	{
 		if (argc < 2)
 		{
-			snprintf(output, maxsize, "usage: ctrnew axstub NAME\r\n");
+			snprintf(output, maxsize, "usage: ctrnew axpid NAME\r\n");
 			return -1;
 		}
 
@@ -127,7 +130,34 @@ int ctrnew(int argc, char ** argv, char * output, int maxsize)
 		return 0;
 	}
 
-	snprintf(output, maxsize, "Unresolved TYPE. Possible types: axisctr, axlinear, axsincos, axstub\r\n");
+	if (strcmp(argv[0], "chain3ctr") == 0)
+	{
+		if (argc < 3)
+		{
+			snprintf(output, maxsize, "usage: ctrnew chain3ctr DIM NAME\r\n");
+			return -1;
+		}
+
+		int dim = atoi32(argv[1], 10, NULL);
+		auto ptr = new heimer::axstate_pose3_chain_processor(argv[2], dim);
+		ptr->allocate_resources();
+		return 0;
+	}
+
+	if (strcmp(argv[0], "dof6ctr") == 0)
+	{
+		if (argc < 2)
+		{
+			snprintf(output, maxsize, "usage: ctrnew dof6ctr NAME\r\n");
+			return -1;
+		}
+
+		new heimer::dof6_controller(argv[1]);
+		return 0;
+	}
+
+	snprintf(output, maxsize, "Unresolved TYPE. Possible types: axisctr, axlinear, "
+		"axsincos, axstub, chain3ctr\r\n");
 	return -1;
 }
 
@@ -175,7 +205,17 @@ int signew(int argc, char ** argv, char * output, int maxsize)
 		return 0;
 	}
 
-	snprintf(output, maxsize, "Unresolved TYPE. Possible types: axstate\r\n");
+	if (strcmp(argv[0], "dof6state") == 0)
+	{
+		for (int i = 1; i < argc; ++i)
+		{
+			const char * name = argv[i];
+			new dof6_signal(name);
+		}
+		return 0;
+	}
+
+	snprintf(output, maxsize, "Unresolved TYPE. Possible types: axstate, scalar, dof6state\r\n");
 	return -1;
 }
 
