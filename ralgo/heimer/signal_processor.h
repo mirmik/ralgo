@@ -54,7 +54,7 @@ namespace heimer
 		virtual int serve(disctime_t time) = 0;
 
 		virtual int  command(int argc, char ** argv, char * output, int outmax);
-		virtual void deinit() = 0;
+		virtual void deinit();
 		virtual signal_head * iterate_left(signal_head *);
 		virtual signal_head * iterate_right(signal_head *);
 
