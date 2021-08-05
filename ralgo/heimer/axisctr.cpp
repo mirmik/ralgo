@@ -310,9 +310,9 @@ void axis_settings_init(axis_settings * settings)
 	settings->limits_enabled = 0;
 }
 
-float axis_controller::external_velocity() { return vel * ralgo::discrete_time_frequency(); }
-float axis_controller::external_acceleration() { return acc * ralgo::discrete_time_frequency() * ralgo::discrete_time_frequency(); }
-float axis_controller::external_decceleration() { return dcc * ralgo::discrete_time_frequency() * ralgo::discrete_time_frequency(); }
+float axis_controller::external_velocity() { return vel * discrete_time_frequency(); }
+float axis_controller::external_acceleration() { return acc * discrete_time_frequency() * discrete_time_frequency(); }
+float axis_controller::external_decceleration() { return dcc * discrete_time_frequency() * discrete_time_frequency(); }
 
 void axis_controller::collect_feedpos(position_t * pos)
 {

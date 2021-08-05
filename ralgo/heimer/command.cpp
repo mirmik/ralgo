@@ -9,7 +9,7 @@
 #include <igris/shell/rshell.h>
 #include <igris/dprint.h>
 
-#include <ralgo/heimer/axis_state.h>
+#include <ralgo/heimer/phase_signals.h>
 #include <ralgo/heimer/scalar_signal.h>
 #include <ralgo/heimer/dof6_signal.h>
 #include <ralgo/heimer/sigtypes.h>

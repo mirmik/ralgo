@@ -37,7 +37,7 @@ void execute_routine()
 	while(1) 
 	{
 		if (cancel_token) return;
-		executor->exec(ralgo::discrete_time());
+		executor->exec(discrete_time());
 		executor->notify();
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
@@ -124,7 +124,7 @@ int exec(const std::string & line)
 
 	if (igris::trim(line) == "time") 
 	{
-		nos::println(ralgo::discrete_time(), ralgo::discrete_time_frequency());
+		nos::println(discrete_time(), discrete_time_frequency());
 		return 0;
 	}
 

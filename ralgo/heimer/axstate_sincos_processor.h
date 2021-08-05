@@ -5,7 +5,7 @@
 
 #include <igris/compiler.h>
 #include <ralgo/heimer/axstate_signal_processor.h>
-#include <ralgo/heimer/axis_state.h>
+#include <ralgo/heimer/phase_signals.h>
 
 namespace heimer
 {
