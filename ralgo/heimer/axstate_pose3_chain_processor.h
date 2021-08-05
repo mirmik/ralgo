@@ -76,7 +76,7 @@ namespace heimer
 
 		void allocate_resources();
 
-		int on_deactivate(disctime_t time) override
+		int on_deactivate(disctime_t) override
 		{
 			deactivation_enabled = true;
 			return 1;
