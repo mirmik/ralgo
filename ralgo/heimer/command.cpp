@@ -131,7 +131,7 @@ int ctrnew(int argc, char ** argv, char * output, int maxsize)
 		return 0;
 	}
 
-	if (strcmp(argv[0], "chain3ctr") == 0)
+	if (strcmp(argv[0], "chain3linctr") == 0)
 	{
 		if (argc < 3)
 		{
@@ -140,7 +140,7 @@ int ctrnew(int argc, char ** argv, char * output, int maxsize)
 		}
 
 		int dim = atoi32(argv[1], 10, NULL);
-		auto ptr = new heimer::axstate_pose3_chain_processor(argv[2], dim);
+		auto ptr = new heimer::axstate_chain3_translation_processor(argv[2], dim);
 		ptr->allocate_resources();
 		return 0;
 	}
@@ -158,7 +158,7 @@ int ctrnew(int argc, char ** argv, char * output, int maxsize)
 	}
 
 	snprintf(output, maxsize, "Unresolved TYPE. Possible types: axisctr, axlinear, "
-		"axsincos, axstub, chain3ctr\r\n");
+		"axsincos, axstub, chain3linctr\r\n");
 	return -1;
 }
 

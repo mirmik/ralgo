@@ -16,6 +16,17 @@ namespace ralgo
 		pose3(const linalg::vec<T, 4>& q, const linalg::vec<T, 3>& l);
 		pose3(const ralgo::screw<T, 3>& scr);
 
+		pose3(const ralgo::pose3<T>& oth) :
+			ang(oth.ang), lin(oth.lin)
+		{}
+
+		pose3 & operator=(const ralgo::pose3<T>& oth) 
+		{
+			ang = oth.ang;
+			lin = oth.lin;
+			return * this;
+		}
+
 		linalg::vec<T, 3> rotate(linalg::vec<T, 3> vec) const;
 		linalg::vec<T, 3> transform(linalg::vec<T, 3> vec) const;
 		linalg::vec<T, 3> rotate_vector(linalg::vec<T, 3> vec) const;
@@ -26,6 +37,9 @@ namespace ralgo
 		linalg::vec<T, 3> ydir() const;
 		linalg::vec<T, 3> zdir() const;
 
+
+		// |A a||B b| = |AB Ab+a|
+		// |0 1||0 1|   | 0    1|
 		pose3 operator * (const pose3& oth);
 		pose3& operator *= (const pose3& oth);
 
@@ -204,7 +218,7 @@ linalg::vec<T, 3> ralgo::pose3<T>::operator()(linalg::vec<T, 3> arg) const
 template <class T>
 pose3<T> ralgo::pose3<T>::translation(linalg::vec<T, 3> vec)
 {
-	return {{}, vec};
+	return {{0,0,0,1}, vec};
 }
 
 template <class T>
@@ -217,6 +231,17 @@ pose3<T> ralgo::pose3<T>::euler_rotation(linalg::vec<T, 3> vec)
 }
 
 
+
+namespace ralgo 
+{
+	using linalg::ostream_overloads::operator<<;
+
+	template<class T>
+	std::ostream & operator<<(std::ostream & os, const pose3<T>& pose) 
+	{
+		return os << "{ang:" << pose.ang << ",lin:" << pose.lin << "}";
+	}
+}
 
 
 #endif
