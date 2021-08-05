@@ -1,6 +1,6 @@
 #include <doctest/doctest.h>
 #include <ralgo/heimer/executor.h>
-#include <ralgo/heimer/axis_state.h>
+#include <ralgo/heimer/phase_signals.h>
 #include <ralgo/heimer/axis_stub_processor.h>
 #include <ralgo/heimer/axisctr.h>
 #include <ralgo/heimer/command.h>

@@ -3,7 +3,7 @@
 
 #include <ralgo/heimer/axstate_signal_processor.h>
 #include <ralgo/heimer/dof6_signal.h>
-#include <ralgo/heimer/axis_state.h>
+#include <ralgo/heimer/phase_signals.h>
 
 #include <ralgo/space/pose3.h>
 #include <ralgo/space/screw.h>

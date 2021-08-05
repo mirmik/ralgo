@@ -2,7 +2,7 @@
 #define RALGO_HEIMER_STEPCTR_APPLIER
 
 #include <ralgo/heimer/stepctr.h>
-#include <ralgo/heimer/axis_state.h>
+#include <ralgo/heimer/phase_signals.h>
 #include <ralgo/heimer/signal_processor.h>
 
 namespace heimer

@@ -2,7 +2,7 @@
 #define RALGO_HEIMER2_AXISCTR_H
 
 #include <ralgo/heimer/axisctr_approval.h>
-#include <ralgo/heimer/axis_state.h>
+#include <ralgo/heimer/phase_signals.h>
 #include <ralgo/trajectory/linetraj.h>
 #include <ralgo/disctime.h>
 

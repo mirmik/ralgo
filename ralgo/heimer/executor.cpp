@@ -1,6 +1,6 @@
 #include <ralgo/heimer/executor.h>
 #include <ralgo/heimer/signal.h>
-#include <ralgo/heimer/axis_state.h>
+#include <ralgo/heimer/phase_signals.h>
 #include <ralgo/heimer/sigtypes.h>
 #include <ralgo/log.h>
 

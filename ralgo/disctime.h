@@ -19,7 +19,7 @@ __END_DECLS
 
 #endif
 
-#ifdef __cplusplus
+/*#ifdef __cplusplus
 
 namespace ralgo
 {
@@ -32,6 +32,6 @@ namespace ralgo
 	}
 }
 
-#endif
+#endif*/
 
 #endif
