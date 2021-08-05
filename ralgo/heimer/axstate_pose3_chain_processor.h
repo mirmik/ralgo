@@ -80,7 +80,7 @@ namespace heimer
 	class axstate_chain3_translation_processor : public axstate_chain3_processor
 	{
 		heimer::phase_signal<3> * rightside;
-		double  compensation_koeff = 0.01;
+		double  compensation_koeff = 0.1;
 
 	public:
 		axstate_chain3_translation_processor(const char * name, int leftdim)
@@ -126,6 +126,9 @@ namespace heimer
 
 			svd.solve(T, R);
 
+			//PRINT(A);
+			//PRINT(T);
+			//PRINT(R);
 
 			for (int i = 0; i < leftdim(); ++i) 
 			{

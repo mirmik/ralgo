@@ -158,11 +158,20 @@ int main(int argc, char ** argv)
 {
 	signal(SIGINT, &sigint_handler);
 	crowaddr = crow::crowker_address();
+	if (crowaddr.size() == 0) 
+	{
+		nos::println("Crowker address has zero size");
+		exit(0);
+	}
 
 	igris::cliopts cli;
 	cli.add_option("debug", 'd');
+	cli.add_option("crowdiag", 'D');
 	cli.add_string("script", 's', "");
 	cli.parse(argc, argv);
+
+	if (cli.get_option("crowdiag"))
+		crow::diagnostic_setup(true, false);
 
 	DEBUG = cli.get_option("debug");
 	auto script_path = cli.get_string("script").unwrap();
@@ -189,6 +198,7 @@ int main(int argc, char ** argv)
 			int sts = exec(str);
 			if (sts) 
 			{
+				nos::println();
 				exit(0);
 			}
 		}

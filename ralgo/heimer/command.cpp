@@ -21,6 +21,7 @@
 #include <ralgo/heimer/axstate_pid_processor.h>
 #include <ralgo/heimer/dof6_controller.h>
 #include <ralgo/heimer/axstate_pose3_chain_processor.h>
+#include <ralgo/heimer/phase_mux_processor.h>
 
 using namespace heimer;
 
@@ -157,8 +158,28 @@ int ctrnew(int argc, char ** argv, char * output, int maxsize)
 		return 0;
 	}
 
+	if (strcmp(argv[0], "axmuxctr") == 0)
+	{
+		if (argc < 3)
+		{
+			snprintf(output, maxsize, "usage: ctrnew axmuxctr DIM NAME\r\n");
+			return -1;
+		}
+
+		int dim = atoi(argv[1]);
+		const char * name = argv[2];
+
+		if (dim==2)
+		   new phase_mux_processor<2>(name);
+
+		if (dim==3)
+		   new phase_mux_processor<3>(name);
+
+		return 0;
+	}
+
 	snprintf(output, maxsize, "Unresolved TYPE. Possible types: axisctr, axlinear, "
-		"axsincos, axstub, chain3linctr\r\n");
+		"axsincos, axstub, chain3linctr, axmuxctr\r\n");
 	return -1;
 }
 
@@ -216,6 +237,23 @@ int signew(int argc, char ** argv, char * output, int maxsize)
 		return 0;
 	}
 
+	if (strcmp(argv[0], "axphase") == 0)
+	{
+		int dim = atoi(argv[1]);
+
+		for (int i = 2; i < argc; ++i)
+		{
+			const char * name = argv[i];
+			
+			if (dim == 2)
+				new phase_signal<2>(name);
+
+			if (dim == 3)
+				new phase_signal<3>(name);
+		}
+		return 0;
+	}
+
 	/*if (strcmp(argv[0], "datasig") == 0)
 	{
 		char * type = argv[1];
@@ -234,7 +272,7 @@ int signew(int argc, char ** argv, char * output, int maxsize)
 		return 0;
 	}*/
 
-	snprintf(output, maxsize, "Unresolved TYPE. Possible types: axstate, scalar, dof6state\r\n");
+	snprintf(output, maxsize, "Unresolved TYPE. Possible types: axstate, scalar, dof6state, axphase\r\n");
 	return -1;
 }
 
