@@ -2,7 +2,7 @@
 #include <ralgo/heimer/sigtypes.h>
 
 heimer::axis_stub_processor::axis_stub_processor(const char* name)
-	: signal_processor(name, 1, 0)
+	: signal_processor(name, 0, 1)
 {
 
 }
@@ -17,9 +17,6 @@ int heimer::axis_stub_processor::feedback(disctime_t)
 
 int heimer::axis_stub_processor::serve(disctime_t time)
 {
-	if (_axstate == nullptr || !is_active())
-		return SIGNAL_PROCESSOR_RETURN_NOT_ACTIVE;
-
 	pos = _axstate->ctrpos;
 	vel = _axstate->ctrvel;
 
@@ -79,6 +76,12 @@ int heimer::axis_stub_processor::command(int argc, char ** argv, char * output, 
 	if (strcmp("info", argv[0]) == 0)
 		status = ::info(this, argc - 1, argv + 1, output, outmax);
 
+	if (strcmp("applyspeed", argv[0]) == 0) 
+	{
+		apply_speed_mode(true);
+		status = 0;
+	}
+	
 	return status;
 }
 

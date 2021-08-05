@@ -5,7 +5,9 @@ using namespace heimer;
 
 axstate_chain3_processor::axstate_chain3_processor(const char * name, int leftdim)
 	: signal_processor(name, leftdim, 1)
-{}
+{
+	//set_need_activation(1);
+}
 
 ralgo::pose3<position_t> axstate_chain3_processor::evaluate_target_position()
 {
@@ -199,5 +201,5 @@ void axstate_chain3_processor::set_sensivity(int i, float a, float b, float c, f
 	ralgo::screw3<double> * sensivity;
 	sensivity = &settings[i].local_sensivity;
 
-	*sensivity = {{a, b, c}, {d, e, f}};
+	*sensivity = {{d, e, f}, {a, b, c}};
 }

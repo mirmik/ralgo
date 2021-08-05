@@ -5,7 +5,7 @@
 //   stub_b ----------b----------------------- |            |
 //                        |   |   |   |        |            |
 //   stub_c --------------c------------------- |            |
-//                            |   |   |        |  chainctr  | --------- P ------- posectr 
+//                            |   |   |        |  chainctr  | ------- P ------ mulctr 
 //   stub_d ------------------d--------------- |            |
 //                                |   |        |            |
 //   stub_e ----------------------e----------- |            |
@@ -13,12 +13,23 @@
 //   stub_f --------------------------d------- |            |
 
 
-signew axstate a b c d e f
-signew dof6state P
+//                    ---- x ---- xctr
+//                   /
+//                  / 
+//   P ------ mulctr ----- y ---- yctr
+//                  \
+//                   \
+//                    ---- z ---- zctr
+
+
+signew axstate a b c d e f 
+signew axstate x y z
+signew axphase 3 P
 
 ctrnew axstub stub_a stub_b stub_c stub_d stub_e stub_f
-ctrnew chain3ctr 6 chainctr
-ctrnew dof6ctr posectr
+ctrnew axisctr 1 xctr yctr zctr
+ctrnew chain3linctr 3 chainctr
+ctrnew axmuxctr 3 muxctr
 
 // Кинематическая цепь задана выражением
 // P_0^6 = C0 W0(x0) C1 W1(x1) C2 W2(x2) C3 W3(x3) C4 W4(x4) C5 W5(x5) C6
@@ -29,20 +40,20 @@ ctr chainctr setconstant 0  0 0 0  0 0 0
 ctr chainctr setconstant 1  0 0 0  0 0 0
 ctr chainctr setconstant 2  0 0 0  0 0 0
 ctr chainctr setconstant 3  0 0 0  0 0 0
-ctr chainctr setconstant 4  0 0 0  0 0 0
-ctr chainctr setconstant 5  0 0 0  0 0 0
-ctr chainctr setconstant 6  0 0 0  0 0 0
+//ctr chainctr setconstant 4  10 0 0  0 0 0
+//ctr chainctr setconstant 5  10 0 0  0 0 0
+//ctr chainctr setconstant 6  10 0 0  0 0 0
 
 // Format : x y z roll pitch yaw
 // Sensivities count : dim
-ctr chainctr setsensivity 0  0 0 0  0 0 0
-ctr chainctr setsensivity 1  0 0 0  0 0 0
-ctr chainctr setsensivity 2  0 0 0  0 0 0
-ctr chainctr setsensivity 3  0 0 0  0 0 0
-ctr chainctr setsensivity 4  0 0 0  0 0 0
-ctr chainctr setsensivity 5  0 0 0  0 0 0
+ctr chainctr setsensivity 0  1 0 0  0 0 0
+ctr chainctr setsensivity 1  0 1 0  0 0 0
+ctr chainctr setsensivity 2  0 0 1  0 0 0
+//ctr chainctr setsensivity 3  0 0 0  1 0 0
+//ctr chainctr setsensivity 4  0 0 0  0 1 0
+//ctr chainctr setsensivity 5  0 0 0  0 0 1
 
-ctr chainctr bindleft a b c d e f
+ctr chainctr bindleft a b c
 ctr chainctr bindright P
 
 ctr stub_a bind a
@@ -52,8 +63,30 @@ ctr stub_d bind d
 ctr stub_e bind e
 ctr stub_f bind f
 
-ctr posectr bindleft P
-ctr posectr setvel 3
-ctr posectr setacc 3
+ctr stub_a applyspeed
+ctr stub_b applyspeed
+ctr stub_c applyspeed
+ctr stub_d applyspeed
+ctr stub_e applyspeed
+ctr stub_f applyspeed
+
+ctr muxctr bindleft P
+ctr muxctr bindright x y z
+
+ctr xctr bind x
+ctr yctr bind y
+ctr zctr bind z
+
+ctr xctr setvel 5
+ctr xctr setacc 2 2
+ctr xctr setgain 10
+
+ctr yctr setvel 5
+ctr yctr setacc 2 2
+ctr yctr setgain 10
+
+ctr zctr setvel 5
+ctr zctr setacc 2 2
+ctr zctr setgain 10
 
 start
