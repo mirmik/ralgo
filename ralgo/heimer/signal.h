@@ -62,6 +62,20 @@ namespace heimer
 	int signals_count();
 	void signal_head_list_reinit();
 	signal_head * signal_get_by_name(const char * name);
+
+
+
+	class datasignal : public signal_head
+	{
+	public:
+		int info(char * buffer, int maxsize) override { return 0; }
+
+		datasignal(char * name, uint8_t type, int size);
+		int size;
+		char data[];
+	};
+
+
 }
 
 
