@@ -22,11 +22,6 @@ ralgo::screw3<position_t> axstate_chain3_processor::evaluate_position_error()
 	return {};
 }
 
-int axstate_chain3_processor::serve(disctime_t)
-{
-	return 0;
-}
-
 static inline
 int info(axstate_chain3_processor * axctr, int, char **, char * output, int outmax)
 {
@@ -128,34 +123,40 @@ void axstate_chain3_processor::backpack(ralgo::screw3<double> *)
 
 }
 
-int axstate_chain3_processor::feedback(disctime_t)
+void axstate_chain3_processor::evaluate_feedback() 
 {
 	ralgo::pose3<position_t> pose;
-	for (int i = 0; i < leftdim(); ++i)
-	{
-		pose = pose * settings[i].constant_transform;
-		temporary[i].leftmatrix = pose;
-		pose = pose * ralgo::pose3<position_t>::from_screw(settings[i].local_sensivity * leftax(i)->feedpos);
-	}
-	feedback_position = pose * last_constant_transform;
-
-	pose = last_constant_transform;
 	for (int i = leftdim() - 1; i >= 0 ; --i)
 	{
-		pose = ralgo::pose3<position_t>::from_screw(settings[i].local_sensivity * leftax(i)->feedpos) * pose;
-		temporary[i].rightmatrix = pose;
-		pose = settings[i].constant_transform * pose;
+		auto W = ralgo::pose3<position_t>::from_screw(settings[i].local_sensivity * leftax(i)->feedpos);
+		auto C = settings[i].constant_transform;
+
+		pose = pose * W * C;
+		temporary[i].result_screw = settings[i].local_sensivity.kinematic_carry(pose);
 	}
 
-	ralgo::screw3<velocity_t> velscr = {};
+	pose = first_constant_transform;
 	for (int i = 0; i < leftdim(); ++i)
 	{
-		velscr +=
-		    settings[i].local_sensivity.kinematic_carry(temporary[i].leftmatrix)
-		    * leftax(i)->feedvel;
+		temporary[i].result_screw = pose.rotate_screw(temporary[i].result_screw);
+		auto W = ralgo::pose3<position_t>::from_screw(settings[i].local_sensivity * leftax(i)->feedpos);
+		auto C = settings[i].constant_transform;
+		pose = pose * W * C;
 	}
+	feedback_position = pose;
 
-	feedback_output();
+	feedback_velocity = {};
+	for (int i = 0; i < leftdim(); ++i)
+	{
+		feedback_velocity +=
+			temporary[i].result_screw * leftax(i)->feedvel;
+	}
+}
+
+int axstate_chain3_processor::feedback(disctime_t)
+{
+	evaluate_feedback();
+	feedback_output(feedback_position, feedback_velocity);
 	return 0;
 }
 
@@ -177,14 +178,14 @@ void axstate_chain3_processor::set_constant(int i, float a, float b, float c, fl
 {
 	ralgo::pose3<double> * constant;
 
-	if (i == leftdim() - 1)
+	if (i == 0)
 	{
-		constant = &last_constant_transform;
+		constant = &first_constant_transform;
 	}
 
 	else
 	{
-		constant = &settings[i].constant_transform;
+		constant = &settings[i-1].constant_transform;
 	}
 
 	*constant =
