@@ -52,9 +52,24 @@ namespace heimer
 	using velscr3 = ralgo::screw3<velocity_t>;
 
 	PHASE_SIGNAL_CLASS(axis_state, position_t, velocity_t, SIGNAL_TYPE_AXIS_STATE)
-	PHASE_SIGNAL_CLASS(phase3_state, posvec3, velvec3, SIGNAL_TYPE_PHASE3)
-	PHASE_SIGNAL_CLASS(phase2_state, posvec2, velvec2, SIGNAL_TYPE_PHASE2)
 	//PHASE_SIGNAL_CLASS(dof6_state, pospose3, velscr3, SIGNAL_TYPE_DOF6)
+
+	template <int Dim>
+	class phase_signal : public phase_signal_base<
+		linalg::vec<position_t, Dim>,
+		linalg::vec<velocity_t, Dim>>
+	{
+	public:
+		phase_signal(const char * name) : 
+			phase_signal_base<
+				linalg::vec<position_t, Dim>, 
+				linalg::vec<velocity_t, Dim>
+			>(name, SIGNAL_TYPE_PHASE_SIGNAL_BASE+Dim-1) {};
+	};
+
+	using phase2_state = phase_signal<2>;
+	using phase3_state = phase_signal<3>;
+	using phase4_state = phase_signal<4>;
 }
 
 #endif
