@@ -12,6 +12,7 @@
 #include <ralgo/heimer/axis_state.h>
 #include <ralgo/heimer/scalar_signal.h>
 #include <ralgo/heimer/dof6_signal.h>
+#include <ralgo/heimer/sigtypes.h>
 
 #include <ralgo/heimer/axisctr.h>
 #include <ralgo/heimer/axstate_linear_processor.h>
@@ -215,7 +216,25 @@ int signew(int argc, char ** argv, char * output, int maxsize)
 		return 0;
 	}
 
-	snprintf(output, maxsize, "Unresolved TYPE. Possible types: axstate, scalar, dof6state\r\n");
+	if (strcmp(argv[0], "datasig") == 0)
+	{
+		char * type = argv[1];
+		int size = atoi(argv[2]);
+
+		bool is_float = strcmp(type, "float") == 0;
+		int elsize = is_float ? 4 : 8;
+		int sigtype = is_float ? SIGNAL_TYPE_DATASIG_FLOAT : SIGNAL_TYPE_DATASIG_DOUBLE; 
+		int datasize = elsize * size;
+
+		for (int i = 3; i < argc; ++i)
+		{
+			void * ptr = malloc(datasize + sizeof(heimer::datasignal));
+			new (ptr) heimer::datasignal(argv[i], sigtype, datasize);
+		}
+		return 0;
+	}
+
+	snprintf(output, maxsize, "Unresolved TYPE. Possible types: axstate, scalar, dof6state, datasig\r\n");
 	return -1;
 }
 

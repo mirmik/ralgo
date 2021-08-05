@@ -25,7 +25,7 @@ void signal_head::deinit()
 	dlist_del(&list_lnk);
 }
 
-int signal_head::attach_listener(signal_processor * proc) 
+int signal_head::attach_listener(signal_processor * proc)
 {
 	if (listener)
 		return -1;
@@ -36,23 +36,23 @@ int signal_head::attach_listener(signal_processor * proc)
 	return 0;
 }
 
-void signal_head::attach_possible_controller(signal_processor *) 
+void signal_head::attach_possible_controller(signal_processor *)
 {
 	refs++;
 }
 
-int signal_head::deattach_listener(signal_processor * proc) 
+int signal_head::deattach_listener(signal_processor * proc)
 {
 	if (listener != proc)
 		return -1;
 
 	listener = nullptr;
 	refs--;
-	
+
 	return 0;
 }
 
-void signal_head::deattach_possible_controller(signal_processor *) 
+void signal_head::deattach_possible_controller(signal_processor *)
 {
 	refs--;
 }
@@ -92,16 +92,16 @@ int signal_head::command_v(int argc, char ** argv, char * output, int maxsize)
 
 int signal_head::activate(struct signal_processor * proc, disctime_t tim)
 {
-	if (current_controller) 
+	if (current_controller)
 	{
-		// Если это вторичная попытка активации того же контроллера, передаём, что продолжаем работу штатно. 
-		if (current_controller == proc) 
+		// Если это вторичная попытка активации того же контроллера, передаём, что продолжаем работу штатно.
+		if (current_controller == proc)
 		{
 			ralgo::warn("signal is reactivated from curcontroller name: ", name);
 			return 0;
 		}
 
-		// Но, если это другой контрорллер, отдаём отказ. 
+		// Но, если это другой контрорллер, отдаём отказ.
 		else
 			return -1;
 	}
@@ -119,7 +119,7 @@ int signal_head::deactivate(struct signal_processor * proc)
 		return -1;
 
 	current_controller = NULL;
-	
+
 	if (listener)
 	{
 		return listener->deactivate();
@@ -128,7 +128,14 @@ int signal_head::deactivate(struct signal_processor * proc)
 	return 0;
 }
 
-signal_head::signal_head(const char * name, uint8_t type) 
+signal_head::signal_head(const char * name, uint8_t type)
 {
 	init(name, type);
+}
+
+
+datasignal::datasignal(char * name, uint8_t type, int size)
+	: signal_head(name, type)
+{
+	this->size = size; 
 }
