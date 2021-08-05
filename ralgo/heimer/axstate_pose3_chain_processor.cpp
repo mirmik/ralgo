@@ -3,81 +3,39 @@
 
 using namespace heimer;
 
-axstate_pose3_chain_processor::axstate_pose3_chain_processor(const char * name, int leftdim)
+axstate_chain3_processor::axstate_chain3_processor(const char * name, int leftdim)
 	: signal_processor(name, leftdim, 1)
 {}
 
-ralgo::pose3<position_t> axstate_pose3_chain_processor::evaluate_target_position()
+ralgo::pose3<position_t> axstate_chain3_processor::evaluate_target_position()
 {
 	return {};
 }
 
-ralgo::screw3<position_t> axstate_pose3_chain_processor::evaluate_target_velocity()
+ralgo::screw3<position_t> axstate_chain3_processor::evaluate_target_velocity()
 {
 	return {};
 }
 
-ralgo::screw3<position_t> axstate_pose3_chain_processor::evaluate_position_error()
+ralgo::screw3<position_t> axstate_chain3_processor::evaluate_position_error()
 {
 	return {};
 }
 
-int axstate_pose3_chain_processor::feedback(disctime_t)
-{
-	return 0;
-}
-
-int axstate_pose3_chain_processor::serve(disctime_t)
+int axstate_chain3_processor::serve(disctime_t)
 {
 	return 0;
 }
 
 static inline
-int bindleft(axstate_pose3_chain_processor * axctr, int argc, char ** argv, char * output, int outmax)
-{
-	if (argc != axctr->leftdim())
-	{
-		snprintf(output, outmax, "Can't bind %d symbols for %d _dim axisctr", argc, axctr->leftdim());
-		return -1;
-	}
-
-	{
-		axis_state * arr[argc];
-
-		for (int i = 0; i < argc; ++i)
-		{
-			signal_head * sig = signal_get_by_name(argv[i]);
-
-			if (!sig)
-			{
-				snprintf(output, outmax, "Wrong signal name '%s ' (type 'siglist' for display)", argv[i]);
-				return -1;
-			}
-
-			if (sig->type != SIGNAL_TYPE_AXIS_STATE)
-			{
-				snprintf(output, outmax, "Wrong signal type. name:(%s)", sig->name);
-				return -1;
-			}
-
-			arr[i] = static_cast<axis_state *>(sig);
-		}
-
-		axctr->set_leftside(arr);
-	}
-
-	return 0;
-}
-
-static inline
-int info(axstate_pose3_chain_processor * axctr, int, char **, char * output, int outmax)
+int info(axstate_chain3_processor * axctr, int, char **, char * output, int outmax)
 {
 	snprintf(output, outmax, "is_active: %d\r\n", axctr->is_active());
 	return 0;
 }
 
 static inline
-int setconstant(axstate_pose3_chain_processor * axctr, int argc, char ** argv, char * output, int outmax)
+int setconstant(axstate_chain3_processor * axctr, int argc, char ** argv, char * output, int outmax)
 {
 	if (argc != 7)
 	{
@@ -99,7 +57,7 @@ int setconstant(axstate_pose3_chain_processor * axctr, int argc, char ** argv, c
 }
 
 static inline
-int setsensivity(axstate_pose3_chain_processor * axctr, int argc, char ** argv, char * output, int outmax)
+int setsensivity(axstate_chain3_processor * axctr, int argc, char ** argv, char * output, int outmax)
 {
 	if (argc != 7)
 	{
@@ -120,7 +78,7 @@ int setsensivity(axstate_pose3_chain_processor * axctr, int argc, char ** argv, 
 	return 0;
 }
 
-int axstate_pose3_chain_processor::command(int argc, char ** argv, char * output, int outmax)
+int axstate_chain3_processor::command(int argc, char ** argv, char * output, int outmax)
 {
 	int status = ENOENT;
 
@@ -139,7 +97,7 @@ int axstate_pose3_chain_processor::command(int argc, char ** argv, char * output
 	return signal_processor::command(argc, argv, output, outmax);
 }
 
-void axstate_pose3_chain_processor::deinit()
+void axstate_chain3_processor::deinit()
 {
 	release_signals();
 
@@ -150,39 +108,58 @@ void axstate_pose3_chain_processor::deinit()
 		delete[] temporary;
 }
 
-void axstate_pose3_chain_processor::on_activate(disctime_t)
+void axstate_chain3_processor::on_activate(disctime_t)
 {
 
 }
 
-void axstate_pose3_chain_processor::evaluate_error()
+void axstate_chain3_processor::evaluate_error()
 {
 
 }
 
-void axstate_pose3_chain_processor::evaluate_output_sensivities(ralgo::screw3<double> *)
+void axstate_chain3_processor::evaluate_output_sensivities(ralgo::screw3<double> *)
 {
 
 }
 
-void axstate_pose3_chain_processor::backpack(ralgo::screw3<double> *)
+void axstate_chain3_processor::backpack(ralgo::screw3<double> *)
 {
 
 }
 
-ralgo::pose3<position_t> axstate_pose3_chain_processor::evaluate_feedback_position()
+int axstate_chain3_processor::feedback(disctime_t)
 {
 	ralgo::pose3<position_t> pose;
 	for (int i = 0; i < leftdim(); ++i)
 	{
-		pose *= settings[i].constant_transform;
-		pose *= ralgo::pose3<position_t>::from_screw(settings[i].local_sensivity * leftax(i)->feedpos);
+		pose = pose * settings[i].constant_transform;
+		temporary[i].leftmatrix = pose;
+		pose = pose * ralgo::pose3<position_t>::from_screw(settings[i].local_sensivity * leftax(i)->feedpos);
 	}
-	pose *= last_constant_transform;
-	return pose;
+	feedback_position = pose * last_constant_transform;
+
+	pose = last_constant_transform;
+	for (int i = leftdim() - 1; i >= 0 ; --i)
+	{
+		pose = ralgo::pose3<position_t>::from_screw(settings[i].local_sensivity * leftax(i)->feedpos) * pose;
+		temporary[i].rightmatrix = pose;
+		pose = settings[i].constant_transform * pose;
+	}
+
+	ralgo::screw3<velocity_t> velscr = {};
+	for (int i = 0; i < leftdim(); ++i)
+	{
+		velscr +=
+		    settings[i].local_sensivity.kinematic_carry(temporary[i].leftmatrix)
+		    * leftax(i)->feedvel;
+	}
+
+	feedback_output();
+	return 0;
 }
 
-void axstate_pose3_chain_processor::allocate_resources()
+void axstate_chain3_processor::allocate_resources()
 {
 	int dim = leftdim();
 	set_dynamic_resources_flag(true);
@@ -191,52 +168,35 @@ void axstate_pose3_chain_processor::allocate_resources()
 	temporary = new axstate_pose3_chain_temporary[dim];
 }
 
-axis_state * axstate_pose3_chain_processor::leftax(int i)
+axis_state * axstate_chain3_processor::leftax(int i)
 {
 	return settings[i].controlled;
 }
 
-void axstate_pose3_chain_processor::set_leftside(axis_state ** arr)
-{
-	for (int i = 0; i < leftdim(); ++i)
-	{
-		settings[i].controlled = arr[i];
-	}
-}
-
-void axstate_pose3_chain_processor::set_constant(int i, float a, float b, float c, float d, float e, float f)
+void axstate_chain3_processor::set_constant(int i, float a, float b, float c, float d, float e, float f)
 {
 	ralgo::pose3<double> * constant;
 
-	if (i == 0)
+	if (i == leftdim() - 1)
 	{
 		constant = &last_constant_transform;
 	}
 
 	else
 	{
-		constant = &settings[i - 1].constant_transform;
+		constant = &settings[i].constant_transform;
 	}
 
 	*constant =
-	    ralgo::pose3<double>::translation({a, b, c});
-	ralgo::pose3<double>::euler_rotation({d, e, f});
+	    ralgo::pose3<double>::translation({a, b, c}) *
+	    ralgo::pose3<double>::euler_rotation({d, e, f});
 }
 
 
-void axstate_pose3_chain_processor::set_sensivity(int i, float a, float b, float c, float d, float e, float f)
+void axstate_chain3_processor::set_sensivity(int i, float a, float b, float c, float d, float e, float f)
 {
 	ralgo::screw3<double> * sensivity;
 	sensivity = &settings[i].local_sensivity;
 
 	*sensivity = {{a, b, c}, {d, e, f}};
 }
-
-int axstate_pose3_chain_processor::leftsigtype(int) { return SIGNAL_TYPE_AXIS_STATE; }
-int axstate_pose3_chain_processor::rightsigtype(int) { return SIGNAL_TYPE_DOF6; }
-
-signal_head * axstate_pose3_chain_processor::leftsig(int i) { return settings[i].controlled; }
-signal_head * axstate_pose3_chain_processor::rightsig(int) { return rightside; }
-
-void axstate_pose3_chain_processor::set_leftsig(int i, signal_head * sig) { settings[i].controlled = static_cast<axis_state*>(sig); }
-void axstate_pose3_chain_processor::set_rightsig(int, signal_head * sig) { rightside = static_cast<dof6_signal*>(sig) ; }
