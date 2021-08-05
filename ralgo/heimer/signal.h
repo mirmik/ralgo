@@ -44,6 +44,7 @@ namespace heimer
 		signal_head(const char * name, uint8_t type);
 
 		virtual int info(char * buffer, int maxsize) = 0;
+		int ctrinfo(char * buffer, int maxsize);
 
 		void init(const char * name, uint8_t type);
 		void deinit();
@@ -65,15 +66,15 @@ namespace heimer
 
 
 
-	class datasignal : public signal_head
+	/*class datasignal : public signal_head
 	{
 	public:
-		int info(char * buffer, int maxsize) override { return 0; }
+		int info(char * , int) override { return 0; }
 
 		datasignal(char * name, uint8_t type, int size);
 		int size;
 		char data[];
-	};
+	};*/
 
 
 }

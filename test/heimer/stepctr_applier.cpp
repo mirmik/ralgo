@@ -5,5 +5,5 @@ using namespace heimer;
 
 TEST_CASE("stepctr_applier") 
 {
-	struct stepctr_applier applier;	
+	//struct stepctr_applier applier;	
 }

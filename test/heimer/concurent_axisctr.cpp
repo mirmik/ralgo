@@ -19,18 +19,13 @@ TEST_CASE("axisctr_concurent")
 	int sts;
 	double tgt;
 
-	struct axis_state state;
+	struct axis_state state("state");
 
 	struct axis_settings settings0;
-	struct axis_controller axctr0;
+	struct axis_controller axctr0("axctr0", &settings0, 1);
 
 	struct axis_settings settings1;
-	struct axis_controller axctr1;
-
-	state.init("state");
-
-	axctr0.init("axctr0", &settings0, 1);
-	axctr1.init("axctr1", &settings1, 1);
+	struct axis_controller axctr1("axctr1", &settings1, 1);
 	
 	axctr0.set_handlers(nullptr, nullptr, finish_handler);
 	axctr1.set_handlers(nullptr, nullptr, finish_handler);

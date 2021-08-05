@@ -10,7 +10,7 @@ using namespace heimer;
 
 int axstate_linear_processor::serve(disctime_t)
 {
-	for (int i = 0; i < leftdim(); ++i)
+	for (int i = 0; i < dim(); ++i)
 	{
 		position_t accpos = 0;
 		velocity_t accvel = 0;
@@ -129,19 +129,16 @@ int  axstate_linear_processor::command(int argc, char ** argv, char * output, in
 {
 	int status = ENOENT;
 
-	if (strcmp("bindleft", argv[0]) == 0)
-		status = heimer::axstate_signal_processor_bindleft(this, argc - 1, argv + 1, output, outmax);
-
-	if (strcmp("bindright", argv[0]) == 0)
-		status = heimer::axstate_signal_processor_bindright(this, argc - 1, argv + 1, output, outmax);
-
 	if (strcmp("matrix", argv[0]) == 0)
 		status = ::matrix(this, argc - 1, argv + 1, output, outmax);
 
 	if (strcmp("info", argv[0]) == 0)
 		status = info(this, argc - 1, argv + 1, output, outmax);
 
-	return status;
+	if (status != ENOENT)
+		return status;
+
+	return signal_processor::command(argc, argv, output, outmax);
 }
 
 void axstate_linear_processor::deinit()
@@ -180,10 +177,9 @@ heimer::axstate_linear_processor::axstate_linear_processor(const char * name, in
 	this->invert_matrix = invert_matrix;
 }
 
-int heimer::axstate_linear_processor::dim()
-{
-	return leftdim();
-}
+heimer::axstate_linear_processor::axstate_linear_processor(const char * name, int dim)
+	: axstate_linear_processor(name, dim, nullptr, nullptr, nullptr, nullptr)	
+{}
 
 void heimer::axstate_linear_processor::allocate_resources()
 {

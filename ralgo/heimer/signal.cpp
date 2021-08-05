@@ -4,6 +4,8 @@
 #include <igris/shell/rshell.h>
 #include <string.h>
 
+#include <nos/fprint.h>
+
 #include <igris/datastruct/nametbl.h>
 
 using namespace heimer;
@@ -86,7 +88,19 @@ int signal_head::command_v(int argc, char ** argv, char * output, int maxsize)
 	if (strcmp(opsname, "info") == 0)
 		return info(output, maxsize);
 
+	if (strcmp(opsname, "ctrinfo") == 0)
+		return ctrinfo(output, maxsize);
+
 	return ENOENT;
+}
+
+int signal_head::ctrinfo(char * buffer, int) 
+{
+	const char * lname = listener ? listener->name().data() : "(null)"; 
+	const char * cname = current_controller ? current_controller->name().data() : "(null)";
+
+	nos::format_buffer(buffer, "listener:{}, controller:{}\r\n", lname, cname);
+	return 0;
 }
 
 
@@ -133,9 +147,10 @@ signal_head::signal_head(const char * name, uint8_t type)
 	init(name, type);
 }
 
-
+/*
 datasignal::datasignal(char * name, uint8_t type, int size)
 	: signal_head(name, type)
 {
 	this->size = size; 
 }
+*/

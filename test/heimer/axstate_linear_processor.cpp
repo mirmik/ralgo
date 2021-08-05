@@ -8,21 +8,15 @@ TEST_CASE("axstate_linear_processor")
 {
 	heimer_reinit();
 
-	axis_state a, b, c, d;
+	axis_state a("a"), b("b"), c("c"), d("d");
 	axis_state * left[] = { &a, &b };
 	axis_state * right[] = { &c, &d };
 
-	a.init("a");
-	b.init("b");
-	c.init("c");
-	d.init("d");
-
-	axstate_linear_processor linproc;
 
 	float matrix[] = { 2, 0.5, 0, 1 }; 
 	float inverse_matrix[4];
 
-	linproc.init(
+	axstate_linear_processor linproc(
 		"linproc",
 		2,
 		left,
@@ -30,6 +24,7 @@ TEST_CASE("axstate_linear_processor")
 		matrix,
 		inverse_matrix
 	);
+	
 	CHECK_EQ(linproc.name(), "linproc");
 	CHECK_EQ(heimer::signal_processors_count(), 1);
 

@@ -6,7 +6,7 @@ using namespace heimer;
 
 TEST_CASE("axis_stub_processor") 
 {
-	axis_state axstate;
+	axis_state axstate("a");
 	axis_stub_processor axstub("axstub");
 
 	axstate.ctrpos = 100;
