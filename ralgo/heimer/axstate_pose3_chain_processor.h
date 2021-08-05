@@ -92,6 +92,8 @@ namespace heimer
 		heimer::phase_signal<3> * rightside;
 		double  compensation_koeff = 0.01;
 
+		double last_w[3] = {0, 0, 0};
+
 	public:
 		axstate_chain3_translation_processor(const char * name, int leftdim)
 			: axstate_chain3_processor(name, leftdim)
@@ -131,23 +133,53 @@ namespace heimer
 			ralgo::vector_view<double> T(&target[0], 3);
 
 			for (int i = 0; i < leftdim(); ++i)
-				for (int j = 0; j < 3; ++j) 
-					A.at(j,i) = temporary[i].result_screw.lin[j];
+				for (int j = 0; j < 3; ++j)
+					A.at(j, i) = temporary[i].result_screw.lin[j];
 
 			auto svd = ralgo::make_SVD(A, U, V, W);
 
 			svd.solve(T, R);
 
+			linalg::vec<double, 3> check = {};
+			for (int i = 0; i < leftdim(); ++i)
+			{
+				check += R[i] * temporary[i].result_screw.lin;
+			}
+
+			for (int i = 0; i < 3; ++i)
+			{
+				if (last_w[i] > W[i] && W[i] < 1)
+				{
+					//TODO
+					exit(0);
+					for (int i = 0; i < leftdim(); ++i)
+					{
+						leftax(i)->ctrvel = 0;
+					}
+
+					deactivation_enabled = false;
+					deactivate(time, true); // deactivation with self on_deactivate handler ignore
+				}
+
+				last_w[i] = W[i];
+			}
+
+
 			bool zerovel = true;
-			for (int i = 0; i < leftdim(); ++i) 
+			for (int i = 0; i < leftdim(); ++i)
 			{
 				leftax(i)->ctrvel = R[i];
-				if (R[i] != 0) { zerovel = false; }
+				if (fabs(R[i]) > 1e-7) { zerovel = false; }
 				leftax(i)->ctrpos = leftax(i)->feedpos;
 			}
 
-			if (deactivation_enabled && zerovel) 
+			if (deactivation_enabled && zerovel)
 			{
+				for (int i = 0; i < leftdim(); ++i)
+				{
+					leftax(i)->ctrvel = 0;
+				}
+
 				deactivation_enabled = false;
 				deactivate(time, true); // deactivation with self on_deactivate handler ignore
 			}

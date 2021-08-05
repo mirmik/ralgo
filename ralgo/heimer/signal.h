@@ -54,7 +54,7 @@ namespace heimer
 		int deattach_listener(signal_processor * );
 		void deattach_possible_controller(signal_processor * );
 
-		int command_v(int argc, char ** argv, char * output, int maxsize);
+		virtual int command_v(int argc, char ** argv, char * output, int maxsize);
 
 		int activate(signal_processor * proc, disctime_t);
 		int deactivate(signal_processor * proc, disctime_t);

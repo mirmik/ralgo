@@ -159,7 +159,7 @@ int axis_controller::_absmove(
 
 	disctime_t tgttim = curtim + (float)(ABS(extdist)) / vel;
 
-	if (extdist == 0 || vel == 0)
+	if (extdist == 0 || vel == 0 || curtim == tgttim)
 	{
 		finish_trajectory(curtim, curpos);
 		return 0;

@@ -41,6 +41,15 @@ namespace heimer
 		void set_rightsig(int i, signal_head * it) { rightside[i] = static_cast<axis_state*>(it); }
 		int leftsigtype(int) { return SIGNAL_TYPE_PHASE_SIGNAL_BASE + Dim - 1; }
 		int rightsigtype(int) { return SIGNAL_TYPE_AXIS_STATE; }
+
+		void on_activate(disctime_t time) 
+		{
+			for (int i = 0; i < Dim; ++i) 
+			{
+				rightside[i]->ctrpos = rightside[i]->feedpos;
+				rightside[i]->ctrvel = rightside[i]->feedvel;
+			}
+		}
 	};
 }
 

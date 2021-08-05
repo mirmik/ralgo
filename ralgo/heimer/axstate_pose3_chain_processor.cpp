@@ -133,7 +133,7 @@ void axstate_chain3_processor::evaluate_feedback()
 		auto W = ralgo::pose3<position_t>::from_screw(settings[i].local_sensivity * leftax(i)->feedpos);
 		auto C = settings[i].constant_transform;
 
-		pose = pose * W * C;
+		pose = W * C * pose;
 		temporary[i].result_screw = settings[i].local_sensivity.kinematic_carry(pose);
 	}
 
