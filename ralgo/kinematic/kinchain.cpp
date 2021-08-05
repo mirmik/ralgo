@@ -13,7 +13,7 @@ void ralgo::kinematic_chain_sensivities(
 	{
 		auto W = ralgo::pose3<double>::from_screw(locsenses[i] * coords[i]);
 		auto C = constants[i+1];
-		temp = temp * W * C;
+		temp = W * C * temp;
 
 		outsenses[i] = locsenses[i].kinematic_carry(temp);
 	}	

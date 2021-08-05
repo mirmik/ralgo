@@ -42,7 +42,7 @@ namespace heimer
 		int leftsigtype(int) { return SIGNAL_TYPE_PHASE_SIGNAL_BASE + Dim - 1; }
 		int rightsigtype(int) { return SIGNAL_TYPE_AXIS_STATE; }
 
-		void on_activate(disctime_t time) 
+		void on_activate(disctime_t) 
 		{
 			for (int i = 0; i < Dim; ++i) 
 			{
