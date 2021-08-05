@@ -70,9 +70,10 @@ namespace heimer
 		void set_rightside(signal_head ** arr);
 
 		virtual void on_activate(disctime_t);
+		virtual int on_deactivate(disctime_t) { return 0; }
 
 		int activate(disctime_t);
-		int deactivate();
+		int deactivate(disctime_t, bool ignore_on_deactivate = false);
 
 		igris::buffer name();
 		bool is_active();

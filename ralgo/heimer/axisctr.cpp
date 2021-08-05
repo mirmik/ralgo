@@ -97,7 +97,7 @@ int axis_controller::serve(disctime_t time)
 	if (f.release_control_flag)
 	{
 		f.release_control_flag = 0;
-		deactivate();
+		deactivate(time);
 		return SIGNAL_PROCESSOR_RETURN_NOT_ACTIVE;
 	}
 

@@ -57,7 +57,7 @@ namespace heimer
 		int command_v(int argc, char ** argv, char * output, int maxsize);
 
 		int activate(signal_processor * proc, disctime_t);
-		int deactivate(signal_processor * proc);
+		int deactivate(signal_processor * proc, disctime_t);
 	};
 
 	int signals_count();

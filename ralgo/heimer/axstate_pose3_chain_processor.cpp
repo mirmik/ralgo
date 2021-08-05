@@ -6,7 +6,7 @@ using namespace heimer;
 axstate_chain3_processor::axstate_chain3_processor(const char * name, int leftdim)
 	: signal_processor(name, leftdim, 1)
 {
-	//set_need_activation(1);
+	set_need_activation(1);
 }
 
 ralgo::pose3<position_t> axstate_chain3_processor::evaluate_target_position()
@@ -105,9 +105,9 @@ void axstate_chain3_processor::deinit()
 		delete[] temporary;
 }
 
-void axstate_chain3_processor::on_activate(disctime_t)
+void axstate_chain3_processor::on_activate(disctime_t time)
 {
-
+	last_time = time;
 }
 
 void axstate_chain3_processor::evaluate_error()
