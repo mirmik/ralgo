@@ -28,6 +28,7 @@ signew axphase 3 P
 
 ctrnew axstub stub_a stub_b stub_c stub_d
 ctrnew axisctr 1 xctr yctr zctr
+ctrnew axisctr 1 actr bctr cctr dctr 
 ctrnew chain3linctr 4 chainctr
 ctrnew axmuxctr 3 muxctr
 
@@ -85,5 +86,25 @@ ctr yctr setgain 1
 ctr zctr setvel 4
 ctr zctr setacc 10 10
 ctr zctr setgain 1
+
+ctr actr bind a
+ctr actr setvel 40
+ctr actr setacc 100 100
+ctr actr setgain 0.017453292519943295
+
+ctr bctr bind b
+ctr bctr setvel 40
+ctr bctr setacc 100 100
+ctr bctr setgain 0.017453292519943295
+
+ctr cctr bind c
+ctr cctr setvel 40
+ctr cctr setacc 100 100
+ctr cctr setgain 0.017453292519943295
+
+ctr dctr bind d
+ctr dctr setvel 40
+ctr dctr setacc 100 100
+ctr dctr setgain 0.017453292519943295
 
 start
