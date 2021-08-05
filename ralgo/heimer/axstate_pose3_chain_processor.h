@@ -46,6 +46,10 @@ namespace heimer
 		ralgo::pose3<position_t> feedback_position;
 		ralgo::pose3<position_t> control_position;
 
+		uint8_t deactivation_enabled = 0;
+
+		disctime_t last_time;
+
 	public:
 		axstate_chain3_processor(const char * name, int leftdim);
 		void set_resources(axstate_pose3_chain_settings * settings, axstate_pose3_chain_temporary * tsettings);
@@ -72,6 +76,12 @@ namespace heimer
 
 		void allocate_resources();
 
+		int on_deactivate(disctime_t time) override
+		{
+			deactivation_enabled = true;
+			return 1;
+		}
+
 		int leftsigtype(int) override { return SIGNAL_TYPE_AXIS_STATE; }
 		signal_head * leftsig(int i) override { return settings[i].controlled; }
 		void set_leftsig(int i, signal_head * sig) override { settings[i].controlled = static_cast<axis_state*>(sig); }
@@ -80,7 +90,7 @@ namespace heimer
 	class axstate_chain3_translation_processor : public axstate_chain3_processor
 	{
 		heimer::phase_signal<3> * rightside;
-		double  compensation_koeff = 0.1;
+		double  compensation_koeff = 0.01;
 
 	public:
 		axstate_chain3_translation_processor(const char * name, int leftdim)
@@ -97,13 +107,15 @@ namespace heimer
 		int rightsigtype(int) override { return SIGNAL_TYPE_PHASE3; }
 		void set_rightsig(int, signal_head * sig) override { rightside = static_cast<phase_signal<3>*>(sig) ; }
 
-		int serve(disctime_t) override
+		int serve(disctime_t time) override
 		{
 			// Строки : 3
 			// Столбцов : leftdim
 
+			auto delta = time - last_time;
+
 			auto poserr = rightside->ctrpos - feedback_position.lin;
-			auto target = rightside->ctrvel + poserr * compensation_koeff;
+			auto target = rightside->ctrvel + poserr * compensation_koeff * delta;
 
 			double Rdata[leftdim()];
 			double Adata[3 * leftdim()];
@@ -126,15 +138,22 @@ namespace heimer
 
 			svd.solve(T, R);
 
-			//PRINT(A);
-			//PRINT(T);
-			//PRINT(R);
-
+			bool zerovel = true;
 			for (int i = 0; i < leftdim(); ++i) 
 			{
 				leftax(i)->ctrvel = R[i];
+				if (R[i] != 0) { zerovel = false; }
 				leftax(i)->ctrpos = leftax(i)->feedpos;
 			}
+
+			if (deactivation_enabled && zerovel) 
+			{
+				deactivation_enabled = false;
+				deactivate(time, true); // deactivation with self on_deactivate handler ignore
+			}
+
+			last_time = time;
+
 			return 0;
 		}
 	};

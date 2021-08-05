@@ -127,7 +127,7 @@ int signal_head::activate(struct signal_processor * proc, disctime_t tim)
 	return 0;
 }
 
-int signal_head::deactivate(struct signal_processor * proc)
+int signal_head::deactivate(struct signal_processor * proc, disctime_t time)
 {
 	if (proc != current_controller)
 		return -1;
@@ -136,7 +136,7 @@ int signal_head::deactivate(struct signal_processor * proc)
 
 	if (listener)
 	{
-		return listener->deactivate();
+		return listener->deactivate(time);
 	}
 
 	return 0;

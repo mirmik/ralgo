@@ -67,12 +67,12 @@ int signal_processor::activate(disctime_t curtim)
 
 	else
 	{
-		deactivate();
+		deactivate(curtim);
 		return -1;
 	}
 }
 
-int signal_processor::deactivate()
+int signal_processor::deactivate(disctime_t curtim, bool ignore_on_deactivate)
 {
 	signal_head * iter;
 	int all_right_deactivated = 1;
@@ -87,10 +87,21 @@ int signal_processor::deactivate()
 	if (!all_right_deactivated)
 		return 0;
 
+	if (!ignore_on_deactivate)
+	{
+		int interrupt = on_deactivate(curtim);
+		if (interrupt)
+		{
+			// Устройство запросило отложенную деактивацию.
+			// Не прокидываем сигнал вниз.
+			return 0;
+		}
+	}
+
 	iter = NULL;
 	while ((iter = iterate_left(iter)))
 	{
-		int err = iter->deactivate(this);
+		int err = iter->deactivate(this, curtim);
 		(void) err;
 	}
 	f.active = 0;
@@ -332,7 +343,7 @@ signal_head * signal_processor::iterate_left(signal_head * iter)
 	{
 		if (iter == leftsig(i))
 		{
-			return leftsig(i+1);
+			return leftsig(i + 1);
 		}
 	}
 
@@ -348,7 +359,7 @@ signal_head * signal_processor::iterate_right(signal_head * iter)
 	{
 		if (iter == rightsig(i))
 		{
-			return rightsig(i+1);
+			return rightsig(i + 1);
 		}
 	}
 
