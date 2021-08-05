@@ -74,6 +74,18 @@ namespace ralgo
 		const iterator       begin() const { return {dat, stride}; } 
 		const iterator       end()   const { return {dat + n * stride, stride}; }
 	};
+
+	template <class T>
+	std::ostream & operator << (std::ostream & os, const vector_view<T> & vec) 
+	{
+		os << '(';
+		for (unsigned int i = 0; i < vec.size(); ++i) 
+		{
+			os<<vec[i]<<',';
+		}
+		os<<vec[vec.size()-1]<<')';
+		return os;
+	}
 }
 
 #endif
