@@ -82,12 +82,6 @@ int  axstate_sincos_processor::command(int argc, char ** argv, char * output, in
 {
 	int status = ENOENT;
 
-	if (strcmp("bindleft", argv[0]) == 0)
-		status = heimer::axstate_signal_processor_bindleft(this, argc - 1, argv + 1, output, outmax);
-
-	if (strcmp("bindright", argv[0]) == 0)
-		status = heimer::axstate_signal_processor_bindright(this, argc - 1, argv + 1, output, outmax);
-
 	if (strcmp("info", argv[0]) == 0)
 		status = info(this, argc - 1, argv + 1, output, outmax);
 
@@ -103,7 +97,10 @@ int  axstate_sincos_processor::command(int argc, char ** argv, char * output, in
 		return 0;
 	}
 
-	return status;
+	if (status != ENOENT)
+		return status;
+
+	return signal_processor::command(argc, argv, output, outmax);
 }
 
 void axstate_sincos_processor::deinit()

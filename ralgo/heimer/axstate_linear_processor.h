@@ -25,12 +25,13 @@ namespace heimer
     public:
         axstate_linear_processor() = default;
         axstate_linear_processor(const char * name, int dim,
-            struct axis_state ** leftside,
-            struct axis_state ** rightside,
-            float * matrix,
-            float * invert_matrix);
+                                 struct axis_state ** leftside,
+                                 struct axis_state ** rightside,
+                                 float * matrix,
+                                 float * invert_matrix);
+        axstate_linear_processor(const char * name, int dim);
 
-        int dim();
+        int dim() { return leftdim(); }
 
         int feedback(disctime_t time) override;
         int serve(disctime_t time) override;

@@ -22,12 +22,12 @@ ralgo::screw3<position_t> axstate_pose3_chain_processor::evaluate_position_error
 	return {};
 }
 
-int axstate_pose3_chain_processor::feedback(disctime_t time)
+int axstate_pose3_chain_processor::feedback(disctime_t)
 {
 	return 0;
 }
 
-int axstate_pose3_chain_processor::serve(disctime_t time)
+int axstate_pose3_chain_processor::serve(disctime_t)
 {
 	return 0;
 }
@@ -160,12 +160,12 @@ void axstate_pose3_chain_processor::evaluate_error()
 
 }
 
-void axstate_pose3_chain_processor::evaluate_output_sensivities(ralgo::screw3<double> * sensivities)
+void axstate_pose3_chain_processor::evaluate_output_sensivities(ralgo::screw3<double> *)
 {
 
 }
 
-void axstate_pose3_chain_processor::backpack(ralgo::screw3<double> * sensivities)
+void axstate_pose3_chain_processor::backpack(ralgo::screw3<double> *)
 {
 
 }
@@ -232,12 +232,11 @@ void axstate_pose3_chain_processor::set_sensivity(int i, float a, float b, float
 	*sensivity = {{a, b, c}, {d, e, f}};
 }
 
-int axstate_pose3_chain_processor::leftsigtype(int i) { return SIGNAL_TYPE_AXIS_STATE; }
-
-int axstate_pose3_chain_processor::rightsigtype(int i) { return SIGNAL_TYPE_DOF6; }
+int axstate_pose3_chain_processor::leftsigtype(int) { return SIGNAL_TYPE_AXIS_STATE; }
+int axstate_pose3_chain_processor::rightsigtype(int) { return SIGNAL_TYPE_DOF6; }
 
 signal_head * axstate_pose3_chain_processor::leftsig(int i) { return settings[i].controlled; }
-signal_head * axstate_pose3_chain_processor::rightsig(int i) { return rightside; }
+signal_head * axstate_pose3_chain_processor::rightsig(int) { return rightside; }
 
 void axstate_pose3_chain_processor::set_leftsig(int i, signal_head * sig) { settings[i].controlled = static_cast<axis_state*>(sig); }
-void axstate_pose3_chain_processor::set_rightsig(int i, signal_head * sig) { rightside = static_cast<dof6_signal*>(sig) ; }
+void axstate_pose3_chain_processor::set_rightsig(int, signal_head * sig) { rightside = static_cast<dof6_signal*>(sig) ; }

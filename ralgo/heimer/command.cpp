@@ -216,7 +216,7 @@ int signew(int argc, char ** argv, char * output, int maxsize)
 		return 0;
 	}
 
-	if (strcmp(argv[0], "datasig") == 0)
+	/*if (strcmp(argv[0], "datasig") == 0)
 	{
 		char * type = argv[1];
 		int size = atoi(argv[2]);
@@ -232,9 +232,9 @@ int signew(int argc, char ** argv, char * output, int maxsize)
 			new (ptr) heimer::datasignal(argv[i], sigtype, datasize);
 		}
 		return 0;
-	}
+	}*/
 
-	snprintf(output, maxsize, "Unresolved TYPE. Possible types: axstate, scalar, dof6state, datasig\r\n");
+	snprintf(output, maxsize, "Unresolved TYPE. Possible types: axstate, scalar, dof6state\r\n");
 	return -1;
 }
 

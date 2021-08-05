@@ -248,13 +248,13 @@ int signal_processor::command(int argc, char ** argv, char * output, int outmax)
 
 
 static signal_head * _;
-signal_head * signal_processor::leftsig(int i)
+signal_head * signal_processor::leftsig(int)
 {
 	BUG();
 	return _;
 }
 
-signal_head * signal_processor::rightsig(int i)
+signal_head * signal_processor::rightsig(int)
 {
 	BUG();
 	return _;
@@ -270,13 +270,13 @@ uint8_t signal_processor::rightdim()
 	return _rightdim;
 }
 
-int leftsigtype(int i)
+int leftsigtype(int)
 {
 	BUG();
 	return 0;
 }
 
-int rightsigtype(int i)
+int rightsigtype(int)
 {
 	BUG();
 	return 0;
@@ -301,24 +301,24 @@ void signal_processor::set_rightside(signal_head ** arr)
 }
 
 
-int signal_processor::leftsigtype(int i)
+int signal_processor::leftsigtype(int)
 {
 	BUG();
 	return 0;
 }
 
-int signal_processor::rightsigtype(int i)
+int signal_processor::rightsigtype(int)
 {
 	BUG();
 	return 0;
 }
 
-void signal_processor::set_leftsig(int i, signal_head *)
+void signal_processor::set_leftsig(int, signal_head *)
 {
 	BUG();
 }
 
-void signal_processor::set_rightsig(int i, signal_head *)
+void signal_processor::set_rightsig(int, signal_head *)
 {
 	BUG();
 }

@@ -18,21 +18,35 @@ namespace heimer
 		axstate_signal_processor() = default;
 		axstate_signal_processor(const char *, int ldim, int rdim);
 
-		signal_head * iterate_left(signal_head *) override;
-		signal_head * iterate_right(signal_head *) override;
-
 		void attach_leftside_table(axis_state ** table);
 		void attach_rightside_table(axis_state ** table);
 
 		axis_state * leftax(int i) { return _leftside[i]; }
 		axis_state * rightax(int i) { return _rightside[i]; }
 
-		void set_leftside(axis_state ** arr);
-		void set_rightside(axis_state ** arr);
-	};
+		int leftsigtype(int) { return SIGNAL_TYPE_AXIS_STATE; }
+		int rightsigtype(int) { return SIGNAL_TYPE_AXIS_STATE; }
 
-	int axstate_signal_processor_bindleft(axstate_signal_processor * axctr, int argc, char ** argv, char * output, int outmax);
-	int axstate_signal_processor_bindright(axstate_signal_processor * axctr, int argc, char ** argv, char * output, int outmax);
+		signal_head * leftsig(int i) { return _leftside[i]; }
+		signal_head * rightsig(int i) { return _rightside[i]; }
+
+		void set_leftsig(int i, signal_head * sig) { _leftside[i] = static_cast<axis_state*>(sig); }
+		void set_rightsig(int i, signal_head * sig) { _rightside[i] = static_cast<axis_state*>(sig); }
+
+
+		void attach_axes_from_tables()
+		{
+			for (int i = 0; i < leftdim(); ++i)
+			{
+				leftsig(i) -> attach_possible_controller(this);
+			}
+
+			for (int i = 0; i < rightdim(); ++i)
+			{
+				rightsig(i) -> attach_listener(this);
+			}
+		}
+	};
 }
 
 #endif

@@ -17,18 +17,10 @@ TEST_CASE("executor")
 {
 	heimer_reinit();
 
-	axis_state state00;
-	axis_state state01;
-	
-	axis_state state10;
-	axis_state state11;
-
-	axis_controller axctr0;
-
-	state00.init("state00");
-	state01.init("state01");
-	state10.init("state10");
-	state11.init("state11");
+	axis_state state00("a");
+	axis_state state01("b");
+	axis_state state10("c");
+	axis_state state11("d");
 
 	axis_stub_processor xstub("xstub");
 	axis_stub_processor ystub("ystub");
@@ -37,16 +29,16 @@ TEST_CASE("executor")
 
 	axis_state * axctr0_states[] = { &state10, &state11 };
 	axis_settings axctr0_settings[2];
-	axctr0.init("axctr0", axctr0_settings, 2);
+	axis_controller axctr0("axctr0", axctr0_settings, 2);
 	axctr0.set_controlled(axctr0_states);
 
 	axis_state * linproc_left[] = {&state00, &state01};
 	axis_state * linproc_right[] = {&state10, &state11};
 	float linproc_matrix[4] = { 1, 0, 0, 1 };
 	float linproc_inverse_matrix[4];
-	axstate_linear_processor linproc;
-	linproc.init("linproc", 2, linproc_left, linproc_right, 
+	axstate_linear_processor linproc("linproc", 2, linproc_left, linproc_right, 
 		linproc_matrix, linproc_inverse_matrix);
+	linproc.attach_axes_from_tables();
 
 	signal_processor * executor_table[10];
 
@@ -105,9 +97,12 @@ TEST_CASE("executor: tandem sort")
 	axis_state * linproc_right[] = {&vx, &vy};
 	float linproc_matrix[4] = { 1, 0, 0, 1 };
 	float linproc_inverse_matrix[4];
-	axstate_linear_processor linproc;
-	linproc.init("linproc", 2, linproc_left, linproc_right, 
-		linproc_matrix, linproc_inverse_matrix);
+	axstate_linear_processor linproc("linproc", 2, 
+		linproc_left, 
+		linproc_right, 
+		linproc_matrix, 
+		linproc_inverse_matrix);
+	linproc.attach_axes_from_tables();
 
 	signal_processor * executor_table[10];
 
@@ -173,9 +168,9 @@ TEST_CASE("executor: tandem activate")
 	axis_state * linproc_right[] = {&vx, &vy};
 	float linproc_matrix[4] = { 1, 0, 0, 1 };
 	float linproc_inverse_matrix[4];
-	axstate_linear_processor linproc;
-	linproc.init("linproc", 2, linproc_left, linproc_right, 
+	axstate_linear_processor linproc("linproc", 2, linproc_left, linproc_right, 
 		linproc_matrix, linproc_inverse_matrix);
+	linproc.attach_axes_from_tables();
 
 	signal_processor * executor_table[10];
 
@@ -208,6 +203,8 @@ TEST_CASE("executor: tandem activate")
 		CHECK_EQ(linproc.is_active(), true);
 		CHECK_EQ(vx.listener, &linproc);
 		CHECK_EQ(vx.current_controller, &vxctr);
+		CHECK_EQ(vy.listener, &linproc);
+		CHECK_EQ(vy.current_controller, nullptr);
 		CHECK_EQ(xstub.is_active(), true);
 		CHECK_EQ(ystub.is_active(), true);
 		CHECK_EQ(x.listener, &xstub);
@@ -244,6 +241,8 @@ TEST_CASE("executor: tandem activate")
 		CHECK_EQ(linproc.is_active(), false);
 		CHECK_EQ(vx.listener, &linproc);
 		CHECK_EQ(vx.current_controller, nullptr);
+		CHECK_EQ(vy.listener, &linproc);
+		CHECK_EQ(vy.current_controller, nullptr);
 		CHECK_EQ(xstub.is_active(), true);
 		CHECK_EQ(ystub.is_active(), false);
 		CHECK_EQ(x.listener, &xstub);

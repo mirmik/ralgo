@@ -37,12 +37,12 @@ void dof6_controller::set_decceleration(double v)
 	dcc = v;
 }
 
-int dof6_controller::feedback(disctime_t time)
+int dof6_controller::feedback(disctime_t)
 {
 	return 0;
 }
 
-int dof6_controller::serve(disctime_t time)
+int dof6_controller::serve(disctime_t)
 {
 	return 0;
 }
@@ -147,6 +147,6 @@ void dof6_controller::deinit()
 
 }
 
-int dof6_controller::leftsigtype(int i) { return SIGNAL_TYPE_DOF6; }
-signal_head * dof6_controller::leftsig(int i) { return controlled; }
-void dof6_controller::set_leftsig(int i, signal_head * sig) { controlled = static_cast<dof6_signal*>(sig); }
+int dof6_controller::leftsigtype(int ) { return SIGNAL_TYPE_DOF6; }
+signal_head * dof6_controller::leftsig(int) { return controlled; }
+void dof6_controller::set_leftsig(int, signal_head * sig) { controlled = static_cast<dof6_signal*>(sig); }

@@ -20,13 +20,10 @@ TEST_CASE("axisctr")
 
 	int sts;
 
-	axis_state state;
+	axis_state state("state");
 	axis_settings settings;
-	axis_controller axctr;
-
-	state.init("state");
-
-	axctr.init("axctr", &settings, 1);
+	axis_controller axctr("axctr", &settings, 1);
+	
 	CHECK_EQ(axctr.name(), "axctr");
 	axctr.set_handlers(nullptr, nullptr, finish_handler);
 	double gain = 1000; axctr.set_gain(&gain);
@@ -98,15 +95,11 @@ TEST_CASE("axisctr_multiax")
 
 	int sts;
 
-	struct axis_state state0;
-	struct axis_state state1;
+	struct axis_state state0("state0");
+	struct axis_state state1("state1");
 	struct axis_settings settings[2];
-	struct axis_controller axctr;
-
-	state0.init("state0");
-	state1.init("state1");
-
-	axctr.init("axctr", settings, 2);
+	struct axis_controller axctr("axctr", settings, 2);
+	
 	axctr.set_handlers(nullptr, nullptr, finish_handler);
 	double gain = 1000; axctr.set_gain(&gain);
 	axctr.set_velocity_external(10);
@@ -171,13 +164,10 @@ TEST_CASE("axisctr_stop")
 
 	int sts;
 
-	struct axis_state state;
+	struct axis_state state("state");
 	struct axis_settings settings[1];
-	struct axis_controller axctr;
+	struct axis_controller axctr("axctr", settings, 1);
 
-	state.init("state");
-
-	axctr.init("axctr", settings, 1);
 	axctr.set_handlers(nullptr, nullptr, finish_handler);
 	double gain = 1000; axctr.set_gain(&gain);
 	axctr.set_velocity_external(10);
