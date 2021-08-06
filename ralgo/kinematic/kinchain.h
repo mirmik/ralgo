@@ -29,13 +29,16 @@ namespace ralgo
 			dP_1^n/dt = summ P_1^i P_n^{i+1}* S_xi
 
 			|A a||S v||B b| = |A a||S*B S*b+v| = |A*S*B A*S*b+A*v| = |? A*(cross(s,r2))+A*v|
-			|0 1||0 0||0 1|   |0 1||  0     0|   |      0       0|   |0                   0|
+			|0 1||0 0||0 1|   |0 1||  0     0|   |    0         0|   |0                   0|
 
-			|A*S*B A*S*b+A*v| = |? A*(cross(s,r2))+A*v|
-			|      0       0|   |0                   0|
+			|A*S*B A*S*b+A*v| = |(As)xAB A*(cross(s,r2))+A*v|
+			     0         0|   |      0                   0|
 
 			
+			A Sx At A B
 			
+			A(w)
+			A(w x b + v)
 
 			
 			
