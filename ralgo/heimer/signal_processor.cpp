@@ -6,6 +6,8 @@
 #include <igris/math.h>
 #include <igris/util/bug.h>
 
+#include <nos/print.h>
+
 #include <string.h>
 #include <assert.h>
 
@@ -364,4 +366,22 @@ signal_head * signal_processor::iterate_right(signal_head * iter)
 	}
 
 	return NULL;
+}
+
+void signal_processor::interrupt(disctime_t time, bool ignore_handle)
+{
+	if (!ignore_handle)
+	{
+		bool prevent = on_interrupt(time);
+		if (prevent)
+		{
+			return;
+		}
+	}
+
+	signal_head * iter = nullptr;
+	while ((iter = iterate_right(iter)))
+	{
+		iter->provide_interrupt(time);
+	}
 }

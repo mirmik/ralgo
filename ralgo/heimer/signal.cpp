@@ -94,9 +94,9 @@ int signal_head::command_v(int argc, char ** argv, char * output, int maxsize)
 	return ENOENT;
 }
 
-int signal_head::ctrinfo(char * buffer, int) 
+int signal_head::ctrinfo(char * buffer, int)
 {
-	const char * lname = listener ? listener->name().data() : "(null)"; 
+	const char * lname = listener ? listener->name().data() : "(null)";
 	const char * cname = current_controller ? current_controller->name().data() : "(null)";
 
 	nos::format_buffer(buffer, "listener:{}, controller:{}\r\n", lname, cname);
@@ -147,10 +147,8 @@ signal_head::signal_head(const char * name, uint8_t type)
 	init(name, type);
 }
 
-/*
-datasignal::datasignal(char * name, uint8_t type, int size)
-	: signal_head(name, type)
+void signal_head::provide_interrupt(disctime_t time)
 {
-	this->size = size; 
+	if (current_controller)
+		current_controller->interrupt(time, false);
 }
-*/

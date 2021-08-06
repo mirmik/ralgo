@@ -431,3 +431,9 @@ axis_controller::axis_controller(
 	                    );
 
 }
+
+bool axis_controller::on_interrupt(disctime_t time) 
+{
+	hardstop(time);
+	return false;
+}
