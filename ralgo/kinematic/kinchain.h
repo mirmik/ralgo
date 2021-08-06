@@ -32,10 +32,19 @@ namespace ralgo
 			|0 1||0 0||0 1|   |0 1||  0     0|   |    0         0|   |0                   0|
 
 			|A*S*B A*S*b+A*v| = |(As)xAB A*(cross(s,r2))+A*v|
-			     0         0|   |      0                   0|
+			|    0         0|   |      0                   0|
 
+			|A*S*S*B A*S*S*b+A*S*v| = |(As_2)xAB A*(cross(s,r2))+A*v|
+			|      0             0|   |        0                   0|
 			
+				,
+			|w|   = |0             |
+			|v|     |wx wx b + wx v|
+				x
+
 			A Sx At A B
+
+			A S At A S At = A S At A S At A B = (As)x (As)x A B
 			
 			A(w)
 			A(w x b + v)
