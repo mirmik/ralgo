@@ -28,14 +28,17 @@ namespace ralgo
 			dP_1^n/dt = summ P_1^i S_xi W_i P_{i+1}^n
 			dP_1^n/dt = summ P_1^i P_n^{i+1}* S_xi
 
-			|R1 r1||S v||R2 r2|
-			| 0  1||0 0|| 0  1|
+			|A a||S v||B b| = |A a||S*B S*b+v| = |A*S*B A*S*b+A*v| = |? A*(cross(s,r2))+A*v|
+			|0 1||0 0||0 1|   |0 1||  0     0|   |      0       0|   |0                   0|
 
-			|R1 r1||S*R2 S*r2 + v|  --- оператор кинематического переноса
-			| 0  1||   0        0|
+			|A*S*B A*S*b+A*v| = |? A*(cross(s,r2))+A*v|
+			|      0       0|   |0                   0|
 
-			|R1*S*R2 R1*S*r2+R1*v|  --- поворот винта
-			|      0            0|
+			
+			
+
+			
+			
 			
 		@param constants - вектор матриц C - размер dim + 1.
 	    @param locsenses - вектор винтов чуствительности W - размер dim.
