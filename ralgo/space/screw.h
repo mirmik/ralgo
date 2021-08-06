@@ -67,8 +67,8 @@ namespace ralgo
 		}
 
 
-		/// |w v||R r| = |w*R w*r+v|
-		/// |0 0||0 1|   |  0     0|
+		/// |S v||R r| = |SR Sr+v|
+		/// |0 0||0 1|   | 0    0|
 		screw kinematic_carry(const pose3<T>& pose);
 	};
 
@@ -161,7 +161,7 @@ template <class T>
 ralgo::screw<T, 3> ralgo::screw<T, 3>::kinematic_carry(const ralgo::pose3<T>& pose)
 {
 	return screw(
-	           pose.rotate_vector(ang),
+	           ang,
 	           lin + cross(ang, pose.lin)
 	       );
 }
