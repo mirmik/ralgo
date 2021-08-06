@@ -58,14 +58,6 @@ namespace heimer
 		virtual signal_head * iterate_left(signal_head *);
 		virtual signal_head * iterate_right(signal_head *);
 
-		virtual signal_head * leftsig(int i);
-		virtual signal_head * rightsig(int i);
-		virtual void set_leftsig(int i, signal_head *);
-		virtual void set_rightsig(int i, signal_head *);
-
-		virtual int leftsigtype(int i);
-		virtual int rightsigtype(int i);
-
 		void set_leftside(signal_head ** arr);
 		void set_rightside(signal_head ** arr);
 
@@ -74,16 +66,37 @@ namespace heimer
 
 		int activate(disctime_t);
 		int deactivate(disctime_t, bool ignore_on_deactivate = false);
+		bool is_active();
 
 		igris::buffer name();
-		bool is_active();
+		void release_signals();
+
 		bool need_activation();
+
+		virtual signal_head * leftsig(int i);
+		virtual signal_head * rightsig(int i);
+		virtual void set_leftsig(int i, signal_head *);
+		virtual void set_rightsig(int i, signal_head *);
+		virtual int leftsigtype(int i);
+		virtual int rightsigtype(int i);
+
+	protected:		
+		/// Бросить сигнал о необходимости прерывания опраций вверх по цепочке контроллеров,
+		/// предварительно вызвав on_interrupt.
+		/// @param ignore_handle - не вызывать метод on_interrupt.
+		void interrupt(disctime_t, bool ignore_handle);
+
+		/// Обработка поступившего прерывания.
+		/// Стандартное поведение при получении прерывания - не делать ничего
+		/// @resval Если true - запретить прокидывать прерывание выше.
+		virtual bool on_interrupt(disctime_t) { return false; }
+
+		void set_dynamic_resources_flag(bool en);
+		bool is_dynamic_resources();
+
 		void set_need_activation(bool en);
 
-		bool is_dynamic_resources();
-		void set_dynamic_resources_flag(bool en);
-
-		void release_signals();
+		friend class signal_head;
 	};
 
 	int signal_processors_count();

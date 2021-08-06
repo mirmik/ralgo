@@ -118,6 +118,7 @@ namespace heimer
 		    double extdist);
 
 		void finish_trajectory(disctime_t time, position_t * ctrpos);
+		bool on_interrupt(disctime_t) override;
 	};
 
 	axis_controller * create_axis_controller(const char * name, int dim);

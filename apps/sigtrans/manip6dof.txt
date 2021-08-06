@@ -75,16 +75,16 @@ ctr xctr bind x
 ctr yctr bind y
 ctr zctr bind z
 
-ctr xctr setvel 4
-ctr xctr setacc 10 10
+ctr xctr setvel 8
+ctr xctr setacc 20 20
 ctr xctr setgain 1
 
-ctr yctr setvel 4
-ctr yctr setacc 10 10
+ctr yctr setvel 8
+ctr yctr setacc 20 20
 ctr yctr setgain 1
 
-ctr zctr setvel 4
-ctr zctr setacc 10 10
+ctr zctr setvel 8
+ctr zctr setacc 20 20
 ctr zctr setgain 1
 
 ctr actr bind a

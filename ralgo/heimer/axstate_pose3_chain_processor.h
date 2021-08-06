@@ -85,6 +85,23 @@ namespace heimer
 		int leftsigtype(int) override { return SIGNAL_TYPE_AXIS_STATE; }
 		signal_head * leftsig(int i) override { return settings[i].controlled; }
 		void set_leftsig(int i, signal_head * sig) override { settings[i].controlled = static_cast<axis_state*>(sig); }
+
+		void deactivation_routine(disctime_t time)
+		{
+			for (int i = 0; i < leftdim(); ++i)
+			{
+				leftax(i)->ctrvel = 0;
+			}
+
+			deactivation_enabled = false;
+			deactivate(time, true); // deactivation with self on_deactivate handler ignore
+		}
+
+		bool on_interrupt(disctime_t time) 
+		{
+			deactivation_routine(time);
+			return false;
+		}
 	};
 
 	class axstate_chain3_translation_processor : public axstate_chain3_processor
@@ -150,15 +167,7 @@ namespace heimer
 			{
 				if (last_w[i] > W[i] && W[i] < 1)
 				{
-					//TODO
-					exit(0);
-					for (int i = 0; i < leftdim(); ++i)
-					{
-						leftax(i)->ctrvel = 0;
-					}
-
-					deactivation_enabled = false;
-					deactivate(time, true); // deactivation with self on_deactivate handler ignore
+					interrupt(time, false);
 				}
 
 				last_w[i] = W[i];
@@ -175,13 +184,7 @@ namespace heimer
 
 			if (deactivation_enabled && zerovel)
 			{
-				for (int i = 0; i < leftdim(); ++i)
-				{
-					leftax(i)->ctrvel = 0;
-				}
-
-				deactivation_enabled = false;
-				deactivate(time, true); // deactivation with self on_deactivate handler ignore
+				deactivation_routine(time);
 			}
 
 			last_time = time;

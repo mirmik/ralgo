@@ -32,11 +32,6 @@ namespace heimer
 		/// Устанавливается во время биндинга и потом не меняется.
 		struct signal_processor * listener = nullptr;
 
-		/// Статус активации.
-		/// Если статус установлен, это значит, что сигнал получает команды свыше.
-		/// и ожидает деактивации в какой-то момент времени.
-		//uint8_t active;
-
 		uint8_t sorting_mark; /// < Метка для алгоритма сортировки (см. executor)
 
 	public:
@@ -58,6 +53,9 @@ namespace heimer
 
 		int activate(signal_processor * proc, disctime_t);
 		int deactivate(signal_processor * proc, disctime_t);
+
+		/// Распространить прерывание вверх по цепочке контроллеров.
+		void provide_interrupt(disctime_t);
 	};
 
 	int signals_count();
