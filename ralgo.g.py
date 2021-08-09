@@ -17,9 +17,10 @@ licant.module("ralgo",
 		"ralgo/trajectory/linetraj.c",
 		"ralgo/robo/quadgen4_arduino.c",
 
+		"ralgo/robo/stepper_controller.cpp",
+		
 		"ralgo/heimer/axisctr.cpp",
 		"ralgo/heimer/axisctr_command.cpp",
-		"ralgo/heimer/stepctr.cpp",
 		"ralgo/heimer/stepctr_applier.cpp",
 		"ralgo/heimer/signal_processor.cpp",
 		"ralgo/heimer/signal.cpp",
