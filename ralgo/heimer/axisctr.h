@@ -13,12 +13,12 @@ namespace heimer
 	class axis_settings
 	{
 	public:
-		axis_state * controlled;
-		int limits_enabled;
-		position_t backlim;
-		position_t forwlim;
-		sf_position_t sfpos;
-		double gain;
+		axis_state * controlled = nullptr;
+		int limits_enabled = 0;
+		position_t backlim = 0;
+		position_t forwlim = 0;
+		sf_position_t sfpos = {0, 0};
+		double gain = 1;
 	};
 
 	class axis_controller : public signal_processor
@@ -89,8 +89,10 @@ namespace heimer
 		void set_controlled(struct axis_state ** state);
 		void release_controlled();
 
-		int incmove(disctime_t current_time, double * dist_real);
-		int absmove(disctime_t current_time, double * pos_real);
+		int incmove(disctime_t current_time, const double * dist_real);
+		int absmove(disctime_t current_time, const double * pos_real);
+		int incmove(disctime_t current_time, const std::initializer_list<double> & dist_real);
+		int absmove(disctime_t current_time, const std::initializer_list<double> & pos_real);
 		int stop(disctime_t);
 		int hardstop(disctime_t);
 
@@ -118,7 +120,7 @@ namespace heimer
 
 		void finish_trajectory(disctime_t time, position_t * ctrpos);
 		bool on_interrupt(disctime_t) override;
-	
+
 		void _init();
 		void allocate_resources();
 	};

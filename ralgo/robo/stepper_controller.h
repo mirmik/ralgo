@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <igris/compiler.h>
+#include <igris/sync/syslock.h>
 
 #include <ralgo/heimer/heimer_types.h>
 #include <ralgo/robo/stepper.h>
@@ -19,8 +20,6 @@ namespace robo
 	class stepper_controller
 	{
 		robo::stepper * stepper;
-
-		double ext2steps;
 
 		float trigger_level = 0.75;
 
@@ -65,19 +64,27 @@ namespace robo
 
 		int64_t control_pos() { return _control_pos; }
 		int64_t virtual_pos() { return _virtual_pos; }
+
+		position_t feedback_position() 
+		{
+			system_lock();
+			auto counter_value = stepper->steps_count();
+			system_unlock();
+
+			return counter_value;
+		}
 	};
 
 	class fixed_frequency_stepper_controller : public stepper_controller
 	{
-		float   speed_to_shift = 1;
-		int64_t current_shift = 0;
-
-		float freq = 1;
-
-		void(*interrupt_handle)(void*, int);
-		void * interrupt_priv;
+		void(*interrupt_handle)(void*, int) = nullptr;
+		void * interrupt_priv = nullptr;
 
 	public:
+		float speed_to_shift = 1;
+		float freq = 1;
+		int64_t current_shift = 0;
+
 		fixed_frequency_stepper_controller(robo::stepper * stepper);
 
 		void set_frequency(float freq)
@@ -94,7 +101,12 @@ namespace robo
 
 		void set_speed(float speed);
 
-		void constant_frequency_serve();
+		int constant_frequency_serve();
+
+		velocity_t feedback_speed() 
+		{
+			return (float)current_shift / speed_to_shift;
+		}
 
 	private:
 		void evaluate() override

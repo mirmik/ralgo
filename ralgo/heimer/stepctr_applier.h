@@ -12,9 +12,10 @@ namespace heimer
 		robo::fixed_frequency_stepper_controller * controlled_stepctr;
 		axis_state * state;
 
-		int64_t deviation_error_limit;
-		float compkoeff; /// Коэффициент комплементарного фильтра.
-		float gain;
+		position_t deviation_error_limit = 0;
+		float compkoeff = 0; /// Коэффициент комплементарного фильтра.
+		float gain = 1;
+		disctime_t last_time;
 
 	public:
 		stepctr_applier(
@@ -22,6 +23,10 @@ namespace heimer
 		    robo::fixed_frequency_stepper_controller * stepctr,
 		    axis_state * state
 		);
+
+		void set_gain(float gain) { this->gain = gain; }
+		void set_compkoeff(float ck) { this->compkoeff = ck; }
+
 
 		int feedback(disctime_t time) override;
 		int serve(disctime_t time) override;
