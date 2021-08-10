@@ -5,7 +5,7 @@ using namespace heimer;
 
 stepctr_applier::stepctr_applier(
     const char * name,
-    robo::stepper_controller * stepctr,
+    robo::fixed_frequency_stepper_controller * stepctr,
     axis_state * state
 )
 	: signal_processor(name, 0, 1)

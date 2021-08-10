@@ -9,7 +9,7 @@ namespace heimer
 {
 	class stepctr_applier : public signal_processor
 	{
-		robo::stepper_controller * controlled_stepctr;
+		robo::fixed_frequency_stepper_controller * controlled_stepctr;
 		axis_state * state;
 
 		int64_t deviation_error_limit;
@@ -19,7 +19,7 @@ namespace heimer
 	public:
 		stepctr_applier(
 		    const char * name,
-		    robo::stepper_controller * stepctr,
+		    robo::fixed_frequency_stepper_controller * stepctr,
 		    axis_state * state
 		);
 
