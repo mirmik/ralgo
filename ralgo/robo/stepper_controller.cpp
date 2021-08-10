@@ -67,14 +67,17 @@ int stepper_controller::speed_apply(
 	return shift(arg);
 }
 
-void fixed_frequency_stepper_controller::constant_frequency_serve()
+int fixed_frequency_stepper_controller::constant_frequency_serve()
 {
 	int sts = shift(current_shift);
 
 	if (sts) 
 	{
-		interrupt_handle(interrupt_priv, sts);
+		if (interrupt_handle)
+			interrupt_handle(interrupt_priv, sts);
 	}
+
+	return sts;
 }
 
 fixed_frequency_stepper_controller::fixed_frequency_stepper_controller(
@@ -87,5 +90,9 @@ fixed_frequency_stepper_controller::fixed_frequency_stepper_controller(
 
 void fixed_frequency_stepper_controller::set_speed(float speed)
 {
-	this->current_shift = speed_to_shift * speed;
+	auto val = speed_to_shift * speed;
+
+	system_lock();
+	this->current_shift = val;
+	system_unlock();
 }

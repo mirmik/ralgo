@@ -1,4 +1,5 @@
 #include <ralgo/heimer/stepctr_applier.h>
+#include <ralgo/log.h>
 #include <igris/math.h>
 
 using namespace heimer;
@@ -24,28 +25,26 @@ void stepctr_applier::deinit()
 
 int stepctr_applier::serve(disctime_t time)
 {
-	(void) time;
+	position_t errpos = state->ctrpos - state->feedpos;
 
-	int64_t errpos = state->ctrpos - state->feedpos;
-
-	if (ABS(errpos) > deviation_error_limit)
+	if (deviation_error_limit && ABS(errpos) > deviation_error_limit)
 	{
 		controlled_stepctr->set_speed(0);
 
-		//char str[56];
-		//sprintf(str, "position deviation error : mnemo:%s", parent::mnemo());
-		//ralgo::warn(str);
+		char str[56];
+		sprintf(str, "position deviation error : mnemo:%s", name().data());
+		ralgo::warn(str);
 
-		//force_stop_interrupt_args msg("position deviation error");
-		//parent::throw_interrupt(&msg);
+		interrupt(time, true);
+		return SIGNAL_PROCESSOR_RETURN_RUNTIME_ERROR;
 	}
 
-	// Скорость вычисляется как
-	// сумма уставной скорости на
-	// Возможно, в этом выражение должно быть время.
-	float compspd = state->ctrvel + compkoeff * errpos;
-	controlled_stepctr->set_speed(compspd);
+	disctime_t delta = time - last_time;
 
+	float compspd = state->ctrvel + compkoeff * errpos * delta;
+	controlled_stepctr->set_speed(compspd * gain);
+
+	last_time = time;
 	return 0;
 }
 
@@ -53,6 +52,8 @@ int stepctr_applier::serve(disctime_t time)
 int stepctr_applier::feedback(disctime_t time)
 {
 	(void) time;
+	state->feedpos = controlled_stepctr->feedback_position() / gain;
+	state->feedvel = controlled_stepctr->feedback_speed() / gain;
 	return 0;
 }
 
