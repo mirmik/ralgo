@@ -1,6 +1,7 @@
 #include <doctest/doctest.h>
 #include <ralgo/robo/stepper_controller.h>
 #include <ralgo/heimer/stepctr_applier.h>
+#include <ralgo/heimer/axisctr.h>
 
 using namespace robo;
 using namespace heimer;
@@ -52,4 +53,20 @@ TEST_CASE("fixed_frequency_stepctr")
 		stepctr.constant_frequency_serve();
 	}
 	CHECK_EQ(stepsim.steps_count(), 0);
+}
+
+
+TEST_CASE("stepctr_applier") 
+{
+	stepper stepsim;	
+	fixed_frequency_stepper_controller stepctr(&stepsim);
+
+	axis_state x("x");
+	axis_controller xctr("xctr", { &x });
+
+	stepctr.set_units_in_step(10000);
+	stepctr.set_frequency(0.1);
+
+
+
 }

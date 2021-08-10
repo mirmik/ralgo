@@ -54,11 +54,9 @@ namespace heimer
 		struct axis_settings * settings;
 
 	public:
-		axis_controller(
-		    const char * name,
-		    struct axis_settings * setings,
-		    int dim
-		);
+		axis_controller(const char * name, axis_settings * setings, int dim);
+		axis_controller(const char * name, int dim);
+		axis_controller(const char * name, const std::initializer_list<axis_state*> & states);
 
 		int feedback(disctime_t time) override;
 		int serve(disctime_t time) override;
@@ -76,6 +74,7 @@ namespace heimer
 		);
 
 		void set_gain(double * gain);
+		void set_gain(const std::initializer_list<double> & gain);
 
 		void set_limits_external(double * back, double * forw);
 		void set_velocity_external(float vel);
@@ -119,6 +118,9 @@ namespace heimer
 
 		void finish_trajectory(disctime_t time, position_t * ctrpos);
 		bool on_interrupt(disctime_t) override;
+	
+		void _init();
+		void allocate_resources();
 	};
 
 	axis_controller * create_axis_controller(const char * name, int dim);
