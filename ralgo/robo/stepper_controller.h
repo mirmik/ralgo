@@ -6,6 +6,7 @@
 
 #include <ralgo/heimer/heimer_types.h>
 #include <ralgo/robo/stepper.h>
+#include <ralgo/disctime.h>
 
 #define STEPCTR_OVERRUN -22
 
@@ -17,18 +18,20 @@ namespace robo
 	*/
 	class stepper_controller
 	{
-		robo::stepper * stepper; 
+		robo::stepper * stepper;
 
 		double ext2steps;
 
-		int64_t units_in_step = 10000;
 		float trigger_level = 0.75;
-		int64_t units_in_step_triggered = units_in_step * trigger_level;
 
-		int64_t control_pos = 0;
-		int64_t virtual_pos = 0;
+		int64_t _control_pos = 0;
+		int64_t _virtual_pos = 0;
 
 		uint8_t state = 0;
+
+	protected:
+		int64_t units_in_step = 10000;
+		int64_t units_in_step_triggered = units_in_step * trigger_level;
 
 	public:
 		stepper_controller(robo::stepper * stepper);
@@ -46,35 +49,62 @@ namespace robo
 		    float delta
 		);
 
-		void set_trigger_level(float trigger_level) 
+		void set_trigger_level(float trigger_level)
 		{
 			this->trigger_level = trigger_level;
 		}
+
+		void set_units_in_step(int64_t ups)
+		{
+			units_in_step = ups;
+			units_in_step_triggered = ups * trigger_level;
+		}
+
+		int64_t control_pos() { return _control_pos; }
+		int64_t virtual_pos() { return _virtual_pos; }
 	};
 
 	class fixed_frequency_stepper_controller : public stepper_controller
 	{
-		float   frequency = 1;
+		float   speed_to_shift = 1;
 		int64_t current_shift = 0;
-		float   speed = 0;
 
-		void(*interrupt_handle)(void*, int); 
-		void * interrupt_priv;		
+		float freq = 1;
+		float gain = 1;
+
+		void(*interrupt_handle)(void*, int);
+		void * interrupt_priv;
 
 	public:
-		fixed_frequency_stepper_controller(
-		    robo::stepper * stepper
-		);
+		fixed_frequency_stepper_controller(robo::stepper * stepper);
 
-		void set_interrupt_handler(void(*handle)(void*,int), void * arg) 
+		void set_frequency(float freq)
+		{
+			this->freq = freq;
+			evaluate_speed_to_shift();
+		}
+
+		void set_gain(float gain)
+		{
+			this->gain = gain;
+			evaluate_speed_to_shift();
+		}
+
+		void set_interrupt_handler(void(*handle)(void*, int), void * arg)
 		{
 			this->interrupt_handle = handle;
 			this->interrupt_priv = arg;
 		}
 
 		void set_speed(float speed);
+
 		void constant_frequency_serve();
 
+	private:
+		void evaluate_speed_to_shift()
+		{
+			speed_to_shift = freq * units_in_step * gain / discrete_time_frequency();
+		}
 	};
 }
 
