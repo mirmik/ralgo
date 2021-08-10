@@ -259,6 +259,12 @@ axis_controller * heimer::create_axis_controller(const char * name, int dim)
 	return ptr;
 }
 
+void axis_controller::allocate_resources()
+{
+	settings = (struct axis_settings *) malloc(sizeof(axis_settings) * leftdim());
+	f.dynamic_resources = 1;
+}
+
 void axis_controller::release_controlled()
 {
 	for (int i = 0; i < leftdim(); ++i)
@@ -393,12 +399,7 @@ int axis_controller::hardstop(disctime_t time)
 }
 
 
-axis_controller::axis_controller(
-    const char * name,
-    axis_settings * settings,
-    int dim
-)
-	: signal_processor(name, dim, dim), settings(settings)
+void axis_controller::_init()
 {
 	set_need_activation(1);
 
@@ -408,7 +409,7 @@ axis_controller::axis_controller(
 
 	if (settings)
 	{
-		for (int i = 0; i < dim; ++i)
+		for (int i = 0; i < leftdim(); ++i)
 		{
 			axis_settings_init(&settings[i]);
 		}
@@ -427,12 +428,35 @@ axis_controller::axis_controller(
 
 	line_trajectory_init(&lintraj, 1,
 	                     &settings[0].sfpos,
-	                     dim
+	                     leftdim()
 	                    );
-
 }
 
-bool axis_controller::on_interrupt(disctime_t time) 
+axis_controller::axis_controller(
+    const char * name,
+    axis_settings * settings,
+    int dim
+)
+	: signal_processor(name, dim, dim), settings(settings)
+{
+	_init();
+}
+
+axis_controller::axis_controller(const char * name, int dim)
+	: signal_processor(name, dim, dim)	
+{
+	allocate_resources();
+	_init();
+}
+
+axis_controller::axis_controller(const char * name, const std::initializer_list<axis_state*> & states)
+	: signal_processor(name, states.size(), states.size())	
+{
+	allocate_resources();
+	_init();
+}
+
+bool axis_controller::on_interrupt(disctime_t time)
 {
 	hardstop(time);
 	return false;
