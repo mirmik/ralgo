@@ -70,7 +70,6 @@ namespace robo
 		int64_t current_shift = 0;
 
 		float freq = 1;
-		float gain = 1;
 
 		void(*interrupt_handle)(void*, int);
 		void * interrupt_priv;
@@ -81,12 +80,6 @@ namespace robo
 		void set_frequency(float freq)
 		{
 			this->freq = freq;
-			evaluate_speed_to_shift();
-		}
-
-		void set_gain(float gain)
-		{
-			this->gain = gain;
 			evaluate_speed_to_shift();
 		}
 
@@ -103,7 +96,7 @@ namespace robo
 	private:
 		void evaluate_speed_to_shift()
 		{
-			speed_to_shift = freq * units_in_step * gain / discrete_time_frequency();
+			speed_to_shift = freq * units_in_step / discrete_time_frequency();
 		}
 	};
 }
