@@ -7,15 +7,9 @@ namespace robo
 {
 	class quadgen : public robo::stepper
 	{
-		int64_t counter = 0;
 		int8_t state = 0;
 
 	public:
-		void set_counter_value(int64_t val) 
-		{
-			counter = val;
-		}
-
 		void set_declared_state(uint8_t declared_state) 
 		{
 			state = declared_state;
@@ -33,11 +27,6 @@ namespace robo
 			--counter;
 			state = state == 0 ? 3 : state - 1;
 			set_state(state);
-		}
-
-		int64_t steps_count() override
-		{
-			return counter;
 		}
 
 		virtual void set_state(uint8_t state) = 0;

@@ -5,10 +5,22 @@ namespace robo
 {
 	class stepper
 	{
+		int64_t counter = 0;
+
 	public:
-		virtual void inc() = 0;
-		virtual void dec() = 0;
-		virtual int64_t steps_count() = 0;
+		virtual void inc() { ++counter; }
+		virtual void dec() { --counter; }
+
+		int64_t steps_count()
+		{
+			return counter;
+		}
+
+		void set_counter_value(int64_t val)
+		{
+			counter = val;
+		}
+
 	};
 }
 
