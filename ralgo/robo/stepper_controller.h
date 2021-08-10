@@ -72,7 +72,6 @@ namespace robo
 			this->interrupt_priv = arg;
 		}
 
-		// Второй уровень.
 		void set_speed(float speed);
 		void constant_frequency_serve();
 
