@@ -58,7 +58,10 @@ namespace robo
 		{
 			units_in_step = ups;
 			units_in_step_triggered = ups * trigger_level;
+			evaluate();
 		}
+
+		virtual void evaluate() {}
 
 		int64_t control_pos() { return _control_pos; }
 		int64_t virtual_pos() { return _virtual_pos; }
@@ -80,7 +83,7 @@ namespace robo
 		void set_frequency(float freq)
 		{
 			this->freq = freq;
-			evaluate_speed_to_shift();
+			evaluate();
 		}
 
 		void set_interrupt_handler(void(*handle)(void*, int), void * arg)
@@ -94,7 +97,7 @@ namespace robo
 		void constant_frequency_serve();
 
 	private:
-		void evaluate_speed_to_shift()
+		void evaluate() override
 		{
 			speed_to_shift = freq * units_in_step / discrete_time_frequency();
 		}
