@@ -4,6 +4,8 @@
 #include <igris/math.h>
 #include <ralgo/disctime.h>
 
+#include <igris/dprint.h>
+
 using namespace robo;
 
 stepper_controller::stepper_controller( robo::stepper * stepper )
@@ -15,8 +17,6 @@ stepper_controller::stepper_controller( robo::stepper * stepper )
 
 	_control_pos = 0;
 	_virtual_pos = 0;
-
-	state = 0;
 }
 
 void stepper_controller::set_steps_position(position_t pos)

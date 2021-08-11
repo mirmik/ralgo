@@ -41,8 +41,9 @@ int stepctr_applier::serve(disctime_t time)
 
 	disctime_t delta = time - last_time;
 
-	float compspd = state->ctrvel + compkoeff * errpos * delta;
-	controlled_stepctr->set_speed(compspd * gain);
+	compspd = state->ctrvel + compkoeff * errpos * delta;
+	impulses_per_disc = compspd * gain;
+	controlled_stepctr->set_speed(impulses_per_disc);
 
 	last_time = time;
 	return 0;
