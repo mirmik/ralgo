@@ -5,6 +5,7 @@ namespace robo
 {
 	class stepper
 	{
+	protected:
 		int64_t counter = 0;
 
 	public:
