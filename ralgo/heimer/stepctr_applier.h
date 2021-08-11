@@ -18,6 +18,11 @@ namespace heimer
 		disctime_t last_time;
 
 	public:
+	// debug
+		velocity_t compspd;
+		velocity_t impulses_per_disc;
+
+	public:
 		stepctr_applier(
 		    const char * name,
 		    robo::fixed_frequency_stepper_controller * stepctr,
@@ -27,6 +32,7 @@ namespace heimer
 		void set_gain(float gain) { this->gain = gain; }
 		void set_compkoeff(float ck) { this->compkoeff = ck; }
 
+		void set_compkoeff_timeconst(float T) { this->compkoeff = 1. / discrete_time_frequency() / T; }
 
 		int feedback(disctime_t time) override;
 		int serve(disctime_t time) override;

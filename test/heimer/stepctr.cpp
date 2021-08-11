@@ -34,22 +34,35 @@ TEST_CASE("stepctr")
 
 TEST_CASE("fixed_frequency_stepctr")
 {
+	dprln("fixed_frequency_stepctr");
+
 	stepper stepsim;
 	fixed_frequency_stepper_controller stepctr(&stepsim);
 
 	stepctr.set_units_in_step(10000);
-
 	stepctr.set_frequency(0.1);
 
-	stepctr.set_speed(7 * 1000);
-	for (int i = 0; i < 10000; ++i)
-	{
-		stepctr.constant_frequency_serve();
-	}
-	CHECK_EQ(stepsim.steps_count(), 7000);
+	CHECK_EQ(stepctr.speed_to_shift, 10000 * 0.1);
+	
+	// Один импульс за дискрет
+	stepctr.set_speed(1);
 
-	stepctr.set_speed(-7 * 1000);
-	for (int i = 0; i < 10000; ++i)
+	CHECK_EQ(stepctr.current_shift, 1000);
+
+	for (int i = 0; i < 10 * 1000; ++i)
+	{
+		int sts = stepctr.constant_frequency_serve();
+		CHECK_EQ(sts, 0);
+	}
+
+	CHECK_EQ(stepctr.control_pos(), 10000 * 1000);
+	CHECK_EQ(stepctr.virtual_pos(), 10000 * 1000);
+	CHECK_EQ(stepsim.steps_count(), 1000);
+
+	// Один импульс за дискрет
+	stepctr.set_speed(-1);
+
+	for (int i = 0; i < 10 * 1000; ++i)
 	{
 		stepctr.constant_frequency_serve();
 	}
@@ -61,26 +74,24 @@ TEST_CASE("stepctr_applier")
 {
 	int sts;
 	heimer::heimer_reinit();
-	dprln("stepctr_applier");
 
 	stepper stepsim;
 	fixed_frequency_stepper_controller stepctr(&stepsim);
-	stepctr.set_frequency(0.1);
 
 	axis_state x("x");
 	axis_controller xctr("xctr", { &x });
 
 	stepctr_applier applier("xapply", &stepctr, &x);
 
-	stepctr.set_units_in_step(10000);
+	stepctr.set_units_in_step((1<<20));
 	stepctr.set_frequency(0.01);
 
-	applier.set_gain(4194304);
-	//applier.set_compkoeff(0.00001);
+	applier.set_gain(4194.304);
+	applier.set_compkoeff_timeconst(0.5);
 
 	xctr.set_velocity_external(1);
-	xctr.set_acceleration_external(2);
-	xctr.set_decceleration_external(2);
+	xctr.set_acceleration_external(1);
+	xctr.set_decceleration_external(1);
 	double forw = 100, back = -100;
 	xctr.set_limits_external(&back, &forw);
 
@@ -91,40 +102,46 @@ TEST_CASE("stepctr_applier")
 	CHECK_EQ(x.feedvel, 0);
 
 	CHECK_EQ(xctr.external_velocity(), 1);
-	sts = xctr.absmove(0, {10.});
+	sts = xctr.absmove(0, {100.});
 	CHECK_EQ(xctr.is_active(), true);
 	CHECK_EQ(sts, 0);
 
-	sts = applier.feedback(1);
-	CHECK_EQ(sts, 0);
-	sts = xctr.feedback(1);
-	CHECK_EQ(sts, 0);
-	sts = xctr.serve(1);
-	CHECK_EQ(xctr.is_active(), true);
-	CHECK_EQ(sts, 0);
-	sts = applier.serve(1);
-	CHECK_EQ(sts, 0);
-
-	CHECK_NE(x.ctrvel, 0);
-
-
-	for (int sec = 0; sec < 2; ++sec)
+	int ii =0;
+	for (int sec = 0; sec < 1; ++sec)
 	{
-		for (int i = 1; i < 100; ++i)
+		for (int i = 0; i < 100; ++i)
 		{
 			int curtime = sec * 1000 + i * 10;
-			for (int j = 0; j < 100; ++j)
-			{
-				sts = stepctr.constant_frequency_serve();
-				CHECK_EQ(sts, 0);
-			}
+
 			applier.feedback(curtime);
 			xctr.feedback(curtime);
 			xctr.serve(curtime);
 			applier.serve(curtime);
+
+			for (int j = 0; j < 1000; ++j)       // freq = 0.01
+			{ 
+				++ii;
+				sts = stepctr.constant_frequency_serve();
+				CHECK_EQ(sts, 0);
+			}
 		}
 	}
+	int curtime = 1000;
+	applier.feedback(curtime);
+	xctr.feedback(curtime);
+	xctr.serve(curtime);
+	applier.serve(curtime);
 
-	CHECK_NE(x.ctrpos, 0);
-	CHECK_EQ(stepsim.steps_count(), 4194304);
+	CHECK_EQ(x.ctrpos, doctest::Approx(0.5));
+	CHECK_EQ(x.ctrvel, doctest::Approx(1. / discrete_time_frequency()));
+	CHECK_EQ(x.feedvel, doctest::Approx(1. / discrete_time_frequency()));
+	CHECK_EQ(x.feedpos, doctest::Approx(0.5).epsilon(0.001));	
+
+	CHECK_EQ(applier.impulses_per_disc, doctest::Approx(4.194304).epsilon(0.01));
+
+	CHECK_EQ(applier.compspd, doctest::Approx(1. / discrete_time_frequency()));
+	CHECK_EQ(stepctr.units_in_step, doctest::Approx((1<<20)));
+	CHECK_EQ(stepctr.speed_to_shift, doctest::Approx((1<<20) * 0.01));
+
+	CHECK_EQ(stepsim.steps_count(), doctest::Approx(4194/2).epsilon(1));
 }

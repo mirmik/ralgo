@@ -26,10 +26,9 @@ namespace robo
 		int64_t _control_pos = 0;
 		int64_t _virtual_pos = 0;
 
-		uint8_t state = 0;
-
-	protected:
-		int64_t units_in_step = 10000;
+	//protected:
+	public:
+		int64_t units_in_step = (1 << 20);
 		int64_t units_in_step_triggered = units_in_step * trigger_level;
 
 	public:
@@ -111,7 +110,8 @@ namespace robo
 	private:
 		void evaluate() override
 		{
-			speed_to_shift = freq * units_in_step / discrete_time_frequency();
+			speed_to_shift = freq * units_in_step// / discrete_time_frequency()
+			;
 		}
 	};
 }
