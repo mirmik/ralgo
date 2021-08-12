@@ -11,6 +11,7 @@ application("runtests",
 	sources = [
 		"imu/*",
 		"*.cpp",
+		"robo/*.cpp",
 		"heimer/*.cpp",
 		"space/*.cpp",
 		"math/*.cpp",
