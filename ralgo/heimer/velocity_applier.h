@@ -2,8 +2,8 @@
 	@file velocity_applier.h
 */
 
-#ifndef RALGO_HEIMER_STEPCTR_APPLIER
-#define RALGO_HEIMER_STEPCTR_APPLIER
+#ifndef RALGO_HEIMER_VELOCITY_APPLIER
+#define RALGO_HEIMER_VELOCITY_APPLIER
 
 #include <ralgo/robo/stepper_controller.h>
 #include <ralgo/heimer/phase_signals.h>
