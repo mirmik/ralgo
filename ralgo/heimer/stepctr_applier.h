@@ -1,3 +1,7 @@
+/** 
+	@file velocity_applier.h
+*/
+
 #ifndef RALGO_HEIMER_STEPCTR_APPLIER
 #define RALGO_HEIMER_STEPCTR_APPLIER
 
@@ -7,9 +11,16 @@
 
 namespace heimer
 {
-	class stepctr_applier : public signal_processor
+	/**
+		Применятет данные объектов axis_state к объектам реализующим интерфейсы датчиков
+		скоростей и положений библиотеки robo. Комплементарно корректирует установленную 
+		скорость по данных о положении.
+	*/
+	class velocity_applier : public signal_processor
 	{
-		robo::fixed_frequency_stepper_controller * controlled_stepctr;
+		robo::i_velocity_setter * controlled_velset;
+		robo::i_velocity_feedback * controlled_velget;
+		robo::i_position_feedback * controlled_posget;
 		axis_state * state;
 
 		position_t deviation_error_limit = 0;

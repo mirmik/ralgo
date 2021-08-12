@@ -9,6 +9,8 @@
 #include <ralgo/robo/stepper.h>
 #include <ralgo/disctime.h>
 
+#include <ralgo/robo/iposvel.h>
+
 #define STEPCTR_OVERRUN -22
 
 namespace robo
@@ -17,7 +19,7 @@ namespace robo
 		Драйвер шагового двигателя или любого устройства, управляемого шагами.
 		Даёт команду на совершения шага изделия в зависимости от установленной скорости.
 	*/
-	class stepper_controller
+	class stepper_controller : public i_position_feedback
 	{
 		robo::stepper * stepper;
 
@@ -64,7 +66,7 @@ namespace robo
 		int64_t control_pos() { return _control_pos; }
 		int64_t virtual_pos() { return _virtual_pos; }
 
-		position_t feedback_position() 
+		double feedback_position() override
 		{
 			system_lock();
 			auto counter_value = stepper->steps_count();
@@ -74,7 +76,7 @@ namespace robo
 		}
 	};
 
-	class fixed_frequency_stepper_controller : public stepper_controller
+	class fixed_frequency_stepper_controller : public stepper_controller, public i_velocity_driver
 	{
 		void(*interrupt_handle)(void*, int) = nullptr;
 		void * interrupt_priv = nullptr;
@@ -98,11 +100,11 @@ namespace robo
 			this->interrupt_priv = arg;
 		}
 
-		void set_speed(float speed);
+		void set_velocity(double speed) override;
 
 		int constant_frequency_serve();
 
-		velocity_t feedback_speed() 
+		double feedback_velocity() override 
 		{
 			return (float)current_shift / speed_to_shift;
 		}
