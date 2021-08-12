@@ -6,6 +6,11 @@
 
 #ifndef __ARDUINO__
 // Mock
+class Adafruit_MotorShield 
+{
+
+};
+
 class Adafruit_DCMotor
 {
 public:
