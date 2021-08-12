@@ -29,6 +29,9 @@ namespace robo
 
 	class i_velocity_driver : public i_velocity_setter, public i_velocity_feedback 
 	{};
+
+	class i_position_driver : public i_position_setter, public i_position_feedback 
+	{};
 }
 
 #endif
