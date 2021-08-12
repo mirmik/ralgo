@@ -45,7 +45,7 @@ TEST_CASE("fixed_frequency_stepctr")
 	CHECK_EQ(stepctr.speed_to_shift, 10000 * 0.1);
 	
 	// Один импульс за дискрет
-	stepctr.set_speed(1);
+	stepctr.set_velocity(1);
 
 	CHECK_EQ(stepctr.current_shift, 1000);
 
@@ -60,7 +60,7 @@ TEST_CASE("fixed_frequency_stepctr")
 	CHECK_EQ(stepsim.steps_count(), 1000);
 
 	// Один импульс за дискрет
-	stepctr.set_speed(-1);
+	stepctr.set_velocity(-1);
 
 	for (int i = 0; i < 10 * 1000; ++i)
 	{

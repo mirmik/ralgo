@@ -11,7 +11,9 @@ stepctr_applier::stepctr_applier(
 )
 	: signal_processor(name, 0, 1)
 {
-	controlled_stepctr = stepctr;
+	controlled_velset = stepctr;
+	controlled_velget = stepctr;
+	controlled_posget = stepctr;
 	this->state = state;
 
 	state->attach_listener(this);
@@ -29,7 +31,7 @@ int stepctr_applier::serve(disctime_t time)
 
 	if (deviation_error_limit && ABS(errpos) > deviation_error_limit)
 	{
-		controlled_stepctr->set_speed(0);
+		controlled_velset->set_velocity(0);
 
 		char str[56];
 		sprintf(str, "position deviation error : mnemo:%s", name().data());
@@ -43,7 +45,7 @@ int stepctr_applier::serve(disctime_t time)
 
 	compspd = state->ctrvel + compkoeff * errpos * delta;
 	impulses_per_disc = compspd * gain;
-	controlled_stepctr->set_speed(impulses_per_disc);
+	controlled_velset->set_velocity(impulses_per_disc);
 
 	last_time = time;
 	return 0;
@@ -53,8 +55,8 @@ int stepctr_applier::serve(disctime_t time)
 int stepctr_applier::feedback(disctime_t time)
 {
 	(void) time;
-	state->feedpos = controlled_stepctr->feedback_position() / gain;
-	state->feedvel = controlled_stepctr->feedback_speed() / gain;
+	state->feedpos = controlled_posget->feedback_position() / gain;
+	state->feedvel = controlled_velget->feedback_velocity() / gain;
 	return 0;
 }
 

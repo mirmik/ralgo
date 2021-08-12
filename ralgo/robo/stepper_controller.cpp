@@ -88,7 +88,7 @@ fixed_frequency_stepper_controller::fixed_frequency_stepper_controller(
 
 }
 
-void fixed_frequency_stepper_controller::set_speed(float speed)
+void fixed_frequency_stepper_controller::set_velocity(double speed)
 {
 	auto val = speed_to_shift * speed;
 
