@@ -21,7 +21,7 @@ licant.module("ralgo",
 		
 		"ralgo/heimer/axisctr.cpp",
 		"ralgo/heimer/axisctr_command.cpp",
-		"ralgo/heimer/stepctr_applier.cpp",
+		"ralgo/heimer/velocity_applier.cpp",
 		"ralgo/heimer/signal_processor.cpp",
 		"ralgo/heimer/signal.cpp",
 		"ralgo/heimer/dof6_signal.cpp",

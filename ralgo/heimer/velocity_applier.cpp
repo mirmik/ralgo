@@ -1,10 +1,10 @@
-#include <ralgo/heimer/stepctr_applier.h>
+#include <ralgo/heimer/velocity_applier.h>
 #include <ralgo/log.h>
 #include <igris/math.h>
 
 using namespace heimer;
 
-stepctr_applier::stepctr_applier(
+velocity_applier::velocity_applier(
     const char * name,
     robo::fixed_frequency_stepper_controller * stepctr,
     axis_state * state
@@ -19,13 +19,13 @@ stepctr_applier::stepctr_applier(
 	state->attach_listener(this);
 }
 
-void stepctr_applier::deinit()
+void velocity_applier::deinit()
 {
 	signal_processor::deinit();
 	state->deattach_listener(this);
 }
 
-int stepctr_applier::serve(disctime_t time)
+int velocity_applier::serve(disctime_t time)
 {
 	position_t errpos = state->ctrpos - state->feedpos;
 
@@ -52,7 +52,7 @@ int stepctr_applier::serve(disctime_t time)
 }
 
 
-int stepctr_applier::feedback(disctime_t time)
+int velocity_applier::feedback(disctime_t time)
 {
 	(void) time;
 	state->feedpos = controlled_posget->feedback_position() / gain;
@@ -60,17 +60,17 @@ int stepctr_applier::feedback(disctime_t time)
 	return 0;
 }
 
-int stepctr_applier::command(int, char **, char *, int) 
+int velocity_applier::command(int, char **, char *, int) 
 {
 	return 0;
 }
 
-signal_head * stepctr_applier::iterate_left(signal_head *) 
+signal_head * velocity_applier::iterate_left(signal_head *) 
 {
 	return NULL;
 }
 
-signal_head * stepctr_applier::iterate_right(signal_head * iter) 
+signal_head * velocity_applier::iterate_right(signal_head * iter) 
 {
 	if (iter) return NULL;
 	else return state;

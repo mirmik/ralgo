@@ -34,7 +34,7 @@ namespace heimer
 		velocity_t impulses_per_disc;
 
 	public:
-		stepctr_applier(
+		velocity_applier(
 		    const char * name,
 		    robo::fixed_frequency_stepper_controller * stepctr,
 		    axis_state * state
