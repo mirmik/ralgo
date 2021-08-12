@@ -5,18 +5,25 @@
 #include <ralgo/robo/motor.h>
 
 #ifndef __ARDUINO__
-// Mock
-class Adafruit_MotorShield 
-{
-
-};
-
 class Adafruit_DCMotor
 {
 public:
 	void setSpeed(float) {}
 	void run(int) {}
 };
+
+// Mock
+class Adafruit_MotorShield 
+{
+	Adafruit_DCMotor M[4];
+
+public:
+	Adafruit_DCMotor * getMotor(int index) 
+	{
+		return &M[index];
+	}
+};
+
 #define RELEASE 0
 #define BACKWARD 0
 #define FORWARD 1
@@ -28,6 +35,7 @@ namespace robo
 {
 	class adafruit_motor_driver : public robo::motor
 	{
+	public:
 		Adafruit_DCMotor* M;
 
 		uint8_t setted_mode = RELEASE;
