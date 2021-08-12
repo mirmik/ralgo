@@ -1,6 +1,6 @@
 #include <doctest/doctest.h>
 #include <ralgo/robo/stepper_controller.h>
-#include <ralgo/heimer/stepctr_applier.h>
+#include <ralgo/heimer/velocity_applier.h>
 #include <ralgo/heimer/axisctr.h>
 #include <ralgo/heimer/command.h>
 
@@ -81,7 +81,7 @@ TEST_CASE("stepctr_applier")
 	axis_state x("x");
 	axis_controller xctr("xctr", { &x });
 
-	stepctr_applier applier("xapply", &stepctr, &x);
+	velocity_applier applier("xapply", &stepctr, &x);
 
 	stepctr.set_units_in_step((1<<20));
 	stepctr.set_frequency(0.01);
