@@ -15,7 +15,6 @@ licant.module("ralgo",
 		"ralgo/trajectory/tsdeform.c",
 		"ralgo/trajectory/trajectory.c",
 		"ralgo/trajectory/linetraj.c",
-		"ralgo/robo/quadgen4_arduino.c",
 
 		"ralgo/robo/stepper_controller.cpp",
 		
