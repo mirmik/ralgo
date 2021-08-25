@@ -16,6 +16,7 @@ application("runtests",
 		"space/*.cpp",
 		"math/*.cpp",
 		"lp/*.cpp",
+		"cnc/*.cpp",
 	],
 
 	cxx_flags = "-g -pedantic -Wno-vla -Werror=extra -Werror=all",

@@ -22,7 +22,17 @@ class control_block
 	int64_t deaceleration_after_ic;
 	int64_t block_finish_ic;
 
+	uint8_t exact_stop;
+
 	bool is_active(int64_t interrupt_counter)
+	{
+		if (exact_stop)
+			return interrupt_counter < block_finish_ic;
+		else 
+			return interrupt_counter < deaceleration_after_ic;
+	}
+
+	bool is_postactive() 
 	{
 		return interrupt_counter < block_finish_ic;
 	}
@@ -46,101 +56,97 @@ class control_axis_phase
 	float acceleration;
 }
 
-class control_applier
+class planned_blocks_ring
 {
 	int64_t interrupt_counter;
 	int64_t revolver_iteration_counter;
 
-	dlist_head active_blocks;
 	int64_t reference_position [N_AXES];
 
 	float delta;
 	float delta_sqr_div_2;
 
+	control_block * active_block;	
+	dlist_head postactive_blocks;
+
+	ring_head ring;
+	int ring_postactive_head;
+
+	control_block planned[PLANNED_BLOCKS_RING];
+
+	int change_active_block() 
+	{
+		ring_move_head_one(&ring);
+
+	}
+
+	int block_index(control_block * it) 
+	{
+		return it - planned;
+	}
+
+	void fixup_postactive_blocks() 
+	{
+		while(ring_postactive_counter_head != ring->head) 
+		{
+			if (!planned[ring_postactive_counter_head].is_postactive()) 
+			{
+				ring_postactive_head = (ring_postactive_head + 1) % ring->size;
+				planned[ring_postactive_counter_head].valid = false;
+			}
+
+			else 
+			{
+				break;
+			}
+		}
+	}
+
+	void discard_postactive(control_block * it) 
+	{
+		if (block_index(it) == ring_postactive_counter_head) 
+			fixup_postactive_blocks();
+	}
+
 	void algorithm_step_for_trapecidal_profile()
 	{
+		int final;
 		int room = revolver_cycle->room();
 
 		while (room--) 
 		{
 			// Планируем поведение револьвера на несколько циклов вперёд
 			// попутно инкрементируя модельное время.
-			iteration(revolver_iteration_counter);
+			final = iteration(revolver_iteration_counter);
+		
+			if (final) 
+				return final;
+
 			++revolver_iteration_counter;
 		}
 	}
 
-	void iteration()
+	int iteration()
 	{
 		control_block * itblock;
 
-		// plan moment
-		if (kept_another_block())
+		if (!active_block->is_active(current_iteration)) 
 		{
-			for (int i = 0; i < total_axes; ++i)
-			{
-				axes[i]->acceleration += itblock->acceleration * itblock->multipliers[i];
-			}
-
-			move_block_to_accel(itblock);
-			continue;
+			int final = change_active_block(active_block);
+			
+			if (final) 
+				return final; 
 		}
 
-		// accel finish
-		while ()
+		auto acceleration = active_block->current_acceleration();
+		
+		dlist_for_each_entry_safe(itblock, postactive_blocks, lnk) 
 		{
-			for (int i = 0; i < total_axes; ++i)
-			{
-				axes[i]->acceleration += itblock->acceleration * itblock->multipliers[i];
-			}
-
-			move_block_to_cruis(itblock);
-			continue;
-		}
-
-		// cruis finish
-		while ()
-		{
-			for (int i = 0; i < total_axes; ++i)
-			{
-				axes[i]->acceleration += itblock->deceleration * itblock->multipliers[i];
-			}
-
-			move_block_to_decel(itblock);
-			continue;
-		}
-
-		// decel finish
-		{
-			for (int i = 0; i < total_axes; ++i)
-			{
-				axes[i]->acceleration -= itblock->deceleration * itblock->multipliers[i];
-			}
-			discard_block(itblock);
-		}
-
-		// Normalization;
-		if (cruise_situation())
-		{
-			auto * block = cruis_block();
-			for (int i = 0; i < total_axes; ++i)
-			{
-				axes_records[i] -> acceleration = 0;
-				axes_records[i] -> velocity = block->nominal_velocity * block->multiplier;
-			}
-		}
-
-		// check position
-		if (idle_situation())
-		{
-			for (int i = 0; i < total_axes; ++i)
-			{
-				axes_records[i] -> acceleration = 0;
-				axes_records[i] -> velocity = 0;
-
-				assert(axes_records[i]->steps[i] == reference_position[i]);
-			}
-		}
+			if (!itblock->is_postactive()) 
+				discard_postactive(itblock);
+			
+			acceleration += itblock->current_acceleration();
+		}	
 
 		for (int i = 0; i < total_axes; ++i)
 		{
@@ -163,7 +169,7 @@ class control_applier
 		}
 	}
 
-	class step_revolver
+	class revolver_ring
 	{
 		typedef uint16_t revolver_t;
 
@@ -177,9 +183,16 @@ class control_applier
 	private:
 		int64_t iteration_counter;
 		ring_head ring;
-		impulse_shift shifts[SHIFTER_RING_SIZE];
+
+		int ring_size;
+		revolver_shift * shifts;
 
 	public:
+		revolver_ring(revolver_shift * shifts, int ring_size) 
+			shifts(shifts),
+			ring_size(ring_size)
+		{}
+
 		void room() 
 		{
 			// Операция взятия оставшегося места над кольцевым буфером
