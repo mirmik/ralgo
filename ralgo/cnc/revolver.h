@@ -3,38 +3,28 @@
 
 #include <stdint.h>
 
-#include <igris/datastruct/ring.h>
+#include <igris/container/ring.h>
 #include <igris/sync/syslock.h>
 
 #include <ralgo/robo/stepper.h>
+#include <ralgo/cnc/shift.h>
 
 namespace cnc
 {
 	class revolver_ring
 	{
-		typedef uint16_t revolver_t;
-
-	public:
-		struct shift
-		{
-			revolver_t step;
-			revolver_t direction;
-		};
-
 	private:
 		int64_t iteration_counter;
-		ring_head ring;
-		shift * shifts;
+
+		igris::ring<cnc::control_shift> * shifts_ring;
 
 		robo::stepper ** steppers;
 		int steppers_total;
 
 	public:
-		revolver_ring(shift * shifts, int ring_size) :
-			shifts(shifts)
-		{
-			ring_init(&ring, ring_size);
-		}
+		revolver_ring(igris::ring<cnc::control_shift> * ring) :
+			shifts_ring(ring)
+		{}
 
 		void set_steppers(robo::stepper ** steppers_table, int size) 
 		{
@@ -47,7 +37,7 @@ namespace cnc
 			int size;
 
 			system_lock();
-			size = ring_avail(&ring);
+			size = shifts_ring->avail();
 			system_unlock();
 
 			return size;
@@ -59,7 +49,7 @@ namespace cnc
 			// требует сравнения head и tail, изменяемых в разных потоках,
 			// поэтому не является атомарной.
 			system_lock();
-			int ret = ring_room(&ring);
+			int ret = shifts_ring->room();
 			system_unlock();
 
 			return ret;
@@ -71,21 +61,18 @@ namespace cnc
 			// потому что ring_head lockfree на добавление и чтение,
 			// если unsigned int атомарен.
 
-			int idx = ring.head;
-			shifts[idx].step = step;
-			shifts[idx].direction = dir;
-			ring_move_head_one(&ring);
+			shifts_ring->emplace(step, dir);
 		}
 
 		void serve()
 		{
 			// В общем случае ring_empty не атомарен. Однако, здесь должен
 			// быть контекст приоритетного прерывания.
-			if (ring_empty(&ring))
+			if (shifts_ring->empty())
 				return;
 
-			int idx = ring.tail;
-			auto & shift = shifts[idx];
+			//int idx = shifts_ring->tail_index();
+			auto & shift = shifts_ring->last();
 
 			for (int i = 0; i < steppers_total; ++i)
 			{
@@ -102,7 +89,7 @@ namespace cnc
 					steppers[i]->dec();
 			}
 
-			ring_move_tail_one(&ring);
+			shifts_ring->move_tail_one();
 			return;
 		}
 	};
