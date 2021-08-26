@@ -1,0 +1,52 @@
+#ifndef RALGO_QUADGENER_H
+#define RALGO_QUADGENER_H
+
+#include <stdint.h>
+#include <igris/compiler.h>
+#include <igris/util/graycode.h>
+
+#include <ralgo/robo/quadgen.h>
+
+#if __has_include(<Arduino.h>)
+#include <Arduino.h>
+#else
+// Затычка для того, чтобы скомпилировать функцию (для тестов)
+// на машине отличной от Arduino
+static inline void digitalWrite(uint8_t pin, uint8_t val)
+{
+	(void) pin;
+	(void) val;
+}
+#endif
+
+namespace robo
+{
+	class quadgen4_arduino : public robo::quadgen
+	{
+		uint8_t apin0, apin1, bpin0, bpin1;
+
+	public:
+		quadgen4_arduino(uint8_t a, uint8_t b, uint8_t c, uint8_t d)
+		{
+			apin0 = a;
+			apin1 = b;
+			bpin0 = c;
+			bpin1 = d;
+		}
+
+		void set_state(uint8_t state) override
+		{
+			uint8_t setcode = graycode8(state);
+
+			int a = (setcode & 0b01);
+			int b = (setcode & 0b10);
+
+			digitalWrite(apin0,  a);
+			digitalWrite(apin1, !a);
+			digitalWrite(bpin0,  b);
+			digitalWrite(bpin1, !b);
+		}
+	};
+}
+
+#endif

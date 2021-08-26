@@ -95,11 +95,13 @@ TEST_CASE("axisctr_multiax")
 
 	int sts;
 
-	struct axis_state state0("state0");
-	struct axis_state state1("state1");
-	struct axis_settings settings[2];
-	struct axis_controller axctr("axctr", settings, 2);
-	
+	axis_state state0("state0");
+	axis_state state1("state1");
+	axis_controller axctr("axctr", { &state0, &state1 });
+
+	CHECK_EQ(axctr.settings[0].controlled, &state0);
+	CHECK_EQ(axctr.settings[1].controlled, &state1);
+
 	axctr.set_handlers(nullptr, nullptr, finish_handler);
 	double gain = 1000; axctr.set_gain(&gain);
 	axctr.set_velocity_external(10);
@@ -108,9 +110,6 @@ TEST_CASE("axisctr_multiax")
 	double forw[2] = { 100,  100 };
 	double back[2] = { -100, -100 };
 	axctr.set_limits_external(back, forw);
-
-	struct axis_state * states[] = { &state0, &state1 };
-	axctr.set_controlled(states);
 
 	double tgt[] = { 100, 100 };
 	sts = axctr.incmove(0, tgt);
