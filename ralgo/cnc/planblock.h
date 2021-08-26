@@ -5,20 +5,24 @@
 #include <ralgo/cnc/defs.h>
 #include <nos/print.h>
 
+#include <assert.h>
+
 namespace cnc
 {
 	class planner_block
 	{
 	public:
 		int32_t steps[NMAX_AXES];
-		int32_t major_steps;
+		
 		float nominal_velocity;
-
 		float acceleration;
+		float fullpath;
+
 		float multipliers[NMAX_AXES];
 
 		// отметки времени хранят инкрементное время до планирования и абсолютное
 		// время после активации блока.
+		int64_t start_ic;
 		int64_t acceleration_before_ic;
 		int64_t deceleration_after_ic;
 		int64_t block_finish_ic;
@@ -26,8 +30,28 @@ namespace cnc
 		uint8_t exact_stop;
 
 	public:
+		bool validation() 
+		{
+			// TODO: remove assertation
+			assert(fabs(acceleration_before_ic * acceleration - nominal_velocity) < 1e-5);
+			assert(fabs(nominal_velocity * deceleration_after_ic - fullpath) < 1e-5);
+			assert(block_finish_ic - deceleration_after_ic == acceleration_before_ic - start_ic);
+
+			if (fabs(acceleration_before_ic * acceleration - nominal_velocity) > 1e-5)
+				return false;
+
+			if (fabs(nominal_velocity * deceleration_after_ic - fullpath) > 1e-5)
+				return false;
+
+			if (block_finish_ic - deceleration_after_ic != acceleration_before_ic - start_ic)
+				return false;
+
+			return true;
+		}
+
 		void shift_timestampes(int64_t iteration_counter)
 		{
+			start_ic += iteration_counter;
 			acceleration_before_ic += iteration_counter;
 			deceleration_after_ic += iteration_counter;
 			block_finish_ic += iteration_counter;
@@ -86,6 +110,37 @@ namespace cnc
 			{
 				accs[i] += acceleration * multipliers[i];
 			}
+		}
+
+		void set_state(int32_t * steps, int axes, float velocity, float acceleration) 
+		{	
+			(void) steps;
+			(void) axes;
+
+			assert(velocity < 1);
+			assert(acceleration < 1);
+
+			float pathsqr = 0; 
+			for (int i = 0; i < axes; ++i)
+				pathsqr += steps[i] * steps[i];
+			float path = sqrtf(pathsqr);
+			float time = path / velocity;
+
+			int itime = ceil(time);
+			int preftime = ceil(velocity / acceleration);
+
+			start_ic = 0;
+			acceleration_before_ic = preftime;
+			deceleration_after_ic = itime;
+			block_finish_ic = itime + preftime;
+
+			this->nominal_velocity = path / itime;
+			this->acceleration = this->nominal_velocity / preftime;
+			this->fullpath = path;
+
+			memcpy(this->steps, steps, sizeof(int32_t) * axes);
+
+			assert(validation());	
 		}
 	};
 }

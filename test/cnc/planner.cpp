@@ -190,13 +190,17 @@ TEST_CASE("planner.3")
 
 	block.acceleration = 0.25;
 	block.multipliers[0] = 1;
+	block.fullpath = 3;
 
+	block.start_ic = 0;
 	block.acceleration_before_ic = 2;
 	block.deceleration_after_ic = 6;
 	block.block_finish_ic = 8;
 
 	block.exact_stop = 0;
 	blocks.move_head_one();
+
+	CHECK(block.validation());
 
 	planner.serve();
 
@@ -218,3 +222,4 @@ TEST_CASE("planner.3")
 	CHECK_EQ(shifts.get(6).direction, 0);
 	CHECK_EQ(shifts.get(7).direction, 1);
 }
+
