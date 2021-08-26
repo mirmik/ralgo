@@ -11,6 +11,23 @@
 
 namespace cnc
 {
+
+	/**
+	 * Structure of shifts ring:
+	 *
+	 *              blocks.tail()                     (place for new shift)
+	 *                    |                                   |
+	 *                    |                                   |
+	 *                    v                                   v
+	 *      ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
+	 *     |     |     |     |     |     |     |     |     |     |     |     |
+	 *     |     |     |  .  |  .  |  .  |  .  |  .  |  .  |     |     |     |
+	 *     |     |     |     |     |     |     |     |     |     |     |     |
+	 *      ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
+	 *                    ^                                   ^
+	 *                    |                                   |
+	 * counters:       (tail)-->                           (head)-->
+	 * */
 	class revolver_ring
 	{
 	private:
@@ -72,7 +89,7 @@ namespace cnc
 				return;
 
 			//int idx = shifts_ring->tail_index();
-			auto & shift = shifts_ring->last();
+			auto & shift = shifts_ring->tail();
 
 			for (int i = 0; i < steppers_total; ++i)
 			{
