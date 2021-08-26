@@ -2,181 +2,263 @@
 #define RALGO_PLANNER_RING_H
 
 #include <stdint.h>
+
+#include <ralgo/cnc/planblock.h>
+#include <ralgo/cnc/shift.h>
+
 #include <igris/datastruct/dlist.h>
 #include <igris/container/ring.h>
+#include <igris/sync/syslock.h>
 
-#include <ralgo/cnc/shift.h>
+#include <nos/print.h>
 
 #define NMAX_AXES 10
 
 namespace cnc
 {
-
-	class control_block
+	/**
+	 * Structure of blocks ring:
+	 *
+	 * accessors:   blocks.tail()
+	 *                  |
+	 *          :       |               acceleration
+	 * signation:       |                   or        (place for new block)
+	 *          :       |  deceleration   cruis               |
+	 *                  |  |    |     |     |                 |
+	 *                  v  v    v     v     v                 v
+	 *      ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
+	 *     |     |     |     |     |     |     |     |     |     |     |     |
+	 *     |     |     |  .  |  .  |  .  |  .  |  .  |  .  |     |     |     |
+	 *     |     |     |     |     |     |     |     |     |     |     |     |
+	 *      ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
+	 *                    ^                 ^                 ^
+	 *                    |                 |                 |
+	 * counters:       (tail)--->       (active)--->       (head)--->
+	 * */
+	class planner
 	{
-		int32_t steps[NMAX_AXES];
-
-		int32_t major_step;
-		int32_t acceleration_before;
-		int32_t deceleration_after;
-
-		float nominal_increment;
-		float acceleration;
-		float deceleration;
-
-		float multipliers[NMAX_AXES];
-		float accelerations[NMAX_AXES];
-		float decelerations[NMAX_AXES];
-
-		int64_t acceleration_before_ic;
-		int64_t deaceleration_after_ic;
-		int64_t block_finish_ic;
-
-		uint8_t exact_stop;
-
-		//runtime
-		uint8_t state;
-
 	public:
-		bool is_active(int64_t interrupt_counter)
-		{
-			if (exact_stop)
-				return interrupt_counter < block_finish_ic;
-			else
-				return interrupt_counter < deaceleration_after_ic;
-		}
-
-		bool is_postactive(int64_t interrupt_counter)
-		{
-			return interrupt_counter < block_finish_ic;
-		}
-
-		float current_acceleration(int64_t interrupt_counter)
-		{
-			if (interrupt_counter < acceleration_before_ic) return acceleration;
-			if (interrupt_counter < deaceleration_after_ic) return 0;
-			return deceleration;
-		}
-	};
-
-	class planner_ring
-	{
-		int64_t interrupt_counter;
-		int64_t revolver_iteration_counter;
-
+		int64_t iteration_counter = 0;
 		int64_t * reference_position; /// < для внутреннего контроля
 
-		float delta;
-		float delta_sqr_div_2;
+		float delta = 1;
+		float delta_sqr_div_2 = 0.5;
 
-		control_block * active_block;
+		float accelerations[NMAX_AXES];
+		float velocities[NMAX_AXES];
+		int64_t steps[NMAX_AXES];
+		float dda_counters[NMAX_AXES];
 
-		igris::ring<cnc::control_block> * blocks;
+		int active = 0; // index of active block
+		planner_block * active_block = nullptr;
+
+		igris::ring<cnc::planner_block> * blocks;
 		igris::ring<cnc::control_shift> * shifts;
-		int ring_postactive_head;
 
-		int total_axes;
+		int total_axes = 0;
+		bool need_to_reevaluate = false;
+		uint8_t state = 0;
+		int count_of_reevaluation = 0;
 
 	public:
-		planner_ring(igris::ring<cnc::control_block> * blocks,
-		             igris::ring<cnc::control_shift> * shifts)
-			: blocks(blocks), shifts(shifts)
-		{}
 
-		int change_active_block()
+		void set_dim(int axes)
 		{
-			blocks->pop();
-
-			
+			total_axes = axes;
 		}
 
-		int block_index(control_block * it)
+		/*void set_revolver_delta(float delta)
 		{
-			return it - planned;
+			this->delta = delta;
+			this->delta_sqr_div_2 = delta * delta / 2;
+		}*/
+
+		void reset_iteration_counter()
+		{
+			iteration_counter = 0;
+		}
+
+		planner(igris::ring<cnc::planner_block> * blocks,
+		        igris::ring<cnc::control_shift> * shifts)
+			: blocks(blocks), shifts(shifts)
+		{
+			memset(accelerations, 0, sizeof(accelerations));
+			memset(velocities, 0, sizeof(velocities));
+			memset(steps, 0, sizeof(steps));
+			memset(dda_counters, 0, sizeof(dda_counters));
+		}
+
+		int block_index(planner_block * it)
+		{
+			return blocks->index_of(it);
 		}
 
 		void fixup_postactive_blocks()
 		{
-			while (ring_postactive_counter_head != ring->head)
+			while (blocks->tail_index() != active)
 			{
-				if (!planned[ring_postactive_counter_head].is_postactive())
-				{
-					ring_postactive_head = (ring_postactive_head + 1) % ring->size;
-					planned[ring_postactive_counter_head].valid = false;
-				}
+				if (!blocks->tail().is_active_or_postactive(iteration_counter))
+					blocks->pop();
 
 				else
-				{
 					break;
-				}
 			}
 		}
 
-		void discard_postactive(control_block * it)
+		bool has_postactive_blocks()
 		{
-			if (block_index(it) == ring_postactive_counter_head)
-				fixup_postactive_blocks();
+			return active != blocks->tail_index();
 		}
 
-		void algorithm_step_for_trapecidal_profile()
+		int count_of_postactive()
+		{
+			return blocks->distance(active, blocks->tail_index());
+		}
+
+		void start_with_first_block()
+		{
+			active_block = &blocks->tail();
+			iteration_counter = 0;
+			need_to_reevaluate = true;
+		}
+
+		int serve()
 		{
 			int final;
-			int room = revolver_cycle->room();
+
+			system_lock();
+			int room = shifts->room();
+			system_unlock();
+
+			if (active_block == nullptr && !has_postactive_blocks())
+			{
+				if (blocks->empty())
+					return 1;
+
+				else
+					start_with_first_block();
+			}
 
 			while (room--)
 			{
 				// Планируем поведение револьвера на несколько циклов вперёд
 				// попутно инкрементируя модельное время.
-				final = iteration(revolver_iteration_counter);
+				final = iteration();
 
 				if (final)
 					return final;
-
-				++revolver_iteration_counter;
 			}
+
+			return 0;
+		}
+
+		void evaluate_accelerations()
+		{
+			if (active_block)
+				active_block->assign_accelerations(
+				    accelerations, total_axes, iteration_counter);
+			else
+			{
+				for (int i = 0; i < total_axes; ++i)
+					accelerations[i] = 0;
+			}
+
+			for (int i = blocks->tail_index(); i != active; i = blocks->fixup_index(i + 1))
+				blocks->get(i).append_accelerations(
+				    accelerations, total_axes, iteration_counter);
+		}
+
+		void change_active_block()
+		{
+			active = blocks->fixup_index(active + 1);
+
+			if (active == blocks->head_index())
+			{
+				active_block = nullptr;
+				return;
+			}
+
+			active_block = &blocks->get(active);
+			active_block -> shift_timestampes(iteration_counter);
 		}
 
 		int iteration()
 		{
-			control_block * itblock;
-
-			if (!active_block->is_active(current_iteration))
+			if (active_block)
 			{
-				int final = change_active_block(active_block);
+				if (state == 0)
+				{
+					if (!active_block->is_accel(iteration_counter))
+					{
+						need_to_reevaluate = true;
+						state = 1;
+					}
+				}
 
-				if (final)
-					return final;
+				else
+				{
+					if (!active_block->is_active(iteration_counter))
+					{
+						change_active_block();
+						need_to_reevaluate = true;
+						state = 0;
+					}
+				}
 			}
 
-			auto acceleration = active_block->current_acceleration();
-
-			dlist_for_each_entry_safe(itblock, safeit, postactive_blocks, lnk)
+			for (int i = blocks->tail_index(); i != active;
+			        i = blocks->fixup_index(i + 1))
 			{
-				if (!itblock->is_postactive())
-					discard_postactive(itblock);
-
-				acceleration += itblock->current_acceleration();
+				if (!blocks->get(i).is_active_or_postactive(iteration_counter))
+				{
+					need_to_reevaluate = true;
+				}
 			}
+
+			if (need_to_reevaluate)
+			{
+				fixup_postactive_blocks();
+				evaluate_accelerations();
+				need_to_reevaluate = false;
+				count_of_reevaluation++;
+			}
+
+			if (active_block == nullptr && !has_postactive_blocks())
+			{
+				return 1;
+			}
+
+			revolver_t mask, step = 0, dir = 0;
 
 			for (int i = 0; i < total_axes; ++i)
 			{
-				axes_records[i]->dda_counter +=
-				    axes_records[i]->velocity * delta +
-				    axes_records[i]->acceleration * delta_sqr_div_2;
+				mask = (1 << i);
 
-				if (axes_records[i]->dda_counter > 1)
-				{
-					axes_records[i]->dda_counter -= 1;
-					axes_records[i]->steps += 1;
-				}
-				else if (axes_records[i]->dda_counter < -1)
-				{
-					axes_records[i]->dda_counter += 1;
-					axes_records[i]->steps -= 1;
-				}
+				dda_counters[i] +=
+				    velocities[i] + //* delta +
+				    accelerations[i] * 0.5; //* delta_sqr_div_2;
 
-				axes_records[i]->velocity += axes_records[i]->acceleration * delta;
+				if (dda_counters[i] > 0.9)
+				{
+					dda_counters[i] -= 1;
+					steps[i] += 1;
+
+					dir |= mask;
+					step |= mask;
+				}
+				else if (dda_counters[i] < -0.9)
+				{
+					dda_counters[i] += 1;
+					steps[i] -= 1;
+
+					dir |= mask;
+				}
+				velocities[i] += accelerations[i] * delta;
 			}
+			shifts->emplace(dir, step);
+			iteration_counter++;
+
+			return 0;
 		}
 	};
 }
