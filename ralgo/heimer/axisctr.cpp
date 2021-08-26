@@ -98,7 +98,7 @@ int axis_controller::serve(disctime_t time)
 	{
 		f.release_control_flag = 0;
 		deactivate(time);
-		return SIGNAL_PROCESSOR_RETURN_NOT_ACTIVE;
+		return 0;
 	}
 
 	for (int i = 0; i < leftdim(); ++i)
@@ -113,7 +113,7 @@ int axis_controller::serve(disctime_t time)
 	}
 
 	if (!curtraj)
-		return SIGNAL_PROCESSOR_RETURN_NOT_ACTIVE;
+		return SIGNAL_PROCESSOR_RETURN_RUNTIME_ERROR;
 
 	int sts = curtraj->attime(curtraj, time, ctrpos, ctrvel);
 
@@ -187,7 +187,7 @@ int axis_controller::_absmove(
 }
 
 
-int axis_controller::incmove(disctime_t current_time, double * dist_real)
+int axis_controller::incmove(disctime_t current_time, const double * dist_real)
 {
 	position_t curpos[leftdim()];
 	position_t tgtpos[leftdim()];
@@ -212,7 +212,7 @@ int axis_controller::incmove(disctime_t current_time, double * dist_real)
 	return _absmove(current_time, curpos, tgtpos, sqrt(extdist_accumulator));
 }
 
-int axis_controller::absmove(disctime_t current_time, double * pos_real)
+int axis_controller::absmove(disctime_t current_time, const double * pos_real)
 {
 
 	position_t curpos[leftdim()];
@@ -253,10 +253,16 @@ float axis_controller::ctrvel_external(int axno)
 
 axis_controller * heimer::create_axis_controller(const char * name, int dim)
 {
-	axis_settings * settings = (struct axis_settings *) malloc(sizeof(axis_settings) * dim);
+	axis_settings * settings = new axis_settings[dim];
 	axis_controller * ptr = new heimer::axis_controller(name, settings, dim);
 	ptr->f.dynamic_resources = 1;
 	return ptr;
+}
+
+void axis_controller::allocate_resources()
+{
+	settings = new axis_settings[leftdim()];
+	f.dynamic_resources = 1;
 }
 
 void axis_controller::release_controlled()
@@ -296,18 +302,6 @@ signal_head * axis_controller::iterate_right(signal_head * iter)
 {
 	(void) iter;
 	return NULL;
-}
-
-
-void axis_settings_init(axis_settings * settings)
-{
-	settings->controlled = NULL;
-	settings->backlim = 0;
-	settings->forwlim = 0;
-	settings->sfpos.spos = 0;
-	settings->sfpos.fpos = 0;
-	settings->gain = 1;
-	settings->limits_enabled = 0;
 }
 
 float axis_controller::external_velocity() { return vel * discrete_time_frequency(); }
@@ -393,26 +387,13 @@ int axis_controller::hardstop(disctime_t time)
 }
 
 
-axis_controller::axis_controller(
-    const char * name,
-    axis_settings * settings,
-    int dim
-)
-	: signal_processor(name, dim, dim), settings(settings)
+void axis_controller::_init()
 {
 	set_need_activation(1);
 
 	vel = 0;
 	acc = 0;
 	dcc = 0;
-
-	if (settings)
-	{
-		for (int i = 0; i < dim; ++i)
-		{
-			axis_settings_init(&settings[i]);
-		}
-	}
 
 	flags = 0;
 
@@ -427,13 +408,53 @@ axis_controller::axis_controller(
 
 	line_trajectory_init(&lintraj, 1,
 	                     &settings[0].sfpos,
-	                     dim
+	                     leftdim()
 	                    );
-
 }
 
-bool axis_controller::on_interrupt(disctime_t time) 
+axis_controller::axis_controller(
+    const char * name,
+    axis_settings * settings,
+    int dim
+)
+	: signal_processor(name, dim, 0), settings(settings)
+{
+	_init();
+}
+
+axis_controller::axis_controller(const char * name, int dim)
+	: signal_processor(name, dim, 0)
+{
+	allocate_resources();
+	_init();
+}
+
+axis_controller::axis_controller(const char * name, const std::initializer_list<axis_state*> & states)
+	: signal_processor(name, states.size(), 0)
+{
+	allocate_resources();
+	_init();
+
+	int i = 0;
+	for (auto* ax : states)
+	{
+		settings[i].controlled = ax;
+		settings[i++].controlled->attach_possible_controller(this);
+	}
+}
+
+bool axis_controller::on_interrupt(disctime_t time)
 {
 	hardstop(time);
 	return false;
+}
+
+int axis_controller::incmove(disctime_t current_time, const std::initializer_list<double> & dist_real)
+{
+	return incmove(current_time, &*dist_real.begin());
+}
+
+int axis_controller::absmove(disctime_t current_time, const std::initializer_list<double> & pos_real) 
+{
+	return absmove(current_time, &*pos_real.begin());
 }

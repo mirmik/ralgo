@@ -1,56 +1,265 @@
-/// @file
-/// Основано на https://github.com/grbl/grbl/blob/master/grbl/planner.h
+#ifndef RALGO_PLANNER_RING_H
+#define RALGO_PLANNER_RING_H
 
-#ifndef RALGO_CNC_PLANNER_H
-#define RALGO_CNC_PLANNER_H
+#include <stdint.h>
 
-#include <igris/datastruct/ring.h>
+#include <ralgo/cnc/planblock.h>
+#include <ralgo/cnc/shift.h>
 
-#define CNC_PLANNER_BLOCK_BUFFER_SIZE 10
+#include <igris/datastruct/dlist.h>
+#include <igris/container/ring.h>
+#include <igris/sync/syslock.h>
+
+#include <nos/print.h>
+
+#define NMAX_AXES 10
 
 namespace cnc
 {
-	class plan_block
+	/**
+	 * Structure of blocks ring:
+	 *
+	 * accessors:   blocks.tail()
+	 *                  |
+	 *          :       |               acceleration
+	 * signation:       |                   or        (place for new block)
+	 *          :       |  deceleration   cruis               |
+	 *                  |  |    |     |     |                 |
+	 *                  v  v    v     v     v                 v
+	 *      ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
+	 *     |     |     |     |     |     |     |     |     |     |     |     |
+	 *     |     |     |  .  |  .  |  .  |  .  |  .  |  .  |     |     |     |
+	 *     |     |     |     |     |     |     |     |     |     |     |     |
+	 *      ----- ----- ----- ----- ----- ----- ----- ----- ----- ----- -----
+	 *                    ^                 ^                 ^
+	 *                    |                 |                 |
+	 * counters:       (tail)--->       (active)--->       (head)--->
+	 * */
+	class planner
 	{
-		uint32_t steps[N_AXIS];    // Step count along each axis
-		uint32_t step_event_count; // The maximum step axis count and number of steps required to complete this block.
+	public:
+		int64_t iteration_counter = 0;
+		int64_t * reference_position; /// < для внутреннего контроля
 
-		// Fields used by the motion planner to manage acceleration. Some of these values may be updated
-		// by the stepper module during execution of special motion cases for replanning purposes.
-		float entry_speed_sqr;     // The current planned entry speed at block junction in (mm/min)^2
-		float max_entry_speed_sqr; // Maximum allowable entry speed based on the minimum of junction limit and
+		float delta = 1;
+		float delta_sqr_div_2 = 0.5;
 
-		//   neighboring nominal speeds with overrides in (mm/min)^2
-		float acceleration;        // Axis-limit adjusted line acceleration in (mm/min^2). Does not change.
-		float millimeters;         // The remaining distance for this block to be executed in (mm).
+		float accelerations[NMAX_AXES];
+		float velocities[NMAX_AXES];
+		int64_t steps[NMAX_AXES];
+		float dda_counters[NMAX_AXES];
 
-		// Stored rate limiting data used by planner when changes occur.
-		float max_junction_speed_sqr; // Junction entry speed limit based on direction vectors in (mm/min)^2
-		float rapid_rate;             // Axis-limit adjusted maximum rate for this block direction in (mm/min)
-		float programmed_rate;        // Programmed rate of this block (mm/min).
+		int active = 0; // index of active block
+		planner_block * active_block = nullptr;
 
-#ifdef VARIABLE_SPINDLE
-		// Stored spindle speed data used by spindle overrides and resuming methods.
-		float spindle_speed;    // Block spindle speed. Copied from pl_line_data.
-#endif
-	};
+		igris::ring<cnc::planner_block> * blocks;
+		igris::ring<cnc::control_shift> * shifts;
 
-	class plan_line_data
-	{
-		float feed_rate;          // Desired feed rate for line motion. Value is ignored, if rapid motion.
-	};
+		int total_axes = 0;
+		bool need_to_reevaluate = false;
+		uint8_t state = 0;
+		int count_of_reevaluation = 0;
 
-	class profile_plan
-	{
-		plan_block block_buffer[CNC_PLANNER_BLOCK_BUFFER_SIZE];
+	public:
 
-		void reset();
+		void set_dim(int axes)
+		{
+			total_axes = axes;
+		}
 
-		void discard_current_block();
+		/*void set_revolver_delta(float delta)
+		{
+			this->delta = delta;
+			this->delta_sqr_div_2 = delta * delta / 2;
+		}*/
 
-		plan_block& current_block();
+		void reset_iteration_counter()
+		{
+			iteration_counter = 0;
+		}
 
-		uint8_t plan_buffer_line(float *target, plan_line_data *pl_data);
+		planner(igris::ring<cnc::planner_block> * blocks,
+		        igris::ring<cnc::control_shift> * shifts)
+			: blocks(blocks), shifts(shifts)
+		{
+			memset(accelerations, 0, sizeof(accelerations));
+			memset(velocities, 0, sizeof(velocities));
+			memset(steps, 0, sizeof(steps));
+			memset(dda_counters, 0, sizeof(dda_counters));
+		}
+
+		int block_index(planner_block * it)
+		{
+			return blocks->index_of(it);
+		}
+
+		void fixup_postactive_blocks()
+		{
+			while (blocks->tail_index() != active)
+			{
+				if (!blocks->tail().is_active_or_postactive(iteration_counter))
+					blocks->pop();
+
+				else
+					break;
+			}
+		}
+
+		bool has_postactive_blocks()
+		{
+			return active != blocks->tail_index();
+		}
+
+		int count_of_postactive()
+		{
+			return blocks->distance(active, blocks->tail_index());
+		}
+
+		void start_with_first_block()
+		{
+			active_block = &blocks->tail();
+			iteration_counter = 0;
+			need_to_reevaluate = true;
+		}
+
+		int serve()
+		{
+			int final;
+
+			system_lock();
+			int room = shifts->room();
+			system_unlock();
+
+			if (active_block == nullptr && !has_postactive_blocks())
+			{
+				if (blocks->empty())
+					return 1;
+
+				else
+					start_with_first_block();
+			}
+
+			while (room--)
+			{
+				// Планируем поведение револьвера на несколько циклов вперёд
+				// попутно инкрементируя модельное время.
+				final = iteration();
+
+				if (final)
+					return final;
+			}
+
+			return 0;
+		}
+
+		void evaluate_accelerations()
+		{
+			if (active_block)
+				active_block->assign_accelerations(
+				    accelerations, total_axes, iteration_counter);
+			else
+			{
+				for (int i = 0; i < total_axes; ++i)
+					accelerations[i] = 0;
+			}
+
+			for (int i = blocks->tail_index(); i != active; i = blocks->fixup_index(i + 1))
+				blocks->get(i).append_accelerations(
+				    accelerations, total_axes, iteration_counter);
+		}
+
+		void change_active_block()
+		{
+			active = blocks->fixup_index(active + 1);
+
+			if (active == blocks->head_index())
+			{
+				active_block = nullptr;
+				return;
+			}
+
+			active_block = &blocks->get(active);
+			active_block -> shift_timestampes(iteration_counter);
+		}
+
+		int iteration()
+		{
+			if (active_block)
+			{
+				if (state == 0)
+				{
+					if (!active_block->is_accel(iteration_counter))
+					{
+						need_to_reevaluate = true;
+						state = 1;
+					}
+				}
+
+				else
+				{
+					if (!active_block->is_active(iteration_counter))
+					{
+						change_active_block();
+						need_to_reevaluate = true;
+						state = 0;
+					}
+				}
+			}
+
+			for (int i = blocks->tail_index(); i != active;
+			        i = blocks->fixup_index(i + 1))
+			{
+				if (!blocks->get(i).is_active_or_postactive(iteration_counter))
+				{
+					need_to_reevaluate = true;
+				}
+			}
+
+			if (need_to_reevaluate)
+			{
+				fixup_postactive_blocks();
+				evaluate_accelerations();
+				need_to_reevaluate = false;
+				count_of_reevaluation++;
+			}
+
+			if (active_block == nullptr && !has_postactive_blocks())
+			{
+				return 1;
+			}
+
+			revolver_t mask, step = 0, dir = 0;
+
+			for (int i = 0; i < total_axes; ++i)
+			{
+				mask = (1 << i);
+
+				dda_counters[i] +=
+				    velocities[i] + //* delta +
+				    accelerations[i] * 0.5; //* delta_sqr_div_2;
+
+				if (dda_counters[i] > 0.9)
+				{
+					dda_counters[i] -= 1;
+					steps[i] += 1;
+
+					dir |= mask;
+					step |= mask;
+				}
+				else if (dda_counters[i] < -0.9)
+				{
+					dda_counters[i] += 1;
+					steps[i] -= 1;
+
+					dir |= mask;
+				}
+				velocities[i] += accelerations[i] * delta;
+			}
+			shifts->emplace(dir, step);
+			iteration_counter++;
+
+			return 0;
+		}
 	};
 }
 
