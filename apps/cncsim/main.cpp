@@ -72,7 +72,7 @@ int main(int argc, char ** argv)
 	revolver_thread = std::thread(revolver_thread_function);
 	planner_thread = std::thread(planner_thread_function);
 
-	interpreter.newline("G01 X10 Y20");
+	interpreter.newline("G01 X10 Y20 F5");
 
 	while (1)
 	{
