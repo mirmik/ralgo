@@ -152,6 +152,9 @@ test/runtests
 sigtrans
 !*/sigtrans
 
+cncsim
+!*/cncsim
+
 doxygen/html
 doxygen/latex
 

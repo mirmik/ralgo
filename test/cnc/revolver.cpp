@@ -12,7 +12,7 @@ TEST_CASE("revolver")
 	cnc::control_shift shft_table[10];
 
 	auto shift_ring = igris::ring<cnc::control_shift>(shft_table, 10);
-	auto revolver = cnc::revolver_ring(&shift_ring);
+	auto revolver = cnc::revolver(&shift_ring);
 
 	revolver.set_steppers(steppers, 2);
 
