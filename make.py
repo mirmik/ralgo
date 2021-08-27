@@ -9,6 +9,7 @@ import licant.install
 licant.include("ralgo", "ralgo.g.py")
 
 licant.execute("apps/sigtrans/make.py")
+licant.execute("apps/cncsim/make.py")
 
 target = "libralgo.so"
 
@@ -34,7 +35,8 @@ licant.install.install_library(
 	headers="ralgo")
 
 licant.fileset("apps", targets=[
-	"sigtrans"
+	"sigtrans",
+	"cncsim"
 ], deps=["libralgo.so"])
 
 licant.fileset("all", targets=["apps", target])

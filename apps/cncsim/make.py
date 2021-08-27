@@ -11,8 +11,8 @@ licant.include("ralgo", "../../ralgo.g.py")
 
 defines = ["NOTRACE=1", "HEIMER_CROW_SUPPORT=1"]
 
-application("cnc", 
-	builddir = "build" if __name__ == "__main__" else "build/cnc",
+application("cncsim", 
+	builddir = "build" if __name__ == "__main__" else "build/cncsim",
 	sources = [
 		"main.cpp"
 	],
@@ -31,8 +31,8 @@ application("cnc",
 #def doc():
 #	os.system("cd doc; ./make.sh")
 
-licant.install.install_application(tgt="install_cnc", src="cnc", dst="cnc")
+licant.install.install_application(tgt="install_cncsim", src="cncsim", dst="cncsim")
 	
 if __name__ == "__main__":
-	licant.install.install_application(tgt="install", src="cnc", dst="cnc")
-	licant.ex("cnc")
+	licant.install.install_application(tgt="install", src="cncsim", dst="cncsim")
+	licant.ex("cncsim")

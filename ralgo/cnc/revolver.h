@@ -28,7 +28,7 @@ namespace cnc
 	 *                    |                                   |
 	 * counters:       (tail)-->                           (head)-->
 	 * */
-	class revolver_ring
+	class revolver
 	{
 	private:
 		int64_t iteration_counter;
@@ -39,7 +39,7 @@ namespace cnc
 		int steppers_total;
 
 	public:
-		revolver_ring(igris::ring<cnc::control_shift> * ring) :
+		revolver(igris::ring<cnc::control_shift> * ring) :
 			shifts_ring(ring)
 		{}
 

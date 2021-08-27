@@ -12,6 +12,11 @@ namespace cnc
 		igris::ring<planner_block> * blocks;
 
 		interpreter(igris::ring<planner_block> * blocks) : blocks(blocks) {}
+
+		void newline(const std::string & line) 
+		{
+
+		}
 	};
 }
 
