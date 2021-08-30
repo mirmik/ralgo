@@ -111,7 +111,8 @@ namespace cnc
 
 		void m_command(int argc, char ** argv)
 		{
-
+			(void) argc;
+			(void) argv;
 		}
 
 		void newline(const char * line, size_t size)
