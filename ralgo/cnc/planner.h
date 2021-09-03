@@ -41,13 +41,13 @@ namespace cnc
 		int64_t iteration_counter = 0;
 		int64_t * reference_position; /// < для внутреннего контроля
 
-		float delta = 1;
-		float delta_sqr_div_2 = 0.5;
+		double delta = 1;
+		double delta_sqr_div_2 = 0.5;
 
-		float accelerations[NMAX_AXES];
-		float velocities[NMAX_AXES];
+		double accelerations[NMAX_AXES];
+		double velocities[NMAX_AXES];
 		int64_t steps[NMAX_AXES];
-		float dda_counters[NMAX_AXES];
+		double dda_counters[NMAX_AXES];
 
 		int active = 0; // index of active block
 		planner_block * active_block = nullptr;
@@ -67,7 +67,7 @@ namespace cnc
 			total_axes = axes;
 		}
 
-		/*void set_revolver_delta(float delta)
+		/*void set_revolver_delta(double delta)
 		{
 			this->delta = delta;
 			this->delta_sqr_div_2 = delta * delta / 2;
@@ -253,7 +253,7 @@ namespace cnc
 
 					dir |= mask;
 				}
-				velocities[i] += accelerations[i] * delta;
+				velocities[i] += accelerations[i];// * delta;
 			}
 			shifts->emplace(dir, step);
 			iteration_counter++;

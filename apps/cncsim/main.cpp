@@ -19,8 +19,10 @@ cnc::revolver revolver(&shifts);
 
 void planner_thread_function();
 void revolver_thread_function();
+void telemetry_thread_function();
 std::thread revolver_thread;
 std::thread planner_thread;
+std::thread telemetry_thread;
 
 using std::chrono::operator""ms;
 using std::chrono::operator""us;
@@ -46,6 +48,20 @@ void planner_thread_function()
 	}
 }
 
+void telemetry_thread_function()
+{
+	auto start = now();
+	auto awake = now();
+
+	while (1)
+	{
+		awake += 100ms; 
+		std::this_thread::sleep_until(awake);
+
+		nos::println(steppers[0].steps_count(), steppers[1].steps_count());
+	}
+}
+
 void revolver_thread_function()
 {
 	auto start = now();
@@ -54,6 +70,9 @@ void revolver_thread_function()
 	while (1)
 	{
 		awake += 100us; 
+		//nos::println(
+		//	std::chrono::duration_cast<std::chrono::milliseconds>(now().time_since_epoch()).count() - 
+		//	std::chrono::duration_cast<std::chrono::milliseconds>(awake.time_since_epoch()).count());
 		std::this_thread::sleep_until(awake);
 	
 		revolver.serve();
@@ -71,8 +90,18 @@ int main(int argc, char ** argv)
 	configuration();
 	revolver_thread = std::thread(revolver_thread_function);
 	planner_thread = std::thread(planner_thread_function);
+	telemetry_thread = std::thread(telemetry_thread_function);
 
-	interpreter.newline("G01 X10 Y20 F5");
+	interpreter.gains[0] = 4194304./10000.;
+	interpreter.gains[1] = 4194304./10000.;
+	interpreter.gains[2] = 4194304./10000.;
+
+	interpreter.task_acc = 10;
+	interpreter.revolver_frequency = 10000;
+	interpreter.newline("G01 X5 F5");
+	interpreter.newline("G01 Y5 F5");
+
+	planner.total_axes = 3;
 
 	while (1)
 	{

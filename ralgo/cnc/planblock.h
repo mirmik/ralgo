@@ -12,13 +12,14 @@ namespace cnc
 	class planner_block
 	{
 	public:
-		int32_t steps[NMAX_AXES];
+		int64_t steps[NMAX_AXES];
 		
-		float nominal_velocity;
-		float acceleration;
-		float fullpath;
+		double nominal_velocity;
+		double acceleration;
+		double fullpath;
 
-		float multipliers[NMAX_AXES];
+		double multipliers[NMAX_AXES];
+		double major_multiplier = 0;
 
 		// отметки времени хранят инкрементное время до планирования и абсолютное
 		// время после активации блока.
@@ -36,6 +37,12 @@ namespace cnc
 			assert(fabs(acceleration_before_ic * acceleration - nominal_velocity) < 1e-5);
 			assert(fabs(nominal_velocity * deceleration_after_ic - fullpath) < 1e-5);
 			assert(block_finish_ic - deceleration_after_ic == acceleration_before_ic - start_ic);
+			assert(nominal_velocity * major_multiplier < 1);
+			assert(acceleration * major_multiplier * acceleration_before_ic < 1);
+
+			PRINT(nominal_velocity);
+			PRINT(nominal_velocity * major_multiplier);
+			PRINT(acceleration * major_multiplier * acceleration_before_ic);
 
 			if (fabs(acceleration_before_ic * acceleration - nominal_velocity) > 1e-5)
 				return false;
@@ -75,7 +82,7 @@ namespace cnc
 			return interrupt_counter < acceleration_before_ic;
 		}
 
-		float current_acceleration(int64_t interrupt_counter)
+		double current_acceleration(int64_t interrupt_counter)
 		{
 			// Вычисление ускорения для трапециидального паттерна.
 			if (interrupt_counter < acceleration_before_ic) return acceleration;
@@ -84,9 +91,9 @@ namespace cnc
 			return 0;
 		}
 
-		void assign_accelerations(float * accs, int len, int64_t itercounter)
+		void assign_accelerations(double * accs, int len, int64_t itercounter)
 		{
-			float acceleration = current_acceleration(itercounter);
+			double acceleration = current_acceleration(itercounter);
 
 			if (acceleration == 0)
 			{
@@ -95,13 +102,16 @@ namespace cnc
 				return;
 			}
 
-			for (int i = 0; i < len; ++i)
+			for (int i = 0; i < len; ++i) 
+			{
 				accs[i] = acceleration * multipliers[i];
+				PRINT(accs[i]);
+			}
 		}
 
-		void append_accelerations(float * accs, int len, int64_t itercounter)
+		void append_accelerations(double * accs, int len, int64_t itercounter)
 		{
-			float acceleration = current_acceleration(itercounter);
+			double acceleration = current_acceleration(itercounter);
 
 			if (acceleration == 0)
 				return;
@@ -112,19 +122,31 @@ namespace cnc
 			}
 		}
 
-		void set_state(int32_t * steps, int axes, float velocity, float acceleration) 
+		void set_state(
+			int64_t * steps, 
+			int axes, 
+			double velocity, 
+			double acceleration,
+			double * multipliers) 
 		{	
 			(void) steps;
 			(void) axes;
 
+			for (int i = 0; i < axes; ++i)  
+			{
+				this->multipliers[i] = multipliers[i];
+				if (multipliers[i] > major_multiplier)
+					major_multiplier = multipliers[i];
+			}
+
 			assert(velocity < 1);
 			assert(acceleration < 1);
 
-			float pathsqr = 0; 
+			double pathsqr = 0; 
 			for (int i = 0; i < axes; ++i)
 				pathsqr += steps[i] * steps[i];
-			float path = sqrtf(pathsqr);
-			float time = path / velocity;
+			double path = sqrt(pathsqr);
+			double time = path / velocity;
 
 			int itime = ceil(time);
 			int preftime = ceil(velocity / acceleration);
@@ -137,6 +159,12 @@ namespace cnc
 			this->nominal_velocity = path / itime;
 			this->acceleration = this->nominal_velocity / preftime;
 			this->fullpath = path;
+
+			PRINT(this->nominal_velocity);
+			PRINT(deceleration_after_ic);
+			PRINT(nominal_velocity * deceleration_after_ic);
+			PRINT(fullpath);
+
 
 			memcpy(this->steps, steps, sizeof(int32_t) * axes);
 
