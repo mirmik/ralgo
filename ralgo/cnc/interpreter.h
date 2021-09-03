@@ -25,8 +25,8 @@ namespace cnc
 
 		struct control_task
 		{
-			float poses[NMAX_AXES];
-			float feed;
+			double poses[NMAX_AXES];
+			double feed;
 
 			void parse(char ** argv, int argc)
 			{
@@ -35,7 +35,7 @@ namespace cnc
 				for (int i = 0; i < argc; ++i)
 				{
 					char symb = argv[i][0];
-					float val = atof(&argv[i][1]);
+					double val = atof(&argv[i][1]);
 
 					switch (symb)
 					{
@@ -62,40 +62,89 @@ namespace cnc
 
 	public:
 		int total_axes = 3;
-		float last_positions[NMAX_AXES];
+		double final_positions[NMAX_AXES];
 		igris::ring<planner_block> * blocks;
+		double revolver_frequency;
+		double gains[NMAX_AXES];
+
+			double task_acc = 1;
+	public:
 
 		interpreter(igris::ring<planner_block> * blocks) : blocks(blocks)
 		{
-			memset(last_positions, 0, sizeof(last_positions));
+			memset(final_positions, 0, sizeof(final_positions));
+			for (auto & gain : gains)
+				gain = 1;
+		}
+
+		void evaluate_multipliers(double * multipliers, int64_t * steps) 
+		{
+			int64_t accum = 0;
+			for (int i = 0; i < total_axes; ++i) 
+			{
+				accum += steps[i] * steps[i];
+			}
+			double dist = sqrt(accum);
+
+			for (int i = 0; i < total_axes; ++i) 
+			{
+				multipliers[i] = (double)steps[i] / dist;
+			}
 		}
 
 		void command_g1(int argc, char ** argv)
 		{
 			control_task task;
 			task.parse(argv, argc);
-		
+
 			auto & block = blocks->head_place();
 
-			float acc = 1;
 			assert(task.feed != 0);
-			assert(acc > 0);
 
-			int32_t steps[NMAX_AXES];
-			for (int i = 0; i < total_axes; ++i) 
+			PRINT(task.feed);
+			
+			int64_t steps[NMAX_AXES];
+			double dists[NMAX_AXES];
+			double summary_gain = 0;
+			double Saccum = 0;
+			double saccum = 0;
+			for (int i = 0; i < total_axes; ++i)
 			{
-				steps[i] = task.poses[i] * 1000;
-				last_positions[i] += task.poses[i];
+				steps[i] = task.poses[i] * gains[i];
+				dists[i] = task.poses[i];
+				final_positions[i] += steps[i];
+
+				saccum += dists[i] * dists[i];
+				Saccum += steps[i] * steps[i];
 			}
 
-			nos::print_list(igris::array_view(steps,total_axes));
+			double vecgain = sqrt(Saccum) / sqrt(saccum);
+			double feed = task.feed * vecgain;
+			double acc = task_acc * vecgain;
+
+			PRINT(feed);
+			PRINT(vecgain);
+			PRINT(steps[0]);
+			PRINT(dists[0]);
+
+			nos::print_list(igris::array_view(steps, total_axes));
 			PRINT(total_axes);
-			PRINT(task.feed);
 			PRINT(acc);
 
-			block.set_state(steps, total_axes, 
-				task.feed, 
-				acc);			
+			double reduced_feed = feed / revolver_frequency;
+			double reduced_acc = acc / (revolver_frequency * revolver_frequency);
+
+			PRINT(reduced_feed);
+			PRINT(reduced_acc);
+
+			double multipliers[total_axes];
+			evaluate_multipliers(multipliers, steps);
+
+			block.set_state(steps, total_axes,
+			                reduced_feed,
+			                reduced_acc,
+			                multipliers);
+			blocks->move_head_one();
 		}
 
 		void g_command(int argc, char ** argv)
@@ -134,16 +183,16 @@ namespace cnc
 			switch (cmdsymb)
 			{
 				case 'G':
-					{
-						g_command(argc, argv);
-						break;
-					}
+				{
+					g_command(argc, argv);
+					break;
+				}
 
 				case 'M':
-					{
-						m_command(argc, argv);
-						break;
-					}
+				{
+					m_command(argc, argv);
+					break;
+				}
 			}
 		}
 
