@@ -79,8 +79,8 @@ void axis_controller::finish_trajectory(disctime_t time, position_t * ctrpos)
 	f.operation_finished_flag = 1;
 	if (operation_finish_handler)
 		operation_finish_handler(operation_handlers_priv, this);
-	line_trajectory_set_point_hold(&lintraj, time, ctrpos);
-	curtraj = &lintraj.traj;
+	lintraj.set_point_hold(time, ctrpos);
+	curtraj = &lintraj;
 	f.release_control_flag = 1;
 }
 
@@ -115,7 +115,7 @@ int axis_controller::serve(disctime_t time)
 	if (!curtraj)
 		return SIGNAL_PROCESSOR_RETURN_RUNTIME_ERROR;
 
-	int sts = curtraj->attime(curtraj, time, ctrpos, ctrvel);
+	int sts = curtraj->attime(time, ctrpos, ctrvel);
 
 	for (int i = 0; i < leftdim(); ++i)
 	{
@@ -168,21 +168,20 @@ int axis_controller::_absmove(
 	disctime_t acc_time = (vel / acc);
 	disctime_t dcc_time = (vel / dcc);
 
-	line_trajectory_init_nominal_speed(&lintraj,
-	                                   curtim,
-	                                   tgttim,
-	                                   curpos,
-	                                   tgtpos,
-	                                   acc_time,
-	                                   dcc_time,
-	                                   f.spattern_enabled
-	                                  );
+	lintraj.init_nominal_speed(curtim,
+	                           tgttim,
+	                           curpos,
+	                           tgtpos,
+	                           acc_time,
+	                           dcc_time,
+	                           f.spattern_enabled
+	                          );
 
 	f.operation_finished_flag = 0;
 	f.release_control_flag = 0;
 	if (operation_start_handler)
 		operation_start_handler(operation_handlers_priv, this);
-	curtraj = &lintraj.traj;
+	curtraj = &lintraj;
 	return 0;
 }
 
@@ -339,8 +338,7 @@ int axis_controller::stop(disctime_t curtim)
 
 	float stoptime = restore_internal_velocity_from_axstates() / dcc;
 
-	line_trajectory_set_stop_pattern(
-	    &lintraj,
+	lintraj.set_stop_pattern(
 	    feedpos,
 	    feedspd,
 	    curtim,
@@ -350,7 +348,7 @@ int axis_controller::stop(disctime_t curtim)
 	f.release_control_flag = 0;
 	if (operation_start_handler)
 		operation_start_handler(operation_handlers_priv, this);
-	curtraj = &lintraj.traj;
+	curtraj = &lintraj;
 
 	return 0;
 }
@@ -406,10 +404,10 @@ void axis_controller::_init()
 
 	curtraj = NULL;
 
-	line_trajectory_init(&lintraj, 1,
-	                     &settings[0].sfpos,
-	                     leftdim()
-	                    );
+	lintraj.init(1,
+	             &settings[0].sfpos,
+	             leftdim()
+	            );
 }
 
 axis_controller::axis_controller(
@@ -454,7 +452,7 @@ int axis_controller::incmove(disctime_t current_time, const std::initializer_lis
 	return incmove(current_time, &*dist_real.begin());
 }
 
-int axis_controller::absmove(disctime_t current_time, const std::initializer_list<double> & pos_real) 
+int axis_controller::absmove(disctime_t current_time, const std::initializer_list<double> & pos_real)
 {
 	return absmove(current_time, &*pos_real.begin());
 }

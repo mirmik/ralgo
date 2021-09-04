@@ -13,8 +13,8 @@ licant.module("ralgo",
 		"ralgo/imu/madgwick.cpp",
 		"ralgo/log/log.cpp",
 		"ralgo/trajectory/tsdeform.c",
-		"ralgo/trajectory/trajectory.c",
-		"ralgo/trajectory/linetraj.c",
+		"ralgo/trajectory/trajectory.cpp",
+		"ralgo/trajectory/linetraj.cpp",
 
 		"ralgo/robo/stepper_controller.cpp",
 		

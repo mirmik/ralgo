@@ -1,26 +1,23 @@
 #include <ralgo/trajectory/linetraj.h>
 #include <igris/dprint.h>
 
-int line_trajectory_attime (void * priv,
-                            disctime_t time,
+int line_trajectory::attime (disctime_t time,
                             position_t  * pos,
                             velocity_t * spd)
 {
-	struct line_trajectory * traj = (struct line_trajectory *) priv;
-
-	int local_time = time - traj->stim;
-	int full_time = traj->ftim - traj->stim;
+	int local_time = time - stim;
+	int full_time = ftim - stim;
 
 	assert(full_time > 0);
 
 	float time_unit = local_time <= 0 ? 0 : (float)(local_time) / (float)(full_time);
 
-	float posmod = tsdeform_posmod(&traj->tsd, time_unit);
-	float spdmod = tsdeform_spdmod(&traj->tsd, time_unit);
+	float posmod = tsdeform_posmod(&tsd, time_unit);
+	float spdmod = tsdeform_spdmod(&tsd, time_unit);
 
-	for (int i = 0; i < traj->traj.dim; ++i)
+	for (int i = 0; i < dim; ++i)
 	{
-		sf_position_t * pair = sparse_array_ptr(&traj->sfpos, i, sf_position_t);
+		sf_position_t * pair = sparse_array_ptr(&sfpos, i, sf_position_t);
 		position_t spos = pair->spos;
 		position_t fpos = pair->fpos;
 
@@ -34,24 +31,22 @@ int line_trajectory_attime (void * priv,
 		spd[i] = naive_speed * spdmod;
 	}
 
-	return (tsdeform_is_finished(&traj->tsd, time_unit) ||
-	        traj->stim == traj->ftim) ? 1 : 0;
+	return (tsdeform_is_finished(&tsd, time_unit) ||
+	        stim == ftim) ? 1 : 0;
 }
 
-void line_trajectory_init(
-    struct line_trajectory * lintraj,
+void line_trajectory::init(
     int dim,
     sf_position_t  * sfpos_array,
     int sfpos_stride
 )
 {
-	trajectory_init(&lintraj->traj, dim, line_trajectory_attime);
-	sparse_array_init(&lintraj->sfpos, sfpos_array, sfpos_stride);
+	trajectory::init(dim);
+	sparse_array_init(&sfpos, sfpos_array, sfpos_stride);
 }
 
 /// detail: Процедура не учитывает возможные начальную и оконечную скорости.
-void line_trajectory_init_nominal_speed(
-    struct line_trajectory * lintraj,
+void line_trajectory::init_nominal_speed(
     disctime_t   stim,
     disctime_t   ftim,
     position_t * spos,
@@ -63,12 +58,12 @@ void line_trajectory_init_nominal_speed(
     int full_spattern
 )
 {
-	lintraj->stim = stim;
-	lintraj->ftim = ftim;
+	this->stim = stim;
+	this->ftim = ftim;
 
-	for (int i = 0; i < lintraj->traj.dim; ++i)
+	for (int i = 0; i < dim; ++i)
 	{
-		sf_position_t * pair = sparse_array_ptr(&lintraj->sfpos, i, sf_position_t);
+		sf_position_t * pair = sparse_array_ptr(&sfpos, i, sf_position_t);
 
 		pair->spos = spos[i];
 		pair->fpos = fpos[i];
@@ -80,33 +75,31 @@ void line_trajectory_init_nominal_speed(
 	float dcc_part = (float)dcc_time / (float)time;
 
 	tsdeform_set_speed_pattern(
-	    &lintraj->tsd,
+	    &tsd,
 	    acc_part, dcc_part,
 	    0, 0,
 	    full_spattern);
 }
 
-void line_trajectory_set_point_hold(
-    struct line_trajectory * traj,
+void line_trajectory::set_point_hold(
     disctime_t ftim,
     position_t * pos)
 {
-	traj->ftim = ftim;
-	traj->stim = ftim - 1;
+	ftim = ftim;
+	stim = ftim - 1;
 
-	for (int i = 0; i < traj->traj.dim; ++i)
+	for (int i = 0; i < dim; ++i)
 	{
-		sf_position_t * pair = sparse_array_ptr(&traj->sfpos, i, sf_position_t);
+		sf_position_t * pair = sparse_array_ptr(&sfpos, i, sf_position_t);
 
 		pair->spos = pos[i];
 		pair->fpos = pos[i];
 	}
 
-	tsdeform_set_stop_pattern(&traj->tsd);
+	tsdeform_set_stop_pattern(&tsd);
 }
 
-void line_trajectory_set_stop_pattern(
-    struct line_trajectory * traj,
+void line_trajectory::set_stop_pattern(
     position_t * curpos,
     velocity_t * curspd,
     disctime_t curtime,
@@ -115,29 +108,29 @@ void line_trajectory_set_stop_pattern(
 	// скоростной деформатор работает с точным выведением в позицию, и изменяет время,
 	// поэтому подменяем время в два раза, чтобы соответствовать равнозамедленному паттерну.
 
-	traj->stim = curtime;
-	traj->ftim = curtime + stoptime / 2; // Время измеяется из-за паттерна деформации.
+	stim = curtime;
+	ftim = curtime + stoptime / 2; // Время измеяется из-за паттерна деформации.
 
-	if (traj->ftim > traj->stim)
+	if (ftim > stim)
 	{
-		for (int i = 0; i < traj->traj.dim ; ++i)
+		for (int i = 0; i < dim ; ++i)
 		{
-			sf_position_t * pair = sparse_array_ptr(&traj->sfpos, i, sf_position_t);
+			sf_position_t * pair = sparse_array_ptr(&sfpos, i, sf_position_t);
 			pair->spos = curpos[i];
 			pair->fpos = curpos[i] + curspd[i] * stoptime / 2; // аналогичное сжатие времени.
 		}
 	}
 	else
 	{
-		traj->ftim = traj->stim + 1; //prevent zero division
-		for (int i = 0; i < traj->traj.dim ; ++i)
+		ftim = stim + 1; //prevent zero division
+		for (int i = 0; i < dim ; ++i)
 		{
-			sf_position_t * pair = sparse_array_ptr(&traj->sfpos, i, sf_position_t);
+			sf_position_t * pair = sparse_array_ptr(&sfpos, i, sf_position_t);
 			pair->spos = curpos[i];
 			pair->fpos = curpos[i];
 		}
 	}
 
 	// Паттерн подменяет прямоугольное движение на треугольное растянутое во времени в два раза.
-	tsdeform_set_stop_pattern(&traj->tsd);
+	tsdeform_set_stop_pattern(&tsd);
 }

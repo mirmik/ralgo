@@ -11,10 +11,9 @@ TEST_CASE("line trajectory")
 	position_t spos = 300;
 	position_t fpos = 400;
 
-	line_trajectory_init(&ltraj, 1, &sfpos, 0);
+	ltraj.init(1, &sfpos, 0);
 
-	line_trajectory_init_nominal_speed(
-		&ltraj,
+	ltraj.init_nominal_speed(
 		0,
 		100,
 		&spos,
@@ -24,15 +23,15 @@ TEST_CASE("line trajectory")
 		false
 	);
 
-	line_trajectory_attime((void*)&ltraj, 0, &pos, &vel);
+	ltraj.attime(0, &pos, &vel);
 	CHECK_EQ(pos, 300);
 	CHECK_EQ(vel, 0);
 
-	line_trajectory_attime((void*)&ltraj, 120, &pos, &vel);
+	ltraj.attime(120, &pos, &vel);
 	CHECK_EQ(pos, 400);
 	CHECK_EQ(vel, 0);
 
-	line_trajectory_attime((void*)&ltraj, 55, &pos, &vel);
+	ltraj.attime(55, &pos, &vel);
 	CHECK_EQ(pos, 350);
 	CHECK_EQ(vel, 1);
 }
