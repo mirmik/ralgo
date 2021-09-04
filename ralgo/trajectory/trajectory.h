@@ -5,24 +5,14 @@
 #include <ralgo/heimer/heimer_types.h>
 #include <ralgo/disctime.h>
 
-typedef int (* trajectory_attime_t) (
-    void * priv,
-    disctime_t timestamp, position_t * outpos, position_t * outspd);
-
-struct trajectory 
+class trajectory
 {
+public:
 	int dim;
-	trajectory_attime_t attime;
+
+public:
+	virtual int attime (disctime_t timestamp, position_t * outpos, position_t * outspd) = 0;
+	void init(int dim);
 };
-
-__BEGIN_DECLS
-
-void trajectory_init(
-	struct trajectory * traj,
-	int dim,
-	trajectory_attime_t attime	
-);
-
-__END_DECLS
 
 #endif

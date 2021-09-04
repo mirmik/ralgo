@@ -5,70 +5,97 @@
 #include <ralgo/trajectory/trajectory.h>
 #include <ralgo/heimer/heimer_types.h>
 
-typedef struct sf_position 
+typedef struct sf_position
 {
     position_t spos;
     position_t fpos;
 } sf_position_t;
 
 /// Простейшая линейная в пространстве параметров траектория.
-struct line_trajectory
+class line_trajectory : public trajectory
 {
-    struct trajectory traj;
-
+public:
     disctime_t stim;
     disctime_t ftim;
 
     /// Специфика использования траекторного объекта такова,
     /// что данные о крайних точках удобно хранить в распределённой структуре (см. axisctr)
-    /// sfpos ссылается на элементы sf_position_t 
+    /// sfpos ссылается на элементы sf_position_t
     struct sparse_array sfpos;
-
     struct trajectory_speed_deformer tsd;
+
+public:
+    line_trajectory() = default;
+
+    line_trajectory(
+        int dim,
+        sf_position_t  * sfpos_array,
+        int sfpos_stride = sizeof(sf_position_t)
+    ) 
+    {
+        init(dim, sfpos_array, sfpos_stride);
+    }
+
+    void init(
+        int dim,
+        sf_position_t  * sfpos_array,
+        int sfpos_stride = sizeof(sf_position_t)
+    );
+
+    /// detail: Процедура не учитывает возможные начальную и оконечную скорости.
+    void init_nominal_speed(
+        disctime_t   stim,
+        disctime_t   ftim,
+        position_t  * spos,
+        position_t  * fpos,
+
+        disctime_t acc_time,
+        disctime_t dcc_time,
+
+        int full_spattern = false
+    );
+
+    void init_nominal_speed(
+        disctime_t stim,
+        disctime_t ftim,
+        position_t spos,
+        position_t fpos,
+        disctime_t acc_time,
+        disctime_t dcc_time,
+        int full_spattern = false
+    )
+    {
+        position_t _spos[1] = { spos };
+        position_t _fpos[1] = { fpos };
+        return init_nominal_speed(stim, ftim, _spos, _fpos, acc_time, dcc_time, full_spattern);
+    }
+
+
+    int attime (disctime_t time,
+                position_t  * outpos,
+                velocity_t * outvel) override;
+
+    void set_point_hold(
+        disctime_t time,
+        position_t * pos);
+
+
+    void set_stop_pattern(
+        position_t * curpos,
+        velocity_t * curspd,
+        disctime_t curtime,
+        disctime_t stoptime);
 };
 
-__BEGIN_DECLS
-
-void line_trajectory_init(
-    struct line_trajectory * lintraj,
-    int dim,
-    sf_position_t  * sfpos_array,
-    int sfpos_stride
-);
-
-/// detail: Процедура не учитывает возможные начальную и оконечную скорости.
-void line_trajectory_init_nominal_speed(
-    struct line_trajectory * lintraj,
-    disctime_t   stim,
-    disctime_t   ftim,
-    position_t  * spos,
-    position_t  * fpos,
-
-    disctime_t acc_time,
-    disctime_t dcc_time,
-
-    int full_spattern
-);
-
-
-int line_trajectory_attime (void * priv,
-                            disctime_t time,
-                            position_t  * outpos,
-                            velocity_t * outvel);
-
-void line_trajectory_set_point_hold(
-    struct line_trajectory * lintraj,
-    disctime_t time,
-    position_t * pos);
-
-
-void line_trajectory_set_stop_pattern(
-    struct line_trajectory * lintraj,
-    position_t * curpos, 
-    velocity_t * curspd, 
-    disctime_t curtime, 
-    disctime_t stoptime);
-
-__END_DECLS
+template<int N>
+class lintraj : public line_trajectory
+{
+private:
+    sf_position_t _arr[N];
+    
+public:
+    lintraj() : line_trajectory(N, _arr)
+    {}
+};
 
 #endif
