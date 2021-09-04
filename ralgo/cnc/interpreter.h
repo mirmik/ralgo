@@ -105,7 +105,6 @@ namespace cnc
 			
 			int64_t steps[NMAX_AXES];
 			double dists[NMAX_AXES];
-			double summary_gain = 0;
 			double Saccum = 0;
 			double saccum = 0;
 			for (int i = 0; i < total_axes; ++i)
