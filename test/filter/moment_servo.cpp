@@ -22,7 +22,7 @@ public:
 TEST_CASE("moment_servo_vel")
 {
 	mass_model model;
-	robo::moment_servo_filter serv;
+	ralgo::moment_servo_filter serv;
 
 	double target = 10;
 
@@ -43,7 +43,7 @@ TEST_CASE("moment_servo_vel")
 TEST_CASE("moment_servo_pos")
 {
 	mass_model model;
-	robo::moment_servo_filter serv;
+	ralgo::moment_servo_filter serv;
 
 	double target = 10;
 
@@ -67,7 +67,7 @@ TEST_CASE("moment_servo_pos")
 TEST_CASE("moment_servo_vel2")
 {
 	mass_model model;
-	robo::moment_servo_filter serv;
+	ralgo::moment_servo_filter serv;
 	lintraj<1> ltraj;
 
 	position_t curpos;
@@ -82,14 +82,13 @@ TEST_CASE("moment_servo_vel2")
 	    300
 	);
 
-	serv.setup_velocity_parameters(0.1, 0.75, 1);
-	serv.setup_position_parameters(0.5, 0.75, 1);
+	serv.setup_velocity_parameters(0.05, 0.75, 1);
+	serv.setup_position_parameters(0.1, 0.75, 1);
 
 	double delta = 0.01;
 	for (int i = 0; i < 400; ++i)
 	{
 		ltraj.attime(delta*i*discrete_time_frequency(), &curpos, &curvel);
-		nos::println(curpos, curvel);
 
 		double error_pos = curpos - model.pos;
 		double error_vel = curvel - model.vel;

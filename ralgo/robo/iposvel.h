@@ -3,10 +3,10 @@
 
 namespace robo 
 {
-	class i_moment_setter
+	class i_torque_setter
 	{
 	public:
-		virtual void set_moment(double val) = 0;
+		virtual void set_torque(double val) = 0;
 	};
 
 	class i_velocity_setter 

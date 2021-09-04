@@ -4,7 +4,7 @@
 #include <ralgo/robo/iposvel.h>
 #include <ralgo/filter/pi.h>
 
-namespace robo
+namespace ralgo
 {
 	class moment_servo_filter
 	{
