@@ -111,7 +111,7 @@ namespace ralgo
 		ralgo::matops::copy_from_cols(mat, igris::array_view<Alg>(vectors, count_of_vectors));
 
 		// Нагрузка на стэк.
-		ralgo::linalg::solve(result, mat, target);
+		ralgo::solve(result, mat, target);
 	}
 
 	template <class C, class T, class M>
@@ -121,7 +121,7 @@ namespace ralgo
 		const M& matrix
 	) 
 	{
-		ralgo::linalg::solve(coords, matrix, target);
+		ralgo::solve(coords, matrix, target);
 	}
 }
 
