@@ -8,6 +8,10 @@ licant.module("ralgo.log", "console",
 	default=True
 )
 
+licant.module("ralgo.log", "silent",
+	sources=["ralgo/log/log-silent.cpp"]
+)
+
 licant.module("ralgo",
 	sources=[
 		"ralgo/imu/madgwick.cpp",

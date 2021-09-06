@@ -40,10 +40,6 @@ namespace cnc
 			assert(nominal_velocity * major_multiplier < 1);
 			assert(acceleration * major_multiplier * acceleration_before_ic < 1);
 
-			PRINT(nominal_velocity);
-			PRINT(nominal_velocity * major_multiplier);
-			PRINT(acceleration * major_multiplier * acceleration_before_ic);
-
 			if (fabs(acceleration_before_ic * acceleration - nominal_velocity) > 1e-5)
 				return false;
 
@@ -105,7 +101,6 @@ namespace cnc
 			for (int i = 0; i < len; ++i) 
 			{
 				accs[i] = acceleration * multipliers[i];
-				PRINT(accs[i]);
 			}
 		}
 
@@ -159,12 +154,6 @@ namespace cnc
 			this->nominal_velocity = path / itime;
 			this->acceleration = this->nominal_velocity / preftime;
 			this->fullpath = path;
-
-			PRINT(this->nominal_velocity);
-			PRINT(deceleration_after_ic);
-			PRINT(nominal_velocity * deceleration_after_ic);
-			PRINT(fullpath);
-
 
 			memcpy(this->steps, steps, sizeof(int32_t) * axes);
 

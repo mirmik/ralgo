@@ -25,7 +25,7 @@ application("runtests",
 	ld_flags = "-L/usr/local/lib/",
 
 	include_paths = ["."],
-	mdepends = ["ralgo"],
+	mdepends = ["ralgo", ("ralgo.log", "silent")],
 	libs = ["igris", "nos"],
 )
 
