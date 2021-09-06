@@ -98,11 +98,14 @@ int main(int argc, char ** argv)
 
 	interpreter.task_acc = 10;
 	interpreter.revolver_frequency = 10000;
-	interpreter.newline("G01 X5 F5");
+	interpreter.newline("G01 X2 F5");
+	interpreter.newline("G01 Y2 F5");
+	interpreter.newline("G01 X5 F1");
 	interpreter.newline("G01 Y5 F5");
 
 	planner.total_axes = 3;
 
+	nos::println("KEKEKEKE:");
 	while (1)
 	{
 		auto str = nos::readline();

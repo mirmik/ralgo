@@ -179,6 +179,7 @@ namespace cnc
 			}
 
 			active_block = &blocks->get(active);
+			nos::println("change_active_block", active_block->blockno);
 			active_block -> shift_timestampes(iteration_counter);
 		}
 

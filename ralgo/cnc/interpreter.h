@@ -67,7 +67,8 @@ namespace cnc
 		double revolver_frequency;
 		double gains[NMAX_AXES];
 
-			double task_acc = 1;
+		int blockno = 0;
+		double task_acc = 1;
 	public:
 
 		interpreter(igris::ring<planner_block> * blocks) : blocks(blocks)
@@ -77,16 +78,16 @@ namespace cnc
 				gain = 1;
 		}
 
-		void evaluate_multipliers(double * multipliers, int64_t * steps) 
+		void evaluate_multipliers(double * multipliers, int64_t * steps)
 		{
 			int64_t accum = 0;
-			for (int i = 0; i < total_axes; ++i) 
+			for (int i = 0; i < total_axes; ++i)
 			{
 				accum += steps[i] * steps[i];
 			}
 			double dist = sqrt(accum);
 
-			for (int i = 0; i < total_axes; ++i) 
+			for (int i = 0; i < total_axes; ++i)
 			{
 				multipliers[i] = (double)steps[i] / dist;
 			}
@@ -102,7 +103,7 @@ namespace cnc
 			assert(task.feed != 0);
 
 			PRINT(task.feed);
-			
+
 			int64_t steps[NMAX_AXES];
 			double dists[NMAX_AXES];
 			double Saccum = 0;
@@ -143,6 +144,7 @@ namespace cnc
 			                reduced_feed,
 			                reduced_acc,
 			                multipliers);
+			block.blockno = blockno++;
 			blocks->move_head_one();
 		}
 
