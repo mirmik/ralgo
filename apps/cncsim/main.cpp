@@ -58,7 +58,7 @@ void telemetry_thread_function()
 		awake += 100ms; 
 		std::this_thread::sleep_until(awake);
 
-		nos::println(steppers[0].steps_count(), steppers[1].steps_count());
+		nos::println(steppers[0].steps_count(), steppers[1].steps_count(), steppers[2].steps_count());
 	}
 }
 
@@ -100,10 +100,11 @@ int main(int argc, char ** argv)
 
 	interpreter.task_acc = 10;
 	interpreter.revolver_frequency = 10000;
-	interpreter.newline("G01 X2 F5");
+	//interpreter.newline("G01 X2 F5");
 	//interpreter.newline("G01 Y2 F5");
-	interpreter.newline("G01 X5 F1");
+	//interpreter.newline("G01 X5 F1");
 	//interpreter.newline("G01 Y5 F5");
+	interpreter.newline("G01 Y5 Z3 F5");
 
 	planner.total_axes = 3;
 
