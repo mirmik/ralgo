@@ -34,8 +34,6 @@ TEST_CASE("stepctr")
 
 TEST_CASE("fixed_frequency_stepctr")
 {
-	dprln("fixed_frequency_stepctr");
-
 	stepper stepsim;
 	fixed_frequency_stepper_controller stepctr(&stepsim);
 
