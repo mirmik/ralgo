@@ -47,6 +47,8 @@ namespace cnc
 		double accelerations[NMAX_AXES];
 		double velocities[NMAX_AXES];
 		int64_t steps[NMAX_AXES];
+		int64_t synced_steps[NMAX_AXES];
+
 		double dda_counters[NMAX_AXES];
 
 		int active = 0; // index of active block
@@ -85,6 +87,7 @@ namespace cnc
 			memset(accelerations, 0, sizeof(accelerations));
 			memset(velocities, 0, sizeof(velocities));
 			memset(steps, 0, sizeof(steps));
+			memset(synced_steps, 0, sizeof(synced_steps));
 			memset(dda_counters, 0, sizeof(dda_counters));
 		}
 
@@ -93,15 +96,41 @@ namespace cnc
 			return blocks->index_of(it);
 		}
 
+		void synchronize_finished_block(planner_block & block)
+		{
+			nos::println("synchronize finished block");
+			for (int i = 0; i < total_axes; ++i)
+			{
+				synced_steps[i] += block.steps[i];
+				nos::println("steps", i, synced_steps[i]);
+			}
+		}
+
+
 		void fixup_postactive_blocks()
 		{
 			while (blocks->tail_index() != active)
 			{
 				if (!blocks->tail().is_active_or_postactive(iteration_counter))
+				{
+					synchronize_finished_block(blocks->tail());
 					blocks->pop();
+				}
 
 				else
 					break;
+			}
+
+			// TODO: remove assertation
+			if (active_block == nullptr && !has_postactive_blocks())
+			{
+				for (int i = 0; i < total_axes; ++i)
+				{
+					assert(steps[i] == synced_steps[i]);
+					PRINT(dda_counters[i]);
+				}
+				nos::println("OK!!!!");
+				exit(0);
 			}
 		}
 
@@ -136,6 +165,13 @@ namespace cnc
 		{
 			static int waited = 0;
 
+			if (active_block &&
+			        has_postactive_blocks() == 0 &&
+			        iteration_counter == active_block->active_finish_ic)
+			{
+				nos::println("normalize time");
+			}
+
 			if (active_block)
 				active = blocks->fixup_index(active + 1);
 
@@ -150,7 +186,7 @@ namespace cnc
 			}
 
 			active_block = &blocks->get(active);
-			
+
 			assert(active_block->blockno == waited);
 			waited++;
 
@@ -240,11 +276,15 @@ namespace cnc
 			if (active_block == nullptr && !has_postactive_blocks())
 			{
 				bool empty = blocks->empty();
-				if (empty) 
+				if (empty)
+					return 1;
+
+				change_active_block();
+
+				if (active_block == nullptr)
 					return 1;
 
 				need_to_reevaluate = true;
-				change_active_block();
 			}
 
 			if (need_to_reevaluate)
@@ -283,8 +323,8 @@ namespace cnc
 				velocities[i] += accelerations[i];// * delta;
 			}
 			shifts->emplace(dir, step);
-			iteration_counter++;
 
+			iteration_counter++;
 			return 0;
 		}
 	};
