@@ -107,19 +107,54 @@ namespace cnc
 
 		bool has_postactive_blocks()
 		{
-			return active != blocks->tail_index();
+			system_lock();
+			auto ret = active != blocks->tail_index();
+			system_unlock();
+			return ret;
 		}
 
 		int count_of_postactive()
 		{
-			return blocks->distance(active, blocks->tail_index());
+			system_lock();
+			auto ret = blocks->distance(active, blocks->tail_index());
+			system_unlock();
+			return ret;
 		}
 
-		void start_with_first_block()
+		/*void start_with_first_block()
 		{
 			active_block = &blocks->tail();
+			nos::println();
+			nos::println("start_with_first_block", active_block->blockno);
+			PRINT(active_block->nominal_velocity);
+			nos::println();
 			iteration_counter = 0;
 			need_to_reevaluate = true;
+		}*/
+
+		void change_active_block()
+		{
+			static int waited = 0;
+
+			if (active_block)
+				active = blocks->fixup_index(active + 1);
+
+			system_lock();
+			int head = blocks->head_index();
+			system_unlock();
+
+			if (active == head)
+			{
+				active_block = nullptr;
+				return;
+			}
+
+			active_block = &blocks->get(active);
+			
+			assert(active_block->blockno == waited);
+			waited++;
+
+			active_block -> shift_timestampes(iteration_counter);
 		}
 
 		int serve()
@@ -128,16 +163,17 @@ namespace cnc
 
 			system_lock();
 			int room = shifts->room();
+			bool empty = blocks->empty();
 			system_unlock();
 
-			if (active_block == nullptr && !has_postactive_blocks())
+			/*if (active_block == nullptr && !has_postactive_blocks())
 			{
-				if (blocks->empty())
+				if (empty)
 					return 1;
 
 				else
 					start_with_first_block();
-			}
+			}*/
 
 			while (room--)
 			{
@@ -166,21 +202,6 @@ namespace cnc
 			for (int i = blocks->tail_index(); i != active; i = blocks->fixup_index(i + 1))
 				blocks->get(i).append_accelerations(
 				    accelerations, total_axes, iteration_counter);
-		}
-
-		void change_active_block()
-		{
-			active = blocks->fixup_index(active + 1);
-
-			if (active == blocks->head_index())
-			{
-				active_block = nullptr;
-				return;
-			}
-
-			active_block = &blocks->get(active);
-			nos::println("change_active_block", active_block->blockno);
-			active_block -> shift_timestampes(iteration_counter);
 		}
 
 		int iteration()
@@ -216,17 +237,22 @@ namespace cnc
 				}
 			}
 
+			if (active_block == nullptr && !has_postactive_blocks())
+			{
+				bool empty = blocks->empty();
+				if (empty) 
+					return 1;
+
+				need_to_reevaluate = true;
+				change_active_block();
+			}
+
 			if (need_to_reevaluate)
 			{
 				fixup_postactive_blocks();
 				evaluate_accelerations();
 				need_to_reevaluate = false;
 				count_of_reevaluation++;
-			}
-
-			if (active_block == nullptr && !has_postactive_blocks())
-			{
-				return 1;
 			}
 
 			revolver_t mask, step = 0, dir = 0;

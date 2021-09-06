@@ -14,24 +14,24 @@ namespace cnc
 	public:
 		int64_t steps[NMAX_AXES];
 
-		double nominal_velocity;
-		double acceleration;
-		double fullpath;
+		double nominal_velocity = 0;
+		double acceleration = 0;
+		double fullpath = 0;
 
 		double multipliers[NMAX_AXES];
 		double major_multiplier = 0;
 
 		// отметки времени хранят инкрементное время до планирования и абсолютное
 		// время после активации блока.
-		int64_t start_ic;
-		int64_t acceleration_before_ic;
-		int64_t deceleration_after_ic;
+		int64_t start_ic = 0;
+		int64_t acceleration_before_ic = 0;
+		int64_t deceleration_after_ic = 0;
 
-		int64_t block_finish_ic;
-		int64_t active_finish_ic;
+		int64_t block_finish_ic = 0;
+		int64_t active_finish_ic = 0;
 
-		int blockno;
-		uint8_t exact_stop;
+		int blockno = 0;
+		uint8_t exact_stop = 0;
 
 	public:
 		bool validation()
@@ -154,10 +154,6 @@ namespace cnc
 			this->active_finish_ic = itime;
 			this->fullpath = path;
 			this->start_ic = 0;
-
-			PRINT(time);
-			PRINT(itime);
-			PRINT(preftime);
 
 			if (itime > preftime)
 			{

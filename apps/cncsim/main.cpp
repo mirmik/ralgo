@@ -92,6 +92,8 @@ int main(int argc, char ** argv)
 	planner_thread = std::thread(planner_thread_function);
 	telemetry_thread = std::thread(telemetry_thread_function);
 
+	std::this_thread::sleep_for(1000ms);
+
 	interpreter.gains[0] = 4194304./10000.;
 	interpreter.gains[1] = 4194304./10000.;
 	interpreter.gains[2] = 4194304./10000.;
@@ -105,7 +107,6 @@ int main(int argc, char ** argv)
 
 	planner.total_axes = 3;
 
-	nos::println("KEKEKEKE:");
 	while (1)
 	{
 		auto str = nos::readline();

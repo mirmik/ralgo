@@ -102,8 +102,6 @@ namespace cnc
 
 			assert(task.feed != 0);
 
-			PRINT(task.feed);
-
 			int64_t steps[NMAX_AXES];
 			double dists[NMAX_AXES];
 			double Saccum = 0;
@@ -122,20 +120,8 @@ namespace cnc
 			double feed = task.feed * vecgain;
 			double acc = task_acc * vecgain;
 
-			PRINT(feed);
-			PRINT(vecgain);
-			PRINT(steps[0]);
-			PRINT(dists[0]);
-
-			nos::print_list(igris::array_view(steps, total_axes));
-			PRINT(total_axes);
-			PRINT(acc);
-
 			double reduced_feed = feed / revolver_frequency;
 			double reduced_acc = acc / (revolver_frequency * revolver_frequency);
-
-			PRINT(reduced_feed);
-			PRINT(reduced_acc);
 
 			double multipliers[total_axes];
 			evaluate_multipliers(multipliers, steps);
@@ -145,13 +131,14 @@ namespace cnc
 			                reduced_acc,
 			                multipliers);
 			block.blockno = blockno++;
+
+			system_lock();
 			blocks->move_head_one();
+			system_unlock();
 		}
 
 		void g_command(int argc, char ** argv)
 		{
-			nos::fprintln("g_command: {}", igris::array_view{argv, argc});
-
 			int cmd = atoi(&argv[0][1]);
 			switch (cmd)
 			{
@@ -170,8 +157,6 @@ namespace cnc
 			char buf[48];
 			memcpy(buf, line, size);
 			buf[size] = 0;
-
-			nos::println("Line: ", buf);
 
 			char * argv[10];
 			int argc = argvc_internal_split(buf, argv, size);
