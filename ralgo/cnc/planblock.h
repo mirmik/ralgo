@@ -154,6 +154,7 @@ namespace cnc
 			this->active_finish_ic = itime;
 			this->fullpath = path;
 			this->start_ic = 0;
+			memcpy(this->steps, steps, sizeof(int32_t) * axes);
 
 			if (itime > preftime)
 			{
@@ -163,10 +164,6 @@ namespace cnc
 				this->block_finish_ic = itime + preftime;
 				this->nominal_velocity = path / itime;
 				this->acceleration = this->nominal_velocity / preftime;
-
-				memcpy(this->steps, steps, sizeof(int32_t) * axes);
-
-				assert(validation());
 			}
 
 			else
