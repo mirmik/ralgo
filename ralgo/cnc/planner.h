@@ -102,7 +102,8 @@ namespace cnc
 			for (int i = 0; i < total_axes; ++i)
 			{
 				synced_steps[i] += block.steps[i];
-				nos::println("steps", i, synced_steps[i]);
+				PRINT(block.steps[i]);
+				nos::println("steps", i, synced_steps[i], steps[i]);
 			}
 		}
 

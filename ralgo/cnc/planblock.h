@@ -154,7 +154,7 @@ namespace cnc
 			this->active_finish_ic = itime;
 			this->fullpath = path;
 			this->start_ic = 0;
-			memcpy(this->steps, steps, sizeof(int32_t) * axes);
+			memcpy(this->steps, steps, sizeof(steps[0]) * axes);
 
 			if (itime > preftime)
 			{
