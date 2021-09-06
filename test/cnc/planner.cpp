@@ -46,6 +46,7 @@ TEST_CASE("planner.1")
 	block.acceleration = 0.1;
 	block.multipliers[0] = 1;
 
+	block.active_finish_ic = 5;
 	block.acceleration_before_ic = 2;
 	block.deceleration_after_ic = 5;
 	block.block_finish_ic = 7;
@@ -74,6 +75,7 @@ TEST_CASE("planner.2")
 	block.acceleration = 0.25;
 	block.multipliers[0] = 1;
 
+	block.active_finish_ic = 6;
 	block.acceleration_before_ic = 2;
 	block.deceleration_after_ic = 6;
 	block.block_finish_ic = 8;

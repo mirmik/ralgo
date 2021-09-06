@@ -13,7 +13,7 @@ namespace cnc
 	{
 	public:
 		int64_t steps[NMAX_AXES];
-		
+
 		double nominal_velocity;
 		double acceleration;
 		double fullpath;
@@ -26,17 +26,19 @@ namespace cnc
 		int64_t start_ic;
 		int64_t acceleration_before_ic;
 		int64_t deceleration_after_ic;
-		int64_t block_finish_ic;
 
+		int64_t block_finish_ic;
+		int64_t active_finish_ic;
+
+		int blockno;
 		uint8_t exact_stop;
 
 	public:
-		bool validation() 
+		bool validation()
 		{
 			// TODO: remove assertation
 			assert(fabs(acceleration_before_ic * acceleration - nominal_velocity) < 1e-5);
 			assert(fabs(nominal_velocity * deceleration_after_ic - fullpath) < 1e-5);
-			assert(block_finish_ic - deceleration_after_ic == acceleration_before_ic - start_ic);
 			assert(nominal_velocity * major_multiplier < 1);
 			assert(acceleration * major_multiplier * acceleration_before_ic < 1);
 
@@ -46,10 +48,12 @@ namespace cnc
 			if (fabs(nominal_velocity * deceleration_after_ic - fullpath) > 1e-5)
 				return false;
 
-			if (block_finish_ic - deceleration_after_ic != acceleration_before_ic - start_ic)
-				return false;
-
 			return true;
+		}
+
+		bool is_triangle()
+		{
+			return acceleration_before_ic == deceleration_after_ic;
 		}
 
 		void shift_timestampes(int64_t iteration_counter)
@@ -58,6 +62,7 @@ namespace cnc
 			acceleration_before_ic += iteration_counter;
 			deceleration_after_ic += iteration_counter;
 			block_finish_ic += iteration_counter;
+			active_finish_ic += iteration_counter;
 		}
 
 		bool is_active(int64_t interrupt_counter)
@@ -65,7 +70,7 @@ namespace cnc
 			if (exact_stop)
 				return interrupt_counter < block_finish_ic;
 			else
-				return interrupt_counter < deceleration_after_ic;
+				return interrupt_counter < active_finish_ic;
 		}
 
 		bool is_active_or_postactive(int64_t interrupt_counter)
@@ -98,7 +103,7 @@ namespace cnc
 				return;
 			}
 
-			for (int i = 0; i < len; ++i) 
+			for (int i = 0; i < len; ++i)
 			{
 				accs[i] = acceleration * multipliers[i];
 			}
@@ -118,16 +123,16 @@ namespace cnc
 		}
 
 		void set_state(
-			int64_t * steps, 
-			int axes, 
-			double velocity, 
-			double acceleration,
-			double * multipliers) 
-		{	
+		    int64_t * steps,
+		    int axes,
+		    double velocity,
+		    double acceleration,
+		    double * multipliers)
+		{
 			(void) steps;
 			(void) axes;
 
-			for (int i = 0; i < axes; ++i)  
+			for (int i = 0; i < axes; ++i)
 			{
 				this->multipliers[i] = multipliers[i];
 				if (multipliers[i] > major_multiplier)
@@ -137,27 +142,52 @@ namespace cnc
 			assert(velocity < 1);
 			assert(acceleration < 1);
 
-			double pathsqr = 0; 
+			double pathsqr = 0;
 			for (int i = 0; i < axes; ++i)
 				pathsqr += steps[i] * steps[i];
-			double path = sqrt(pathsqr);
+			double path = sqrt(pathsqr);         // area
 			double time = path / velocity;
 
 			int itime = ceil(time);
 			int preftime = ceil(velocity / acceleration);
 
-			start_ic = 0;
-			acceleration_before_ic = preftime;
-			deceleration_after_ic = itime;
-			block_finish_ic = itime + preftime;
-
-			this->nominal_velocity = path / itime;
-			this->acceleration = this->nominal_velocity / preftime;
+			this->active_finish_ic = itime;
 			this->fullpath = path;
+			this->start_ic = 0;
 
-			memcpy(this->steps, steps, sizeof(int32_t) * axes);
+			PRINT(time);
+			PRINT(itime);
+			PRINT(preftime);
 
-			assert(validation());	
+			if (itime > preftime)
+			{
+				// trapecidal pattern
+				this->acceleration_before_ic = preftime;
+				this->deceleration_after_ic = itime;
+				this->block_finish_ic = itime + preftime;
+				this->nominal_velocity = path / itime;
+				this->acceleration = this->nominal_velocity / preftime;
+
+				memcpy(this->steps, steps, sizeof(int32_t) * axes);
+
+				assert(validation());
+			}
+
+			else
+			{
+				// triangle pattern
+				double maxspeed = sqrt(path * acceleration);
+				double halftime = path / maxspeed;
+				int itime2 = ceil(halftime);
+
+				this->acceleration_before_ic = itime2;
+				this->deceleration_after_ic = itime2;
+				this->block_finish_ic = itime2 * 2;
+				this->nominal_velocity = path / itime2;
+				this->acceleration = this->nominal_velocity / itime2;
+			}
+
+			assert(validation());
 		}
 	};
 }
