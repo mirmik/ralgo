@@ -4,8 +4,13 @@
 #include <ralgo/cnc/revolver.h>
 #include <ralgo/cnc/planner.h>
 #include <ralgo/cnc/interpreter.h>
-
 #include <ralgo/robo/stepper.h>
+
+#include <crow/pubsub/pubsub.h>
+#include <crow/address.h>
+#include <crow/pubsub/publisher.h>
+#include <crow/tower.h>
+#include <crow/gates/udpgate.h>
 
 igris::ring<cnc::planner_block, 40> blocks;
 igris::ring<cnc::control_shift, 400> shifts;
@@ -24,10 +29,14 @@ std::thread revolver_thread;
 std::thread planner_thread;
 std::thread telemetry_thread;
 
+auto crowker = crow::crowker_address();
+
 using std::chrono::operator""ms;
 using std::chrono::operator""us;
 
 robo::stepper steppers[3]; 
+
+crow::publisher publisher(crowker, "cncsim/feedpos");
 
 auto now()
 {
@@ -52,13 +61,19 @@ void telemetry_thread_function()
 {
 	auto start = now();
 	auto awake = now();
+	float poses[3];
 
 	while (1)
 	{
-		awake += 100ms; 
+		awake += 10ms; 
 		std::this_thread::sleep_until(awake);
 
-		nos::println(steppers[0].steps_count(), steppers[1].steps_count(), steppers[2].steps_count());
+		for (int i = 0; i < 3; ++i)
+			poses[i] = float(steppers[i].steps_count()) / 100;
+
+		//nos::println(steppers[0].steps_count(), steppers[1].steps_count(), steppers[2].steps_count());
+
+		publisher.publish(igris::buffer(poses, sizeof(poses)), 0, 0);
 	}
 }
 
@@ -87,6 +102,10 @@ void configuration()
 
 int main(int argc, char ** argv)
 {
+	crow::diagnostic_setup(true, false);
+	crow::create_udpgate();
+	crow::start_spin();
+
 	configuration();
 	revolver_thread = std::thread(revolver_thread_function);
 	planner_thread = std::thread(planner_thread_function);
@@ -105,6 +124,9 @@ int main(int argc, char ** argv)
 	interpreter.newline("G01 X5 F1");
 	interpreter.newline("G01 Y5 F5");
 	interpreter.newline("G01 Y5 Z3 F5");
+	interpreter.newline("G01 X20 F10");
+	interpreter.newline("G01 Y-20 F10");
+	interpreter.newline("G01 X-20 F10");
 
 	planner.total_axes = 3;
 
