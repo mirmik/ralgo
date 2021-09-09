@@ -3,12 +3,15 @@
 
 #include <ralgo/log.h>
 #include <ralgo/trajectory/traj1d.h>
-#include <ralgo/heimer/axis.h>
-#include <ralgo/heimer/protect.h>
+#include <ralgo/oldheimer/axis.h>
+#include <ralgo/oldheimer/protect.h>
 
 #include <igris/event/delegate.h>
 #include <igris/math.h>
 #include <igris/util/numconvert.h>
+
+#include <nos/print.h>
+#include <nos/fprint.h>
 
 namespace heimer
 {
@@ -152,8 +155,6 @@ namespace heimer
 			int sts;
 			P ctrpos = 0;
 			V ctrspd = 0;
-
-			nos::println(lintraj);
 
 			if (curtraj)
 				sts = curtraj->attime(ralgo::discrete_time(), ctrpos, ctrspd);

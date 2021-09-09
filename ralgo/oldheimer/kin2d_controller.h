@@ -6,7 +6,7 @@
 
 #include <ralgo/disctime.h>
 #include <ralgo/linalg/backpack.h>
-#include <ralgo/heimer/multiax.h>
+#include <ralgo/oldheimer/multiax.h>
 
 namespace heimer
 {

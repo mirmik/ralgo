@@ -4,7 +4,7 @@
 #include <igris/shell/conscmd.h>
 #include <igris/datastruct/dlist.h>
 
-#include <ralgo/heimer/interrupt_args.h>
+#include <ralgo/oldheimer/interrupt_args.h>
 
 #include <nos/print.h>
 

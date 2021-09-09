@@ -7,8 +7,8 @@
 #include <igris/util/numconvert.h>
 #include <igris/dtrace.h>
 #include <igris/dprint.h>
-#include <ralgo/heimer/phaser.h>
-#include <ralgo/heimer/interrupt_args.h>
+#include <ralgo/oldheimer/phaser.h>
+#include <ralgo/oldheimer/interrupt_args.h>
 
 #include <ralgo/log.h>
 
@@ -237,7 +237,7 @@ namespace heimer
 	};
 }
 
-#include <ralgo/heimer/phaser_axis.h>
+#include <ralgo/oldheimer/phaser_axis.h>
 
 template< class Position, class IntPos, class Speed>
 void heimer::stepctr<Position, IntPos, Speed>::

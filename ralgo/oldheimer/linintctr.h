@@ -6,9 +6,9 @@
 #include <igris/dtrace.h>
 #include <ralgo/linalg/vecops.h>
 
-#include <ralgo/heimer/interpolation_group.h>
-#include <ralgo/heimer/coordinate_checker.h>
-#include <ralgo/heimer/control.h>
+#include <ralgo/oldheimer/interpolation_group.h>
+#include <ralgo/oldheimer/coordinate_checker.h>
+#include <ralgo/oldheimer/control.h>
 
 #include <ralgo/trajectory/trajNd.h>
 

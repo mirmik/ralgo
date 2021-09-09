@@ -39,7 +39,7 @@
 
 #include <ralgo/space/screw.h>
 #include <ralgo/space/htrans2.h>
-#include <ralgo/heimer/kin2d_controller.h>
+#include <ralgo/oldheimer/kin2d_controller.h>
 
 namespace heimer
 {

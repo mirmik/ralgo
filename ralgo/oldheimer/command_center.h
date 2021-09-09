@@ -1,8 +1,8 @@
 #ifndef RALGO_HEIMER_COMMAND_CENTER_H
 #define RALGO_HEIMER_COMMAND_CENTER_H
 
-#include <ralgo/heimer/axisctr.h>
-#include <ralgo/heimer/linintctr.h>
+#include <ralgo/oldheimer/axisctr.h>
+#include <ralgo/oldheimer/linintctr.h>
 #include <ctype.h>
 
 namespace heimer

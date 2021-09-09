@@ -1,7 +1,7 @@
 #ifndef RALGO_HEIMER_MULTIAX_H
 #define RALGO_HEIMER_MULTIAX_H
 
-#include <ralgo/heimer/axis.h>
+#include <ralgo/oldheimer/axis.h>
 
 namespace heimer
 {
