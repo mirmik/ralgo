@@ -3,7 +3,7 @@
 
 #include <igris/sync/syslock.h>
 #include <ralgo/disctime.h>
-#include <ralgo/heimer/control.h>
+#include <ralgo/oldheimer/control.h>
 
 #include <nos/print.h>
 

@@ -22,6 +22,7 @@ licant.module("ralgo",
 
 		"ralgo/robo/stepper_controller.cpp",
 		
+		"ralgo/oldheimer/*.cpp",
 		"ralgo/heimer/axisctr.cpp",
 		"ralgo/heimer/axisctr_command.cpp",
 		"ralgo/heimer/velocity_applier.cpp",

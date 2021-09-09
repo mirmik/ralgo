@@ -1,8 +1,8 @@
 #ifndef HEIMER_AXISCTR_LINEAR_COMPILATION_H
 #define HEIMER_AXISCTR_LINEAR_COMPILATION_H
 
-#include <ralgo/heimer/axisctr.h>
-#include <ralgo/heimer/linintctr.h>
+#include <ralgo/oldheimer/axisctr.h>
+#include <ralgo/oldheimer/linintctr.h>
 
 namespace heimer 
 {

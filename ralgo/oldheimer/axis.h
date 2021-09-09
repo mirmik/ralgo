@@ -2,7 +2,7 @@
 #define HEIMER_AXIS_H
 
 #include <math.h>
-#include <ralgo/heimer/control.h>
+#include <ralgo/oldheimer/control.h>
 #include <assert.h>
 
 namespace heimer

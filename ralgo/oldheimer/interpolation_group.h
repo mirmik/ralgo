@@ -3,8 +3,8 @@
 
 #include <igris/binreader.h>
 
-#include <ralgo/heimer/coordinate_checker.h>
-#include <ralgo/heimer/control.h>
+#include <ralgo/oldheimer/coordinate_checker.h>
+#include <ralgo/oldheimer/control.h>
 #include <linalg/linalg.h>
 
 namespace heimer

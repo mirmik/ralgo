@@ -1,7 +1,7 @@
 #ifndef RALGO_HEIMER_STUB_AXIS_H
 #define RALGO_HEIMER_STUB_AXIS_H
 
-#include <ralgo/heimer/axis.h>
+#include <ralgo/oldheimer/axis.h>
 
 namespace heimer
 {

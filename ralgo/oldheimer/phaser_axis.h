@@ -1,8 +1,8 @@
 #ifndef RALGO_HEIMER_SPEED_PHASER_AXIS_H
 #define RALGO_HEIMER_SPEED_PHASER_AXIS_H
 
-#include <ralgo/heimer/phaser.h>
-#include <ralgo/heimer/axis.h>
+#include <ralgo/oldheimer/phaser.h>
+#include <ralgo/oldheimer/axis.h>
 
 #include<hal/irq.h>
 #include <util/cpu_delay.h>

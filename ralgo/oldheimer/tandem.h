@@ -1,8 +1,8 @@
 #ifndef RALGO_HEIMER_TANDEM_H
 #define RALGO_HEIMER_TANDEM_H
 
-#include <ralgo/heimer/multiax.h>
-#include <ralgo/heimer/control.h>
+#include <ralgo/oldheimer/multiax.h>
+#include <ralgo/oldheimer/control.h>
 
 namespace heimer
 {
