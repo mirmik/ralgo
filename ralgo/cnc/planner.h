@@ -200,7 +200,7 @@ namespace cnc
 
 			system_lock();
 			int room = shifts->room();
-			bool empty = blocks->empty();
+			//bool empty = blocks->empty();
 			system_unlock();
 
 			/*if (active_block == nullptr && !has_postactive_blocks())

@@ -67,7 +67,7 @@ namespace heimer
 		}
 
 		// итератор подчинённых устройств
-		virtual control_node * iterate (control_node * it)
+		virtual control_node * iterate (control_node *)
 		{ return nullptr; }
 
 		// Итератор контроллирующих устройств
@@ -128,7 +128,7 @@ namespace heimer
 		}
 
 		virtual
-		int internal_command(int argc, char** argv)
+		int internal_command(int, char**)
 		{
 			return -1;
 		}
@@ -144,12 +144,12 @@ namespace heimer
 	protected:
 		// вызывается при взятии внешнего управления нодом
 		virtual int on_external_take(
-		    control_node * master)
+		    control_node *)
 		{ return 0; }
 
 		// вызывается при отпускании внешнего управления
 		virtual int on_external_release(
-		    control_node * master)
+		    control_node *)
 		{ return 0; }
 
 		virtual int on_activate() { return 0; }

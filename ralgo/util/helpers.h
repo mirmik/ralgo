@@ -45,6 +45,9 @@ namespace ralgo
 	struct op_mul { template<class A, class B> auto operator()(const A& a, const B& b) const { return a * b; } };
 	struct op_div { template<class A, class B> auto operator()(const A& a, const B& b) const { return a / b; } };
 
+	struct op_sin { template<class A> auto operator()(const A& a) const { return sin(a); } };
+	struct op_cos { template<class A> auto operator()(const A& a) const { return cos(a); } };
+
 	struct op_abs { template<class A> auto operator()(const A& a) const { return std::abs(a); } };
 
 	struct op_eq

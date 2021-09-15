@@ -4,6 +4,7 @@
 #include <igris/container/ring.h>
 #include <igris/container/array_view.h>
 #include <igris/datastruct/argvc.h>
+#include <igris/sync/syslock.h>
 
 #include <ralgo/cnc/planblock.h>
 #include <ralgo/cnc/defs.h>

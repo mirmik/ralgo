@@ -1,7 +1,7 @@
 #ifndef RALGO_HEIMER_COORDINATE_CHECKER_H
 #define RALGO_HEIMER_COORDINATE_CHECKER_H
 
-#include <linalg/linalg.h>
+#include <ralgo/linalg/linalg.h>
 #include <ralgo/geom/zone_check.h>
 #include <ralgo/oldheimer/interpolation_group.h>
 #include <igris/container/array_view.h>
@@ -30,7 +30,7 @@ namespace heimer
 		}
 
 		virtual bool check_impl(control_node * dev, P * val, int dim, char * msgbuf) = 0;
-		virtual int command(int argc, char ** argv) { return -1; }
+		virtual int command(int, char **) { return -1; }
 
 		void link_next(coordinate_checker * next) { this->next = next; }
 	};
