@@ -92,15 +92,15 @@ namespace ralgo
 		}
 
 		// Построить линейное пространство аля numpy.
-		template<class R>
-		auto linspace(double s, double f, int n)
+		template<class R = void, class T>
+		defvec_of_t<R, T> linspace(T s, T f, int n)
 		{
-			R r(n);
-			double k;
+			defvec_of_t<R, T> r(n);
+			T k;
 
 			for (int i = 0; i < n; ++i)
 			{
-				k = (double)i / ((double)n - 1);
+				k = (T)i / ((T)n - 1);
 				r[i] = s * (1 - k) + f * k;
 			}
 
@@ -129,6 +129,10 @@ namespace ralgo
 		template <class R = void, class A> defsame_t<R, A> abs(const A& obj) { return elementwise<R>(ralgo::op_abs(), obj); }
 		template <template<class C> class V, class T> auto real(const V<T>& obj) { return elementwise<V<T>>([](const auto & c) {return c.real();}, obj); }
 		template <template<class C> class V, class T> auto imag(const V<T>& obj) { return elementwise<V<T>>([](const auto & c) {return c.imag();}, obj); }
+
+		// Тригонометрия.
+		template <class R = void, class A> defsame_t<R, A> sin(const A& obj) { return elementwise<R>(ralgo::op_sin(), obj); }
+		template <class R = void, class A> defsame_t<R, A> cos(const A& obj) { return elementwise<R>(ralgo::op_cos(), obj); }
 
 		// Вернуть реверс вектора src
 		template <typename T> T reverse(const T& src)

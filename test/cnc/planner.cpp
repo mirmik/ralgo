@@ -31,7 +31,7 @@ TEST_CASE("planner.0")
 	CHECK_EQ(shifts.room(), 0);
 }
 
-TEST_CASE("planner.1")
+/*TEST_CASE("planner.1")
 {
 	igris::ring<cnc::planner_block, 10> blocks;
 	igris::ring<cnc::control_shift, 20> shifts;
@@ -58,9 +58,9 @@ TEST_CASE("planner.1")
 
 	CHECK_EQ(planner.iteration_counter, 7);
 	CHECK_EQ(shifts.avail(), 7);
-}
+}*/
 
-TEST_CASE("planner.2")
+/*TEST_CASE("planner.2")
 {
 	igris::ring<cnc::planner_block, 10> blocks;
 	igris::ring<cnc::control_shift, 20> shifts;
@@ -83,7 +83,7 @@ TEST_CASE("planner.2")
 	block.exact_stop = 0;
 	blocks.move_head_one();
 
-	planner.start_with_first_block();	
+	//planner.start_with_first_block();	
 
 	planner.iteration();
 	CHECK_EQ(planner.count_of_reevaluation, 1);
@@ -223,5 +223,5 @@ TEST_CASE("planner.3")
 	CHECK_EQ(shifts.get(5).direction, 0);
 	CHECK_EQ(shifts.get(6).direction, 0);
 	CHECK_EQ(shifts.get(7).direction, 1);
-}
+}*/
 

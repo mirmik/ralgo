@@ -7,24 +7,44 @@
 
 #include <ralgo/filter/inout.h>
 
-namespace ralgo 
+namespace ralgo
 {
 	template <class T>
 	class aperiodic_filter : public ralgo::inout<T, T>
 	{
-		float koeff;
+		T koeff;
 		T state;
 
 	public:
-		aperiodic_filter(float _koeff) : koeff(_koeff) {}
+		aperiodic_filter() 
+		{}
 
-		T operator()(const T & in) override 
+		aperiodic_filter(T _koeff) : koeff(_koeff) 
+		{
+
+		}
+
+		T serve(const T & in)
 		{
 			state += (in - state) * koeff;
 			return state;
 		}
 
-		void reset(T val) { state = val; }
+		T operator()(const T & in) override 
+		{
+			return serve(in);
+		}
+
+		void reset(T val)
+		{
+			state = val;
+		}
+
+		aperiodic_filter& set_koefficient(T delta, T time_constant) 
+		{
+			koeff = delta / time_constant;
+			return *this;
+		}
 	};
 }
 

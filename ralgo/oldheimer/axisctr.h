@@ -271,13 +271,13 @@ namespace heimer
 
 		ralgo::traj1d_nominal_speed_params<P, V> nm_params =
 		{
-			.stim = curtim,
-			.spos = curpos,
-			.fpos = tgtpos,
-			.speed = spd,
-			.acc = acc,
-			.dcc = dcc,
-			.full_spattern = enable_full_spattern
+			curtim,
+			curpos,
+			tgtpos,
+			spd,
+			acc,
+			dcc,
+			enable_full_spattern
 		};
 
 		lintraj.init_nominal_speed_mode(&nm_params);
