@@ -12,6 +12,10 @@ licant.module("ralgo.log", "silent",
 	sources=["ralgo/log/log-silent.cpp"]
 )
 
+licant.module("ralgo.signal",
+	sources=["ralgo/signal/fft.cpp"]
+)
+
 licant.module("ralgo",
 	sources=[
 		"ralgo/imu/madgwick.cpp",
@@ -55,7 +59,8 @@ licant.module("ralgo",
 	mdepends=[
 		"ralgo.include",
 		"ralgo.log",
-		"ralgo.disctime"
+		"ralgo.disctime",
+		"ralgo.signal"
 	],
 )
 
