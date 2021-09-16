@@ -9,6 +9,7 @@ licant.execute("../ralgo.g.py")
 
 application("runtests",
 	sources = [
+		"signal/*.cpp",
 		"imu/*",
 		"*.cpp",
 		"robo/*.cpp",
