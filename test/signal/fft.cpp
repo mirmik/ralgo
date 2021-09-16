@@ -15,11 +15,30 @@ TEST_CASE("fft")
 	 
 	 freqs.resize((1<<8) / 2);
 	 ralgo::signal::rfftfreq(freqs.data(), 1<<8, (1.)/(1<<8));
+}
 
+TEST_CASE("fft.2") 
+{
+	std::vector<double> freqs;
 
-	 nos::println("values:");
-	 for (unsigned int i = 0; i < ret.size()/2; ++i) 
-	 {
-	 	nos::println(ret[i], freqs[i]);
-	 }
+	 auto tim = ralgo::vecops::linspace(0., 12 * M_PI * 2., 254);
+	 auto sig = ralgo::vecops::sin(tim);
+
+	 auto ret = ralgo::signal::rfft(sig);
+	 
+	 CHECK_EQ(ret.size(), 128);
+
+	 nos::println(ret);
+}
+
+TEST_CASE("fft.2") 
+{
+	std::vector<double> freqs;
+
+	 auto tim = ralgo::vecops::linspace(0., 12 * M_PI * 2., 100000);
+	 auto sig = ralgo::vecops::sin(tim);
+
+	 auto ret = ralgo::signal::rfft(sig);
+
+	 CHECK_EQ(ret.size(), 65536);
 }

@@ -24,6 +24,8 @@ namespace ralgo
 
 		std::vector<double> spectre(double *src, size_t srclen, size_t dstlen);
 
+		std::vector<double> rfft(const std::vector<double>& src);
+
 		/* Write array of freqs for spectre or other fft operations to buffer
 		*
 		* dst - target array
