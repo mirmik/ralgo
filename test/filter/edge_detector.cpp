@@ -13,8 +13,8 @@ TEST_CASE("edge_detector")
 
 	for (auto & val : signal) 
 	{
-		int sig = detector.serve(val);
-		acc += sig;
+		ralgo::EdgeDetectorStatus sig = detector.serve(val);
+		acc += sig == ralgo::EdgeDetectorStatus::RisingEvent ? 1 : 0;
 	}
 
 	CHECK_EQ(acc, 10);
