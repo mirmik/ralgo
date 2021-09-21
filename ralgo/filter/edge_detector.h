@@ -9,7 +9,7 @@ namespace ralgo
 	{
 		UpdateFallingCandidate,
 		UpdateRisingCandidate,
-		FallingEvent,
+		FailingEvent,
 		RisingEvent,
 		None
 	};
@@ -23,6 +23,8 @@ namespace ralgo
 
 		float start;
 		float last;
+
+		bool prevent_halfspaces_area = true;
 
 	public:
 		rising_edge_detector(float trigger_level)
@@ -40,31 +42,38 @@ namespace ralgo
 
 				if (direction)
 					status = EdgeDetectorStatus::UpdateRisingCandidate;
+				else 
+					status = EdgeDetectorStatus::UpdateFallingCandidate;
 			}
 
 			else
 			{
-				if (direction == false)
+				if (fabs(signal - start) > trigger_level)
 				{
-					if (fabs(signal - start) > trigger_level)
-						phase = false;
-				}
+					if (direction == false)
+					{
+						if (phase == true)
+						{
+							phase = false;
 
-				if (direction == true)
-				{
-					if (fabs(signal - start) > trigger_level)
+							if (!prevent_halfspaces_area || start > 0)
+								status = EdgeDetectorStatus::FailingEvent;
+						}
+					}
+
+					if (direction == true)
 					{
 						if (phase == false)
 						{
 							phase = true;
 
-							if (start < 0)
+							if (!prevent_halfspaces_area || start < 0)
 								status = EdgeDetectorStatus::RisingEvent;
 						}
 					}
 				}
 			}
-			
+
 			last_direction = direction;
 			last = signal;
 
