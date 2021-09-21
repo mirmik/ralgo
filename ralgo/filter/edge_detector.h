@@ -9,12 +9,12 @@ namespace ralgo
 	{
 		UpdateFallingCandidate,
 		UpdateRisingCandidate,
-		FailingEvent,
+		FallingEvent,
 		RisingEvent,
 		None
 	};
 
-	class rising_edge_detector
+	class edge_detector
 	{
 		bool phase = false;
 		bool last_direction = false;
@@ -27,7 +27,7 @@ namespace ralgo
 		bool prevent_halfspaces_area = true;
 
 	public:
-		rising_edge_detector(float trigger_level)
+		edge_detector(float trigger_level)
 			: trigger_level(trigger_level)
 		{}
 
@@ -57,7 +57,7 @@ namespace ralgo
 							phase = false;
 
 							if (!prevent_halfspaces_area || start > 0)
-								status = EdgeDetectorStatus::FailingEvent;
+								status = EdgeDetectorStatus::FallingEvent;
 						}
 					}
 
@@ -80,6 +80,8 @@ namespace ralgo
 			return status;
 		}
 	};
+
+	using rising_edge_detector = edge_detector;
 }
 
 #endif
