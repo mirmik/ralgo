@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <algorithm>
 #include <iterator>
+#include <tuple>
 #include <ralgo/util/helpers.h>
 
 #include <igris/util/signature.h>

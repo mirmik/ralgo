@@ -1,6 +1,8 @@
 #ifndef RALGO_HEIMER_SIGNAL_TYPES_H
 #define RALGO_HEIMER_SIGNAL_TYPES_H
 
+#include <errno.h>
+
 #define SIGNAL_TYPE_AXIS_STATE 1
 #define SIGNAL_TYPE_SCALAR 2
 #define SIGNAL_TYPE_DOF6 3

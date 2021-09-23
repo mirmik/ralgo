@@ -1,6 +1,7 @@
 #ifndef RALGO_SPACE_POSE3_H
 #define RALGO_SPACE_POSE3_H
 
+#include <iostream>
 #include <ralgo/space/screw.h>
 
 namespace ralgo
