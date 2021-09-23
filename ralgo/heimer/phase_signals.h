@@ -1,6 +1,8 @@
 #ifndef RALGO_HEIMER_PHASE_SIGNALS_H
 #define RALGO_HEIMER_PHASE_SIGNALS_H
 
+#include <errno.h>
+
 #include <nos/fprint.h>
 #include <ralgo/heimer/sigtypes.h>
 #include <ralgo/heimer/heimer_types.h>
@@ -32,8 +34,6 @@ namespace heimer
 			nos::format_buffer(data, "(cpos:{}, cvel:{}, fpos:{}, fvel:{})\r\n", ctrpos, ctrvel, feedpos, feedvel);
 			return 0;
 		}
-
-
 	};
 
 	class axis_state : public phase_signal_base <

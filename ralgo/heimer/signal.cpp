@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include <nos/fprint.h>
+#include <errno.h>
 
 #include <igris/datastruct/nametbl.h>
 

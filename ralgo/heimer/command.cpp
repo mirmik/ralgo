@@ -169,17 +169,17 @@ int ctrnew(int argc, char ** argv, char * output, int maxsize)
 		int dim = atoi(argv[1]);
 		const char * name = argv[2];
 
-		if (dim==2)
-		   new phase_mux_processor<2>(name);
+		if (dim == 2)
+			new phase_mux_processor<2>(name);
 
-		if (dim==3)
-		   new phase_mux_processor<3>(name);
+		if (dim == 3)
+			new phase_mux_processor<3>(name);
 
 		return 0;
 	}
 
 	snprintf(output, maxsize, "Unresolved TYPE. Possible types: axisctr, axlinear, "
-		"axsincos, axstub, chain3linctr, axmuxctr\r\n");
+	         "axsincos, axstub, chain3linctr, axmuxctr\r\n");
 	return -1;
 }
 
@@ -244,7 +244,7 @@ int signew(int argc, char ** argv, char * output, int maxsize)
 		for (int i = 2; i < argc; ++i)
 		{
 			const char * name = argv[i];
-			
+
 			if (dim == 2)
 				new phase_signal<2>(name);
 
@@ -261,7 +261,7 @@ int signew(int argc, char ** argv, char * output, int maxsize)
 
 		bool is_float = strcmp(type, "float") == 0;
 		int elsize = is_float ? 4 : 8;
-		int sigtype = is_float ? SIGNAL_TYPE_DATASIG_FLOAT : SIGNAL_TYPE_DATASIG_DOUBLE; 
+		int sigtype = is_float ? SIGNAL_TYPE_DATASIG_FLOAT : SIGNAL_TYPE_DATASIG_DOUBLE;
 		int datasize = elsize * size;
 
 		for (int i = 3; i < argc; ++i)
@@ -299,6 +299,7 @@ int ctrlist(int, char **, char * output, int maxsize)
 	signal_processor * it;
 	dlist_for_each_entry(it, &signal_processor_list, list_lnk)
 	{
+		memset(buf, 0, 48);
 		snprintf(buf, 48,
 		         "%*s is_active:%d\r\n", SIGNAL_PROCESSOR_NAME_MAX_LENGTH, it->name().data(), it->is_active());
 		strncat(output, buf, maxsize);
@@ -310,12 +311,17 @@ int ctrlist(int, char **, char * output, int maxsize)
 static
 int siglist(int, char **, char * output, int maxsize)
 {
+	char buf[48];
+
 	signal_head * it;
 	dlist_for_each_entry(it, &signals_list, list_lnk)
 	{
-		char buf[48];
+		memset(buf, 0, 48);
 		snprintf(buf, 48,
-		         "%*s controlled: %d\r\n", SIGNAL_PROCESSOR_NAME_MAX_LENGTH, it->name, it->current_controller != nullptr);
+		         "%*s controlled: %d\r\n",
+		         SIGNAL_PROCESSOR_NAME_MAX_LENGTH,
+		         it->name,
+		         it->current_controller != nullptr);
 		strncat(output, buf, maxsize);
 	}
 
@@ -333,6 +339,7 @@ static struct rshell_command commands[] =
 	{ "siglist", siglist, NULL },
 	{ NULL, NULL, NULL }
 };
+struct rshell_command * heimer::commands_table = commands;
 
 int heimer::command(int argc, char ** argv, char * output, int maxsize, int * ret)
 {

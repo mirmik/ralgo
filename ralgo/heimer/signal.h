@@ -4,6 +4,7 @@
 #include <igris/compiler.h>
 #include <igris/datastruct/dlist.h>
 
+#include <errno.h>
 #include <ralgo/disctime.h>
 
 #define SIGNAL_NAME_MAX_LENGTH 12
