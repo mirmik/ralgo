@@ -5,15 +5,24 @@
 #include <ralgo/disctime.h>
 
 #include <igris/dprint.h>
+#include <nos/fprint.h>
 
 using namespace robo;
 
+stepper_controller::stepper_controller()
+{
+	_control_pos = 0;
+	_virtual_pos = 0;
+}
+
 stepper_controller::stepper_controller( robo::stepper * stepper )
 {
-	this->stepper = stepper;
+	init(stepper);
+}
 
-	//this->units_in_step = units_in_step;
-	//this->units_in_step_triggered = trigger_level * units_in_step;
+void stepper_controller::init(robo::stepper * stepper)
+{
+	this->stepper = stepper;
 
 	_control_pos = 0;
 	_virtual_pos = 0;
@@ -71,7 +80,7 @@ int fixed_frequency_stepper_controller::constant_frequency_serve()
 {
 	int sts = shift(current_shift);
 
-	if (sts) 
+	if (sts)
 	{
 		if (interrupt_handle)
 			interrupt_handle(interrupt_priv, sts);
@@ -81,18 +90,55 @@ int fixed_frequency_stepper_controller::constant_frequency_serve()
 }
 
 fixed_frequency_stepper_controller::fixed_frequency_stepper_controller(
-	robo::stepper * stepper
+    robo::stepper * stepper
 )
 	: stepper_controller(stepper)
-{
+{}
 
-}
+fixed_frequency_stepper_controller::fixed_frequency_stepper_controller()
+	: stepper_controller()
+{}
 
 void fixed_frequency_stepper_controller::set_velocity(double speed)
 {
+	DPRINT(speed);
 	auto val = speed_to_shift * speed;
 
 	system_lock();
 	this->current_shift = val;
 	system_unlock();
+}
+
+void stepper_controller::info(char* buf, int len)
+{
+	//nos::format_buffer(buf, "_control_pos: {}\r\n_virtual_pos:{}\r\n");
+}
+
+void fixed_frequency_stepper_controller::info(char* buf, int len)
+{
+	//char sbuf[48];
+	//stepper_controller::info(buf, len);
+
+	nos::format_buffer(buf,
+	                   "speed_to_shift: {}*10**6\r\n"
+	                   "freq: {}\r\n"
+	                   "current_shift: {}\r\n"
+	                   "_control_pos: {}\r\n"
+	                   "_virtual_pos: {}\r\n"
+	                   "units_in_step_triggered: {}\r\n",
+	                   speed_to_shift / 1000000,
+	                   freq,
+	                   current_shift,
+	                   _control_pos,
+	                   _virtual_pos,
+	                   units_in_step_triggered);
+
+	//strcat(buf, sbuf);
+}
+
+/// Расчитывает множитель, переводящий
+/// скорость (имп / диск. сек) в сдвиг (единиц / ) 
+void fixed_frequency_stepper_controller::evaluate()
+{
+	speed_to_shift = freq * units_in_step;// / discrete_time_frequency()
 }

@@ -42,6 +42,8 @@ namespace heimer
 
         void evaluate_invertion();
         void allocate_resources();
+
+        int help(char * output, int outmax) override;
     };
 }
 

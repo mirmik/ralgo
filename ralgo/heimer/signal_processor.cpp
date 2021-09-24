@@ -19,11 +19,25 @@ signal_processor::signal_processor(const char * name, int ldim, int rdim)
 {
 	_leftdim = ldim;
 	_rightdim = rdim;
+	set_name(name);
+	rebind();
+	this->flags = 0;
+}
+
+signal_processor::signal_processor(int ldim, int rdim)
+	: signal_processor("undef", ldim, rdim)
+{}
+
+void signal_processor::rebind()
+{
+	dlist_add_tail(&list_lnk, &signal_processor_list);
+}
+
+void signal_processor::set_name(const char * name)
+{
 	int len = MIN(strlen(name), SIGNAL_PROCESSOR_NAME_MAX_LENGTH);
 	memset(_name, 0, SIGNAL_PROCESSOR_NAME_MAX_LENGTH);
 	memcpy(_name, name, len);
-	dlist_add_tail(&list_lnk, &signal_processor_list);
-	this->flags = 0;
 }
 
 void signal_processor::deinit()
@@ -38,6 +52,11 @@ int heimer::signal_processors_count()
 
 void heimer::signal_processors_list_reinit()
 {
+	while (!dlist_empty(&signal_processor_list))
+	{
+		dlist_del_init(signal_processor_list.next);
+	}
+
 	dlist_init(&signal_processor_list);
 }
 
@@ -246,6 +265,18 @@ int bindright(signal_processor * axctr, int argc, char ** argv, char * output, i
 	return 0;
 }
 
+int signal_processor::info(char * output, int outmax)
+{
+	snprintf(output, outmax, "Info is not implemented\r\n");
+	return 0;
+}
+
+int signal_processor::help(char * output, int outmax)
+{
+	snprintf(output, outmax, "TODO: Automatic help.\r\n");
+	return 0;
+}
+
 int signal_processor::command(int argc, char ** argv, char * output, int outmax)
 {
 	int status = ENOENT;
@@ -255,6 +286,12 @@ int signal_processor::command(int argc, char ** argv, char * output, int outmax)
 
 	if (strcmp("bindright", argv[0]) == 0)
 		status = ::bindright(this, argc - 1, argv + 1, output, outmax);
+
+	if (strcmp("info", argv[0]) == 0) 
+		status = info(output, outmax);
+
+	if (strcmp("help", argv[0]) == 0) 
+		status = help(output, outmax);
 
 	return status;
 }

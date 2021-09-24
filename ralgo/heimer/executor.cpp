@@ -1,12 +1,12 @@
 #include <ralgo/heimer/executor.h>
 #include <ralgo/heimer/signal.h>
-#include <ralgo/heimer/phase_signals.h>
+#include <ralgo/heimer/axis_state.h>
 #include <ralgo/heimer/sigtypes.h>
 #include <ralgo/log.h>
 
 #include <igris/dprint.h>
 
-void heimer::executor::set_order_table(signal_processor ** order_table, int capacity, int size)
+void heimer::executor_class::set_order_table(signal_processor ** order_table, int capacity, int size)
 {
 	this->order_table = order_table;
 	this->order_table_capacity = capacity;
@@ -14,7 +14,7 @@ void heimer::executor::set_order_table(signal_processor ** order_table, int capa
 }
 
 
-int heimer::executor::order_sort()
+int heimer::executor_class::order_sort()
 {
 	signal_head * it;
 	dlist_for_each_entry(it, &signals_list, list_lnk)
@@ -70,7 +70,7 @@ int heimer::executor::order_sort()
 	return 0;
 }
 
-void heimer::executor::append_processor(signal_processor * proc)
+void heimer::executor_class::append_processor(signal_processor * proc)
 {
 	if (order_table_size >= order_table_capacity)
 		return;
@@ -78,7 +78,7 @@ void heimer::executor::append_processor(signal_processor * proc)
 	order_table[order_table_size++] = proc;
 }
 
-int heimer::executor::serve(disctime_t curtime)
+int heimer::executor_class::serve(disctime_t curtime)
 {
 	int retcode;
 
@@ -102,7 +102,7 @@ int heimer::executor::serve(disctime_t curtime)
 	return 0;
 }
 
-int heimer::executor::feedback(disctime_t curtime)
+int heimer::executor_class::feedback(disctime_t curtime)
 {
 	int retcode;
 
@@ -122,7 +122,7 @@ int heimer::executor::feedback(disctime_t curtime)
 	return 0;
 }
 
-int heimer::executor::exec(disctime_t curtime)
+int heimer::executor_class::exec(disctime_t curtime)
 {
 	char buf[16];
 	int retcode;
@@ -144,14 +144,17 @@ int heimer::executor::exec(disctime_t curtime)
 	return retcode;
 }
 
-heimer::executor::~executor()
+heimer::executor_class::~executor_class()
 {
 	if (f.dynamic)
 		delete[] order_table;
 }
 
-void heimer::executor::allocate_order_table(int size)
+void heimer::executor_class::allocate_order_table(int size)
 {
+	if (order_table)
+		delete[] order_table;
+
 	order_table = new signal_processor * [size];
 	order_table_size = 0;
 	order_table_capacity = size;
@@ -159,7 +162,7 @@ void heimer::executor::allocate_order_table(int size)
 }
 
 #if HEIMER_CROW_SUPPORT
-void heimer::executor::notification_prepare(const char * theme, crow::hostaddr_view addrview)
+void heimer::executor_class::notification_prepare(const char * theme, crow::hostaddr_view addrview)
 {
 	count_of_axstates = 0;
 
@@ -175,7 +178,7 @@ void heimer::executor::notification_prepare(const char * theme, crow::hostaddr_v
 	coordinate_publisher.init(addrview, theme, 0, 50);
 }
 
-void heimer::executor::notify()
+void heimer::executor_class::notify()
 {
 	float arr[count_of_axstates];
 	float * it = arr;
@@ -192,3 +195,92 @@ void heimer::executor::notify()
 	coordinate_publisher.publish({(void*)arr, sizeof(arr)});
 }
 #endif
+
+heimer::executor_class heimer::executor;
+int heimer::executor_command(int argc, char ** argv, char * output, int maxsize)
+{
+	int status = ENOENT;
+
+	if (strcmp("order", argv[0]) == 0)
+	{
+		if (!executor.allowed_to_execution)
+		{
+			executor.allocate_order_table(heimer::signal_processors_count());
+
+			heimer::signal_processor * proc;
+			dlist_for_each_entry(proc, &heimer::signal_processor_list, list_lnk)
+			{
+				executor.append_processor(proc);
+			}
+		}
+
+		char buffer[28];
+		memset(buffer, 0, 28);
+		snprintf(buffer, 28, "size: %d\r\n", executor.order_table_size);
+		strncat(output, buffer, maxsize);
+
+		memset(buffer, 0, 28);
+		snprintf(buffer, 28, "capacity: %d\r\n", executor.order_table_capacity);
+		strncat(output, buffer, maxsize);
+
+		for (int i = executor.order_table_size - 1; i >= 0; --i)
+		{
+			memset(buffer, 0, 28);
+			snprintf(buffer, 28, "%*s\r\n", 
+				(int)executor.order_table[i]->name().size(), 
+				executor.order_table[i]->name().data());
+			strncat(output, buffer, maxsize);
+		}
+
+		status = 0;
+	}
+
+	if (strcmp("start", argv[0]) == 0)
+	{
+		if (executor.allowed_to_execution)
+		{
+			snprintf(output, maxsize, "executor: it runned\r\n");
+			return 0;
+		}
+
+		executor.allocate_order_table(heimer::signal_processors_count());
+
+		heimer::signal_processor * proc;
+		dlist_for_each_entry(proc, &heimer::signal_processor_list, list_lnk)
+		{
+			executor.append_processor(proc);
+		}
+
+		executor.activate_process();
+		return 0;
+	}
+
+	if (strcmp("stop", argv[0]) == 0)
+	{
+		executor.deactivate_process();
+		return 0;
+	}
+
+	if (status == ENOENT)
+	{
+		snprintf(output, maxsize, "executor: unresolved command\r\n");
+	}
+
+	return status;
+}
+
+void heimer::executor_class::execute_if_allowed(disctime_t time)
+{
+	if (allowed_to_execution)
+		exec(time);
+}
+
+void heimer::executor_class::activate_process() 
+{
+	allowed_to_execution = true;
+}
+
+void heimer::executor_class::deactivate_process() 
+{
+	allowed_to_execution = false;
+}

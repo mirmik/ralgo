@@ -83,7 +83,7 @@ int  axstate_sincos_processor::command(int argc, char ** argv, char * output, in
 	int status = ENOENT;
 
 	if (strcmp("info", argv[0]) == 0)
-		status = info(this, argc - 1, argv + 1, output, outmax);
+		status = ::info(this, argc - 1, argv + 1, output, outmax);
 
 	if (strcmp("radius", argv[0]) == 0)
 		status = ::radius(this, argc - 1, argv + 1, output, outmax);

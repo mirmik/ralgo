@@ -22,7 +22,6 @@
 
 int DEBUG = 0;
 
-std::unique_ptr<heimer::executor> executor;
 std::unique_ptr<std::thread> execute_thread;
 int started = 0;
 int cancel_token = 0;
@@ -37,8 +36,8 @@ void execute_routine()
 	while(1) 
 	{
 		if (cancel_token) return;
-		executor->exec(discrete_time());
-		executor->notify();
+		heimer::executor.exec(discrete_time());
+		heimer::executor.notify();
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
 }
@@ -53,16 +52,16 @@ void start_routine()
 	
 	started = 1;
 	cancel_token = 0;
-	executor.reset(new heimer::executor);
-	executor->allocate_order_table(heimer::signal_processors_count());
+	
+	heimer::executor.allocate_order_table(heimer::signal_processors_count());
 
 	heimer::signal_processor * proc;
 	dlist_for_each_entry(proc, &heimer::signal_processor_list, list_lnk) 
 	{
-		executor->append_processor(proc);
+		heimer::executor.append_processor(proc);
 	}
-	executor->order_sort();
-	executor->notification_prepare("sigtrans/feedpos", crowaddr);
+	heimer::executor.order_sort();
+	heimer::executor.notification_prepare("sigtrans/feedpos", crowaddr);
 
 	execute_thread.reset(new std::thread(execute_routine));
 }
@@ -88,9 +87,9 @@ void execinfo()
 		return;
 	}
 
-	for (int i = 0; i < executor->order_table_size; ++i) 
+	for (int i = 0; i < heimer::executor.order_table_size; ++i) 
 	{
-		heimer::signal_processor * proc = executor->order_table[i];
+		heimer::signal_processor * proc = heimer::executor.order_table[i];
 		nos::println(std::string_view(proc->name().data(), proc->name().size()));
 	}
 }

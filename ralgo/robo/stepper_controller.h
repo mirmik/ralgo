@@ -25,6 +25,7 @@ namespace robo
 
 		float trigger_level = 0.75;
 
+	public:
 		int64_t _control_pos = 0;
 		int64_t _virtual_pos = 0;
 
@@ -34,7 +35,11 @@ namespace robo
 		int64_t units_in_step_triggered = units_in_step * trigger_level;
 
 	public:
+		stepper_controller();
 		stepper_controller(robo::stepper * stepper);
+		stepper_controller(const stepper_controller&) = delete;
+
+		void init(robo::stepper * stepper);
 
 		void set_steps_position(position_t pos);
 		void set_position(position_t pos);
@@ -74,6 +79,8 @@ namespace robo
 
 			return counter_value;
 		}
+
+		virtual void info(char* buf, int len);
 	};
 
 	class fixed_frequency_stepper_controller : public stepper_controller, public i_velocity_driver
@@ -81,16 +88,19 @@ namespace robo
 		void(*interrupt_handle)(void*, int) = nullptr;
 		void * interrupt_priv = nullptr;
 
-	public:
+	private:
 		float speed_to_shift = 1;
 		float freq = 1;
 		int64_t current_shift = 0;
 
+	public:
+		fixed_frequency_stepper_controller();
 		fixed_frequency_stepper_controller(robo::stepper * stepper);
+		fixed_frequency_stepper_controller(const fixed_frequency_stepper_controller&) = delete;
 
-		void set_frequency(float freq)
+		void set_frequency(float _freq)
 		{
-			this->freq = freq;
+			freq = _freq;
 			evaluate();
 		}
 
@@ -109,12 +119,15 @@ namespace robo
 			return (float)current_shift / speed_to_shift;
 		}
 
-	private:
-		void evaluate() override
+		void info(char* buf, int len) override;
+
+		float frequency() 
 		{
-			speed_to_shift = freq * units_in_step// / discrete_time_frequency()
-			;
+			return freq;
 		}
+
+	private:
+		void evaluate() override;
 	};
 }
 

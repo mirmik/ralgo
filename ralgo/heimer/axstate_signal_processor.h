@@ -1,10 +1,10 @@
-/** @brief */
+/** @file */
 
 #ifndef RALGO_HEIMER_AXSTATE_SIGNAL_PROCESSOR_H
 #define RALGO_HEIMER_AXSTATE_SIGNAL_PROCESSOR_H
 
 #include <ralgo/heimer/signal_processor.h>
-#include <ralgo/heimer/phase_signals.h>
+#include <ralgo/heimer/axis_state.h>
 
 namespace heimer
 {
