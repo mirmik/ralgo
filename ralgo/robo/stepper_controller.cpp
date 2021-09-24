@@ -101,7 +101,6 @@ fixed_frequency_stepper_controller::fixed_frequency_stepper_controller()
 
 void fixed_frequency_stepper_controller::set_velocity(double speed)
 {
-	DPRINT(speed);
 	auto val = speed_to_shift * speed;
 
 	system_lock();
