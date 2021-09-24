@@ -25,7 +25,7 @@ namespace heimer
 
 		position_t deviation_error_limit = 10000;
 		float compkoeff = 0; /// Коэффициент комплементарного фильтра.
-		const float gain = 1;
+		float gear = 1;
 		disctime_t last_time;
 
 		robo::fixed_frequency_stepper_controller * stepctr;
@@ -40,15 +40,24 @@ namespace heimer
 
 		velocity_applier(
 		    const char * name,
+		    robo::fixed_frequency_stepper_controller * stepctr
+		);
+
+		velocity_applier(
+		    const char * name,
 		    robo::fixed_frequency_stepper_controller * stepctr,
 		    axis_state * state
 		);
+
+		void set_gear(float gear);
 
 		void init(
 		    const char * name,
 		    robo::fixed_frequency_stepper_controller * stepctr,
 		    axis_state * state
 		);
+
+		int bind(int argc, char ** argv, char * output, int outmax);
 
 		//void set_gain(float gain) { this->gain = gain; }
 		void set_compkoeff(float ck) { this->compkoeff = ck; }

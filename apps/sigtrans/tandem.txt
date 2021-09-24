@@ -6,9 +6,10 @@
 //             |
 //            yctr
 
+stepsim xstub ystub
+
 signew axstate x y vx vy 
 ctrnew axisctr 1 xctr yctr vxctr vyctr
-ctrnew axstub xstub ystub
 
 ctrnew axlinear tand 2
 ctr tand bindleft x y
@@ -39,5 +40,9 @@ ctr vyctr bind vy
 ctr vyctr setgain 10
 ctr vyctr setvel 5
 ctr vyctr setacc 2 2
+
+// 200 импульсов на миллиметр
+ctr xstub setgear 2000
+ctr ystub setgear 2000 
 
 start

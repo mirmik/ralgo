@@ -23,6 +23,9 @@
 #include <ralgo/heimer/dof6_controller.h>
 #include <ralgo/heimer/axstate_pose3_chain_processor.h>
 #include <ralgo/heimer/phase_mux_processor.h>
+#include <ralgo/heimer/velocity_applier.h>
+
+#include <ralgo/robo/stepper_controller.h>
 
 using namespace heimer;
 
@@ -255,24 +258,6 @@ int signew(int argc, char ** argv, char * output, int maxsize)
 		return 0;
 	}
 
-	/*if (strcmp(argv[0], "datasig") == 0)
-	{
-		char * type = argv[1];
-		int size = atoi(argv[2]);
-
-		bool is_float = strcmp(type, "float") == 0;
-		int elsize = is_float ? 4 : 8;
-		int sigtype = is_float ? SIGNAL_TYPE_DATASIG_FLOAT : SIGNAL_TYPE_DATASIG_DOUBLE;
-		int datasize = elsize * size;
-
-		for (int i = 3; i < argc; ++i)
-		{
-			void * ptr = malloc(datasize + sizeof(heimer::datasignal));
-			new (ptr) heimer::datasignal(argv[i], sigtype, datasize);
-		}
-		return 0;
-	}*/
-
 	snprintf(output, maxsize, "Unresolved TYPE. Possible types: axstate, scalar, dof6state, axphase\r\n");
 	return -1;
 }
@@ -330,6 +315,19 @@ int siglist(int, char **, char * output, int maxsize)
 }
 
 static
+int stepsim(int argc, char ** argv, char * output, int maxsize)
+{
+	for (int i = 0; i < argc; ++i) 
+	{
+		auto * stpr = new robo::stepper;
+		auto * sctr = new robo::fixed_frequency_stepper_controller(stpr); 
+		auto * vctr = new heimer::velocity_applier(argv[i], sctr);
+	}
+
+	return 0;
+}
+
+static
 int execcmd(int argc, char ** argv, char * output, int maxsize) 
 {
 	return executor_command(argc, argv, output, maxsize);
@@ -344,6 +342,7 @@ static struct rshell_command commands[] =
 	{ "signew", signew, NULL },
 	{ "ctrlist", ctrlist, NULL },
 	{ "siglist", siglist, NULL },
+	{ "stepsim", stepsim, NULL },
 	{ "exec", execcmd, NULL },
 	{ NULL, NULL, NULL }
 };
