@@ -25,6 +25,10 @@ namespace heimer
 		V feedvel = {};
 
 	public:
+		phase_signal_base(uint8_t type)
+			: signal_head(type)
+		{}
+	
 		phase_signal_base(const char * name, uint8_t type)
 			: signal_head(name, type)
 		{}
@@ -33,41 +37,6 @@ namespace heimer
 		{
 			nos::format_buffer(data, "(cpos:{}, cvel:{}, fpos:{}, fvel:{})\r\n", ctrpos, ctrvel, feedpos, feedvel);
 			return 0;
-		}
-	};
-
-	class axis_state : public phase_signal_base <
-		position_t,
-		velocity_t
-		>
-	{
-	public:
-		axis_state(const char * name) :
-			phase_signal_base <
-			position_t,
-			velocity_t
-			> (name, SIGNAL_TYPE_AXIS_STATE)
-		{};
-
-		int command_v(int argc, char ** argv, char * output, int maxsize) override
-		{
-			int status = ENOENT;
-
-			if (strcmp("setpos", argv[0]) == 0) 
-			{
-				feedpos = atof(argv[1]);
-				ctrpos = atof(argv[1]);
-				PRINT(ctrpos);
-				PRINT(feedpos);
-				PRINT(ctrvel);
-				return 0;
-			}
-	
-			if (status != ENOENT)
-				return status;
-
-
-			return signal_head::command_v(argc, argv, output, maxsize);
 		}
 	};
 }

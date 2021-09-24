@@ -37,12 +37,15 @@ namespace heimer
 
 	public:
 		signal_head() = default;
+		signal_head(uint8_t type);
 		signal_head(const char * name, uint8_t type);
+		void set_name(const char * name);
 
 		virtual int info(char * buffer, int maxsize) = 0;
 		int ctrinfo(char * buffer, int maxsize);
 
 		void init(const char * name, uint8_t type);
+		void rebind();
 		void deinit();
 
 		int attach_listener(signal_processor * );
@@ -62,20 +65,6 @@ namespace heimer
 	int signals_count();
 	void signal_head_list_reinit();
 	signal_head * signal_get_by_name(const char * name);
-
-
-
-	/*class datasignal : public signal_head
-	{
-	public:
-		int info(char * , int) override { return 0; }
-
-		datasignal(char * name, uint8_t type, int size);
-		int size;
-		char data[];
-	};*/
-
-
 }
 
 

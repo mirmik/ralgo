@@ -13,6 +13,7 @@
 #include <ralgo/heimer/scalar_signal.h>
 #include <ralgo/heimer/dof6_signal.h>
 #include <ralgo/heimer/sigtypes.h>
+#include <ralgo/heimer/executor.h>
 
 #include <ralgo/heimer/axisctr.h>
 #include <ralgo/heimer/axstate_linear_processor.h>
@@ -191,7 +192,7 @@ int ctr(int argc, char ** argv, char * output, int maxsize)
 
 	if (ctr == NULL)
 	{
-		snprintf(output, maxsize, "Processor not found.");
+		snprintf(output, maxsize, "Processor not found.\r\n");
 		return ENOENT;
 	}
 
@@ -328,6 +329,12 @@ int siglist(int, char **, char * output, int maxsize)
 	return 0;
 }
 
+static
+int execcmd(int argc, char ** argv, char * output, int maxsize) 
+{
+	return executor_command(argc, argv, output, maxsize);
+}
+
 static struct rshell_command commands[] =
 {
 	{ "help", help, NULL },
@@ -337,6 +344,7 @@ static struct rshell_command commands[] =
 	{ "signew", signew, NULL },
 	{ "ctrlist", ctrlist, NULL },
 	{ "siglist", siglist, NULL },
+	{ "exec", execcmd, NULL },
 	{ NULL, NULL, NULL }
 };
 struct rshell_command * heimer::commands_table = commands;
