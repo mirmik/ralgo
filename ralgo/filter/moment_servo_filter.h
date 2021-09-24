@@ -18,6 +18,11 @@ namespace ralgo
 			vel_pi.init(kp, ki);
 		}
 
+		void setup_position_filter(double kp, double ki) 
+		{
+			pos_pi.init(kp, ki);
+		}
+		
 		// T**2 = 1/ki
 		// 2*ksi*T = kp/ki
 		void setup_velocity_parameters(double T, double ksi, double A) 
@@ -32,11 +37,6 @@ namespace ralgo
 			double ki = A / (T*T);
 			double kp = 2 * ksi * T * ki;
 			setup_position_filter(kp, ki);
-		}
-
-		void setup_position_filter(double kp, double ki) 
-		{
-			pos_pi.init(kp, ki);
 		}
 
 		double velocity_control(double error_vel, double delta) 
