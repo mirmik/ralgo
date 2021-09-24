@@ -36,23 +36,23 @@ void axis_controller::set_gain(double * gain)
 
 void axis_controller::set_velocity_external(float speed)
 {
-	vel = speed / discrete_time_frequency();
+	vel = speed;
 }
 
 void axis_controller::set_accdcc_external(float acc, float dcc)
 {
-	this->acc = acc / discrete_time_frequency() / discrete_time_frequency();
-	this->dcc = dcc / discrete_time_frequency() / discrete_time_frequency();
+	this->acc = acc;
+	this->dcc = dcc;
 }
 
 void axis_controller::set_acceleration_external(float acc)
 {
-	this->acc = acc / discrete_time_frequency() / discrete_time_frequency();
+	this->acc = acc;
 }
 
 void axis_controller::set_decceleration_external(float dcc)
 {
-	this->dcc = dcc / discrete_time_frequency() / discrete_time_frequency();
+	this->dcc = dcc;
 }
 
 void axis_controller::set_limits_external(double * back, double * forw)
@@ -120,8 +120,10 @@ int axis_controller::serve(disctime_t time)
 	for (int i = 0; i < leftdim(); ++i)
 	{
 		// Установить текущие целевые параметры.
+		// Скорость умножается на частоту, чтобы вернуться от 
+		// дискретного времени, в которых работает расчёт траектории к секундам.
 		settings[i].controlled->ctrpos = ctrpos[i];
-		settings[i].controlled->ctrvel = ctrvel[i];
+		settings[i].controlled->ctrvel = ctrvel[i] * discrete_time_frequency();
 	}
 
 	if (sts && !f.operation_finished_flag)
@@ -157,7 +159,7 @@ int axis_controller::_absmove(
 		return -1;
 	}
 
-	disctime_t tgttim = curtim + (float)(ABS(extdist)) / vel;
+	disctime_t tgttim = curtim + (float)(ABS(extdist)) / (vel / discrete_time_frequency());
 
 	if (extdist == 0 || vel == 0 || curtim == tgttim)
 	{
@@ -165,8 +167,8 @@ int axis_controller::_absmove(
 		return 0;
 	}
 
-	disctime_t acc_time = (vel / acc);
-	disctime_t dcc_time = (vel / dcc);
+	disctime_t acc_time = (vel / acc) * discrete_time_frequency();
+	disctime_t dcc_time = (vel / dcc) * discrete_time_frequency();
 
 	lintraj.init_nominal_speed(curtim,
 	                           tgttim,
@@ -247,7 +249,7 @@ float axis_controller::feedpos_external(int axno)
 
 float axis_controller::ctrvel_external(int axno)
 {
-	return settings[axno].controlled->ctrvel * discrete_time_frequency() / settings[axno].gain;
+	return settings[axno].controlled->ctrvel / settings[axno].gain;
 }
 
 axis_controller * heimer::create_axis_controller(const char * name, int dim)
@@ -303,9 +305,9 @@ signal_head * axis_controller::iterate_right(signal_head * iter)
 	return NULL;
 }
 
-float axis_controller::external_velocity() { return vel * discrete_time_frequency(); }
-float axis_controller::external_acceleration() { return acc * discrete_time_frequency() * discrete_time_frequency(); }
-float axis_controller::external_decceleration() { return dcc * discrete_time_frequency() * discrete_time_frequency(); }
+float axis_controller::external_velocity() { return vel; }
+float axis_controller::external_acceleration() { return acc; }
+float axis_controller::external_decceleration() { return dcc; }
 
 void axis_controller::collect_feedpos(position_t * pos)
 {
