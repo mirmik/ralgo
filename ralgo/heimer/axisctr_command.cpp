@@ -126,18 +126,29 @@ int info(axis_controller * axctr, int argc, char ** argv, char * output, int out
 	snprintf(buf, bufsize, "signals:");
 	strncat(output, buf, outmax);
 
-	memset(buf, 0, bufsize);
 	for (int i = 0; i < axctr->leftdim() - 1; ++i)
 	{
-		snprintf(buf, bufsize, "%s,", axctr->settings[i].controlled->name);
-		strncat(output, buf, outmax);
+		memset(buf, 0, bufsize);
+		if (axctr->settings[i].controlled == nullptr)
+		{
+			snprintf(buf, bufsize, "(none),");
+			strncat(output, buf, outmax);
+		}
+		else
+		{
+			snprintf(buf, bufsize, "%s,", axctr->settings[i].controlled->name);
+			strncat(output, buf, outmax);
+		}
 	}
+	memset(buf, 0, bufsize);
 	snprintf(buf, bufsize, "%s\r\n", axctr->settings[axctr->leftdim() - 1].controlled->name);
 	strncat(output, buf, outmax);
 
 	memset(buf, 0, bufsize);
-	snprintf(buf, bufsize, "external: vel:%f, acc:%f, dcc:%f\r\n", 
-		axctr->external_velocity(), axctr->external_acceleration(), axctr->external_decceleration());
+	nos::format_buffer(buf, "external: vel:{}, acc:{}, dcc:{}\r\n",
+	         axctr->external_velocity(), 
+	         axctr->external_acceleration(), 
+	         axctr->external_decceleration());
 	strncat(output, buf, outmax);
 
 	memset(buf, 0, bufsize);
@@ -148,18 +159,18 @@ int info(axis_controller * axctr, int argc, char ** argv, char * output, int out
 	         (uint8_t)axctr->f.spattern_enabled);
 	strncat(output, buf, outmax);
 
-	for (int i = 0; i < axctr->leftdim(); ++i) 
+	for (int i = 0; i < axctr->leftdim(); ++i)
 	{
 		memset(buf, 0, bufsize);
-		snprintf(buf, bufsize, "axsets: lims: %d,%f,%f sfpos: %f,%f gain: %f\r\n", 
-			axctr->settings[i].limits_enabled,
-			axctr->settings[i].backlim,
-			axctr->settings[i].forwlim,
-			axctr->settings[i].sfpos.spos,
-			axctr->settings[i].sfpos.fpos,
-			axctr->settings[i].gain
-		);
-	strncat(output, buf, outmax);
+		nos::format_buffer(buf, "axsets: lims: {},{},{} sfpos: {},{} gain: {}\r\n",
+		         axctr->settings[i].limits_enabled,
+		         axctr->settings[i].backlim,
+		         axctr->settings[i].forwlim,
+		         axctr->settings[i].sfpos.spos,
+		         axctr->settings[i].sfpos.fpos,
+		         axctr->settings[i].gain
+		        );
+		strncat(output, buf, outmax);
 	}
 
 	return 0;
@@ -223,8 +234,11 @@ int axis_controller::command(int argc, char ** argv, char * output, int outmax)
 	if (strcmp("bind", argv[0]) == 0)
 		status = bind(this, argc - 1, argv + 1, output, outmax);
 
+	else if (strcmp("help", argv[0]) == 0)
+		status = help(output, outmax);
+
 	else if (strcmp("info", argv[0]) == 0)
-		status = info(this, argc - 1, argv + 1, output, outmax);
+		status = ::info(this, argc - 1, argv + 1, output, outmax);
 
 	else if (strcmp("absmove", argv[0]) == 0)
 		status = absmov(this, argc - 1, argv + 1, output, outmax);
@@ -250,5 +264,26 @@ int axis_controller::command(int argc, char ** argv, char * output, int outmax)
 	else if (strcmp("setgain", argv[0]) == 0)
 		status = setgain(this, argc - 1, argv + 1, output, outmax);
 
+	if (status == ENOENT)
+		snprintf(output, outmax, "axisctr: Command is not found\r\n");
+
 	return status;
+}
+
+int axis_controller::help(char * output, int outmax)
+{
+	snprintf(output, outmax,
+	         "bind\r\n"
+	         "info\r\n"
+	         "absmove\r\n"
+	         "incmove\r\n"
+	         "stop\r\n"
+	         "hardstop\r\n"
+	         "setvel\r\n"
+	         "setacc\r\n"
+	         "setdcc\r\n"
+	         "setgain\r\n"
+	        );
+
+	return 0;
 }

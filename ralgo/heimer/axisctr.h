@@ -2,7 +2,7 @@
 #define RALGO_HEIMER2_AXISCTR_H
 
 #include <ralgo/heimer/axisctr_approval.h>
-#include <ralgo/heimer/phase_signals.h>
+#include <ralgo/heimer/axis_state.h>
 #include <ralgo/trajectory/linetraj.h>
 #include <ralgo/disctime.h>
 
@@ -23,9 +23,9 @@ namespace heimer
 
 	class axis_controller : public signal_processor
 	{
-		velocity_t     vel;
-		acceleration_t acc;
-		acceleration_t dcc;
+		velocity_t     vel = 0.1;
+		acceleration_t acc = 0.1;
+		acceleration_t dcc = 0.1;
 
 	public:
 		union
@@ -61,6 +61,7 @@ namespace heimer
 		int feedback(disctime_t time) override;
 		int serve(disctime_t time) override;
 		int command(int argc, char ** argv, char * output, int outmax) override;
+		int help(char * output, int outmax) override;
 		void deinit() override;
 		signal_head * iterate_left(signal_head *) override;
 		signal_head * iterate_right(signal_head *) override;
@@ -102,12 +103,6 @@ namespace heimer
 
 		void collect_feedpos(position_t * pos);
 		void collect_feedvel(velocity_t * pos);
-
-		int command(
-		    struct signal_processor * sigproc,
-		    int argc, char ** argv,
-		    char * output,
-		    int outmax);
 
 		velocity_t restore_internal_velocity_from_axstates();
 

@@ -9,7 +9,7 @@
 
 namespace heimer 
 {
-	class executor 
+	class executor_class 
 	{
 	public:
 		signal_processor ** order_table = nullptr;
@@ -17,6 +17,7 @@ namespace heimer
 		int order_table_capacity = 0;
 
 		int count_of_axstates = 0;
+		bool allowed_to_execution = false;
 
 		union 
 		{
@@ -32,7 +33,7 @@ namespace heimer
 #endif
 
 	public:
-		executor() = default;
+		executor_class() = default;
 		void set_order_table(signal_processor ** order_table, int capacity, int size);
 
 		void allocate_order_table(int size);
@@ -44,13 +45,20 @@ namespace heimer
 		int feedback(disctime_t curtime);
 		int exec(disctime_t curtime);
 
+		void execute_if_allowed(disctime_t curtime);
+		void activate_process();
+		void deactivate_process();
+
 #if HEIMER_CROW_SUPPORT
 		void notification_prepare(const char * theme, crow::hostaddr_view addrview);
 		void notify();
 #endif
 
-		~executor();
+		~executor_class();
 	};
+
+	extern executor_class executor;
+	int executor_command(int argc, char ** argv, char * output, int maxsize);
 }
 
 #endif

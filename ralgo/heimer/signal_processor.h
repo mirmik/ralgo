@@ -42,7 +42,10 @@ namespace heimer
 		};
 
 	public:
+		signal_processor(int ldim, int rdim);
 		signal_processor(const char * name, int ldim, int rdim);
+		void rebind();
+		void set_name(const char * name);
 
 		uint8_t leftdim();
 		uint8_t rightdim();
@@ -54,6 +57,8 @@ namespace heimer
 		virtual int serve(disctime_t time) = 0;
 
 		virtual int  command(int argc, char ** argv, char * output, int outmax);
+		virtual int  help(char * output, int outmax);
+		virtual int  info(char * output, int outmax);
 		virtual void deinit();
 		virtual signal_head * iterate_left(signal_head *);
 		virtual signal_head * iterate_right(signal_head *);
