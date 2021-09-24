@@ -5,6 +5,8 @@
 #include <ralgo/linalg/matops.h>
 #include <ralgo/log.h>
 
+#include <igris/util/numconvert.h>
+
 
 using namespace heimer;
 
@@ -71,19 +73,20 @@ int info(axstate_linear_processor * axctr, int argc, char ** argv, char * output
 	(void) argc;
 	(void) argv;
 
-	int bufsize = 96;
+	const int bufsize = 48;
 	char buf[bufsize];
 
 	memset(buf, 0, bufsize);
 	snprintf(buf, bufsize, "lsignals: ");
 	strncat(output, buf, outmax);
 
-	memset(buf, 0, bufsize);
 	for (int i = 0; i < axctr->dim() - 1; ++i)
 	{
+		memset(buf, 0, bufsize);
 		snprintf(buf, bufsize, "%s,", axctr->leftax(i)->name);
 		strncat(output, buf, outmax);
 	}
+	memset(buf, 0, bufsize);
 	snprintf(buf, bufsize, "%s\r\n", axctr->leftax(axctr->dim() - 1)->name);
 	strncat(output, buf, outmax);
 
@@ -91,12 +94,14 @@ int info(axstate_linear_processor * axctr, int argc, char ** argv, char * output
 	snprintf(buf, bufsize, "rsignals: ");
 	strncat(output, buf, outmax);
 
-	memset(buf, 0, bufsize);
 	for (int i = 0; i < axctr->dim() - 1; ++i)
 	{
+		memset(buf, 0, bufsize);
 		snprintf(buf, bufsize, "%s,", axctr->rightax(i)->name);
 		strncat(output, buf, outmax);
 	}
+
+	memset(buf, 0, bufsize);
 	snprintf(buf, bufsize, "%s\r\n", axctr->rightax(axctr->dim() - 1)->name);
 	strncat(output, buf, outmax);
 
@@ -105,9 +110,13 @@ int info(axstate_linear_processor * axctr, int argc, char ** argv, char * output
 	strncat(output, buf, outmax);
 	for (int i = 0; i < axctr->dim() * axctr->dim(); ++i)
 	{
-		snprintf(buf, bufsize, "%f ", axctr->matrix[i]);
+		memset(buf, 0, bufsize);
+		f32toa(axctr->matrix[i], buf, 5);
+		//snprintf(buf, bufsize, "%f ", axctr->matrix[i]);
 		strncat(output, buf, outmax);
+		strncat(output, " ", outmax);
 	}
+	memset(buf, 0, bufsize);
 	snprintf(buf, bufsize, "\r\n");
 	strncat(output, buf, outmax);
 
@@ -116,9 +125,13 @@ int info(axstate_linear_processor * axctr, int argc, char ** argv, char * output
 	strncat(output, buf, outmax);
 	for (int i = 0; i < axctr->dim() * axctr->dim(); ++i)
 	{
-		snprintf(buf, bufsize, "%f ", axctr->matrix[i]);
+		memset(buf, 0, bufsize);
+		f32toa(axctr->matrix[i], buf, 5);
+		//snprintf(buf, bufsize, "%f ", axctr->matrix[i]);
 		strncat(output, buf, outmax);
+		strncat(output, " ", outmax);
 	}
+	memset(buf, 0, bufsize);
 	snprintf(buf, bufsize, "\r\n");
 	strncat(output, buf, outmax);
 
@@ -133,7 +146,7 @@ int  axstate_linear_processor::command(int argc, char ** argv, char * output, in
 		status = ::matrix(this, argc - 1, argv + 1, output, outmax);
 
 	if (strcmp("info", argv[0]) == 0)
-		status = info(this, argc - 1, argv + 1, output, outmax);
+		status = ::info(this, argc - 1, argv + 1, output, outmax);
 
 	if (status != ENOENT)
 		return status;
@@ -162,10 +175,10 @@ void axstate_linear_processor::evaluate_invertion()
 
 
 heimer::axstate_linear_processor::axstate_linear_processor(const char * name, int _dim,
-            struct axis_state ** leftside,
-            struct axis_state ** rightside,
-            float * matrix,
-            float * invert_matrix)
+        struct axis_state ** leftside,
+        struct axis_state ** rightside,
+        float * matrix,
+        float * invert_matrix)
 	: axstate_signal_processor(name, _dim, _dim)
 {
 	set_need_activation(1);
@@ -178,7 +191,7 @@ heimer::axstate_linear_processor::axstate_linear_processor(const char * name, in
 }
 
 heimer::axstate_linear_processor::axstate_linear_processor(const char * name, int dim)
-	: axstate_linear_processor(name, dim, nullptr, nullptr, nullptr, nullptr)	
+	: axstate_linear_processor(name, dim, nullptr, nullptr, nullptr, nullptr)
 {}
 
 void heimer::axstate_linear_processor::allocate_resources()
@@ -196,11 +209,22 @@ void heimer::axstate_linear_processor::allocate_resources()
 }
 
 
-void heimer::axstate_linear_processor::on_activate(disctime_t) 
+void heimer::axstate_linear_processor::on_activate(disctime_t)
 {
 	for (int i = 0; i < dim(); ++i)
 	{
-		rightax(i)->ctrpos = rightax(i)->feedpos; 
+		rightax(i)->ctrpos = rightax(i)->feedpos;
 		rightax(i)->ctrvel = rightax(i)->feedvel;
 	}
+}
+
+int heimer::axstate_linear_processor::help(char * output, int outmax)
+{
+	snprintf(output, outmax,
+	         "bindleft\r\n"
+	         "bindright\r\n"
+	         "matrix\r\n"
+	         "info\r\n"
+	        );
+	return 0;
 }

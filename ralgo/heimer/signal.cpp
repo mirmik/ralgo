@@ -13,11 +13,20 @@ using namespace heimer;
 
 DLIST_HEAD(heimer::signals_list);
 
+signal_head::signal_head(const char * name, uint8_t type)
+{
+	init(name, type);
+}
+
+signal_head::signal_head(uint8_t type)
+	: signal_head("undef", type)
+{}
+
 void signal_head::init(const char * name, uint8_t type)
 {
 	refs = 0;
 	this->type = type;
-	strncpy(this->name, name, SIGNAL_NAME_MAX_LENGTH);
+	set_name(name);
 	dlist_add_tail(&list_lnk, &signals_list);
 	current_controller = NULL;
 	listener = NULL;
@@ -26,6 +35,11 @@ void signal_head::init(const char * name, uint8_t type)
 void signal_head::deinit()
 {
 	dlist_del(&list_lnk);
+}
+
+void signal_head::set_name(const char * name)
+{
+	strncpy(this->name, name, SIGNAL_NAME_MAX_LENGTH);
 }
 
 int signal_head::attach_listener(signal_processor * proc)
@@ -67,6 +81,11 @@ int heimer::signals_count()
 
 void heimer::signal_head_list_reinit()
 {
+	while(!dlist_empty(&signals_list)) 
+	{
+		dlist_del_init(signals_list.next);
+	}
+
 	dlist_init(&signals_list);
 }
 
@@ -104,7 +123,11 @@ int signal_head::ctrinfo(char * buffer, int)
 	return 0;
 }
 
-
+void signal_head::rebind() 
+{
+	dlist_add_tail(&list_lnk, &signals_list);
+}
+		
 int signal_head::activate(struct signal_processor * proc, disctime_t tim)
 {
 	if (current_controller)
@@ -141,11 +164,6 @@ int signal_head::deactivate(struct signal_processor * proc, disctime_t time)
 	}
 
 	return 0;
-}
-
-signal_head::signal_head(const char * name, uint8_t type)
-{
-	init(name, type);
 }
 
 void signal_head::provide_interrupt(disctime_t time)

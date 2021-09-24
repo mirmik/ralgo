@@ -4,19 +4,32 @@
 
 using namespace heimer;
 
+velocity_applier::velocity_applier()
+	: signal_processor(0, 1)
+{}
+
 velocity_applier::velocity_applier(
     const char * name,
     robo::fixed_frequency_stepper_controller * stepctr,
     axis_state * state
 )
-	: signal_processor(name, 0, 1)
+	: signal_processor(0, 1)
 {
+	init(name, stepctr, state);
+}
+
+void velocity_applier::init(
+    const char * name,
+    robo::fixed_frequency_stepper_controller * stepctr,
+    axis_state * state)
+{
+	set_name(name);
 	controlled_velset = stepctr;
 	controlled_velget = stepctr;
 	controlled_posget = stepctr;
 	this->state = state;
-
 	state->attach_listener(this);
+	this->stepctr = stepctr;
 }
 
 void velocity_applier::deinit()
@@ -44,7 +57,7 @@ int velocity_applier::serve(disctime_t time)
 	disctime_t delta = time - last_time;
 
 	compspd = state->ctrvel + compkoeff * errpos * delta;
-	impulses_per_disc = compspd * gain;
+	this->impulses_per_disc = compspd * gain;
 	controlled_velset->set_velocity(impulses_per_disc);
 
 	last_time = time;
@@ -60,17 +73,41 @@ int velocity_applier::feedback(disctime_t time)
 	return 0;
 }
 
-int velocity_applier::command(int, char **, char *, int) 
+int velocity_applier::info(char * ans, int anslen)
 {
+	static char stepctr_info[256];
+	stepctr->info(stepctr_info, 256);
+
+	nos::format_buffer(ans,
+	         "listen: {} \r\n"
+	         "feedpos: {} \r\n"
+	         "impulses_per_disc: {} \r\n"
+	         "stepctr_info: \r\n{}",
+	         state->name,
+	         controlled_posget->feedback_position(),
+	         impulses_per_disc,
+	         stepctr_info
+	    );
+
 	return 0;
 }
 
-signal_head * velocity_applier::iterate_left(signal_head *) 
+int velocity_applier::command(int argc, char ** argv, char * output, int outmax)
+{
+	int status;
+
+	if (strcmp("info", argv[0]) == 0)
+		status = info(output, outmax);
+
+	return status;
+}
+
+signal_head * velocity_applier::iterate_left(signal_head *)
 {
 	return NULL;
 }
 
-signal_head * velocity_applier::iterate_right(signal_head * iter) 
+signal_head * velocity_applier::iterate_right(signal_head * iter)
 {
 	if (iter) return NULL;
 	else return state;

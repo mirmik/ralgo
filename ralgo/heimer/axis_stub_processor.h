@@ -4,7 +4,7 @@
 #define RALGO_HEIMER_AXIS_STUB_PROCESSOR_H
 
 #include <ralgo/heimer/signal_processor.h>
-#include <ralgo/heimer/phase_signals.h>
+#include <ralgo/heimer/axis_state.h>
 
 namespace heimer
 {

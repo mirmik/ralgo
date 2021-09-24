@@ -30,7 +30,7 @@ X = 10
 Y = 20
 
 def animate(arg):
-	sphere.relocate(zencad.movY(X/100) * zencad.movZ(Y/100))
+	sphere.relocate(zencad.movY(X) * zencad.movZ(Y))
 
 
 zencad.show(animate = animate)
