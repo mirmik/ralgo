@@ -71,8 +71,10 @@ int velocity_applier::serve(disctime_t time)
 	disctime_t delta = time - last_time;
 
 	compspd = state->ctrvel + compkoeff * errpos * delta;
-	this->impulses_per_disc = compspd * gear;
-	controlled_velset->set_velocity(impulses_per_disc);
+
+	velocity_t impulses_per_sec = compspd * gear;
+	
+	controlled_velset->set_velocity(impulses_per_sec);
 
 	last_time = time;
 	return 0;
@@ -95,11 +97,9 @@ int velocity_applier::info(char * ans, int anslen)
 	nos::format_buffer(ans,
 	                   "listen: {} \r\n"
 	                   "feedpos: {} \r\n"
-	                   "impulses_per_disc: {} \r\n"
 	                   "stepctr_info: \r\n{}",
 	                   state->name,
 	                   controlled_posget->feedback_position(),
-	                   impulses_per_disc,
 	                   stepctr_info
 	                  );
 

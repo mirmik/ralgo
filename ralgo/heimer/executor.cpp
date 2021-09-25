@@ -2,6 +2,7 @@
 #include <ralgo/heimer/signal.h>
 #include <ralgo/heimer/axis_state.h>
 #include <ralgo/heimer/sigtypes.h>
+#include <ralgo/heimer/fast_cycle_device.h>
 #include <ralgo/log.h>
 
 #include <igris/dprint.h>
@@ -226,9 +227,9 @@ int heimer::executor_command(int argc, char ** argv, char * output, int maxsize)
 		for (int i = executor.order_table_size - 1; i >= 0; --i)
 		{
 			memset(buffer, 0, 28);
-			snprintf(buffer, 28, "%*s\r\n", 
-				(int)executor.order_table[i]->name().size(), 
-				executor.order_table[i]->name().data());
+			snprintf(buffer, 28, "%*s\r\n",
+			         (int)executor.order_table[i]->name().size(),
+			         executor.order_table[i]->name().data());
 			strncat(output, buffer, maxsize);
 		}
 
@@ -275,12 +276,28 @@ void heimer::executor_class::execute_if_allowed(disctime_t time)
 		exec(time);
 }
 
-void heimer::executor_class::activate_process() 
+void heimer::executor_class::activate_process()
 {
 	allowed_to_execution = true;
 }
 
-void heimer::executor_class::deactivate_process() 
+void heimer::executor_class::deactivate_process()
 {
 	allowed_to_execution = false;
+}
+
+void heimer::executor_class::exec_fast_cycle()
+{
+	if (!allowed_to_execution)
+		return;
+
+	fast_cycle_device * dev;
+	dlist_for_each_entry(dev, &heimer::fast_cycle_list, fast_cycle_list_lnk)
+	{
+		int sts = dev->fast_cycle_serve();
+		if (sts) 
+		{
+			deactivate_process();
+		}
+	}
 }

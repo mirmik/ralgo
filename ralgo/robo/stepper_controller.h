@@ -10,6 +10,7 @@
 #include <ralgo/disctime.h>
 
 #include <ralgo/robo/iposvel.h>
+#include <ralgo/heimer/fast_cycle_device.h>
 
 #define STEPCTR_OVERRUN -22
 
@@ -83,7 +84,10 @@ namespace robo
 		virtual void info(char* buf, int len);
 	};
 
-	class fixed_frequency_stepper_controller : public stepper_controller, public i_velocity_driver
+	class fixed_frequency_stepper_controller : 
+		public stepper_controller, 
+		public heimer::fast_cycle_device,
+		public i_velocity_driver
 	{
 		void(*interrupt_handle)(void*, int) = nullptr;
 		void * interrupt_priv = nullptr;
@@ -124,6 +128,11 @@ namespace robo
 		float frequency() 
 		{
 			return freq;
+		}
+
+		int fast_cycle_serve() override 
+		{
+			return constant_frequency_serve();
 		}
 
 	private:

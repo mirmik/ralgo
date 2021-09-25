@@ -25,7 +25,10 @@ namespace heimer
 
 		position_t deviation_error_limit = 10000;
 		float compkoeff = 0; /// Коэффициент комплементарного фильтра.
+
+		// Количество импульсов в системной единице (миллиметре или радиане).
 		float gear = 1;
+		
 		disctime_t last_time;
 
 		robo::fixed_frequency_stepper_controller * stepctr;
@@ -33,7 +36,6 @@ namespace heimer
 	public:
 		// debug
 		velocity_t compspd;
-		velocity_t impulses_per_disc;
 
 	public:
 		velocity_applier();

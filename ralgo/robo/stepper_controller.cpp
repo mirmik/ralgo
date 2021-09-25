@@ -7,6 +7,8 @@
 #include <igris/dprint.h>
 #include <nos/fprint.h>
 
+#include <ralgo/log.h>
+
 using namespace robo;
 
 stepper_controller::stepper_controller()
@@ -36,8 +38,11 @@ void stepper_controller::set_steps_position(position_t pos)
 
 int stepper_controller::shift(int64_t shift)
 {
-	if (ABS(shift) >= units_in_step)
+	if (ABS(shift) >= units_in_step) 
+	{
+		ralgo::warn("overrun");
 		return STEPCTR_OVERRUN;
+	}
 
 	_virtual_pos += shift;
 	int64_t diffpos = _virtual_pos - _control_pos;
@@ -119,13 +124,13 @@ void fixed_frequency_stepper_controller::info(char* buf, int len)
 	//stepper_controller::info(buf, len);
 
 	nos::format_buffer(buf,
-	                   "speed_to_shift: {}*10**6\r\n"
+	                   "speed_to_shift: {}*10**3\r\n"
 	                   "freq: {}\r\n"
 	                   "current_shift: {}\r\n"
 	                   "_control_pos: {}\r\n"
 	                   "_virtual_pos: {}\r\n"
 	                   "units_in_step_triggered: {}\r\n",
-	                   speed_to_shift / 1000000,
+	                   speed_to_shift / 1000,
 	                   freq,
 	                   current_shift,
 	                   _control_pos,
@@ -136,8 +141,8 @@ void fixed_frequency_stepper_controller::info(char* buf, int len)
 }
 
 /// Расчитывает множитель, переводящий
-/// скорость (имп / диск. сек) в сдвиг (единиц / ) 
+/// скорость (имп / сек) в сдвиг 
 void fixed_frequency_stepper_controller::evaluate()
 {
-	speed_to_shift = freq * units_in_step;// / discrete_time_frequency()
+	speed_to_shift = units_in_step / freq;
 }
