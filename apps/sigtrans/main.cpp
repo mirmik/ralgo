@@ -34,7 +34,10 @@ int cancel_token = 0;
 crow::udpgate udpgate;
 crow::hostaddr crowaddr;
 
-
+namespace heimer 
+{
+	double fast_cycle_frequence() { return 10000; }
+}
 
 void execute_routine()
 {
@@ -43,7 +46,7 @@ void execute_routine()
 	while (1)
 	{
 		if (cancel_token) return;
-		heimer::executor.exec(discrete_time());
+		heimer::executor.execute_if_allowed(discrete_time());
 		heimer::executor.notify();
 		std::this_thread::sleep_until(target_time += 10000us);
 	}
@@ -55,6 +58,8 @@ void fast_execute_routine()
 
 	while (1)
 	{
+		heimer::executor.exec_fast_cycle();
+
 		if (cancel_token) return;
 		std::this_thread::sleep_until(target_time += 100us);
 	}
@@ -122,7 +127,7 @@ int exec(const std::string & line)
 	if (line.size() == 0)
 		return 0;
 
-	if (igris::trim(line) == "start")
+	/*if (igris::trim(line) == "start")
 	{
 		start_routine();
 		return 0;
@@ -132,7 +137,7 @@ int exec(const std::string & line)
 	{
 		stop_routine();
 		return 0;
-	}
+	}*/
 
 	if (igris::trim(line) == "execinfo")
 	{
@@ -225,6 +230,8 @@ int main(int argc, char ** argv)
 	udpgate.open();
 	udpgate.bind(CROW_UDPGATE_NO);
 	crow::start_spin();
+
+	start_routine();
 
 	while (1)
 	{

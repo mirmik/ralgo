@@ -46,6 +46,7 @@ namespace heimer
 		int exec(disctime_t curtime);
 
 		void execute_if_allowed(disctime_t curtime);
+		void exec_fast_cycle();
 		void activate_process();
 		void deactivate_process();
 

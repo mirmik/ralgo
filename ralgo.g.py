@@ -45,6 +45,7 @@ licant.module("ralgo",
 		"ralgo/heimer/axstate_pose3_chain_processor.cpp",
 		"ralgo/heimer/convex_zone_approval.cpp",
 		"ralgo/heimer/executor.cpp",
+		"ralgo/heimer/fast_cycle_device.cpp",
 
 		"ralgo/clinalg/matops_square_inverse.cpp",  
 		"ralgo/clinalg/solve.cpp",
