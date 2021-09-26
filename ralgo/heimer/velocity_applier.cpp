@@ -54,6 +54,7 @@ void velocity_applier::deinit()
 
 int velocity_applier::serve(disctime_t time)
 {
+	disctime_t delta = time - last_time;
 	position_t errpos = state->ctrpos - state->feedpos;
 
 	if (deviation_error_limit && ABS(errpos) > deviation_error_limit)
@@ -68,12 +69,8 @@ int velocity_applier::serve(disctime_t time)
 		return SIGNAL_PROCESSOR_RETURN_RUNTIME_ERROR;
 	}
 
-	disctime_t delta = time - last_time;
-
 	compspd = state->ctrvel + compkoeff * errpos * delta;
-
 	velocity_t impulses_per_sec = compspd * gear;
-	
 	controlled_velset->set_velocity(impulses_per_sec);
 
 	last_time = time;

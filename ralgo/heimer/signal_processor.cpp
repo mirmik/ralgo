@@ -73,7 +73,6 @@ int signal_processor::activate(disctime_t curtim)
 		int err = iter->activate(this, curtim);
 		if (err)
 		{
-			ralgo::warn("activation is unsucess");
 			success = 0;
 			break;
 		}
@@ -88,12 +87,32 @@ int signal_processor::activate(disctime_t curtim)
 
 	else
 	{
-		deactivate(curtim);
+		_deactivate(curtim);
 		return -1;
 	}
 }
 
-int signal_processor::deactivate(disctime_t curtim, bool ignore_on_deactivate)
+int signal_processor::_deactivate(disctime_t curtim)
+{
+	signal_head * iter = NULL;
+
+	// Передаём команду деактивации на нижние уровни через подчинённые сигналы.
+	while ((iter = iterate_left(iter)))
+	{
+		int err = iter->deactivate(this, curtim);
+		(void) err;
+	}
+	f.active = 0;
+
+	return 0;
+}
+
+int signal_processor::on_deactivation_request(disctime_t curtim) 
+{
+	return _deactivate(curtim);
+}
+
+int signal_processor::deactivation_request(disctime_t curtim, bool ignore_request)
 {
 	signal_head * iter;
 	int all_right_deactivated = 1;
@@ -106,28 +125,16 @@ int signal_processor::deactivate(disctime_t curtim, bool ignore_on_deactivate)
 	}
 
 	if (!all_right_deactivated)
-		return 0;
+		return -1;
 
-	if (!ignore_on_deactivate)
+	if (!ignore_request)
 	{
-		int interrupt = on_deactivate(curtim);
-		if (interrupt)
-		{
-			// Устройство запросило отложенную деактивацию.
-			// Не прокидываем сигнал вниз.
-			return 0;
-		}
+		return on_deactivation_request(curtim);
 	}
-
-	iter = NULL;
-	while ((iter = iterate_left(iter)))
+	else 
 	{
-		int err = iter->deactivate(this, curtim);
-		(void) err;
+		return _deactivate(curtim);
 	}
-	f.active = 0;
-
-	return 0;
 }
 
 signal_processor * heimer::signal_processor_get_by_name(const char * name)

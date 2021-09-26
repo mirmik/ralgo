@@ -97,7 +97,7 @@ int axis_controller::serve(disctime_t time)
 	if (f.release_control_flag)
 	{
 		f.release_control_flag = 0;
-		deactivate(time);
+		_deactivate(time);
 		return 0;
 	}
 
@@ -160,6 +160,7 @@ int axis_controller::_absmove(
 	}
 
 	disctime_t tgttim = curtim + (float)(ABS(extdist)) / (vel / discrete_time_frequency());
+	if ((tgttim - curtim == 0) && (tgtpos - curpos != 0)) tgttim = curtim + 1; 
 
 	if (extdist == 0 || vel == 0 || curtim == tgttim)
 	{
@@ -445,6 +446,8 @@ axis_controller::axis_controller(const char * name, const std::initializer_list<
 
 bool axis_controller::on_interrupt(disctime_t time)
 {
+	ralgo::warn("axisctr:", name().data(), " - hardstop by interrupt.");
+
 	hardstop(time);
 	return false;
 }

@@ -36,7 +36,7 @@ namespace ralgo
 			lin(lin)
 		{}
 
-		screw operator * (float koeff)
+		screw operator * (double koeff)
 		{
 			return { ang * koeff, lin * koeff };
 		}
@@ -95,7 +95,7 @@ namespace ralgo
 			return *this;
 		}
 
-		screw operator * (float koeff)
+		screw operator * (double koeff)
 		{
 			return { ang * koeff, lin * koeff };
 		}

@@ -322,6 +322,7 @@ int stepsim(int argc, char ** argv, char * output, int maxsize)
 		auto * stpr = new robo::stepper;
 		auto * sctr = new robo::fixed_frequency_stepper_controller(stpr); 
 		auto * vctr = new heimer::velocity_applier(argv[i], sctr);
+		(void) vctr;
 
 		sctr->bind();
 		sctr->set_frequency(fast_cycle_frequence());

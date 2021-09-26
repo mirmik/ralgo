@@ -77,6 +77,11 @@ void telemetry_thread_function()
 	}
 }
 
+namespace heimer 
+{
+	double fast_cycle_frequence() { return 10000; }
+}
+
 void revolver_thread_function()
 {
 	auto start = now();

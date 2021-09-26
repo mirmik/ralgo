@@ -110,23 +110,9 @@ void axstate_chain3_processor::on_activate(disctime_t time)
 	last_time = time;
 }
 
-void axstate_chain3_processor::evaluate_error()
-{
-
-}
-
-void axstate_chain3_processor::evaluate_output_sensivities(ralgo::screw3<double> *)
-{
-
-}
-
-void axstate_chain3_processor::backpack(ralgo::screw3<double> *)
-{
-
-}
-
 void axstate_chain3_processor::evaluate_feedback() 
 {
+	// Вычисляем матрицы справа налево.
 	ralgo::pose3<position_t> pose;
 	for (int i = leftdim() - 1; i >= 0 ; --i)
 	{
@@ -135,8 +121,10 @@ void axstate_chain3_processor::evaluate_feedback()
 
 		pose = W * C * pose;
 		temporary[i].result_screw = settings[i].local_sensivity.kinematic_carry(pose);
+		temporary[i].right_transform = pose;
 	}
 
+	// Вычисляем матрицы слева направо.
 	pose = first_constant_transform;
 	for (int i = 0; i < leftdim(); ++i)
 	{
@@ -144,6 +132,7 @@ void axstate_chain3_processor::evaluate_feedback()
 		auto W = ralgo::pose3<position_t>::from_screw(settings[i].local_sensivity * leftax(i)->feedpos);
 		auto C = settings[i].constant_transform;
 		pose = pose * W * C;
+		temporary[i].left_transform = pose;
 	}
 	feedback_position = pose;
 
@@ -176,7 +165,7 @@ axis_state * axstate_chain3_processor::leftax(int i)
 	return settings[i].controlled;
 }
 
-void axstate_chain3_processor::set_constant(int i, float a, float b, float c, float d, float e, float f)
+void axstate_chain3_processor::set_constant(int i, double a, double b, double c, double d, double e, double f)
 {
 	ralgo::pose3<double> * constant;
 
@@ -196,7 +185,7 @@ void axstate_chain3_processor::set_constant(int i, float a, float b, float c, fl
 }
 
 
-void axstate_chain3_processor::set_sensivity(int i, float a, float b, float c, float d, float e, float f)
+void axstate_chain3_processor::set_sensivity(int i, double a, double b, double c, double d, double e, double f)
 {
 	ralgo::screw3<double> * sensivity;
 	sensivity = &settings[i].local_sensivity;

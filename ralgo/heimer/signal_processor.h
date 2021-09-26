@@ -67,10 +67,15 @@ namespace heimer
 		void set_rightside(signal_head ** arr);
 
 		virtual void on_activate(disctime_t);
-		virtual int on_deactivate(disctime_t) { return 0; }
+
+		/// Устройству предлогают деактивировать себя.
+		/// Поведение по умолчанию вызывает
+		virtual int on_deactivation_request(disctime_t);
+		int deactivation_request(disctime_t, bool ignore_on_deactivate = false);
 
 		int activate(disctime_t);
-		int deactivate(disctime_t, bool ignore_on_deactivate = false);
+		int _deactivate(disctime_t);
+		
 		bool is_active();
 
 		igris::buffer name();

@@ -23,7 +23,7 @@ int heimer::axis_stub_processor::serve(disctime_t time)
 	if (_apply_speed_mode)
 	{
 		disctime_t delta = time - lasttime;
-		pos = pos + vel * delta;
+		pos = pos + vel * delta / discrete_time_frequency();
 	}
 
 	lasttime = time;

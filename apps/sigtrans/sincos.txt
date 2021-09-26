@@ -55,4 +55,4 @@ ctr vactr setvel 5
 ctr vactr setacc 2 2
 ctr vactr setgain 100
 
-start
+exec start
