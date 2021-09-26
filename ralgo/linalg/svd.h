@@ -108,7 +108,7 @@ namespace ralgo
 
 		T pythag(const T a, const T b)
 		{
-			T absa = abs(a), absb = abs(b);
+			T absa = std::abs(a), absb = std::abs(b);
 			return (absa > absb ? absa * sqrt(1.0 + ralgo::sqr(absb / absa)) :
 			        (absb == 0.0 ? 0.0 : absb * sqrt(1.0 + ralgo::sqr(absa / absb))));
 		}
@@ -209,7 +209,7 @@ namespace ralgo
 			g = s = scale = 0.0;
 			if (i < m)
 			{
-				for (k = i; k < m; k++) scale += abs(u[k][i]);
+				for (k = i; k < m; k++) scale += std::abs(u[k][i]);
 				if (scale != 0.0)
 				{
 					for (k = i; k < m; k++)
@@ -234,7 +234,7 @@ namespace ralgo
 			g = s = scale = 0.0;
 			if (i + 1 <= m && i + 1 != n)
 			{
-				for (k = l - 1; k < n; k++) scale += abs(u[i][k]);
+				for (k = l - 1; k < n; k++) scale += std::abs(u[i][k]);
 				if (scale != 0.0)
 				{
 					for (k = l - 1; k < n; k++)
@@ -255,7 +255,7 @@ namespace ralgo
 					for (k = l - 1; k < n; k++) u[i][k] *= scale;
 				}
 			}
-			anorm = __MAX__(anorm, (abs(w[i]) + abs(rv1[i])));
+			anorm = __MAX__(anorm, (std::abs(w[i]) + std::abs(rv1[i])));
 		}
 
 		for (i = n - 1; i >= 0; i--)
@@ -306,12 +306,12 @@ namespace ralgo
 				for (l = k; l >= 0; l--)
 				{
 					nm = l - 1;
-					if (l == 0 || abs(rv1[l]) <= eps * anorm)
+					if (l == 0 || std::abs(rv1[l]) <= eps * anorm)
 					{
 						flag = false;
 						break;
 					}
-					if (abs(w[nm]) <= eps * anorm) break;
+					if (std::abs(w[nm]) <= eps * anorm) break;
 				}
 				if (flag)
 				{
@@ -321,7 +321,7 @@ namespace ralgo
 					{
 						f = s * rv1[i];
 						rv1[i] = c * rv1[i];
-						if (abs(f) <= eps * anorm) break;
+						if (std::abs(f) <= eps * anorm) break;
 						g = w[i];
 						h = pythag(f, g);
 						w[i] = h;

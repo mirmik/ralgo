@@ -23,8 +23,8 @@ namespace heimer
 		robo::i_position_feedback * controlled_posget;
 		axis_state * state;
 
-		position_t deviation_error_limit = 10000;
-		float compkoeff = 0; /// Коэффициент комплементарного фильтра.
+		position_t deviation_error_limit = 10;
+		float compkoeff = compkoeff_timeconst(0.1); /// Коэффициент комплементарного фильтра.
 
 		// Количество импульсов в системной единице (миллиметре или радиане).
 		float gear = 1;
@@ -61,10 +61,9 @@ namespace heimer
 
 		int bind(int argc, char ** argv, char * output, int outmax);
 
-		//void set_gain(float gain) { this->gain = gain; }
+		static float compkoeff_timeconst(float T) { return 1. / discrete_time_frequency() / T; }
 		void set_compkoeff(float ck) { this->compkoeff = ck; }
-
-		void set_compkoeff_timeconst(float T) { this->compkoeff = 1. / discrete_time_frequency() / T; }
+		void set_compkoeff_timeconst(float T) { this->compkoeff = compkoeff_timeconst(T); }
 
 		int feedback(disctime_t time) override;
 		int serve(disctime_t time) override;

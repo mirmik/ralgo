@@ -160,7 +160,7 @@ int signal_head::deactivate(struct signal_processor * proc, disctime_t time)
 
 	if (listener)
 	{
-		return listener->deactivate(time);
+		return listener->deactivation_request(time);
 	}
 
 	return 0;
