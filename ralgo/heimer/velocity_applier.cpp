@@ -56,6 +56,9 @@ int velocity_applier::serve(disctime_t time)
 {
 	disctime_t delta = time - last_time;
 	position_t errpos = state->ctrpos - state->feedpos;
+	velocity_t used_compkoeff = 
+		(ABS(errpos) < 1e-2 && ABS(state->ctrvel) == 0) ?
+		 compkoeff_hard : compkoeff;
 
 	if (deviation_error_limit && ABS(errpos) > deviation_error_limit)
 	{
@@ -69,9 +72,20 @@ int velocity_applier::serve(disctime_t time)
 		return SIGNAL_PROCESSOR_RETURN_RUNTIME_ERROR;
 	}
 
-	compspd = state->ctrvel + compkoeff * errpos * delta;
+	compspd = state->ctrvel + used_compkoeff * errpos * delta;
 	velocity_t impulses_per_sec = compspd * gear;
-	controlled_velset->set_velocity(impulses_per_sec);
+
+	/*if (!is_active())
+	{
+		if (errpos < 1e-6)
+		{
+			controlled_velset->set_velocity(0);
+		}
+	}
+	else
+	{*/
+		controlled_velset->set_velocity(impulses_per_sec);
+	//}
 
 	last_time = time;
 	return 0;
@@ -143,7 +157,7 @@ int velocity_applier::command(int argc, char ** argv, char * output, int outmax)
 	if (strcmp("bind", argv[0]) == 0)
 		status = bind(argc - 1, argv + 1, output, outmax);
 
-	if (strcmp("setgear", argv[0]) == 0) 
+	if (strcmp("setgear", argv[0]) == 0)
 	{
 		set_gear(atof32(argv[1], nullptr));
 		return 0;

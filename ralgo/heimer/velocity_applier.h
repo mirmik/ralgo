@@ -8,6 +8,7 @@
 #include <ralgo/robo/stepper_controller.h>
 #include <ralgo/heimer/axis_state.h>
 #include <ralgo/heimer/signal_processor.h>
+#include <ralgo/log.h>
 
 namespace heimer
 {
@@ -23,15 +24,20 @@ namespace heimer
 		robo::i_position_feedback * controlled_posget;
 		axis_state * state;
 
-		position_t deviation_error_limit = 10;
-		float compkoeff = compkoeff_timeconst(0.1); /// Коэффициент комплементарного фильтра.
+		position_t deviation_error_limit = 0;
+		disctime_t deactivation_timer_start = 0;
+		float compkoeff = compkoeff_timeconst(0.003); /// Коэффициент комплементарного фильтра.
+		float compkoeff_hard = compkoeff_timeconst(0.00001); /// Коэффициент комплементарного фильтра.
 
 		// Количество импульсов в системной единице (миллиметре или радиане).
 		float gear = 1;
-		
+
 		disctime_t last_time;
 
 		robo::fixed_frequency_stepper_controller * stepctr;
+
+		bool deactivation_enabled = false;
+		bool interrupt_situation = false;
 
 	public:
 		// debug
@@ -72,6 +78,20 @@ namespace heimer
 		void deinit() override;
 		signal_head * iterate_left(signal_head *) override;
 		signal_head * iterate_right(signal_head *) override;
+
+		/*int on_deactivation_request(disctime_t) override
+		{
+			ralgo::warn("velctr : on_deactivation_request");
+			if (interrupt_situation)
+			{
+				interrupt_situation = false;
+				return 0;
+			}
+
+			deactivation_enabled = true;
+			return 1;
+		}*/
+
 	};
 }
 

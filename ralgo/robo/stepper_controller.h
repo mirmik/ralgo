@@ -22,8 +22,8 @@ namespace robo
 	*/
 	class stepper_controller : public i_position_feedback
 	{
+	public:
 		robo::stepper * stepper;
-
 		float trigger_level = 0.75;
 
 	public:
@@ -72,13 +72,27 @@ namespace robo
 		int64_t control_pos() { return _control_pos; }
 		int64_t virtual_pos() { return _virtual_pos; }
 
-		double feedback_position() override
+		double real_feedback_position()
 		{
 			system_lock();
 			auto counter_value = stepper->steps_count();
 			system_unlock();
 
 			return counter_value;
+		}
+
+		double control_feedback_position()
+		{
+			system_lock();
+			auto counter_value = (double)_virtual_pos / (double)units_in_step;
+			system_unlock();
+
+			return counter_value;
+		}
+
+		double feedback_position() override
+		{
+			return control_feedback_position();
 		}
 
 		virtual void info(char* buf, int len);
