@@ -336,10 +336,15 @@ int axis_controller::stop(disctime_t curtim)
 	collect_feedpos(feedpos);
 	collect_feedvel(feedspd);
 
+	for (int i = 0; i < leftdim(); ++i)
+		feedspd[i] /= discrete_time_frequency();
+
 	if (curtraj == nullptr)
 		return 0;
 
-	float stoptime = restore_internal_velocity_from_axstates() / dcc;
+	// Время, которое потребуется на остановку в дискретных единицах.
+	float stoptime = restore_internal_velocity_from_axstates() / dcc 
+		* discrete_time_frequency();
 
 	lintraj.set_stop_pattern(
 	    feedpos,
