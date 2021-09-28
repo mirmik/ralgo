@@ -24,13 +24,12 @@ namespace heimer
 		robo::i_position_feedback * controlled_posget;
 		axis_state * state;
 
-		position_t deviation_error_limit = 0;
-		disctime_t deactivation_timer_start = 0;
-		float compkoeff = compkoeff_timeconst(0.003); /// Коэффициент комплементарного фильтра.
-		float compkoeff_hard = compkoeff_timeconst(0.00001); /// Коэффициент комплементарного фильтра.
+		position_t deviation_error_limit = 0.1;
+		double compkoeff = compkoeff_timeconst(0.003); /// Коэффициент комплементарного фильтра.
+		double compkoeff_hard = compkoeff_timeconst(0.0001); /// Коэффициент комплементарного фильтра.
 
 		// Количество импульсов в системной единице (миллиметре или радиане).
-		float gear = 1;
+		double gear = 1;
 
 		disctime_t last_time;
 
@@ -57,7 +56,7 @@ namespace heimer
 		    axis_state * state
 		);
 
-		void set_gear(float gear);
+		void set_gear(double gear);
 
 		void init(
 		    const char * name,
@@ -67,10 +66,12 @@ namespace heimer
 
 		int bind(int argc, char ** argv, char * output, int outmax);
 
-		static float compkoeff_timeconst(float T) { return 1. / discrete_time_frequency() / T; }
-		void set_compkoeff(float ck) { this->compkoeff = ck; }
-		void set_compkoeff_timeconst(float T) { this->compkoeff = compkoeff_timeconst(T); }
-
+		static double compkoeff_timeconst(double T) { return 1. / discrete_time_frequency() / T; }
+		void set_compkoeff(double ck) { this->compkoeff = ck; }
+		void set_compkoeff_timeconst(double T) { this->compkoeff = compkoeff_timeconst(T); }
+		int set_current_position_protected(double pos);
+		int set_current_steps_protected(int64_t pos);
+		
 		int feedback(disctime_t time) override;
 		int serve(disctime_t time) override;
 		int info(char * ans, int anslen) override;
@@ -79,9 +80,14 @@ namespace heimer
 		signal_head * iterate_left(signal_head *) override;
 		signal_head * iterate_right(signal_head *) override;
 
-		/*int on_deactivation_request(disctime_t) override
+		void on_activate(disctime_t time) override 
 		{
-			ralgo::warn("velctr : on_deactivation_request");
+			last_time = time;
+			deactivation_enabled = false;
+		}
+
+		int on_deactivation_request(disctime_t) override
+		{
 			if (interrupt_situation)
 			{
 				interrupt_situation = false;
@@ -90,7 +96,7 @@ namespace heimer
 
 			deactivation_enabled = true;
 			return 1;
-		}*/
+		}
 
 	};
 }

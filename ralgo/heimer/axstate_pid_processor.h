@@ -11,7 +11,7 @@ namespace heimer
 		axis_state * state;
 		scalar_signal * target;
 
-		float compcoeff;
+		double compcoeff;
 		disctime_t last_serve_time;
 
 	public:
@@ -24,7 +24,7 @@ namespace heimer
 
 		void set_right(scalar_signal *);
 		void set_left(axis_state *);
-		void set_compcoeff(float coeff);
+		void set_compcoeff(double coeff);
 
 		signal_head * iterate_left(signal_head * iter) override;
 		signal_head * iterate_right(signal_head * iter) override;

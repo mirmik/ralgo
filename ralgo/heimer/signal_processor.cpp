@@ -1,6 +1,7 @@
 #include <ralgo/heimer/signal_processor.h>
 #include <ralgo/heimer/signal.h>
 #include <ralgo/log.h>
+#include <ralgo/heimer/executor.h>
 
 #include <igris/shell/rshell.h>
 #include <igris/math.h>
@@ -14,6 +15,7 @@
 using namespace heimer;
 
 DLIST_HEAD(heimer::signal_processor_list);
+bool heimer::debug_activations = false;
 
 signal_processor::signal_processor(const char * name, int ldim, int rdim)
 {
@@ -64,6 +66,9 @@ int signal_processor::activate(disctime_t curtim)
 {
 	int success = 1;
 
+	if (global_protection)
+		return -1;
+
 	if (is_active())
 		return 0;
 
@@ -82,6 +87,12 @@ int signal_processor::activate(disctime_t curtim)
 	{
 		f.active = 1;
 		on_activate(curtim);
+
+		if (heimer::debug_activations)
+		{
+			ralgo::info("active:", name().data());
+		}
+
 		return 0;
 	}
 
@@ -103,11 +114,15 @@ int signal_processor::_deactivate(disctime_t curtim)
 		(void) err;
 	}
 	f.active = 0;
+	if (heimer::debug_activations)
+	{
+		ralgo::info("deactive:", name().data());
+	}
 
 	return 0;
 }
 
-int signal_processor::on_deactivation_request(disctime_t curtim) 
+int signal_processor::on_deactivation_request(disctime_t curtim)
 {
 	return _deactivate(curtim);
 }
@@ -131,7 +146,7 @@ int signal_processor::deactivation_request(disctime_t curtim, bool ignore_reques
 	{
 		return on_deactivation_request(curtim);
 	}
-	else 
+	else
 	{
 		return _deactivate(curtim);
 	}
@@ -158,18 +173,8 @@ bool signal_processor::is_active()
 	return f.active;
 }
 
-bool signal_processor::need_activation()
-{
-	return f.need_activation;
-}
-
 void signal_processor::on_activate(disctime_t)
 {}
-
-void signal_processor::set_need_activation(bool en)
-{
-	f.need_activation = en;
-}
 
 bool signal_processor::is_dynamic_resources()
 {
@@ -294,10 +299,10 @@ int signal_processor::command(int argc, char ** argv, char * output, int outmax)
 	if (strcmp("bindright", argv[0]) == 0)
 		status = ::bindright(this, argc - 1, argv + 1, output, outmax);
 
-	if (strcmp("info", argv[0]) == 0) 
+	if (strcmp("info", argv[0]) == 0)
 		status = info(output, outmax);
 
-	if (strcmp("help", argv[0]) == 0) 
+	if (strcmp("help", argv[0]) == 0)
 		status = help(output, outmax);
 
 	return status;

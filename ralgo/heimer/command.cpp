@@ -14,7 +14,7 @@
 #include <ralgo/heimer/dof6_signal.h>
 #include <ralgo/heimer/sigtypes.h>
 #include <ralgo/heimer/executor.h>
-
+#include <ralgo/heimer/axisapi.h>
 #include <ralgo/heimer/axisctr.h>
 #include <ralgo/heimer/axstate_linear_processor.h>
 #include <ralgo/heimer/axstate_sincos_processor.h>
@@ -337,6 +337,27 @@ int execcmd(int argc, char ** argv, char * output, int maxsize)
 	return executor_command(argc, argv, output, maxsize);
 }
 
+static
+int confcmd(int argc, char ** argv, char * output, int maxsize) 
+{
+	if (strcmp(argv[0], "debugacts") == 0)
+	{
+		heimer::debug_activations = atoi(argv[1]);
+	}	
+
+	if (strcmp(argv[0], "protect") == 0)
+	{
+		heimer::global_protection = atoi(argv[1]);
+	}	
+
+	if (strcmp(argv[0], "initaxapi") == 0)
+	{
+		collect_axis_api();
+	}	
+
+	return 0;
+}
+
 static struct rshell_command commands[] =
 {
 	{ "help", help, NULL },
@@ -347,7 +368,10 @@ static struct rshell_command commands[] =
 	{ "ctrlist", ctrlist, NULL },
 	{ "siglist", siglist, NULL },
 	{ "stepsim", stepsim, NULL },
+	{ "config", confcmd, NULL },
 	{ "exec", execcmd, NULL },
+	{ "ax", axises_api_command, NULL },
+	{ "ig", igroups_api_command, NULL },
 	{ NULL, NULL, NULL }
 };
 struct rshell_command * heimer::commands_table = commands;

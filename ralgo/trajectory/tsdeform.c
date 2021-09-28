@@ -1,6 +1,6 @@
 #include <ralgo/trajectory/tsdeform.h>
 
-int tsdeform_is_finished(tsdeform_t * tsd, float t)
+int tsdeform_is_finished(tsdeform_t * tsd, double t)
 {
 	return t >= tsd->t3;
 }
@@ -8,10 +8,10 @@ int tsdeform_is_finished(tsdeform_t * tsd, float t)
 /// Вариант движения с увеличением максимальной скорости.
 void tsdeform_set_timestamp_pattern(
 	tsdeform_t * tsd, 
-	float t01, 
-	float t23, 
-	float v0, 
-	float v3)
+	double t01, 
+	double t23, 
+	double v0, 
+	double v3)
 {
 	tsd->full_spattern = 0;
 	tsd->t01 = t01;
@@ -35,13 +35,13 @@ void tsdeform_set_timestamp_pattern(
 /// расширяется время довода изделия.
 void tsdeform_set_speed_pattern(
 	tsdeform_t * tsd,
-    float t01,
-    float t23,
-    float v0,
-    float v3,
+    double t01,
+    double t23,
+    double v0,
+    double v3,
     int full_spattern)
 {
-	float v1 = 1;
+	double v1 = 1;
 
 	tsd->full_spattern = full_spattern;
 	tsd->t01 = t01;
@@ -91,30 +91,30 @@ void tsdeform_set_speed_pattern(
 }
 
 /// Интеграл коэффициента деформации
-float tsdeform_posmod(tsdeform_t * tsd, float t)
+double tsdeform_posmod(tsdeform_t * tsd, double t)
 {
 	int full_spattern = tsd->full_spattern;
 
-	float v0 = tsd->v0;
-	float v1 = tsd->v1;
-	float v3 = tsd->v3;
-	float v0h = tsd->v0h;
-	float v2h = tsd->v2h;
+	double v0 = tsd->v0;
+	double v1 = tsd->v1;
+	double v3 = tsd->v3;
+	double v0h = tsd->v0h;
+	double v2h = tsd->v2h;
 	
-	float x1 = tsd->x1;
-	float x2 = tsd->x2;
-	float x0h = tsd->x0h;
-	float x2h = tsd->x2h;
+	double x1 = tsd->x1;
+	double x2 = tsd->x2;
+	double x0h = tsd->x0h;
+	double x2h = tsd->x2h;
 
-	float t2 = tsd->t2;
-	float t3 = tsd->t3;
-	float t01 = tsd->t01;
-	float t23 = tsd->t23;
+	double t2 = tsd->t2;
+	double t3 = tsd->t3;
+	double t01 = tsd->t01;
+	double t23 = tsd->t23;
 
-	float c = tsd->c;
-	float b = tsd->b;
-	float a0h = tsd->a0h;
-	float a2h = tsd->a2h;
+	double c = tsd->c;
+	double b = tsd->b;
+	double a0h = tsd->a0h;
+	double a2h = tsd->a2h;
 
 	
 	if (t >= t3)
@@ -156,7 +156,7 @@ float tsdeform_posmod(tsdeform_t * tsd, float t)
 	{
 		if (full_spattern == 0)
 		{
-			float loct = t - t3 + t23;
+			double loct = t - t3 + t23;
 			return x2
 			       + (loct) * v1
 			       - (loct) * ((loct) / t23 * (v1 - v3)) / 2;
@@ -179,25 +179,25 @@ float tsdeform_posmod(tsdeform_t * tsd, float t)
 }
 
 /// Коэффициент деформации
-float tsdeform_spdmod(tsdeform_t * tsd, float t)
+double tsdeform_spdmod(tsdeform_t * tsd, double t)
 {
 	int full_spattern = tsd->full_spattern;
 
-	float t3 = tsd->t3;
-	float v3 = tsd->v3;
-	float t01 = tsd->t01;
-	float b = tsd->b;
-	float c = tsd->c;
+	double t3 = tsd->t3;
+	double v3 = tsd->v3;
+	double t01 = tsd->t01;
+	double b = tsd->b;
+	double c = tsd->c;
 
-	float v0 = tsd->v0;
-	float v1 = tsd->v1;
-	float t2 = tsd->t2;
-	float t23 = tsd->t23;
+	double v0 = tsd->v0;
+	double v1 = tsd->v1;
+	double t2 = tsd->t2;
+	double t23 = tsd->t23;
 
-	float v0h = tsd->v0h;
-	float v2h = tsd->v2h;
-	float a0h = tsd->a0h;
-	float a2h = tsd->a2h;
+	double v0h = tsd->v0h;
+	double v2h = tsd->v2h;
+	double a0h = tsd->a0h;
+	double a2h = tsd->a2h;
 
 	if (t >= t3)
 	{
@@ -209,7 +209,7 @@ float tsdeform_spdmod(tsdeform_t * tsd, float t)
 	{
 		if (full_spattern == 0)
 		{
-			float k = t / t01;
+			double k = t / t01;
 			return v0 * (1 - k) + v1 * k;
 		}
 		else
@@ -236,7 +236,7 @@ float tsdeform_spdmod(tsdeform_t * tsd, float t)
 	{
 		if (full_spattern == 0)
 		{
-			float k = (t3 - t) / t23;
+			double k = (t3 - t) / t23;
 			return v3 * (1 - k) + v1 * k;
 		}
 		else

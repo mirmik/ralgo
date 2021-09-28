@@ -10,10 +10,10 @@ int line_trajectory::attime (disctime_t time,
 
 	assert(full_time > 0);
 
-	float time_unit = local_time <= 0 ? 0 : (float)(local_time) / (float)(full_time);
+	double time_unit = local_time <= 0 ? 0 : (double)(local_time) / (double)(full_time);
 
-	float posmod = tsdeform_posmod(&tsd, time_unit);
-	float spdmod = tsdeform_spdmod(&tsd, time_unit);
+	double posmod = tsdeform_posmod(&tsd, time_unit);
+	double spdmod = tsdeform_spdmod(&tsd, time_unit);
 
 	for (int i = 0; i < dim; ++i)
 	{
@@ -71,8 +71,8 @@ void line_trajectory::init_nominal_speed(
 
 	int time = ftim - stim;
 
-	float acc_part = (float)acc_time / (float)time;
-	float dcc_part = (float)dcc_time / (float)time;
+	double acc_part = (double)acc_time / (double)time;
+	double dcc_part = (double)dcc_time / (double)time;
 
 	tsdeform_set_speed_pattern(
 	    &tsd,

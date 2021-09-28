@@ -14,12 +14,12 @@ int axstate_sincos_processor::serve(disctime_t time)
 	struct axis_state * yr = rightside[1];
 	struct axis_state * ar = rightside[2];
 
-	float ascale = alpha_to_radian_scale;
+	double ascale = alpha_to_radian_scale;
 
 	position_t a = ar->ctrpos + a_right_offset;
-	float s = heimpos_sin(a * ascale);             // безразмерная величина
-	float c = heimpos_cos(a * ascale);             // безразмерная величина
-	float avelocity = heimvel_restore(ar->ctrvel) * ascale;         // скорость в радианах
+	double s = heimpos_sin(a * ascale);             // безразмерная величина
+	double c = heimpos_cos(a * ascale);             // безразмерная величина
+	double avelocity = heimvel_restore(ar->ctrvel) * ascale;         // скорость в радианах
 
 	xl->ctrpos = xr->ctrpos + x_offset + radius * c;
 	yl->ctrpos = yr->ctrpos + y_offset + radius * s;
@@ -44,12 +44,12 @@ int axstate_sincos_processor::feedback(disctime_t time)
 	struct axis_state * yr = rightside[1];
 	struct axis_state * ar = rightside[2];
 
-	float ascale = alpha_to_radian_scale;
+	double ascale = alpha_to_radian_scale;
 
 	position_t a = al->feedpos - a_left_offset;
-	float s = heimpos_sin(a * ascale);             // безразмерная величина
-	float c = heimpos_cos(a * ascale);             // безразмерная величина
-	float avelocity = heimvel_restore(al->feedvel) * ascale;         // скорость в радианах
+	double s = heimpos_sin(a * ascale);             // безразмерная величина
+	double c = heimpos_cos(a * ascale);             // безразмерная величина
+	double avelocity = heimvel_restore(al->feedvel) * ascale;         // скорость в радианах
 
 	xr->feedpos = xl->feedpos - x_offset - radius * c;
 	yr->feedpos = yl->feedpos - y_offset - radius * s;
@@ -107,7 +107,7 @@ void axstate_sincos_processor::deinit()
 {}
 
 void axstate_sincos_processor::set_alpha_scale(
-    float ascale
+    double ascale
 )
 {
 	alpha_to_radian_scale = ascale;
@@ -154,7 +154,6 @@ axstate_sincos_processor::axstate_sincos_processor(const char * name)
 	this->radius = 0;
 	attach_leftside_table(leftside);
 	attach_rightside_table(rightside);
-	set_need_activation(true);
 }
 
 void heimer::axstate_sincos_processor::on_activate(disctime_t)

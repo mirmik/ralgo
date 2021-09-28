@@ -83,7 +83,7 @@ namespace heimer
 		position_t a_left_offset = 0;
 		position_t a_right_offset = 0;
 
-		float alpha_to_radian_scale = 1;
+		double alpha_to_radian_scale = 1;
 
 	public:
 		axstate_sincos_processor() = default;
@@ -95,7 +95,7 @@ namespace heimer
 		void deinit() override;
         void on_activate(disctime_t) override;
 
-		void set_alpha_scale(float ascale);
+		void set_alpha_scale(double ascale);
 		void set_offset(
 		    position_t xoff,
 		    position_t yoff,

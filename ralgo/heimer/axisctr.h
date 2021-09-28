@@ -78,14 +78,14 @@ namespace heimer
 		void set_gain(const std::initializer_list<double> & gain);
 
 		void set_limits_external(double * back, double * forw);
-		void set_velocity_external(float vel);
-		void set_accdcc_external(float acc, float dcc);
-		void set_acceleration_external(float acc);
-		void set_decceleration_external(float dcc);
+		void set_velocity_external(double vel);
+		void set_accdcc_external(double acc, double dcc);
+		void set_acceleration_external(double acc);
+		void set_decceleration_external(double dcc);
 
-		float external_velocity();
-		float external_acceleration();
-		float external_decceleration();
+		double external_velocity();
+		double external_acceleration();
+		double external_decceleration();
 
 		void set_controlled(struct axis_state ** state);
 		void release_controlled();
@@ -97,9 +97,9 @@ namespace heimer
 		int stop(disctime_t);
 		int hardstop(disctime_t);
 
-		float feedpos_external(int axno);
-		float ctrpos_external(int axno);
-		float ctrvel_external(int axno);
+		double feedpos_external(int axno);
+		double ctrpos_external(int axno);
+		double ctrvel_external(int axno);
 
 		void collect_feedpos(position_t * pos);
 		void collect_feedvel(velocity_t * pos);

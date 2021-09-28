@@ -137,23 +137,23 @@ a0=0 /         \  a1=0
 
 struct trajectory_speed_deformer
 {
-	float t01;
-	float t23;
-	float t3;
+	double t01;
+	double t23;
+	double t3;
 
-	float v0;
-	float v3;
-	float v1;
+	double v0;
+	double v3;
+	double v1;
 
-	float x1;
-	float x2;
+	double x1;
+	double x2;
 
 	int full_spattern;
-	float t2;
-	float x0h, x2h;
-	float v0h, v2h;
-	float a0h, a2h;
-	float b, c;
+	double t2;
+	double x0h, x2h;
+	double v0h, v2h;
+	double a0h, a2h;
+	double b, c;
 };
 
 typedef struct trajectory_speed_deformer tsdeform_t;
@@ -161,7 +161,7 @@ typedef struct trajectory_speed_deformer tsdeform_t;
 
 __BEGIN_DECLS
 
-int tsdeform_is_finished(tsdeform_t * tsd, float t);
+int tsdeform_is_finished(tsdeform_t * tsd, double t);
 
 /// Вариант движения с увеличением максимальной скорости.
 /// Завершение движения произойдёт точно в установленный момент,
@@ -172,10 +172,10 @@ int tsdeform_is_finished(tsdeform_t * tsd, float t);
 /// @param v3  - доля скорости, планируемая на момент окончания движения.
 void tsdeform_set_timestamp_pattern(
     tsdeform_t * tsd,
-    float t01,
-    float t23,
-    float v0,
-    float v3
+    double t01,
+    double t23,
+    double v0,
+    double v3
 );
 
 /// Второй вариант инициализации, когда вместо увеличения максимальной скорости
@@ -188,17 +188,17 @@ void tsdeform_set_timestamp_pattern(
 /// @full_spattern - включение стратегии плавного изменения ускорения.
 void tsdeform_set_speed_pattern(
     tsdeform_t * tsd,
-    float t01,
-    float t23,
-    float v0,
-    float v3,
+    double t01,
+    double t23,
+    double v0,
+    double v3,
     int full_spattern);
 
 /// Интеграл коэффициента деформации
-float tsdeform_posmod(tsdeform_t * tsd, float t);
+double tsdeform_posmod(tsdeform_t * tsd, double t);
 
 /// Коэффициент деформации
-float tsdeform_spdmod(tsdeform_t * tsd, float t);
+double tsdeform_spdmod(tsdeform_t * tsd, double t);
 
 /// Сбросить состояние.
 void tsdeform_nullify(tsdeform_t * tsd);

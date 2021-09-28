@@ -81,7 +81,7 @@ int heimer::signals_count()
 
 void heimer::signal_head_list_reinit()
 {
-	while(!dlist_empty(&signals_list)) 
+	while (!dlist_empty(&signals_list))
 	{
 		dlist_del_init(signals_list.next);
 	}
@@ -123,11 +123,11 @@ int signal_head::ctrinfo(char * buffer, int)
 	return 0;
 }
 
-void signal_head::rebind() 
+void signal_head::rebind()
 {
 	dlist_add_tail(&list_lnk, &signals_list);
 }
-		
+
 int signal_head::activate(struct signal_processor * proc, disctime_t tim)
 {
 	if (current_controller)
@@ -144,8 +144,20 @@ int signal_head::activate(struct signal_processor * proc, disctime_t tim)
 			return -1;
 	}
 
-	if (listener && listener->activate(tim))
+	if (!listener)
+	{
+		ralgo::warn("trying to activate over signal without listener");
 		return -1;
+	}
+
+	if (listener->activate(tim))
+	{
+		if (debug_activations)
+		{
+			ralgo::warn("fault in controller activation", listener->name().data());
+		}
+		return -1;
+	}
 
 	current_controller = proc;
 	return 0;
