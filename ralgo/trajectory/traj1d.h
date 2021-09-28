@@ -90,11 +90,11 @@ namespace ralgo
 			else
 			{
 				setted_speed =
-				    (float)(fpos - spos) / (ftim - stim);
+				    (double)(fpos - spos) / (ftim - stim);
 			}
 
-			float acc_part = (float)args->acctime / (float)(ftim - stim);
-			float dcc_part = (float)args->dcctime / (float)(ftim - stim);
+			double acc_part = (double)args->acctime / (double)(ftim - stim);
+			double dcc_part = (double)args->dcctime / (double)(ftim - stim);
 
 			if (acc_part + dcc_part > 1)
 			{
@@ -117,7 +117,7 @@ namespace ralgo
 			               ralgo::discrete_time_frequency();
 
 			P dist = args->fpos - args->spos;
-			float time = fabs(dist) / setted_speed;
+			double time = fabs(dist) / setted_speed;
 
 			if (dist < 0)
 				setted_speed = -setted_speed;
@@ -128,13 +128,13 @@ namespace ralgo
 			stim = args->stim;
 			ftim = stim + (int64_t)time;
 
-			float acc_time = args->speed / args->acc
+			double acc_time = args->speed / args->acc
 			                 * ralgo::discrete_time_frequency();
-			float dcc_time = args->speed / args->dcc
+			double dcc_time = args->speed / args->dcc
 			                 * ralgo::discrete_time_frequency();
 
-			float acc_part = acc_time / time;
-			float dcc_part = dcc_time / time;
+			double acc_part = acc_time / time;
+			double dcc_part = dcc_time / time;
 
 			// Учёт возможного треугольного паттерна осуществляется
 			// здесь:
@@ -158,7 +158,7 @@ namespace ralgo
 				v = V * spdmod(u)
 			*/
 
-			float time_unit = ftim == stim ? 0 : (float)(time - stim) / (float)(ftim - stim);
+			double time_unit = ftim == stim ? 0 : (double)(time - stim) / (double)(ftim - stim);
 
 			assert(!isnan(time_unit));
 
@@ -177,7 +177,7 @@ namespace ralgo
 			// поэтому подменяем время в два раза, чтобы соответствовать равнозамедленному паттерну.
 
 			stim = ralgo::discrete_time();
-			float realdiff = (fabs(curspd) / dccval);
+			double realdiff = (fabs(curspd) / dccval);
 			ftim = stim + (int)(realdiff * ralgo::discrete_time_frequency() / 2);
 
 			spos = curpos;

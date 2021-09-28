@@ -70,7 +70,7 @@ namespace ralgo
 					setted_speed[i] = 0;
 				else
 				{
-					setted_speed[i] = ((float)(fpos[i] - spos[i])) / ((float)(ftim - stim));
+					setted_speed[i] = ((double)(fpos[i] - spos[i])) / ((double)(ftim - stim));
 				}
 			}
 
@@ -99,7 +99,7 @@ namespace ralgo
 			// взятую на дискретную единицу времени в скорость взятую
 			// на единицу времени рабочего пространства.
 
-			float time_unit = ftim == stim ? 0 : (float)(time - stim) / (float)(ftim - stim);
+			double time_unit = ftim == stim ? 0 : (double)(time - stim) / (double)(ftim - stim);
 
 			if (isnan(time_unit))
 			{
@@ -122,8 +122,8 @@ namespace ralgo
 			return (tsdeform_is_finished(&spddeform, time_unit) || stim == ftim) ? 1 : 0;
 		}
 
-		void set_speed_pattern(float acc, float dcc,
-		                       float speed, bool full_spattern = false)
+		void set_speed_pattern(double acc, double dcc,
+		                       double speed, bool full_spattern = false)
 		{
 			// Чтобы расчитать интервал времени разгона, необходимо
 			// соотнести значение ускорения и скорости.
@@ -131,13 +131,13 @@ namespace ralgo
 			// setted_speed - установленная скорость в дискреных единицах
 			// тогда setted_speed / acc = acc_time в дискретных единицах
 
-			float time = ftim - stim;
+			double time = ftim - stim;
 
-			float acc_time = speed / acc * ralgo::discrete_time_frequency();
-			float dcc_time = speed / dcc * ralgo::discrete_time_frequency();
+			double acc_time = speed / acc * ralgo::discrete_time_frequency();
+			double dcc_time = speed / dcc * ralgo::discrete_time_frequency();
 
-			float acc_part = acc_time / time;
-			float dcc_part = dcc_time / time;
+			double acc_part = acc_time / time;
+			double dcc_part = dcc_time / time;
 
 			//ralgo::speed_deformer::acc_dcc_balance(acc_part, dcc_part);
 
@@ -154,7 +154,7 @@ namespace ralgo
 			// поэтому подменяем время в два раза, чтобы соответствовать равнозамедленному паттерну.
 
 			stim = ralgo::discrete_time();
-			float realdiff = ralgo::vecops::length(curspd) / dccval;
+			double realdiff = ralgo::vecops::length(curspd) / dccval;
 			ftim = stim + realdiff / 2 * ralgo::discrete_time_frequency();
 
 			std::copy(std::begin(curpos), std::end(curpos), std::begin(this->spos));

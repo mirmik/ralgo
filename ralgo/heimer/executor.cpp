@@ -3,6 +3,7 @@
 #include <ralgo/heimer/axis_state.h>
 #include <ralgo/heimer/sigtypes.h>
 #include <ralgo/heimer/fast_cycle_device.h>
+#include <ralgo/heimer/axisapi.h>
 #include <ralgo/log.h>
 
 #include <igris/dprint.h>
@@ -85,7 +86,8 @@ int heimer::executor_class::serve(disctime_t curtime)
 
 	for (int i = order_table_size - 1; i >= 0; --i)
 	{
-		if (order_table[i]->need_activation() && !order_table[i]->is_active())
+		//if (order_table[i]->need_activation() && !order_table[i]->is_active())
+		if (!order_table[i]->is_active())
 			continue;
 
 		// serve исполняется только если контроллер включен.
@@ -127,6 +129,9 @@ int heimer::executor_class::exec(disctime_t curtime)
 {
 	char buf[16];
 	int retcode;
+
+	if (global_protection)
+		return 0;
 
 	retcode = feedback(curtime);
 	if (retcode)
@@ -252,7 +257,9 @@ int heimer::executor_command(int argc, char ** argv, char * output, int maxsize)
 			executor.append_processor(proc);
 		}
 
+		collect_axis_api();
 		executor.activate_process();
+		global_protection = false;
 		return 0;
 	}
 
@@ -288,16 +295,28 @@ void heimer::executor_class::deactivate_process()
 
 void heimer::executor_class::exec_fast_cycle()
 {
-	if (!allowed_to_execution)
+	if (global_protection || !allowed_to_execution)
 		return;
 
 	fast_cycle_device * dev;
 	dlist_for_each_entry(dev, &heimer::fast_cycle_list, fast_cycle_list_lnk)
 	{
 		int sts = dev->fast_cycle_serve();
-		if (sts) 
+		if (sts)
 		{
 			deactivate_process();
 		}
 	}
+}
+
+bool heimer::is_device_ready_for_settings_change()
+{
+
+	heimer::signal_processor * proc;
+	dlist_for_each_entry(proc, &heimer::signal_processor_list, list_lnk)
+	{
+		if (proc->is_active())
+			return false;
+	}
+	return true;
 }

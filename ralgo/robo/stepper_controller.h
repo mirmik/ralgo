@@ -24,7 +24,7 @@ namespace robo
 	{
 	public:
 		robo::stepper * stepper;
-		float trigger_level = 0.75;
+		double trigger_level = 0.75;
 
 	public:
 		int64_t _control_pos = 0;
@@ -32,13 +32,18 @@ namespace robo
 
 	//protected:
 	public:
-		int64_t units_in_step = (1 << 20);
+		int64_t units_in_step = (1 << 24);
 		int64_t units_in_step_triggered = units_in_step * trigger_level;
 
 	public:
 		stepper_controller();
 		stepper_controller(robo::stepper * stepper);
 		stepper_controller(const stepper_controller&) = delete;
+
+		void reset_current_position(double pos) 
+		{
+			_control_pos = _virtual_pos = pos * units_in_step;
+		}
 
 		void init(robo::stepper * stepper);
 
@@ -51,11 +56,11 @@ namespace robo
 		// чтобы можно было передавать интервалы времени
 		// меньше disctime
 		int speed_apply(
-		    float speed,
-		    float delta
+		    double speed,
+		    double delta
 		);
 
-		void set_trigger_level(float trigger_level)
+		void set_trigger_level(double trigger_level)
 		{
 			this->trigger_level = trigger_level;
 		}
@@ -107,8 +112,8 @@ namespace robo
 		void * interrupt_priv = nullptr;
 
 	private:
-		float speed_to_shift = 1;
-		float freq = 1;
+		double speed_to_shift = 1;
+		double freq = 1;
 		int64_t current_shift = 0;
 
 	public:
@@ -116,7 +121,7 @@ namespace robo
 		fixed_frequency_stepper_controller(robo::stepper * stepper);
 		fixed_frequency_stepper_controller(const fixed_frequency_stepper_controller&) = delete;
 
-		void set_frequency(float _freq)
+		void set_frequency(double _freq)
 		{
 			freq = _freq;
 			evaluate();
@@ -134,12 +139,12 @@ namespace robo
 
 		double feedback_velocity() override 
 		{
-			return (float)current_shift / speed_to_shift;
+			return (double)current_shift / (double)speed_to_shift;
 		}
 
 		void info(char* buf, int len) override;
 
-		float frequency() 
+		double frequency() 
 		{
 			return freq;
 		}

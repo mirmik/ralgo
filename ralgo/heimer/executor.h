@@ -9,6 +9,8 @@
 
 namespace heimer 
 {
+	extern bool global_protection;
+
 	class executor_class 
 	{
 	public:
@@ -59,6 +61,7 @@ namespace heimer
 	};
 
 	extern executor_class executor;
+	bool is_device_ready_for_settings_change();
 	int executor_command(int argc, char ** argv, char * output, int maxsize);
 }
 

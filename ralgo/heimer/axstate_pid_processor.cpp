@@ -6,7 +6,7 @@ heimer::axstate_pid_processor::axstate_pid_processor(const char * name)
 
 }
 
-void heimer::axstate_pid_processor::set_compcoeff(float coeff) 
+void heimer::axstate_pid_processor::set_compcoeff(double coeff) 
 {
 	compcoeff = coeff;
 }

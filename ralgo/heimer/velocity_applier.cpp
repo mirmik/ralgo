@@ -2,6 +2,7 @@
 #include <ralgo/log.h>
 #include <igris/math.h>
 #include <igris/util/numconvert.h>
+#include <ralgo/heimer/executor.h>
 
 using namespace heimer;
 
@@ -56,9 +57,9 @@ int velocity_applier::serve(disctime_t time)
 {
 	disctime_t delta = time - last_time;
 	position_t errpos = state->ctrpos - state->feedpos;
-	velocity_t used_compkoeff = 
-		(ABS(errpos) < 1e-2 && ABS(state->ctrvel) == 0) ?
-		 compkoeff_hard : compkoeff;
+	velocity_t used_compkoeff =
+	    (ABS(errpos) < 1e-2 && ABS(state->ctrvel) == 0) ?
+	    compkoeff_hard : compkoeff;
 
 	if (deviation_error_limit && ABS(errpos) > deviation_error_limit)
 	{
@@ -72,21 +73,27 @@ int velocity_applier::serve(disctime_t time)
 		return SIGNAL_PROCESSOR_RETURN_RUNTIME_ERROR;
 	}
 
+	if (state->current_controller == nullptr && state->ctrvel != 0) 
+	{
+		ralgo::warn("nullcontroller without nullspeed");
+		interrupt(time, true);
+	}
+
 	compspd = state->ctrvel + used_compkoeff * errpos * delta;
 	velocity_t impulses_per_sec = compspd * gear;
-
-	/*if (!is_active())
+	
+	if (deactivation_enabled)
 	{
-		if (errpos < 1e-6)
+		if (ABS(impulses_per_sec) < 1e-3 && ABS(errpos) < 1e-6)
 		{
+			_deactivate(time);
 			controlled_velset->set_velocity(0);
+			deactivation_enabled = false;
+			return 0;
 		}
 	}
-	else
-	{*/
-		controlled_velset->set_velocity(impulses_per_sec);
-	//}
 
+	controlled_velset->set_velocity(impulses_per_sec);
 	last_time = time;
 	return 0;
 }
@@ -145,9 +152,27 @@ int velocity_applier::bind(int argc, char ** argv, char * output, int outmax)
 	return 0;
 }
 
-void velocity_applier::set_gear(float gear)
+void velocity_applier::set_gear(double gear)
 {
 	this->gear = gear;
+}
+
+int velocity_applier::set_current_position_protected(double pos)
+{
+	if (!heimer::is_device_ready_for_settings_change()) 
+		return -1;
+
+	stepctr->reset_current_position(pos * gear);
+	return 0;
+}
+
+int velocity_applier::set_current_steps_protected(int64_t pos)
+{
+	if (!heimer::is_device_ready_for_settings_change()) 
+		return -1;
+
+	stepctr->reset_current_position(pos);
+	return 0;
 }
 
 int velocity_applier::command(int argc, char ** argv, char * output, int outmax)
@@ -165,6 +190,35 @@ int velocity_applier::command(int argc, char ** argv, char * output, int outmax)
 
 	if (strcmp("info", argv[0]) == 0)
 		status = info(output, outmax);
+
+	if (strcmp("setpos", argv[0]) == 0)
+	{
+		double pos = atof(argv[1]);
+		int sts = set_current_position_protected(pos);
+		if (sts) 
+		{
+			snprintf(output, outmax, 
+				"position cannot be setted because device in protected state");
+		}
+		status = 0;
+	}
+		
+	if (strcmp("setsteps", argv[0]) == 0)
+	{
+		int64_t pos = atoi64(argv[1], 10, nullptr);
+		int sts = set_current_steps_protected(pos);
+		if (sts) 
+		{
+			snprintf(output, outmax, 
+				"position cannot be setted because device in protected state");
+		}
+		status = 0;
+	}
+
+	if (status == ENOENT) 
+	{
+		snprintf(output, outmax, "velctr: Unresolved command");
+	}
 
 	return status;
 }

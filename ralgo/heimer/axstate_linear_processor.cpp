@@ -165,7 +165,7 @@ void axstate_linear_processor::deinit()
 
 void axstate_linear_processor::evaluate_invertion()
 {
-	matops_square_inverse_f(
+	matops_square_inverse_d(
 	    matrix, // in
 	    dim(),  //size, n==m
 	    dim(),  //stride
@@ -177,12 +177,10 @@ void axstate_linear_processor::evaluate_invertion()
 heimer::axstate_linear_processor::axstate_linear_processor(const char * name, int _dim,
         struct axis_state ** leftside,
         struct axis_state ** rightside,
-        float * matrix,
-        float * invert_matrix)
+        double * matrix,
+        double * invert_matrix)
 	: axstate_signal_processor(name, _dim, _dim)
 {
-	set_need_activation(1);
-
 	attach_leftside_table(leftside);
 	attach_rightside_table(rightside);
 
@@ -198,11 +196,11 @@ void heimer::axstate_linear_processor::allocate_resources()
 {
 	this->attach_leftside_table(new axis_state * [dim()]);
 	this->attach_rightside_table(new axis_state * [dim()]);
-	this->matrix = new float[dim() * dim()];
-	this->invert_matrix = new float[dim() * dim()];
+	this->matrix = new double[dim() * dim()];
+	this->invert_matrix = new double[dim() * dim()];
 
-	ralgo::matrix_view_ro<float> A(this->matrix, dim(), dim());
-	ralgo::matrix_view_ro<float> B(this->invert_matrix, dim(), dim());
+	ralgo::matrix_view_ro<double> A(this->matrix, dim(), dim());
+	ralgo::matrix_view_ro<double> B(this->invert_matrix, dim(), dim());
 
 	ralgo::matops::eye(A);
 	ralgo::matops::eye(B);

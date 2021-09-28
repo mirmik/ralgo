@@ -19,16 +19,16 @@ namespace heimer
     {
 //  struct signal_processor proc;
     public:
-        float * matrix = nullptr;
-        float * invert_matrix = nullptr;
+        double * matrix = nullptr;
+        double * invert_matrix = nullptr;
 
     public:
         axstate_linear_processor() = default;
         axstate_linear_processor(const char * name, int dim,
                                  struct axis_state ** leftside,
                                  struct axis_state ** rightside,
-                                 float * matrix,
-                                 float * invert_matrix);
+                                 double * matrix,
+                                 double * invert_matrix);
         axstate_linear_processor(const char * name, int dim);
 
         int dim() { return leftdim(); }

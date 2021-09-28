@@ -34,23 +34,23 @@ void axis_controller::set_gain(double * gain)
 	}
 }
 
-void axis_controller::set_velocity_external(float speed)
+void axis_controller::set_velocity_external(double speed)
 {
 	vel = speed;
 }
 
-void axis_controller::set_accdcc_external(float acc, float dcc)
+void axis_controller::set_accdcc_external(double acc, double dcc)
 {
 	this->acc = acc;
 	this->dcc = dcc;
 }
 
-void axis_controller::set_acceleration_external(float acc)
+void axis_controller::set_acceleration_external(double acc)
 {
 	this->acc = acc;
 }
 
-void axis_controller::set_decceleration_external(float dcc)
+void axis_controller::set_decceleration_external(double dcc)
 {
 	this->dcc = dcc;
 }
@@ -159,7 +159,7 @@ int axis_controller::_absmove(
 		return -1;
 	}
 
-	disctime_t tgttim = curtim + (float)(ABS(extdist)) / (vel / discrete_time_frequency());
+	disctime_t tgttim = curtim + (double)(ABS(extdist)) / (vel / discrete_time_frequency());
 	if ((tgttim - curtim == 0) && (tgtpos - curpos != 0)) tgttim = curtim + 1; 
 
 	if (extdist == 0 || vel == 0 || curtim == tgttim)
@@ -238,17 +238,17 @@ int axis_controller::absmove(disctime_t current_time, const double * pos_real)
 	return _absmove(current_time, curpos, tgtpos, sqrt(extdist_accumulator));
 }
 
-float axis_controller::ctrpos_external(int axno)
+double axis_controller::ctrpos_external(int axno)
 {
 	return  settings[axno].controlled->ctrpos / settings[axno].gain;
 }
 
-float axis_controller::feedpos_external(int axno)
+double axis_controller::feedpos_external(int axno)
 {
 	return  settings[axno].controlled->feedpos / settings[axno].gain;
 }
 
-float axis_controller::ctrvel_external(int axno)
+double axis_controller::ctrvel_external(int axno)
 {
 	return settings[axno].controlled->ctrvel / settings[axno].gain;
 }
@@ -306,9 +306,9 @@ signal_head * axis_controller::iterate_right(signal_head * iter)
 	return NULL;
 }
 
-float axis_controller::external_velocity() { return vel; }
-float axis_controller::external_acceleration() { return acc; }
-float axis_controller::external_decceleration() { return dcc; }
+double axis_controller::external_velocity() { return vel; }
+double axis_controller::external_acceleration() { return acc; }
+double axis_controller::external_decceleration() { return dcc; }
 
 void axis_controller::collect_feedpos(position_t * pos)
 {
@@ -343,7 +343,7 @@ int axis_controller::stop(disctime_t curtim)
 		return 0;
 
 	// Время, которое потребуется на остановку в дискретных единицах.
-	float stoptime = restore_internal_velocity_from_axstates() / dcc 
+	double stoptime = restore_internal_velocity_from_axstates() / dcc 
 		* discrete_time_frequency();
 
 	lintraj.set_stop_pattern(
@@ -395,13 +395,12 @@ int axis_controller::hardstop(disctime_t time)
 
 void axis_controller::_init()
 {
-	set_need_activation(1);
-
 	vel = 0;
 	acc = 0;
 	dcc = 0;
 
 	flags = 0;
+	signal_processor::f.is_axisctr = 1;
 
 	operation_start_handler = NULL;
 	operation_finish_handler = NULL;
@@ -465,4 +464,328 @@ int axis_controller::incmove(disctime_t current_time, const std::initializer_lis
 int axis_controller::absmove(disctime_t current_time, const std::initializer_list<double> & pos_real)
 {
 	return absmove(current_time, &*pos_real.begin());
+}
+
+static inline
+int setvel(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
+{
+	if (argc < 1)
+	{
+		snprintf(output, outmax, "Need argument");
+		return -1;
+	}
+
+	axctr->set_velocity_external(atof(argv[0]));
+	return 0;
+}
+
+static inline
+int setacc(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
+{
+	if (argc < 1)
+	{
+		snprintf(output, outmax, "Need argument");
+		return -1;
+	}
+
+	axctr->set_acceleration_external(atof(argv[0]));
+
+	if (argc > 1)
+		axctr->set_decceleration_external(atof(argv[1]));
+	return 0;
+}
+
+
+static inline
+int setlim(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
+{
+	if (argc != axctr->leftdim() * 2)
+	{
+		snprintf(output, outmax, "Can't bind %d symbols for %d leftdim() axisctr", argc, axctr->leftdim());
+		return -1;
+	}
+
+	for (int i = 0; i < axctr->leftdim(); ++i)
+	{
+		axctr->settings[i].backlim = atof(argv[i*2]);
+		axctr->settings[i].forwlim = atof(argv[i*2+1]);
+	}
+
+	return 0;
+}
+
+static inline
+int feed(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
+{
+	for (int i = 0; i < axctr->leftdim(); ++i)
+	{
+		char buf[64];
+		axctr->settings[i].controlled->info(buf, 64);
+		strcat(output, buf);
+	}
+
+	return 0;
+}
+
+static inline
+int setdcc(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
+{
+	if (argc < 1)
+	{
+		snprintf(output, outmax, "Need argument");
+		return -1;
+	}
+
+	axctr->set_acceleration_external(atof(argv[0]));
+	return 0;
+}
+
+static inline
+int bind(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
+{
+	if (argc != axctr->leftdim())
+	{
+		snprintf(output, outmax, "Can't bind %d symbols for %d leftdim() axisctr", argc, axctr->leftdim());
+		return -1;
+	}
+
+	{
+		axis_state * arr[argc];
+
+		for (int i = 0; i < argc; ++i)
+		{
+			signal_head * sig = signal_get_by_name(argv[i]);
+
+			if (!sig)
+			{
+				snprintf(output, outmax, "Wrong signal name '%s' (type 'siglist' for display)", argv[i]);
+				return -1;
+			}
+
+			if (sig->type != SIGNAL_TYPE_AXIS_STATE)
+			{
+				snprintf(output, outmax, "Wrong signal type. name:(%s)", sig->name);
+				return -1;
+			}
+
+			arr[i] = static_cast<axis_state *>(sig);
+		}
+
+		axctr->release_controlled();
+		axctr->set_controlled(arr);
+	}
+
+	return 0;
+}
+
+static inline
+int setgain(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
+{
+	if (argc != axctr->leftdim())
+	{
+		snprintf(output, outmax, "Can't bind %d symbols for %d leftdim() axisctr", argc, axctr->leftdim());
+		return -1;
+	}
+
+	for (int i = 0; i < argc; ++i)
+	{
+		axctr->settings[i].gain = atof(argv[i]);
+	}
+
+	return 0;
+}
+
+static inline
+int info(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
+{
+	(void) argc;
+	(void) argv;
+
+	int bufsize = 96;
+	char buf[bufsize];
+
+	memset(buf, 0, bufsize);
+	snprintf(buf, bufsize, "isactive:%d, ", axctr->is_active());
+	strncat(output, buf, outmax);
+
+	memset(buf, 0, bufsize);
+	snprintf(buf, bufsize, "leftdim():%d, ", axctr->leftdim());
+	strncat(output, buf, outmax);
+
+	memset(buf, 0, bufsize);
+	snprintf(buf, bufsize, "signals:");
+	strncat(output, buf, outmax);
+
+	for (int i = 0; i < axctr->leftdim() - 1; ++i)
+	{
+		memset(buf, 0, bufsize);
+		if (axctr->settings[i].controlled == nullptr)
+		{
+			snprintf(buf, bufsize, "(none),");
+			strncat(output, buf, outmax);
+		}
+		else
+		{
+			snprintf(buf, bufsize, "%s,", axctr->settings[i].controlled->name);
+			strncat(output, buf, outmax);
+		}
+	}
+	memset(buf, 0, bufsize);
+	snprintf(buf, bufsize, "%s\r\n", axctr->settings[axctr->leftdim() - 1].controlled->name);
+	strncat(output, buf, outmax);
+
+	memset(buf, 0, bufsize);
+	nos::format_buffer(buf, "external: vel:{}, acc:{}, dcc:{}\r\n",
+	         axctr->external_velocity(), 
+	         axctr->external_acceleration(), 
+	         axctr->external_decceleration());
+	strncat(output, buf, outmax);
+
+	memset(buf, 0, bufsize);
+	snprintf(buf, bufsize, "flags: opfinished:%d, releaseflag:%d, dynamic:%d, spattern:%d\r\n",
+	         axctr->f.operation_finished_flag,
+	         axctr->f.release_control_flag,
+	         axctr->f.dynamic_resources,
+	         (uint8_t)axctr->f.spattern_enabled);
+	strncat(output, buf, outmax);
+
+	for (int i = 0; i < axctr->leftdim(); ++i)
+	{
+		memset(buf, 0, bufsize);
+		nos::format_buffer(buf, "axsets: lims: {},{},{} sfpos: {},{} gain: {}\r\n",
+		         axctr->settings[i].limits_enabled,
+		         axctr->settings[i].backlim,
+		         axctr->settings[i].forwlim,
+		         axctr->settings[i].sfpos.spos,
+		         axctr->settings[i].sfpos.fpos,
+		         axctr->settings[i].gain
+		        );
+		strncat(output, buf, outmax);
+	}
+
+	return 0;
+}
+
+static inline
+int incmov(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
+{
+	if (argc != axctr->leftdim())
+	{
+		snprintf(output, outmax, "Can't use %d coord for %d leftdim() axisctr", argc, axctr->leftdim());
+		return -1;
+	}
+
+	int dim = axctr->leftdim();
+	position_t dist[dim];
+
+	for (int i = 0; i < dim; ++i)
+	{
+		dist[i] = atof(argv[i]);
+	}
+
+	return axctr->incmove(discrete_time(), dist);
+}
+
+static inline
+int absmov(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
+{
+	if (argc != axctr->leftdim())
+	{
+		snprintf(output, outmax, "Can't use %d coord for %d leftdim() axisctr", argc, axctr->leftdim());
+		return -1;
+	}
+
+	int dim = axctr->leftdim();
+	position_t pos[dim];
+
+	for (int i = 0; i < dim; ++i)
+	{
+		pos[i] = atof(argv[i]);
+	}
+	return axctr->absmove(discrete_time(), pos);
+}
+
+static inline
+int stop(axis_controller * axctr, int, char **, char *, int)
+{
+	return axctr->stop(discrete_time());
+}
+
+static inline
+int hardstop(axis_controller * axctr, int, char **, char *, int)
+{
+	return axctr->hardstop(discrete_time());
+}
+
+int axis_controller::command(int argc, char ** argv, char * output, int outmax)
+{
+	int status = ENOENT;
+
+	if (strcmp("bind", argv[0]) == 0)
+		status = bind(this, argc - 1, argv + 1, output, outmax);
+
+	else if (strcmp("help", argv[0]) == 0)
+		status = help(output, outmax);
+
+	else if (strcmp("info", argv[0]) == 0)
+		status = ::info(this, argc - 1, argv + 1, output, outmax);
+
+	else if (strcmp("absmove", argv[0]) == 0 || strcmp(argv[0], "mov") == 0)
+		status = absmov(this, argc - 1, argv + 1, output, outmax);
+
+	else if (strcmp("incmove", argv[0]) == 0 || strcmp(argv[0], "incmov") == 0)
+		status = incmov(this, argc - 1, argv + 1, output, outmax);
+
+	else if (strcmp("stop", argv[0]) == 0)
+		status = ::stop(this, argc - 1, argv + 1, output, outmax);
+
+	else if (strcmp("hardstop", argv[0]) == 0)
+		status = ::hardstop(this, argc - 1, argv + 1, output, outmax);
+
+	else if (strcmp("setvel", argv[0]) == 0 || strcmp(argv[0], "setspd") == 0)
+		status = setvel(this, argc - 1, argv + 1, output, outmax);
+
+	else if (strcmp("setacc", argv[0]) == 0)
+		status = setacc(this, argc - 1, argv + 1, output, outmax);
+
+	else if (strcmp("setdcc", argv[0]) == 0)
+		status = setdcc(this, argc - 1, argv + 1, output, outmax);
+
+	else if (strcmp("setgain", argv[0]) == 0)
+		status = setgain(this, argc - 1, argv + 1, output, outmax);
+
+	else if (strcmp("setlim", argv[0]) == 0)
+		status = setlim(this, argc - 1, argv + 1, output, outmax);
+
+	else if (strcmp("feed", argv[0]) == 0)
+		status = feed(this, argc - 1, argv + 1, output, outmax);
+
+	else if (strcmp("name", argv[0]) == 0)
+	{
+		snprintf(output, outmax, "%s\r\n", name().data());
+		status = 0;
+	}
+
+	if (status == ENOENT)
+		snprintf(output, outmax, "axisctr: Command is not found\r\n");
+
+	return status;
+}
+
+int axis_controller::help(char * output, int outmax)
+{
+	snprintf(output, outmax,
+	         "bind\r\n"
+	         "info\r\n"
+	         "absmove\r\n"
+	         "incmove\r\n"
+	         "stop\r\n"
+	         "hardstop\r\n"
+	         "setvel\r\n"
+	         "setacc\r\n"
+	         "setdcc\r\n"
+	         "setgain\r\n"
+	        );
+
+	return 0;
 }

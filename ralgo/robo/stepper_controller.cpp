@@ -40,7 +40,11 @@ int stepper_controller::shift(int64_t shift)
 {
 	if (ABS(shift) >= units_in_step) 
 	{
-		ralgo::warn("overrun");
+		char buf0[16];
+		char buf1[16];
+		sprintf(buf0, "%ld ", shift);
+		sprintf(buf1, "%ld ", units_in_step);
+		ralgo::warn("overrun ", buf0, buf1);
 		return STEPCTR_OVERRUN;
 	}
 
@@ -69,8 +73,8 @@ int stepper_controller::shift(int64_t shift)
 }
 
 int stepper_controller::speed_apply(
-    float speed,
-    float delta
+    double speed,
+    double delta
     // дискретное время дано с плавающей точкой,
     // чтобы можно было передавать интервалы времени
     // меньше disctime

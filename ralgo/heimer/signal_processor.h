@@ -18,6 +18,7 @@
 namespace heimer
 {
 	extern struct dlist_head signal_processor_list;
+	extern bool debug_activations;
 
 	class signal_processor
 	{
@@ -30,14 +31,15 @@ namespace heimer
 		uint8_t _leftdim;
 		uint8_t _rightdim;
 
+	protected:
 		union
 		{
 			uint8_t flags;
 			struct
 			{
 				uint8_t active : 1;
-				uint8_t need_activation : 1;
 				uint8_t dynamic_resources : 1;
+				uint8_t is_axisctr : 1;
 			} f;
 		};
 
@@ -46,6 +48,7 @@ namespace heimer
 		signal_processor(const char * name, int ldim, int rdim);
 		void rebind();
 		void set_name(const char * name);
+		bool is_axisctr() { return f.is_axisctr; }
 
 		uint8_t leftdim();
 		uint8_t rightdim();
@@ -81,8 +84,6 @@ namespace heimer
 		igris::buffer name();
 		void release_signals();
 
-		bool need_activation();
-
 		virtual signal_head * leftsig(int i);
 		virtual signal_head * rightsig(int i);
 		virtual void set_leftsig(int i, signal_head *);
@@ -103,8 +104,6 @@ namespace heimer
 
 		void set_dynamic_resources_flag(bool en);
 		bool is_dynamic_resources();
-
-		void set_need_activation(bool en);
 
 		friend class signal_head;
 	};
