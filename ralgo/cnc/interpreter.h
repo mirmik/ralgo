@@ -8,75 +8,82 @@
 
 #include <ralgo/cnc/planblock.h>
 #include <ralgo/cnc/defs.h>
+#include <ralgo/log.h>
 
 #include <nos/print.h>
 #include <nos/fprint.h>
 
 namespace cnc
 {
-	class token
+	struct interpreter_control_task
 	{
+		double poses[NMAX_AXES];
+		double feed;
+		double acc;
 
+		void parse(char ** argv, int argc)
+		{
+			memset(poses, 0, sizeof(poses));
+
+			for (int i = 0; i < argc; ++i)
+			{
+				char symb = argv[i][0];
+				double val = atof(&argv[i][1]);
+
+				switch (symb)
+				{
+					case 'F' : feed = val; continue;
+					case 'X' : poses[0] = val; continue;
+					case 'Y' : poses[1] = val; continue;
+					case 'Z' : poses[2] = val; continue;
+					case 'A' : poses[3] = val; continue;
+					case 'B' : poses[4] = val; continue;
+					case 'C' : poses[5] = val; continue;
+					case 'S' : poses[6] = val; continue;
+					case 'T' : poses[7] = val; continue;
+					case 'V' : poses[8] = val; continue;
+				}
+			}
+		}
+
+		template<class O>
+		int print_to(O& os) const
+		{
+			return nos::fprint_to(os, "{},{}", igris::array_view(poses, NMAX_AXES), feed);
+		}
+
+		void strinfo(char * ans, int ansmax) 
+		{
+			nos::format_buffer(ans, "{}", *this);
+		}
 	};
+
 
 	class interpreter
 	{
 		static constexpr char alphabet[9] =
 		{ 'X', 'Y', 'Z', 'A', 'B', 'C', 'S', 'T', 'V' };
 
-		struct control_task
-		{
-			double poses[NMAX_AXES];
-			double feed;
-
-			void parse(char ** argv, int argc)
-			{
-				memset(poses, 0, sizeof(poses));
-
-				for (int i = 0; i < argc; ++i)
-				{
-					char symb = argv[i][0];
-					double val = atof(&argv[i][1]);
-
-					switch (symb)
-					{
-						case 'F' : feed = val; continue;
-						case 'X' : poses[0] = val; continue;
-						case 'Y' : poses[1] = val; continue;
-						case 'Z' : poses[2] = val; continue;
-						case 'A' : poses[3] = val; continue;
-						case 'B' : poses[4] = val; continue;
-						case 'C' : poses[5] = val; continue;
-						case 'S' : poses[6] = val; continue;
-						case 'T' : poses[7] = val; continue;
-						case 'V' : poses[8] = val; continue;
-					}
-				}
-			}
-
-			template<class O>
-			int print_to(O& os) const
-			{
-				return nos::fprint_to(os, "{},{}", igris::array_view(poses, NMAX_AXES), feed);
-			}
-		};
-
 	public:
+		bool info_mode = false;
+
 		int total_axes = 3;
 		double final_positions[NMAX_AXES];
 		igris::ring<planner_block> * blocks;
-		double revolver_frequency;
+		double revolver_frequency = 0;
 		double gains[NMAX_AXES];
 
 		int blockno = 0;
-		double task_acc = 1;
+		
+		double saved_acc = 1;
+		double saved_feed = 1;
 	public:
 
 		interpreter(igris::ring<planner_block> * blocks) : blocks(blocks)
 		{
 			memset(final_positions, 0, sizeof(final_positions));
 			for (auto & gain : gains)
-				gain = 1;
+				gain = 1000;
 		}
 
 		void evaluate_multipliers(double * multipliers, int64_t * steps)
@@ -94,14 +101,22 @@ namespace cnc
 			}
 		}
 
-		void command_g1(int argc, char ** argv)
+		void command_G1(int argc, char ** argv, char* ans, int ansmax)
 		{
-			control_task task;
+			interpreter_control_task task;
+			memset(&task, 0, sizeof(task));
+
+			task.feed = saved_feed;
+			task.acc = saved_acc;
 			task.parse(argv, argc);
 
-			auto & block = blocks->head_place();
+			if (task.feed == 0 || task.acc == 0) 
+			{
+				ralgo::warn("nullvelocity block. ignore.");
+				return;
+			}
 
-			assert(task.feed != 0);
+			auto & block = blocks->head_place();
 
 			int64_t steps[NMAX_AXES];
 			double dists[NMAX_AXES];
@@ -119,7 +134,7 @@ namespace cnc
 
 			double vecgain = sqrt(Saccum) / sqrt(saccum);
 			double feed = task.feed * vecgain;
-			double acc = task_acc * vecgain;
+			double acc = task.acc * vecgain;
 
 			double reduced_feed = feed / revolver_frequency;
 			double reduced_acc = acc / (revolver_frequency * revolver_frequency);
@@ -133,37 +148,56 @@ namespace cnc
 			                multipliers);
 			block.blockno = blockno++;
 
+			if (info_mode) 
+			{
+				ralgo::info("interpreter: add new block");
+			}
+
 			system_lock();
 			blocks->move_head_one();
 			system_unlock();
 		}
 
-		void g_command(int argc, char ** argv)
+		void command_M204(int argc, char ** argv, char* ans, int ansmax) 
+		{
+			if (argc == 0) 
+			{
+				nos::format_buffer(ans, "{}", saved_acc);
+				return;
+			}
+
+			saved_acc = atof64(argv[0], nullptr);
+		}
+
+		void g_command(int argc, char ** argv, char * ans, int ansmax)
 		{
 			int cmd = atoi(&argv[0][1]);
 			switch (cmd)
 			{
-				case 1: command_g1(argc - 1, argv + 1); break;
+				case 1: command_G1(argc - 1, argv + 1, ans, ansmax); break;
+				default:
+					snprintf(ans, ansmax, "Unresolved G command");
 			}
 		}
 
-		void m_command(int argc, char ** argv)
+		void m_command(int argc, char ** argv, char * ans, int ansmax)
 		{
-			(void) argc;
-			(void) argv;
+			int cmd = atoi(&argv[0][1]);
+			switch (cmd)
+			{
+				case 204: command_M204(argc - 1, argv + 1, ans, ansmax); break;
+				default:
+					snprintf(ans, ansmax, "Unresolved M command");
+			}
+
 		}
 
-		void newline(const char * line, size_t size)
+		int command(int argc, char** argv, char* ans, int ansmax)
 		{
-			char buf[48];
-			memcpy(buf, line, size);
-			buf[size] = 0;
-
-			char * argv[10];
-			int argc = argvc_internal_split(buf, argv, size);
+			assert(revolver_frequency != 0);
 
 			if (argc == 0)
-				return;
+				return 0;
 
 			char cmdsymb = argv[0][0];
 
@@ -171,22 +205,47 @@ namespace cnc
 			{
 				case 'G':
 				{
-					g_command(argc, argv);
+					g_command(argc, argv, ans, ansmax);
 					break;
 				}
 
 				case 'M':
 				{
-					m_command(argc, argv);
+					m_command(argc, argv, ans, ansmax);
 					break;
 				}
 			}
+
+			return 0;
+		}
+
+		void newline(const char * line, size_t size)
+		{
+			char buf[48];
+			char ans[48];
+			memcpy(buf, line, size);
+			buf[size] = 0;
+
+			char * argv[10];
+			int argc = argvc_internal_split(buf, argv, size);
+
+			command(argc, argv, ans, 48);
 		}
 
 		void newline(const std::string & line)
 		{
 			newline(line.data(), line.size());
 		}
+
+		void set_revolver_frequency(double freq) 
+		{
+			revolver_frequency = freq;
+		} 
+
+		void set_axes_count(int total) 
+		{
+			total_axes = total;
+		} 
 	};
 }
 

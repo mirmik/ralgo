@@ -30,26 +30,31 @@ namespace cnc
 	 * */
 	class revolver
 	{
-	private:
-		int64_t iteration_counter;
+	public:
+		bool info_mode = false;
 
+	private:
+		bool first_iteration_label = false; 
+		bool all_blocks_resolved = true; 
+
+		int64_t iteration_counter;
 		igris::ring<cnc::control_shift> * shifts_ring;
 
-		robo::stepper ** steppers;
-		int steppers_total;
+		robo::stepper ** steppers = nullptr;
+		int steppers_total = 0;
 
 	public:
 		revolver(igris::ring<cnc::control_shift> * ring) :
 			shifts_ring(ring)
 		{}
 
-		void set_steppers(robo::stepper ** steppers_table, int size) 
+		void set_steppers(robo::stepper ** steppers_table, int size)
 		{
 			steppers = steppers_table;
 			steppers_total = size;
 		}
 
-		int queue_size() 
+		int queue_size()
 		{
 			int size;
 
@@ -83,10 +88,36 @@ namespace cnc
 
 		void serve()
 		{
+
+			if (first_iteration_label == false)
+			{
+				assert(steppers);
+
+				first_iteration_label = true;
+				if (info_mode)
+				{
+					ralgo::info("revolver: first start. success");
+				}
+			}
+
 			// В общем случае ring_empty не атомарен. Однако, здесь должен
 			// быть контекст приоритетного прерывания.
-			if (shifts_ring->empty())
+			if (shifts_ring->empty()) 
+			{
+				if (all_blocks_resolved == false) 
+				{
+					all_blocks_resolved = true;
+					if (info_mode) 
+					{
+						ralgo::info("revolver: all blocks resolved");
+					}
+				} 
 				return;
+			}
+			else 
+			{
+				all_blocks_resolved = false;
+			}
 
 			//int idx = shifts_ring->tail_index();
 			auto & shift = shifts_ring->tail();
@@ -100,6 +131,7 @@ namespace cnc
 					continue;
 
 				bool dir = shift.direction & mask;
+
 				if (dir)
 					steppers[i]->inc();
 				else
