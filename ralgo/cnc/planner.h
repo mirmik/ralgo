@@ -10,6 +10,7 @@
 #include <igris/container/ring.h>
 #include <igris/sync/syslock.h>
 
+#include <ralgo/log.h>
 #include <nos/print.h>
 
 #define NMAX_AXES 10
@@ -38,6 +39,9 @@ namespace cnc
 	class planner
 	{
 	public:
+		bool info_mode = false;
+		bool first_iteration_label = false;
+
 		int64_t iteration_counter = 0;
 		int64_t * reference_position; /// < для внутреннего контроля
 
@@ -98,15 +102,11 @@ namespace cnc
 
 		void synchronize_finished_block(planner_block & block)
 		{
-			nos::println("synchronize finished block");
 			for (int i = 0; i < total_axes; ++i)
 			{
 				synced_steps[i] += block.steps[i];
-				PRINT(block.steps[i]);
-				nos::println("steps", i, synced_steps[i], steps[i]);
 			}
 		}
-
 
 		void fixup_postactive_blocks()
 		{
@@ -115,6 +115,10 @@ namespace cnc
 				if (!blocks->tail().is_active_or_postactive(iteration_counter))
 				{
 					synchronize_finished_block(blocks->tail());
+					if (info_mode)
+					{
+						ralgo::info("planner: discard_finished_block");
+					}
 					blocks->pop();
 				}
 
@@ -122,16 +126,14 @@ namespace cnc
 					break;
 			}
 
-			// TODO: remove assertation
 			if (active_block == nullptr && !has_postactive_blocks())
 			{
 				for (int i = 0; i < total_axes; ++i)
 				{
 					assert(steps[i] == synced_steps[i]);
-					PRINT(dda_counters[i]);
 				}
-				nos::println("OK!!!!");
-				exit(0);
+				if (info_mode)
+					ralgo::info("planner: all blocks resolved");
 			}
 		}
 
@@ -166,11 +168,16 @@ namespace cnc
 		{
 			static int waited = 0;
 
+			if (info_mode)
+			{
+				ralgo::info("planner: change_active_block");
+			}
+
 			if (active_block &&
 			        has_postactive_blocks() == 0 &&
 			        iteration_counter == active_block->active_finish_ic)
 			{
-				nos::println("normalize time");
+				//TODO: normalize time
 			}
 
 			if (active_block)
@@ -197,6 +204,15 @@ namespace cnc
 		int serve()
 		{
 			int final;
+
+			if (first_iteration_label == false)
+			{
+				first_iteration_label = true;
+				if (info_mode)
+				{
+					ralgo::info("planner: first start. success");
+				}
+			}
 
 			system_lock();
 			int room = shifts->room();
@@ -239,6 +255,42 @@ namespace cnc
 			for (int i = blocks->tail_index(); i != active; i = blocks->fixup_index(i + 1))
 				blocks->get(i).append_accelerations(
 				    accelerations, total_axes, iteration_counter);
+		}
+
+		/// В этой фазе расчитывается программе револьвера
+		/// на основе интегрирования ускорений и скоростей.
+		void iteration_planning_phase()
+		{
+			revolver_t mask, step = 0, dir = 0;
+
+			for (int i = 0; i < total_axes; ++i)
+			{
+				mask = (1 << i);
+
+				dda_counters[i] +=
+				    velocities[i] + //* delta +
+				    accelerations[i] * 0.5; //* delta_sqr_div_2;
+
+				if (dda_counters[i] > 0.9)
+				{
+					dda_counters[i] -= 1;
+					steps[i] += 1;
+
+					dir |= mask;
+					step |= mask;
+				}
+				else if (dda_counters[i] < -0.9)
+				{
+					dda_counters[i] += 1;
+					steps[i] -= 1;
+
+					dir |= mask;
+				}
+				velocities[i] += accelerations[i];// * delta;
+			}
+			shifts->emplace(dir, step);
+
+			iteration_counter++;
 		}
 
 		int iteration()
@@ -296,37 +348,13 @@ namespace cnc
 				count_of_reevaluation++;
 			}
 
-			revolver_t mask, step = 0, dir = 0;
-
-			for (int i = 0; i < total_axes; ++i)
-			{
-				mask = (1 << i);
-
-				dda_counters[i] +=
-				    velocities[i] + //* delta +
-				    accelerations[i] * 0.5; //* delta_sqr_div_2;
-
-				if (dda_counters[i] > 0.9)
-				{
-					dda_counters[i] -= 1;
-					steps[i] += 1;
-
-					dir |= mask;
-					step |= mask;
-				}
-				else if (dda_counters[i] < -0.9)
-				{
-					dda_counters[i] += 1;
-					steps[i] -= 1;
-
-					dir |= mask;
-				}
-				velocities[i] += accelerations[i];// * delta;
-			}
-			shifts->emplace(dir, step);
-
-			iteration_counter++;
+			iteration_planning_phase();
 			return 0;
+		}
+
+		void set_axes_count(int total) 
+		{
+			total_axes = total;
 		}
 	};
 }

@@ -40,11 +40,7 @@ int stepper_controller::shift(int64_t shift)
 {
 	if (ABS(shift) >= units_in_step) 
 	{
-		char buf0[16];
-		char buf1[16];
-		sprintf(buf0, "%ld ", shift);
-		sprintf(buf1, "%ld ", units_in_step);
-		ralgo::warn("overrun ", buf0, buf1);
+		ralgo::warn("overrun ");
 		return STEPCTR_OVERRUN;
 	}
 
