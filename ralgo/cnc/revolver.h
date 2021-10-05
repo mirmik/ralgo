@@ -5,9 +5,11 @@
 
 #include <igris/container/ring.h>
 #include <igris/sync/syslock.h>
+#include <igris/util/numconvert.h>
 
 #include <ralgo/robo/stepper.h>
 #include <ralgo/cnc/shift.h>
+#include <ralgo/log.h>
 
 namespace cnc
 {
