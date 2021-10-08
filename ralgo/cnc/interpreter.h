@@ -5,6 +5,7 @@
 #include <igris/container/array_view.h>
 #include <igris/datastruct/argvc.h>
 #include <igris/sync/syslock.h>
+#include <igris/util/numconvert.h>
 
 #include <ralgo/cnc/planblock.h>
 #include <ralgo/cnc/defs.h>
