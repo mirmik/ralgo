@@ -122,7 +122,7 @@ int main(int argc, char ** argv)
 	interpreter.gains[1] = 4194304./10000.;
 	interpreter.gains[2] = 4194304./10000.;
 
-	interpreter.task_acc = 10;
+	interpreter.saved_acc = 10;
 	interpreter.revolver_frequency = 10000;
 	interpreter.newline("G01 X2 F5");
 	interpreter.newline("G01 Y2 F5");

@@ -8,6 +8,7 @@
 
 #include <ralgo/robo/stepper.h>
 #include <ralgo/cnc/shift.h>
+#include <ralgo/log.h>
 
 namespace cnc
 {
