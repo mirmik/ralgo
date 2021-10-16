@@ -16,7 +16,7 @@ TEST_CASE("fft")
 	 freqs.resize((1<<8) / 2);
 	 ralgo::signal::rfftfreq(freqs.data(), 1<<8, (1.)/(1<<8));
 }
-
+/*
 TEST_CASE("fft.2") 
 {
 	std::vector<double> freqs;
@@ -29,8 +29,8 @@ TEST_CASE("fft.2")
 	 CHECK_EQ(ret.size(), 128);
 
 	 nos::println(ret);
-}
-
+}*/
+/*
 TEST_CASE("fft.2") 
 {
 	std::vector<double> freqs;
@@ -42,3 +42,4 @@ TEST_CASE("fft.2")
 
 	 CHECK_EQ(ret.size(), 65536);
 }
+*/

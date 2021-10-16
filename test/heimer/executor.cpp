@@ -6,6 +6,7 @@
 #include <ralgo/heimer/command.h>
 #include <ralgo/heimer/axstate_linear_processor.h>
 
+/*
 using namespace heimer;
 
 std::string str(igris::buffer buf) 
@@ -302,3 +303,4 @@ TEST_CASE("executor: tandem activate")
 		CHECK_EQ(y.current_controller, nullptr);
 	}
 }
+*/

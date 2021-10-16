@@ -2,6 +2,7 @@
 #include <ralgo/heimer/axisctr.h>
 #include <ralgo/heimer/command.h>
 
+/*
 static int a = 0;
 
 using namespace heimer;
@@ -136,3 +137,4 @@ TEST_CASE("axisctr_concurent")
 	CHECK_EQ(axctr0.ctrpos_external(0), 200);
 	CHECK_EQ(a, 2);
 }
+*/

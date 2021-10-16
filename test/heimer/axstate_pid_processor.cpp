@@ -3,7 +3,7 @@
 #include <ralgo/heimer/axis_stub_processor.h>
 #include <ralgo/heimer/command.h>
 
-
+/*
 TEST_CASE("axstate_pid_processor")
 {
 	heimer::heimer_reinit();
@@ -40,3 +40,4 @@ TEST_CASE("axstate_pid_processor")
 
 	CHECK_EQ(x.ctrpos, doctest::Approx(10));
 }
+*/
