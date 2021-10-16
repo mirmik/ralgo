@@ -152,7 +152,7 @@ int heimer::executor_class::exec(disctime_t curtime)
 
 heimer::executor_class::~executor_class()
 {
-	if (f.dynamic)
+	if (u.f.dynamic)
 		delete[] order_table;
 }
 
@@ -164,7 +164,7 @@ void heimer::executor_class::allocate_order_table(int size)
 	order_table = new signal_processor * [size];
 	order_table_size = 0;
 	order_table_capacity = size;
-	f.dynamic = 1;
+	u.f.dynamic = 1;
 }
 
 #if HEIMER_CROW_SUPPORT
@@ -203,7 +203,7 @@ void heimer::executor_class::notify()
 #endif
 
 heimer::executor_class heimer::executor;
-int heimer::executor_command(int argc, char ** argv, char * output, int maxsize)
+int heimer::executor_command(int, char ** argv, char * output, int maxsize)
 {
 	int status = ENOENT;
 

@@ -13,8 +13,8 @@ TEST_CASE("axstate_linear_processor")
 	axis_state * right[] = { &c, &d };
 
 
-	float matrix[] = { 2, 0.5, 0, 1 }; 
-	float inverse_matrix[4];
+	double matrix[] = { 2, 0.5, 0, 1 }; 
+	double inverse_matrix[4];
 
 	axstate_linear_processor linproc(
 		"linproc",

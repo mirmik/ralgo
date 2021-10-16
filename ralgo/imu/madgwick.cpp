@@ -6,7 +6,7 @@ namespace ralgo
     madgwick::madgwick()
     {}
 
-    void madgwick::setKoeff(float _sampleFreq, float _beta)
+    void madgwick::set_koeffs(float _sampleFreq, float _beta)
     {
         beta = _beta;
         sampleFreq = _sampleFreq;

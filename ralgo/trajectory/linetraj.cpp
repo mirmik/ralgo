@@ -85,8 +85,8 @@ void line_trajectory::set_point_hold(
     disctime_t ftim,
     position_t * pos)
 {
-	ftim = ftim;
-	stim = ftim - 1;
+	this->ftim = ftim;
+	this->stim = ftim - 1;
 
 	for (int i = 0; i < dim; ++i)
 	{

@@ -6,13 +6,13 @@ int axstate_sincos_processor::serve(disctime_t time)
 {
 	(void) time;
 
-	struct axis_state * xl = leftside[0];
-	struct axis_state * yl = leftside[1];
-	struct axis_state * al = leftside[2];
+	axis_state * xl = leftside[0];
+	axis_state * yl = leftside[1];
+	axis_state * al = leftside[2];
 
-	struct axis_state * xr = rightside[0];
-	struct axis_state * yr = rightside[1];
-	struct axis_state * ar = rightside[2];
+	axis_state * xr = rightside[0];
+	axis_state * yr = rightside[1];
+	axis_state * ar = rightside[2];
 
 	double ascale = alpha_to_radian_scale;
 
@@ -36,13 +36,13 @@ int axstate_sincos_processor::feedback(disctime_t time)
 {
 	(void) time;
 
-	struct axis_state * xl = leftside[0];
-	struct axis_state * yl = leftside[1];
-	struct axis_state * al = leftside[2];
+	axis_state * xl = leftside[0];
+	axis_state * yl = leftside[1];
+	axis_state * al = leftside[2];
 
-	struct axis_state * xr = rightside[0];
-	struct axis_state * yr = rightside[1];
-	struct axis_state * ar = rightside[2];
+	axis_state * xr = rightside[0];
+	axis_state * yr = rightside[1];
+	axis_state * ar = rightside[2];
 
 	double ascale = alpha_to_radian_scale;
 

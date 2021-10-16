@@ -163,7 +163,7 @@ namespace ralgo
 		template <class A, class B>
 		value_t<A> inner_product (A&& a, B&& b)
 		{
-			value_t<A> acc;
+			value_t<A> acc = {};
 			for (unsigned int i = 0; i < a.size(); i++)
 			{
 				acc += a[i] * b[i];
@@ -178,7 +178,7 @@ namespace ralgo
 
 			size_t idx = start;
 
-			for (int i = 0; i < size; ++i)
+			for (unsigned int i = 0; i < size; ++i)
 			{
 				dst[i] = src[idx];
 				idx += stride;

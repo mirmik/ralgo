@@ -76,12 +76,12 @@ void axis_controller::set_controlled(axis_state ** state)
 
 void axis_controller::finish_trajectory(disctime_t time, position_t * ctrpos)
 {
-	f.operation_finished_flag = 1;
+	u.f.operation_finished_flag = 1;
 	if (operation_finish_handler)
 		operation_finish_handler(operation_handlers_priv, this);
 	lintraj.set_point_hold(time, ctrpos);
 	curtraj = &lintraj;
-	f.release_control_flag = 1;
+	u.f.release_control_flag = 1;
 }
 
 int axis_controller::feedback(disctime_t)
@@ -94,9 +94,9 @@ int axis_controller::serve(disctime_t time)
 	position_t ctrpos[leftdim()];
 	velocity_t ctrvel[leftdim()];
 
-	if (f.release_control_flag)
+	if (u.f.release_control_flag)
 	{
-		f.release_control_flag = 0;
+		u.f.release_control_flag = 0;
 		_deactivate(time);
 		return 0;
 	}
@@ -126,7 +126,7 @@ int axis_controller::serve(disctime_t time)
 		settings[i].controlled->ctrvel = ctrvel[i] * discrete_time_frequency();
 	}
 
-	if (sts && !f.operation_finished_flag)
+	if (sts && !u.f.operation_finished_flag)
 	{
 		finish_trajectory(time, ctrpos);
 	}
@@ -177,11 +177,11 @@ int axis_controller::_absmove(
 	                           tgtpos,
 	                           acc_time,
 	                           dcc_time,
-	                           f.spattern_enabled
+	                           u.f.spattern_enabled
 	                          );
 
-	f.operation_finished_flag = 0;
-	f.release_control_flag = 0;
+	u.f.operation_finished_flag = 0;
+	u.f.release_control_flag = 0;
 	if (operation_start_handler)
 		operation_start_handler(operation_handlers_priv, this);
 	curtraj = &lintraj;
@@ -257,14 +257,14 @@ axis_controller * heimer::create_axis_controller(const char * name, int dim)
 {
 	axis_settings * settings = new axis_settings[dim];
 	axis_controller * ptr = new heimer::axis_controller(name, settings, dim);
-	ptr->f.dynamic_resources = 1;
+	ptr->u.f.dynamic_resources = 1;
 	return ptr;
 }
 
 void axis_controller::allocate_resources()
 {
 	settings = new axis_settings[leftdim()];
-	f.dynamic_resources = 1;
+	u.f.dynamic_resources = 1;
 }
 
 void axis_controller::release_controlled()
@@ -352,8 +352,8 @@ int axis_controller::stop(disctime_t curtim)
 	    curtim,
 	    stoptime);
 
-	f.operation_finished_flag = 0;
-	f.release_control_flag = 0;
+	u.f.operation_finished_flag = 0;
+	u.f.release_control_flag = 0;
 	if (operation_start_handler)
 		operation_start_handler(operation_handlers_priv, this);
 	curtraj = &lintraj;
@@ -398,9 +398,7 @@ void axis_controller::_init()
 	vel = 0;
 	acc = 0;
 	dcc = 0;
-
-	flags = 0;
-	signal_processor::f.is_axisctr = 1;
+	signal_processor::u.f.is_axisctr = 1;
 
 	operation_start_handler = NULL;
 	operation_finish_handler = NULL;
@@ -515,7 +513,7 @@ int setlim(axis_controller * axctr, int argc, char ** argv, char * output, int o
 }
 
 static inline
-int feed(axis_controller * axctr, int argc, char ** argv, char * output, int outmax)
+int feed(axis_controller * axctr, int, char **, char * output, int)
 {
 	for (int i = 0; i < axctr->leftdim(); ++i)
 	{
@@ -643,10 +641,10 @@ int info(axis_controller * axctr, int argc, char ** argv, char * output, int out
 
 	memset(buf, 0, bufsize);
 	snprintf(buf, bufsize, "flags: opfinished:%d, releaseflag:%d, dynamic:%d, spattern:%d\r\n",
-	         axctr->f.operation_finished_flag,
-	         axctr->f.release_control_flag,
-	         axctr->f.dynamic_resources,
-	         (uint8_t)axctr->f.spattern_enabled);
+	         axctr->u.f.operation_finished_flag,
+	         axctr->u.f.release_control_flag,
+	         axctr->u.f.dynamic_resources,
+	         (uint8_t)axctr->u.f.spattern_enabled);
 	strncat(output, buf, outmax);
 
 	for (int i = 0; i < axctr->leftdim(); ++i)

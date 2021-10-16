@@ -124,7 +124,7 @@ namespace heimer
 			_deactivate(time);
 		}
 
-		bool on_interrupt(disctime_t time)
+		bool on_interrupt(disctime_t time) override
 		{
 			interrupt_situation = true;
 			ralgo::warn("chainproc : on_interrupt handle");

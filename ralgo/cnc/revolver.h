@@ -38,8 +38,6 @@ namespace cnc
 	private:
 		bool first_iteration_label = false; 
 		bool all_blocks_resolved = true; 
-
-		int64_t iteration_counter;
 		igris::ring<cnc::control_shift> * shifts_ring;
 
 		robo::stepper ** steppers = nullptr;

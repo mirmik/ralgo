@@ -113,12 +113,12 @@ void fixed_frequency_stepper_controller::set_velocity(double speed)
 	system_unlock();
 }
 
-void stepper_controller::info(char* buf, int len)
+void stepper_controller::info(char*, int)
 {
 	//nos::format_buffer(buf, "_control_pos: {}\r\n_virtual_pos:{}\r\n");
 }
 
-void fixed_frequency_stepper_controller::info(char* buf, int len)
+void fixed_frequency_stepper_controller::info(char* buf, int)
 {
 	//char sbuf[48];
 	//stepper_controller::info(buf, len);

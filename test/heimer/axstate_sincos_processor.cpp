@@ -13,11 +13,11 @@ TEST_CASE("axstate_sincos_processor")
 	{
 		heimer_reinit();
 
-		struct axis_state xl("xl"), yl("yl"), al("al"), xr("xr"), yr("yr"), ar("ar");
-		struct signal_head * left[] = { &xl, &yl, &al };
-		struct signal_head * right[] = { &xr, &yr, &ar };
+		axis_state xl("xl"), yl("yl"), al("al"), xr("xr"), yr("yr"), ar("ar");
+		signal_head * left[] = { &xl, &yl, &al };
+		signal_head * right[] = { &xr, &yr, &ar };
 
-		float angle = 60.f;
+		double angle = 60.f;
 
 		xr.ctrpos = heimdist(10.f);
 		yr.ctrpos = heimdist(20.f);
@@ -83,14 +83,14 @@ TEST_CASE("axstate_sincos_processor")
 	{
 		heimer_reinit();
 
-		struct axis_state xl("xl"), yl("yl"), al("al"), xr("xr"), yr("yr"), ar("ar");
-		struct signal_head * left[] = { &xl, &yl, &al };
-		struct signal_head * right[] = { &xr, &yr, &ar };
+		axis_state xl("xl"), yl("yl"), al("al"), xr("xr"), yr("yr"), ar("ar");
+		signal_head * left[] = { &xl, &yl, &al };
+		signal_head * right[] = { &xr, &yr, &ar };
 
 
-		float angle = 60.f;
+		double angle = 60.f;
 
-		struct axstate_sincos_processor scproc("axproc");
+		axstate_sincos_processor scproc("axproc");
 		scproc.set_radius(heimdist(10.f));
 		scproc.set_leftside(left);
 		scproc.set_rightside(right);

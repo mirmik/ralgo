@@ -59,7 +59,7 @@ namespace ralgo
 	struct op_not_eq
 	{
 		template<class A, class B>          auto operator()(const A& a, const B& b) const { return a != b; }
-		template<class A, class B, class T> auto operator()(const A& a, const B& b, T epsilon) const { return a != b; }
+		template<class A, class B, class T> auto operator()(const A& a, const B& b, T epsilon) const { return std::abs(a - b) >= epsilon; }
 	};
 
 	struct op_and { template<class A, class B> bool operator()(const A& a, const B& b) const { return a && b; } };
@@ -102,7 +102,7 @@ namespace ralgo
 	template<class T>
 	struct optional_vector_resize_helper<T, 0>
 	{
-		static void doit(T& a, int arg) {}
+		static void doit(T&, int) {}
 	};
 
 	template<class T>

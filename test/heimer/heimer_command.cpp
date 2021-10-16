@@ -43,7 +43,7 @@ TEST_CASE("command")
 	CHECK_EQ(sts, 0);
 	CHECK_NE(strlen(buf), 0);
 
-	struct signal_head * sig = signal_get_by_name("x");
+	signal_head * sig = signal_get_by_name("x");
 	sig->info(
 		buf, 
 		96);

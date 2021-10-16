@@ -34,15 +34,14 @@ TEST_CASE("executor")
 
 	axis_state * linproc_left[] = {&state00, &state01};
 	axis_state * linproc_right[] = {&state10, &state11};
-	float linproc_matrix[4] = { 1, 0, 0, 1 };
-	float linproc_inverse_matrix[4];
+	double linproc_matrix[4] = { 1, 0, 0, 1 };
+	double linproc_inverse_matrix[4];
 	axstate_linear_processor linproc("linproc", 2, linproc_left, linproc_right, 
 		linproc_matrix, linproc_inverse_matrix);
 	linproc.attach_axes_from_tables();
 
 	signal_processor * executor_table[10];
 
-	heimer::executor executor;	
 	executor.set_order_table(executor_table, 10, 0);
 	executor.append_processor(&xstub);
 	executor.append_processor(&ystub);
@@ -95,8 +94,8 @@ TEST_CASE("executor: tandem sort")
 
 	axis_state * linproc_left[] =  { &x,  &y};
 	axis_state * linproc_right[] = {&vx, &vy};
-	float linproc_matrix[4] = { 1, 0, 0, 1 };
-	float linproc_inverse_matrix[4];
+	double linproc_matrix[4] = { 1, 0, 0, 1 };
+	double linproc_inverse_matrix[4];
 	axstate_linear_processor linproc("linproc", 2, 
 		linproc_left, 
 		linproc_right, 
@@ -106,7 +105,6 @@ TEST_CASE("executor: tandem sort")
 
 	signal_processor * executor_table[10];
 
-	heimer::executor executor;	
 	executor.set_order_table(executor_table, 10, 0);
 	executor.append_processor(&xctr);
 	executor.append_processor(&yctr);
@@ -166,15 +164,14 @@ TEST_CASE("executor: tandem activate")
 
 	axis_state * linproc_left[] =  { &x,  &y};
 	axis_state * linproc_right[] = {&vx, &vy};
-	float linproc_matrix[4] = { 1, 0, 0, 1 };
-	float linproc_inverse_matrix[4];
+	double linproc_matrix[4] = { 1, 0, 0, 1 };
+	double linproc_inverse_matrix[4];
 	axstate_linear_processor linproc("linproc", 2, linproc_left, linproc_right, 
 		linproc_matrix, linproc_inverse_matrix);
 	linproc.attach_axes_from_tables();
 
 	signal_processor * executor_table[10];
 
-	heimer::executor executor;	
 	executor.set_order_table(executor_table, 10, 0);
 	executor.append_processor(&xctr);
 	executor.append_processor(&yctr);

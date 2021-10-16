@@ -25,8 +25,8 @@ namespace heimer
     public:
         axstate_linear_processor() = default;
         axstate_linear_processor(const char * name, int dim,
-                                 struct axis_state ** leftside,
-                                 struct axis_state ** rightside,
+                                 axis_state ** leftside,
+                                 axis_state ** rightside,
                                  double * matrix,
                                  double * invert_matrix);
         axstate_linear_processor(const char * name, int dim);

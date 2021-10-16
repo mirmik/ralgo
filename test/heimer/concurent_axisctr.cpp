@@ -7,7 +7,7 @@ static int a = 0;
 using namespace heimer;
 
 static inline
-void finish_handler(void *, struct axis_controller *)
+void finish_handler(void *, axis_controller *)
 {
 	++a;
 }
@@ -19,13 +19,13 @@ TEST_CASE("axisctr_concurent")
 	int sts;
 	double tgt;
 
-	struct axis_state state("state");
+	axis_state state("state");
 
-	struct axis_settings settings0;
-	struct axis_controller axctr0("axctr0", &settings0, 1);
+	axis_settings settings0;
+	axis_controller axctr0("axctr0", &settings0, 1);
 
-	struct axis_settings settings1;
-	struct axis_controller axctr1("axctr1", &settings1, 1);
+	axis_settings settings1;
+	axis_controller axctr1("axctr1", &settings1, 1);
 	
 	axctr0.set_handlers(nullptr, nullptr, finish_handler);
 	axctr1.set_handlers(nullptr, nullptr, finish_handler);
@@ -44,7 +44,7 @@ TEST_CASE("axisctr_concurent")
 	axctr0.set_limits_external(&back, &forw);
 	axctr1.set_limits_external(&back, &forw);
 
-	struct axis_state * state_ptr = &state;
+	axis_state * state_ptr = &state;
 	axctr0.set_controlled(&state_ptr);
 	axctr1.set_controlled(&state_ptr);
 
@@ -77,8 +77,8 @@ TEST_CASE("axisctr_concurent")
 	CHECK_EQ(axctr1.ctrpos_external(0), 100);
 	CHECK_EQ(a, 1);
 
-	CHECK_EQ(axctr0.f.release_control_flag, 1);
-	CHECK_EQ(axctr1.f.release_control_flag, 0);
+	CHECK_EQ(axctr0.u.f.release_control_flag, 1);
+	CHECK_EQ(axctr1.u.f.release_control_flag, 0);
 	
 	CHECK_EQ(state.current_controller, &axctr0);
 	
@@ -89,8 +89,8 @@ TEST_CASE("axisctr_concurent")
 	axctr0.serve(12.1 * discrete_time_frequency());
 	axctr1.serve(12.1 * discrete_time_frequency());
 
-	CHECK_EQ(axctr0.f.release_control_flag, 0);
-	CHECK_EQ(axctr1.f.release_control_flag, 0);
+	CHECK_EQ(axctr0.u.f.release_control_flag, 0);
+	CHECK_EQ(axctr1.u.f.release_control_flag, 0);
 
 	CHECK_EQ(state.current_controller, nullptr);
 

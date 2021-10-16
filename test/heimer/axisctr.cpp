@@ -9,7 +9,7 @@ using namespace heimer;
 static int a = 0;
 
 static inline
-void finish_handler(void *, struct axis_controller *)
+void finish_handler(void *, axis_controller *)
 {
 	++a;
 }
@@ -32,7 +32,7 @@ TEST_CASE("axisctr")
 	double forw = 100, back = -100;
 	axctr.set_limits_external(&back, &forw);
 
-	struct axis_state * state_ptr = &state;
+	axis_state * state_ptr = &state;
 	axctr.set_controlled(&state_ptr);
 	double tgt = 100;
 	sts = axctr.incmove(0, &tgt);
@@ -163,9 +163,9 @@ TEST_CASE("axisctr_stop")
 
 	int sts;
 
-	struct axis_state state("state");
-	struct axis_settings settings[1];
-	struct axis_controller axctr("axctr", settings, 1);
+	axis_state state("state");
+	axis_settings settings[1];
+	axis_controller axctr("axctr", settings, 1);
 
 	axctr.set_handlers(nullptr, nullptr, finish_handler);
 	double gain = 1000; axctr.set_gain(&gain);
@@ -176,7 +176,7 @@ TEST_CASE("axisctr_stop")
 	double back[2] = { -100, -100 };
 	axctr.set_limits_external(back, forw);
 
-	struct axis_state * states[] = { &state };
+	axis_state * states[] = { &state };
 	axctr.set_controlled(states);
 
 	double tgt[] = { 100, 100 };

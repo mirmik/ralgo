@@ -21,14 +21,14 @@ namespace heimer
 		int count_of_axstates = 0;
 		bool allowed_to_execution = false;
 
-		union 
+		union union_t
 		{
 			uint8_t flags = 0;
-			struct 
+			struct flags_t 
 			{
 				uint8_t dynamic : 1;
 			} f;
-		};
+		} u;
 
 #if HEIMER_CROW_SUPPORT
 		crow::publisher coordinate_publisher;

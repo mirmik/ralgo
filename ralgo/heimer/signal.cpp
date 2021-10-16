@@ -128,7 +128,7 @@ void signal_head::rebind()
 	dlist_add_tail(&list_lnk, &signals_list);
 }
 
-int signal_head::activate(struct signal_processor * proc, disctime_t tim)
+int signal_head::activate(signal_processor * proc, disctime_t tim)
 {
 	if (current_controller)
 	{
@@ -163,7 +163,7 @@ int signal_head::activate(struct signal_processor * proc, disctime_t tim)
 	return 0;
 }
 
-int signal_head::deactivate(struct signal_processor * proc, disctime_t time)
+int signal_head::deactivate(signal_processor * proc, disctime_t time)
 {
 	if (proc != current_controller)
 		return -1;

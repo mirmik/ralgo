@@ -32,23 +32,24 @@ namespace heimer
 		uint8_t _rightdim;
 
 	protected:
-		union
+		union union_t
 		{
 			uint8_t flags;
-			struct
+			struct flags_t
 			{
 				uint8_t active : 1;
 				uint8_t dynamic_resources : 1;
 				uint8_t is_axisctr : 1;
 			} f;
-		};
+		} u;
 
 	public:
+		signal_processor() = default;
 		signal_processor(int ldim, int rdim);
 		signal_processor(const char * name, int ldim, int rdim);
 		void rebind();
 		void set_name(const char * name);
-		bool is_axisctr() { return f.is_axisctr; }
+		bool is_axisctr() { return u.f.is_axisctr; }
 
 		uint8_t leftdim();
 		uint8_t rightdim();

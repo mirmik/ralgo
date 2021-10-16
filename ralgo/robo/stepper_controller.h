@@ -111,7 +111,7 @@ namespace robo
 		void(*interrupt_handle)(void*, int) = nullptr;
 		void * interrupt_priv = nullptr;
 
-	private:
+	public:
 		double speed_to_shift = 1;
 		double freq = 1;
 		int64_t current_shift = 0;

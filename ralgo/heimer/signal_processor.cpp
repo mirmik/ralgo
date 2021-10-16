@@ -23,7 +23,7 @@ signal_processor::signal_processor(const char * name, int ldim, int rdim)
 	_rightdim = rdim;
 	set_name(name);
 	rebind();
-	this->flags = 0;
+	this->u.flags = 0;
 }
 
 signal_processor::signal_processor(int ldim, int rdim)
@@ -85,7 +85,7 @@ int signal_processor::activate(disctime_t curtim)
 
 	if (success)
 	{
-		f.active = 1;
+		u.f.active = 1;
 		on_activate(curtim);
 
 		if (heimer::debug_activations)
@@ -113,7 +113,7 @@ int signal_processor::_deactivate(disctime_t curtim)
 		int err = iter->deactivate(this, curtim);
 		(void) err;
 	}
-	f.active = 0;
+	u.f.active = 0;
 	if (heimer::debug_activations)
 	{
 		ralgo::info("deactive:", name().data());
@@ -170,7 +170,7 @@ igris::buffer signal_processor::name()
 
 bool signal_processor::is_active()
 {
-	return f.active;
+	return u.f.active;
 }
 
 void signal_processor::on_activate(disctime_t)
@@ -178,12 +178,12 @@ void signal_processor::on_activate(disctime_t)
 
 bool signal_processor::is_dynamic_resources()
 {
-	return f.dynamic_resources;
+	return u.f.dynamic_resources;
 }
 
 void signal_processor::set_dynamic_resources_flag(bool en)
 {
-	f.dynamic_resources = en;
+	u.f.dynamic_resources = en;
 }
 
 void signal_processor::release_signals()

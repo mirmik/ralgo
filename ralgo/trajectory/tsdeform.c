@@ -134,7 +134,6 @@ double tsdeform_posmod(tsdeform_t * tsd, double t)
 		{
 			if (t < t01 / 2)
 			{
-				t = t;
 				return v0 * t + b * t * t * t / 6;;
 			}
 			else
@@ -216,7 +215,6 @@ double tsdeform_spdmod(tsdeform_t * tsd, double t)
 		{
 			if (t < t01 / 2)
 			{
-				t = t;
 				return b * t * t / 2;
 			}
 			else

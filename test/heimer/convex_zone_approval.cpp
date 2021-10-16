@@ -5,7 +5,7 @@ using namespace heimer;
 
 TEST_CASE("convex_zone_approval") 
 {
-	struct convex_zone_approval cza;
+	convex_zone_approval cza;
 	double table[64];
 
 	cza.init(2);

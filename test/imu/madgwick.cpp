@@ -13,7 +13,7 @@ TEST_CASE("madgwick")
 
 	SUBCASE("a")
 	{
-		madgwick.setKoeff(100, 10);
+		madgwick.set_koeffs(100, 10);
 
 		madgwick.reset(linalg::rotation_quat<float>({0., 0., 1.}, 0));
 		madgwick.update(0, 0, 0, 0, 0, -1, 1, 0, 0);

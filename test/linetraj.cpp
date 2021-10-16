@@ -3,7 +3,7 @@
 
 TEST_CASE("line trajectory") 
 {
-	struct line_trajectory ltraj;
+	line_trajectory ltraj;
 	position_t pos;
 	velocity_t   vel;
 

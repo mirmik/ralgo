@@ -21,7 +21,6 @@ namespace ralgo
 		// Точность может существенно влиять на время.
 		auto epsilon = 0.0000001;
 
-		float tgtnorm = target.norm();
 		float vnorms[dim];
 		Alg vnormalized[dim];
 
