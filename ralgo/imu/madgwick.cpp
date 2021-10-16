@@ -310,33 +310,33 @@ namespace ralgo
         return getRollRad() * RAD_TO_DEG;
     }
 
-    void madgwick::ZYX(float *z, float *y, float *x)
+    void madgwick::ZYX(float &z, float &y, float &x)
     {
-        *z = atan2(q1 * q2 + q3 * q0, 0.5 - q2 * q2 - q3 * q3);
-        *y = - asin(2 * (q1 * q3 - q2 * q0));
-        *x = atan2(q2 * q3 + q1 * q0, 0.5 - q1 * q1 - q2 * q2);
+        z = atan2(q1 * q2 + q3 * q0, 0.5 - q2 * q2 - q3 * q3);
+        y = - asin(2 * (q1 * q3 - q2 * q0));
+        x = atan2(q2 * q3 + q1 * q0, 0.5 - q1 * q1 - q2 * q2);
     }
 
     linalg::vec<float,3> madgwick::ZYX()
     {
         linalg::vec<float,3> ret;
-        ZYX(&ret[0], &ret[1], &ret[2]);
+        ZYX(ret[0], ret[1], ret[2]);
         return ret;
     }
 
 
-    void madgwick::ZYZ(float *z, float *y, float *z2)
+    void madgwick::ZYZ(float &z, float &y, float &z2)
     {
-        *z = atan2(q2 * q3 - q1 * q0, q1 * q3 + q2 * q0);
-        *y = acos(1 - 2 * (q1 * q1 + q2 * q2));
-        *z2 = -atan2(q2 * q3 + q1 * q0, q1 * q3 - q2 * q0);
+        z = atan2(q2 * q3 - q1 * q0, q1 * q3 + q2 * q0);
+        y = acos(1 - 2 * (q1 * q1 + q2 * q2));
+        z2 = -atan2(q2 * q3 + q1 * q0, q1 * q3 - q2 * q0);
     }
 
-    void madgwick::ZYZ_u(float *z, float *y, float *z2)
+    void madgwick::ZYZ_u(float &z, float &y, float &z2)
     {
-        *z = atan2(q1 * q2 + q3 * q0, 0.5 - (q2 * q2 + q3 * q3));
-        *y = acos(1 - 2 * (q1 * q1 + q2 * q2));
-        *z2 = -atan2(q2 * q3 + q1 * q0, q1 * q3 - q2 * q0);
+        z = atan2(q1 * q2 + q3 * q0, 0.5 - (q2 * q2 + q3 * q3));
+        y = acos(1 - 2 * (q1 * q1 + q2 * q2));
+        z2 = -atan2(q2 * q3 + q1 * q0, q1 * q3 - q2 * q0);
     }
 
     linalg::vec<float, 3> madgwick::horizon_projection(const linalg::vec<float, 3> & vec) 
