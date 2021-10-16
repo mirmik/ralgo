@@ -79,9 +79,9 @@ namespace ralgo
         float getRollDeg();
         float getYawDeg();
 
-        void ZYX(float *z, float *y, float *x);
-        void ZYZ(float *z, float *y, float *z2);
-        void ZYZ_u(float *z, float *y, float *z2);
+        void ZYX(float &z, float &y, float &x);
+        void ZYZ(float &z, float &y, float &z2);
+        void ZYZ_u(float &z, float &y, float &z2);
 
         linalg::vec<float,3> ZYX();
 
