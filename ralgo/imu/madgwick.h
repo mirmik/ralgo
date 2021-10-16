@@ -46,7 +46,7 @@ namespace ralgo
         void reset(const linalg::vec<float,4> & q) 
         { q0 = q.w; q1 = q.x; q2 = q.y; q3 = q.z; }
 
-        void setKoeff(float sampleFreq, float beta);
+        void set_koeffs(float sampleFreq, float beta);
 
         void update_magnetic_reference_direction(float umx, float umy, float umz);
 

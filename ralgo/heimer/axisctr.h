@@ -28,30 +28,30 @@ namespace heimer
 		acceleration_t dcc = 0.1;
 
 	public:
-		union
+		union union_t
 		{
 			uint8_t flags;
-			struct
+			struct flags_t
 			{
 				uint8_t operation_finished_flag : 1;
 				uint8_t release_control_flag : 1;
 				uint8_t dynamic_resources : 1;
 				uint8_t spattern_enabled : 1;
 			} f;
-		};
+		} u;
 
 
 		void (* operation_start_handler)(void * priv, axis_controller * ax);
 		void (* operation_finish_handler)(void * priv, axis_controller * ax);
 		void * operation_handlers_priv;
 
-		struct line_trajectory lintraj;
-		struct trajectory * curtraj;
+		line_trajectory lintraj;
+		trajectory * curtraj;
 
-		struct axisctr_approval ** approvals;
+		axisctr_approval ** approvals;
 		int approvals_total;
 
-		struct axis_settings * settings;
+		axis_settings * settings;
 
 	public:
 		axis_controller(const char * name, axis_settings * setings, int dim);
@@ -66,7 +66,7 @@ namespace heimer
 		signal_head * iterate_left(signal_head *) override;
 		signal_head * iterate_right(signal_head *) override;
 
-		void deinit(struct signal_processor * sigproc);
+		void deinit(signal_processor * sigproc);
 
 		void set_handlers(
 		    void * operation_handlers_priv,
@@ -87,7 +87,7 @@ namespace heimer
 		double external_acceleration();
 		double external_decceleration();
 
-		void set_controlled(struct axis_state ** state);
+		void set_controlled(axis_state ** state);
 		void release_controlled();
 
 		int incmove(disctime_t current_time, const double * dist_real);

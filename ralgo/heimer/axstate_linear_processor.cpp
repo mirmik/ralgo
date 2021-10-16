@@ -175,8 +175,8 @@ void axstate_linear_processor::evaluate_invertion()
 
 
 heimer::axstate_linear_processor::axstate_linear_processor(const char * name, int _dim,
-        struct axis_state ** leftside,
-        struct axis_state ** rightside,
+        axis_state ** leftside,
+        axis_state ** rightside,
         double * matrix,
         double * invert_matrix)
 	: axstate_signal_processor(name, _dim, _dim)

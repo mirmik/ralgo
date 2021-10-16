@@ -18,6 +18,7 @@ licant.module("ralgo.signal",
 
 licant.module("ralgo",
 	sources=[
+		"ralgo/global_protection.cpp",
 		"ralgo/imu/madgwick.cpp",
 		"ralgo/log/log.cpp",
 		"ralgo/trajectory/tsdeform.c",
@@ -26,7 +27,6 @@ licant.module("ralgo",
 
 		"ralgo/robo/stepper_controller.cpp",
 		
-		"ralgo/oldheimer/*.cpp",
 		"ralgo/heimer/axisctr.cpp",
 		"ralgo/heimer/velocity_applier.cpp",
 		"ralgo/heimer/signal_processor.cpp",
@@ -62,6 +62,10 @@ licant.module("ralgo",
 		"ralgo.disctime",
 		"ralgo.signal"
 	],
+)
+
+licant.module("ralgo.oldheimer",
+	source=["ralgo/oldheimer/*.cpp",]
 )
 
 licant.module("f2clib.internal",

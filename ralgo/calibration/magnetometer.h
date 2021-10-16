@@ -15,9 +15,6 @@ namespace ralgo
 		int yaw_total;
 		int pitch_total; // Количество уровней без учёта вершин.
 
-		float yaw_step;
-		float pitch_step;
-
 		linalg::vec<float, 3> * points_array; // (size : yaw_total + pitch_total + 2)
 
 	public:

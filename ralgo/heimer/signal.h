@@ -7,10 +7,12 @@
 #include <errno.h>
 #include <ralgo/disctime.h>
 
+
 #define SIGNAL_NAME_MAX_LENGTH 12
 
 namespace heimer
 {
+	class signal_processor;
 	extern struct dlist_head signals_list;
 
 	class signal_head
@@ -27,11 +29,11 @@ namespace heimer
 
 		/// Процессор, который сейчас контолирует этот сигнал.
 		/// Активируется при активации контроллера и отключается в ином случае.
-		struct signal_processor * current_controller = nullptr;
+		signal_processor * current_controller = nullptr;
 
 		/// Процессор, который слушает этот сигнал.
 		/// Устанавливается во время биндинга и потом не меняется.
-		struct signal_processor * listener = nullptr;
+		signal_processor * listener = nullptr;
 
 		uint8_t sorting_mark; /// < Метка для алгоритма сортировки (см. executor)
 

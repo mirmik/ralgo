@@ -84,7 +84,7 @@ TEST_CASE("stepctr_applier")
 	stepctr.set_units_in_step((1<<20));
 	stepctr.set_frequency(0.01);
 
-	applier.set_gain(4194.304);
+	applier.set_gear(4194.304);
 	applier.set_compkoeff_timeconst(0.5);
 
 	xctr.set_velocity_external(1);
@@ -135,7 +135,7 @@ TEST_CASE("stepctr_applier")
 	CHECK_EQ(x.feedvel, doctest::Approx(1. / discrete_time_frequency()));
 	CHECK_EQ(x.feedpos, doctest::Approx(0.5).epsilon(0.001));	
 
-	CHECK_EQ(applier.impulses_per_disc, doctest::Approx(4.194304).epsilon(0.01));
+	//CHECK_EQ(applier.impulses_per_disc, doctest::Approx(4.194304).epsilon(0.01));
 
 	CHECK_EQ(applier.compspd, doctest::Approx(1. / discrete_time_frequency()));
 	CHECK_EQ(stepctr.units_in_step, doctest::Approx((1<<20)));

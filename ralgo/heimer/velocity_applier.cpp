@@ -107,7 +107,7 @@ int velocity_applier::feedback(disctime_t time)
 	return 0;
 }
 
-int velocity_applier::info(char * ans, int anslen)
+int velocity_applier::info(char * ans, int)
 {
 	static char stepctr_info[256];
 	stepctr->info(stepctr_info, 256);

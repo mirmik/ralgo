@@ -11,8 +11,8 @@ namespace heimer
 	class axstate_signal_processor : public signal_processor
 	{
 	private:
-		struct axis_state ** _leftside = nullptr;
-		struct axis_state ** _rightside = nullptr;
+		axis_state ** _leftside = nullptr;
+		axis_state ** _rightside = nullptr;
 
 	public:
 		axstate_signal_processor() = default;

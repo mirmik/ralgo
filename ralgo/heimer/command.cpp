@@ -315,7 +315,7 @@ int siglist(int, char **, char * output, int maxsize)
 }
 
 static
-int stepsim(int argc, char ** argv, char * output, int maxsize)
+int stepsim(int argc, char ** argv, char *, int)
 {
 	for (int i = 0; i < argc; ++i) 
 	{
@@ -338,7 +338,7 @@ int execcmd(int argc, char ** argv, char * output, int maxsize)
 }
 
 static
-int confcmd(int argc, char ** argv, char * output, int maxsize) 
+int confcmd(int, char ** argv, char *, int) 
 {
 	if (strcmp(argv[0], "debugacts") == 0)
 	{

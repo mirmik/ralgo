@@ -6,6 +6,7 @@
 #define RALGO_HEIMER_POSITION_APPLIER
 
 #include <ralgo/heimer/signal_processor.h>
+#include <ralgo/heimer/axis_state.h>
 #include <ralgo/heimer/phase_signals.h>
 #include <ralgo/robo/iposvel.h>
 

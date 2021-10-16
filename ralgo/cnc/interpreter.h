@@ -4,6 +4,7 @@
 #include <igris/container/ring.h>
 #include <igris/container/array_view.h>
 #include <igris/datastruct/argvc.h>
+#include <igris/util/numconvert.h>
 #include <igris/sync/syslock.h>
 
 #include <ralgo/cnc/planblock.h>
@@ -52,7 +53,7 @@ namespace cnc
 			return nos::fprint_to(os, "{},{}", igris::array_view(poses, NMAX_AXES), feed);
 		}
 
-		void strinfo(char * ans, int ansmax) 
+		void strinfo(char * ans, int) 
 		{
 			nos::format_buffer(ans, "{}", *this);
 		}
@@ -101,7 +102,7 @@ namespace cnc
 			}
 		}
 
-		void command_G1(int argc, char ** argv, char* ans, int ansmax)
+		void command_G1(int argc, char ** argv, char*, int)
 		{
 			interpreter_control_task task;
 			memset(&task, 0, sizeof(task));
@@ -158,7 +159,7 @@ namespace cnc
 			system_unlock();
 		}
 
-		void command_M204(int argc, char ** argv, char* ans, int ansmax) 
+		void command_M204(int argc, char ** argv, char* ans, int) 
 		{
 			if (argc == 0) 
 			{
