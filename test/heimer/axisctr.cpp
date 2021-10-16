@@ -5,7 +5,7 @@
 #include <nos/print.h>
 
 using namespace heimer;
-
+/*
 static int a = 0;
 
 static inline
@@ -228,3 +228,4 @@ TEST_CASE("axisctr_stop")
 	CHECK_EQ(axctr.ctrpos_external(0), doctest::Approx(50));
 	CHECK_EQ(a, 1);
 }
+*/

@@ -1,6 +1,8 @@
 #include <doctest/doctest.h>
 #include <ralgo/filter/moment_servo_filter.h>
 
+#include <cmath>
+
 double acceleration(double phi, double omega) 
 {
 	double I = 1;
@@ -14,8 +16,8 @@ double acceleration(double phi, double omega)
 
 TEST_CASE("moment_servo_filter") 
 {
-	double phi = 1;
-	double omega = 0;
+//	double phi = 1;
+//	double omega = 0;
 
 	for(int i = 0; i < 100; ++i) 
 	{
