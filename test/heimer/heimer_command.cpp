@@ -7,7 +7,7 @@
 
 #include <string.h>
 #include <string_view>
-
+/*
 using namespace heimer;
 
 TEST_CASE("command")
@@ -70,3 +70,4 @@ TEST_CASE("command")
 
 	CHECK_EQ(heimer::signal_processors_count(), 4);
 }
+*/
