@@ -23,10 +23,12 @@ namespace ralgo
 			return N;
 		}
 
-		void push(T val)
+		T push(T val)
 		{
 			ring_counter_increment(&counter, 1);
+			T ret = data[ring_counter_get(&counter)];
 			data[ring_counter_get(&counter)] = val;
+			return ret;
 		}
 
 		/// Получить элемент z*i, где z - дискретный оператор.

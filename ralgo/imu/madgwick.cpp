@@ -13,6 +13,14 @@ namespace ralgo
         invSampleFreq = (1.0f / _sampleFreq);
     }
 
+    void madgwick::quat(float& x, float& y, float& z, float& w) 
+    {
+        x = q1;
+        y = q2;
+        z = q3;
+        w = q0;
+    }
+
     void madgwick::reset()
     {
         q0 = 1; q1 = q2 = q3 = 0;
