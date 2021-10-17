@@ -23,8 +23,6 @@ namespace ralgo
         float beta = 0;                // algorithm gain
         float sampleFreq = 0;
         float invSampleFreq = 0;
-
-        linalg::vec<float,4> q = {0,0,0,1};
     
         float q0=1;
         float q1=0;
@@ -38,6 +36,8 @@ namespace ralgo
 
         linalg::vec<float,4> quat()
         { return linalg::vec<float,4>(q1,q2,q3,q0); };
+
+        void quat(float& x, float& y, float& z, float& w);
         
         void reset();
         void reset(float _q0,float _q1,float _q2,float _q3) 
@@ -64,12 +64,9 @@ namespace ralgo
         void apply(float gx, float gy, float gz, float ax, float ay, float az);
         void apply(float gx, float gy, float gz);
 
-
         linalg::vec<float, 3> body2earth(const linalg::vec<float, 3> & vec);
         linalg::vec<float, 3> earth2body(const linalg::vec<float, 3> & vec);
-
         linalg::vec<float, 3> horizon_projection(const linalg::vec<float, 3> & vec);
-
         linalg::vec<float, 3> gravity_direction();
 
         float getPitchRad();
