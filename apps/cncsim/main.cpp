@@ -1,5 +1,5 @@
 #include <nos/input.h>
-#include <igris/systime.h>
+#include <igris/time/systime.h>
 
 #include <ralgo/cnc/revolver.h>
 #include <ralgo/cnc/planner.h>
