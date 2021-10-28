@@ -1,4 +1,4 @@
-#include <ralgo/oldheimer/protect.h>
+#include <ralgo/global_protection.h>
 
 #include <stdio.h>
 #include <stdlib.h>
