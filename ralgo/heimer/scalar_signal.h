@@ -3,17 +3,17 @@
 
 #include <ralgo/heimer/signal.h>
 
-namespace heimer 
+namespace heimer
 {
-	class scalar_signal : public signal_head
-	{
-	public:
-		double value;
+    class scalar_signal : public signal_head
+    {
+    public:
+        double value;
 
-	public:
-		scalar_signal(const char * name);
-		int info(char*, int) override;
-	};
+    public:
+        scalar_signal(const char *name);
+        int info(char *, int) override;
+    };
 }
 
 #endif

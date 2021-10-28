@@ -5,18 +5,18 @@
 
 #include <ralgo/heimer/types.h>
 
-namespace heimer 
+namespace heimer
 {
-	struct servo_wishfeed
-	{
-		real wishpos;
-		real wishspd;
-		//real wishacc;
+    struct servo_wishfeed
+    {
+        real wishpos;
+        real wishspd;
+        // real wishacc;
 
-		real feedctr;
-		real feedpos;
-		real feedspd;
-	};
+        real feedctr;
+        real feedpos;
+        real feedspd;
+    };
 }
 
 #endif

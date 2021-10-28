@@ -3,13 +3,12 @@
 
 #include <ralgo/robo/iposvel.h>
 
-namespace robo 
+namespace robo
 {
-	class pwmservo_controller : public i_position_driver
-	{
-		void set_position(double pos) override;
-
-	};
+    class pwmservo_controller : public i_position_driver
+    {
+        void set_position(double pos) override;
+    };
 }
 
 #endif

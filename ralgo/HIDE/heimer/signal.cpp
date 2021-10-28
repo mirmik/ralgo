@@ -1,9 +1,9 @@
 /** @file */
 
-#include <ralgo/heimer/signal.h>
 #include <igris/dprint.h>
+#include <ralgo/heimer/signal.h>
 
-void heimer::send_signal(int signal, void * source) 
+void heimer::send_signal(int signal, void *source)
 {
-	dprln("WARNING: %d", signal);
+    dprln("WARNING: %d", signal);
 }

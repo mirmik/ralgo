@@ -3,11 +3,11 @@
 
 #include <igris/datastruct/dlist.h>
 
-namespace heimer 
+namespace heimer
 {
-	void collect_axis_api();
-	int axises_api_command(int argc, char ** argv, char * ans, int anslen);
-	int igroups_api_command(int argc, char ** argv, char * ans, int anslen);
+    void collect_axis_api();
+    int axises_api_command(int argc, char **argv, char *ans, int anslen);
+    int igroups_api_command(int argc, char **argv, char *ans, int anslen);
 }
 
 #endif

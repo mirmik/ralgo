@@ -7,17 +7,13 @@
 
 namespace helix
 {
-	class phase_transformer 
-	{
-		std::vector<widewish_node_basic<Signal> *> workers;
+    class phase_transformer
+    {
+        std::vector<widewish_node_basic<Signal> *> workers;
 
-	public:
-
-		void create_wishfeed(const char * name) 
-		{
-			signals.emplace_back(name, );
-		}
-	};
+    public:
+        void create_wishfeed(const char *name) { signals.emplace_back(name, ); }
+    };
 }
 
 #endif

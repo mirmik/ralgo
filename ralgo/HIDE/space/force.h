@@ -3,14 +3,13 @@
 
 #include <ralgo/linalg/linalg.h>
 
-namespace rabbit 
+namespace rabbit
 {
-	template<class T>
-	struct force3 
-	{
-		linalg::vec<T,3> angfrc;
-		linalg::vec<T,3> linfrc;		
-	};
+    template <class T> struct force3
+    {
+        linalg::vec<T, 3> angfrc;
+        linalg::vec<T, 3> linfrc;
+    };
 }
 
 #endif

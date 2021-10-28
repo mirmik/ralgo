@@ -6,15 +6,11 @@
 
 namespace heimer
 {
-	class axisctr_approval
-	{
-	public:
-		virtual int check (
-		    int dim,
-		    position_t * strt,
-		    position_t * fini
-		) = 0;
-	};
+    class axisctr_approval
+    {
+    public:
+        virtual int check(int dim, position_t *strt, position_t *fini) = 0;
+    };
 }
 
 #endif

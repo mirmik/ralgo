@@ -5,12 +5,11 @@
 
 #include <ralgo/heimer/phaser.h>
 
-namespace heimer 
+namespace heimer
 {
-	class tim_phaser 
-	{
-		
-	};
+    class tim_phaser
+    {
+    };
 }
 
 #endif

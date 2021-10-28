@@ -3,35 +3,31 @@
 
 namespace ralgo
 {
-	template <class T>
-	class clamper
-	{
-		T lo = T();
-		T hi = T();
-		bool enabled = false;
+    template <class T> class clamper
+    {
+        T lo = T();
+        T hi = T();
+        bool enabled = false;
 
-	public:
-		clamper() = default;
-		
-		void set_limits(const T& lo, const T& hi) 
-		{
-			this->lo = lo;
-			this->hi = hi;
-		}
+    public:
+        clamper() = default;
 
-		void enable(bool en) 
-		{
-			enabled = en;
-		}
+        void set_limits(const T &lo, const T &hi)
+        {
+            this->lo = lo;
+            this->hi = hi;
+        }
 
-		T operator() (const T & x) 
-		{
-			if (!enabled)
-				return x;
+        void enable(bool en) { enabled = en; }
 
-			return std::clamp(x, lo, hi);
-		}
-	};
+        T operator()(const T &x)
+        {
+            if (!enabled)
+                return x;
+
+            return std::clamp(x, lo, hi);
+        }
+    };
 }
 
 #endif

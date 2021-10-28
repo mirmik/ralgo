@@ -5,28 +5,25 @@
 
 namespace heimer
 {
-	class convex_zone_approval : public axisctr_approval
-	{
-	public:
-		double * table;
-		int dim;
+    class convex_zone_approval : public axisctr_approval
+    {
+    public:
+        double *table;
+        int dim;
 
-		int points_total;
-		int points_capacity;
+        int points_total;
+        int points_capacity;
 
-		void init(int dim);
+        void init(int dim);
 
-		int check(
-		    int dim,
-		    position_t * strt,
-		    position_t * fini) override;
+        int check(int dim, position_t *strt, position_t *fini) override;
 
-		int room();
+        int room();
 
-		void bind_table(position_t * table, int cap, int size);
+        void bind_table(position_t *table, int cap, int size);
 
-		void extend(position_t * pnt, int size);
-	};
+        void extend(position_t *pnt, int size);
+    };
 }
 
 #endif

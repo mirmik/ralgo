@@ -5,12 +5,12 @@
 
 #define HEIMER_SIGNAL_WRONG_NODE_MODE -100
 
-using handler_ptr = void (*)(int signal, void * source);
+using handler_ptr = void (*)(int signal, void *source);
 
-namespace heimer 
+namespace heimer
 {
-	//extern std::pair<int, handler_ptr> signal_handlers;
-	void send_signal(int signal, void * source);
+    // extern std::pair<int, handler_ptr> signal_handlers;
+    void send_signal(int signal, void *source);
 }
 
 #endif
