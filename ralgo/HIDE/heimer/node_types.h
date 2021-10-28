@@ -7,7 +7,7 @@
 
 namespace heimer
 {
-	int node_typehint_cast(std::string_view name);
+    int node_typehint_cast(std::string_view name);
 }
 
 #endif

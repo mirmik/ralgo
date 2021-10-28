@@ -7,31 +7,27 @@
 
 namespace heimer
 {
-	template <class P, class V>
-	class stub_axis : public axis_node<P,V>
-	{
-		using parent = axis_node<P,V>;
+    template <class P, class V> class stub_axis : public axis_node<P, V>
+    {
+        using parent = axis_node<P, V>;
 
-	public:
-		stub_axis(const char * name) : parent(name) {}
+    public:
+        stub_axis(const char *name) : parent(name) {}
 
-		void feedback() 
-		{
-			parent::feedpos = parent::ctrpos;
-			parent::feedspd = parent::ctrspd;
-		}
+        void feedback()
+        {
+            parent::feedpos = parent::ctrpos;
+            parent::feedspd = parent::ctrspd;
+        }
 
-		P request_feedback_position() override
-		{
-			// Должна обновляться управляющим устройством
-			return axis_node<P, V>::feedpos;
-		}
+        P request_feedback_position() override
+        {
+            // Должна обновляться управляющим устройством
+            return axis_node<P, V>::feedpos;
+        }
 
-		void serve() 
-		{
-
-		}
-	};
+        void serve() {}
+    };
 }
 
 #endif

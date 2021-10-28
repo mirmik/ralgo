@@ -5,82 +5,80 @@
 
 namespace ralgo
 {
-	template <class V, class C>
-	V bilinear_interpolation(
-		const C & rkoeff, 
-		const C & ckoeff,
-		const V & lb,
-		const V & rb,
-		const V & lt,
-		const V & rt
-	) 
-	{
-		return 
-			(1-rkoeff)*(1-ckoeff) * lb +
-			(rkoeff)*(1-ckoeff) * rb + 	
-			(1-rkoeff)*(ckoeff) * lt +
-			(rkoeff)*(ckoeff) * rt;
-	}
+    template <class V, class C>
+    V bilinear_interpolation(const C &rkoeff, const C &ckoeff, const V &lb,
+                             const V &rb, const V &lt, const V &rt)
+    {
+        return (1 - rkoeff) * (1 - ckoeff) * lb + (rkoeff) * (1 - ckoeff) * rb +
+               (1 - rkoeff) * (ckoeff)*lt + (rkoeff) * (ckoeff)*rt;
+    }
 
-	template <class A, class B, class K>
-	auto lerp(A a, B b, K k)
-	{
-		return (1 - k) * a + k * b;
-	}
+    template <class A, class B, class K> auto lerp(A a, B b, K k)
+    {
+        return (1 - k) * a + k * b;
+    }
 
-	template <class A, class B, class U>
-	auto lerpkoeff(A left, B right, U target)
-	{
-		return ( target - left ) / ( right - left );
-	}
+    template <class A, class B, class U>
+    auto lerpkoeff(A left, B right, U target)
+    {
+        return (target - left) / (right - left);
+    }
 
-	template <class T>
-	class linspace
-	{
-		class linspace_iterator : public std::iterator<std::bidirectional_iterator_tag, T, T, T*, T&>
-		{
-			linspace * ls;
-			int p;
+    template <class T> class linspace
+    {
+        class linspace_iterator
+            : public std::iterator<std::bidirectional_iterator_tag, T, T, T *,
+                                   T &>
+        {
+            linspace *ls;
+            int p;
 
-		public:
-			linspace_iterator(linspace* ls, int p) : ls(ls), p(p) {}
-			T operator * () { return ls->operator[](p); }
-			linspace_iterator & operator++() { ++p; return *this; }
+        public:
+            linspace_iterator(linspace *ls, int p) : ls(ls), p(p) {}
+            T operator*() { return ls->operator[](p); }
+            linspace_iterator &operator++()
+            {
+                ++p;
+                return *this;
+            }
 
-			bool operator==(const linspace_iterator & oth) { return p == oth.p && ls == oth.ls; }
-			bool operator!=(const linspace_iterator & oth) { return p != oth.p || ls != oth.ls; }
-		};
+            bool operator==(const linspace_iterator &oth)
+            {
+                return p == oth.p && ls == oth.ls;
+            }
+            bool operator!=(const linspace_iterator &oth)
+            {
+                return p != oth.p || ls != oth.ls;
+            }
+        };
 
-		T a, b;
-		int points;
+        T a, b;
+        int points;
 
-	public:
-		linspace(T _a, T _b, int _points, bool endpoint = true) :
-			a(_a), b(_b), points(_points)
-		{
-			if (!endpoint)
-			{
-				T k = (T)(points-1) / (T)(points);
-				b = lerp(a,b,k);
-			}
-		}
+    public:
+        linspace(T _a, T _b, int _points, bool endpoint = true)
+            : a(_a), b(_b), points(_points)
+        {
+            if (!endpoint)
+            {
+                T k = (T)(points - 1) / (T)(points);
+                b = lerp(a, b, k);
+            }
+        }
 
-		T step()
-		{
-			return (b - a) / (points - 1);
-		}
+        T step() { return (b - a) / (points - 1); }
 
-		T operator[](int p)
-		{
-			T koeff = (T)p / (T)(points - 1);
-			return lerp(a, b, koeff);
-		}
+        T operator[](int p)
+        {
+            T koeff = (T)p / (T)(points - 1);
+            return lerp(a, b, koeff);
+        }
 
-		int size() const { return points; }
+        int size() const { return points; }
 
-		linspace_iterator begin() { return linspace_iterator(this, 0); }
-		linspace_iterator end() { return linspace_iterator(this, points); }
-	};
+        linspace_iterator begin() { return linspace_iterator(this, 0); }
+        linspace_iterator end() { return linspace_iterator(this, points); }
+    };
 }
 
 #endif

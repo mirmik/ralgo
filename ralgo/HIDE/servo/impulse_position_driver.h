@@ -7,26 +7,26 @@
 
 namespace ralgo
 {
-	//Класс управления шаговым двигателем или сервоусилителем.
-	template <typename P = float, typename V = float, typename A = float>
-	struct impulse_position_driver : public ralgo::position_driver<P, V, A>
-	{
-		// ralgo::position_reader<P> * posreader;
-		ralgo::impulse_writer<P, V> *impwriter;
+    //Класс управления шаговым двигателем или сервоусилителем.
+    template <typename P = float, typename V = float, typename A = float>
+    struct impulse_position_driver : public ralgo::position_driver<P, V, A>
+    {
+        // ralgo::position_reader<P> * posreader;
+        ralgo::impulse_writer<P, V> *impwriter;
 
-		double scale_factor;
+        double scale_factor;
 
-		void serve(const ralgo::phase<P, V, A> &phs) override
-		{
-			// P curpos = posreader->current_position();
-			P tgtpos = phs.pos;
-			V tgtspd = phs.spd;
+        void serve(const ralgo::phase<P, V, A> &phs) override
+        {
+            // P curpos = posreader->current_position();
+            P tgtpos = phs.pos;
+            V tgtspd = phs.spd;
 
-			// assert(tgtspd > 0);
+            // assert(tgtspd > 0);
 
-			impwriter->write(tgtpos * scale_factor, tgtspd * scale_factor);
-		}
-	};
+            impwriter->write(tgtpos * scale_factor, tgtspd * scale_factor);
+        }
+    };
 
 } // namespace ralgo
 

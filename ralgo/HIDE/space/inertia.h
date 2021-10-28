@@ -3,19 +3,19 @@
 
 #include <ralgo/linalg/linalg.h>
 
-namespace rabbit 
+namespace rabbit
 {
-	// Инерция тела обязательно задаётся в главных осях.
-	template<typename T>
-	struct hinertia3 
-	{
-		linalg::vec<T,3> moment;
-		T mass;
+    // Инерция тела обязательно задаётся в главных осях.
+    template <typename T> struct hinertia3
+    {
+        linalg::vec<T, 3> moment;
+        T mass;
 
-		inertia3(T moment, T mass) 
-			: moment(linalg::vec<T,3>(linalg::identity) * moment), 
-			mass(mass) {}	
-	};
+        inertia3(T moment, T mass)
+            : moment(linalg::vec<T, 3>(linalg::identity) * moment), mass(mass)
+        {
+        }
+    };
 }
 
 #endif

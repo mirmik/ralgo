@@ -3,9 +3,4 @@
 #include <string.h>
 #include <unistd.h>
 
-void ralgo::log(ralgo::LogLevel, 
-	const char *,
-	const char *,
-	const char *
-) 
-{}
+void ralgo::log(ralgo::LogLevel, const char *, const char *, const char *) {}

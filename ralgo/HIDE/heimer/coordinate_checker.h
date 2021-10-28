@@ -6,39 +6,39 @@
 #include <cmath>
 #include <cstdlib>
 
-#include <ralgo/linalg/linalg.h>
+#include <igris/container/array_view.h>
 #include <ralgo/geom/zone_check.h>
 #include <ralgo/heimer/interpolation_group.h>
-#include <igris/container/array_view.h>
+#include <ralgo/linalg/linalg.h>
 
 namespace heimer
 {
-	template <class P>
-	class coordinate_checker 
-	{
-		coordinate_checker * next = nullptr;
+    template <class P> class coordinate_checker
+    {
+        coordinate_checker *next = nullptr;
 
-	public:
-		bool check(control_node * dev, P * val, int dim, char * msgbuf) 
-		{
-			if (check_impl(dev, val, dim, msgbuf)) 
-			{
-				return true;
-			}
+    public:
+        bool check(control_node *dev, P *val, int dim, char *msgbuf)
+        {
+            if (check_impl(dev, val, dim, msgbuf))
+            {
+                return true;
+            }
 
-			if (next) 
-			{
-				return next->check(dev, val, dim, msgbuf);
-			}
+            if (next)
+            {
+                return next->check(dev, val, dim, msgbuf);
+            }
 
-			return false;
-		}
+            return false;
+        }
 
-		virtual bool check_impl(control_node * dev, P * val, int dim, char * msgbuf) = 0;
-		virtual int command(int argc, char ** argv) { return -1; }
+        virtual bool check_impl(control_node *dev, P *val, int dim,
+                                char *msgbuf) = 0;
+        virtual int command(int argc, char **argv) { return -1; }
 
-		void link_next(coordinate_checker * next) { this->next = next; }
-	};
+        void link_next(coordinate_checker *next) { this->next = next; }
+    };
 }
 
 #endif

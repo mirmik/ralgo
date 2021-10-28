@@ -1,8 +1,8 @@
 #ifndef RALGO_DISCRETE_TIME_H
 #define RALGO_DISCRETE_TIME_H
 
-#include <stdint.h>
 #include <igris/compiler.h>
+#include <stdint.h>
 
 #if __has_include(<asm/heimer_types.h>)
 #include <asm/heimer_types.h>
@@ -23,8 +23,8 @@ __END_DECLS
 
 namespace ralgo
 {
-	using ::discrete_time;
-	using ::discrete_time_frequency;
+    using ::discrete_time;
+    using ::discrete_time_frequency;
 }
 
 #endif

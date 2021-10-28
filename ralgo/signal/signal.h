@@ -2,7 +2,7 @@
 #define RALGO_SIGNAL_SIGNAL_H
 
 /**
-	@file
+    @file
 */
 
 #include <igris/util/bug.h>
@@ -12,64 +12,63 @@
 
 namespace ralgo
 {
-	namespace signal
-	{
-		/**
-			lerp_values строит значения функции, заданной на отрезках вектором точек vals/stamp,
-			в точках, заданных фектором keys. Значения точек линейно интерполируются. 
-		*/
+    namespace signal
+    {
+        /**
+            lerp_values строит значения функции, заданной на отрезках вектором
+           точек vals/stamp, в точках, заданных фектором keys. Значения точек
+           линейно интерполируются.
+        */
 
-		template<class VI, class SI, class KI, class RI>
-		static void lerp_values(
-		    VI vit, const VI vend,
-		    SI sit, const SI send,
-		    KI kit, const KI kend,
-		    RI rit)
-		{
-			SI sitnext = std::next(sit);
-			VI vitnext = std::next(vit);
+        template <class VI, class SI, class KI, class RI>
+        static void lerp_values(VI vit, const VI vend, SI sit, const SI send,
+                                KI kit, const KI kend, RI rit)
+        {
+            SI sitnext = std::next(sit);
+            VI vitnext = std::next(vit);
 
-			for (; kit != kend; kit++, rit++)
-			{
-				auto key = *kit;
+            for (; kit != kend; kit++, rit++)
+            {
+                auto key = *kit;
 
-				while(key - *sitnext >= ralgo::epsilon) { 
-					sit++; sitnext++; 
-					vit++; vitnext++;
-				
-					if (sitnext == send) 
-						BUG(); 
-				} 
+                while (key - *sitnext >= ralgo::epsilon)
+                {
+                    sit++;
+                    sitnext++;
+                    vit++;
+                    vitnext++;
 
-				auto vleft = *vit;
-				auto vright = *vitnext;
-				auto sleft = *sit;
-				auto sright = *sitnext;
-				auto lkoeff = ralgo::lerpkoeff(sleft, sright, key);
-				auto lerp = ralgo::lerp(vleft, vright, lkoeff);
+                    if (sitnext == send)
+                        BUG();
+                }
 
-				*rit = lerp;
-			}
-		}
+                auto vleft = *vit;
+                auto vright = *vitnext;
+                auto sleft = *sit;
+                auto sright = *sitnext;
+                auto lkoeff = ralgo::lerpkoeff(sleft, sright, key);
+                auto lerp = ralgo::lerp(vleft, vright, lkoeff);
 
-		template<class R=void, class V, class S, class K>
-		static defvec_t<R,V> lerp_values(const V& vals, const S& stamp, const K& keys)
-		{
-			defvec_t<R,V> r(keys.size());
+                *rit = lerp;
+            }
+        }
 
-			/*PRINT(vals);
-			PRINT(stamp);
-			PRINT(keys);*/
+        template <class R = void, class V, class S, class K>
+        static defvec_t<R, V> lerp_values(const V &vals, const S &stamp,
+                                          const K &keys)
+        {
+            defvec_t<R, V> r(keys.size());
 
-			lerp_values(
-			    vals.begin(), vals.end(),
-			    stamp.begin(), stamp.end(),
-			    keys.begin(), keys.end(),
-			    r.begin());
+            /*PRINT(vals);
+            PRINT(stamp);
+            PRINT(keys);*/
 
-			return r;
-		}
-	}
+            lerp_values(vals.begin(), vals.end(), stamp.begin(), stamp.end(),
+                        keys.begin(), keys.end(), r.begin());
+
+            return r;
+        }
+    }
 }
 
 #endif

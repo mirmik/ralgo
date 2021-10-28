@@ -4,18 +4,18 @@
 
 using namespace heimer;
 
-TEST_CASE("axis_stub_processor") 
+TEST_CASE("axis_stub_processor")
 {
-	axis_state axstate("a");
-	axis_stub_processor axstub("axstub");
+    axis_state axstate("a");
+    axis_stub_processor axstub("axstub");
 
-	axstate.ctrpos = 100;
+    axstate.ctrpos = 100;
 
-	axstub.bind(&axstate);
-	axstub.activate(0);
+    axstub.bind(&axstate);
+    axstub.activate(0);
 
-	axstub.serve(0);
-	axstub.feedback(0);
+    axstub.serve(0);
+    axstub.feedback(0);
 
-	CHECK_EQ(axstate.feedpos, 100);
+    CHECK_EQ(axstate.feedpos, 100);
 }

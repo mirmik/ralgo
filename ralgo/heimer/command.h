@@ -10,13 +10,13 @@
 
 namespace heimer
 {
-	int command(int argc, char ** argv, char * output, int maxsize, int * ret);
-	int command_exec_safe(const char * str, char * output, int maxsize, int * ret);
+    int command(int argc, char **argv, char *output, int maxsize, int *ret);
+    int command_exec_safe(const char *str, char *output, int maxsize, int *ret);
 
-	void heimer_reinit();
-	void heimer_system_init();
+    void heimer_reinit();
+    void heimer_system_init();
 
-	extern struct rshell_command * commands_table;
+    extern struct rshell_command *commands_table;
 }
 
 #endif

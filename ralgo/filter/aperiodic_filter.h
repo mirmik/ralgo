@@ -1,5 +1,5 @@
 /**
-	@file
+    @file
 */
 
 #ifndef RALGO_FILTER_APERIODIC_FILTER_H
@@ -9,43 +9,37 @@
 
 namespace ralgo
 {
-	template <class T>
-	class aperiodic_filter : public ralgo::inout<T, T>
-	{
-		T koeff;
-		T state;
+    template <class T> class aperiodic_filter : public ralgo::inout<T, T>
+    {
+        T koeff;
+        T state;
 
-	public:
-		aperiodic_filter() 
-		{}
+    public:
+        aperiodic_filter() {}
 
-		aperiodic_filter(T _koeff) : koeff(_koeff) 
-		{
+        aperiodic_filter(T _koeff) : koeff(_koeff) {}
 
-		}
+        aperiodic_filter(T delta, T time_constant)
+        {
+            set_koefficient(delta, time_constant);
+        }
 
-		T serve(const T & in)
-		{
-			state += (in - state) * koeff;
-			return state;
-		}
+        T serve(const T &in)
+        {
+            state += (in - state) * koeff;
+            return state;
+        }
 
-		T operator()(const T & in) override 
-		{
-			return serve(in);
-		}
+        T operator()(const T &in) override { return serve(in); }
 
-		void reset(T val)
-		{
-			state = val;
-		}
+        void reset(T val) { state = val; }
 
-		aperiodic_filter& set_koefficient(T delta, T time_constant) 
-		{
-			koeff = delta / time_constant;
-			return *this;
-		}
-	};
+        aperiodic_filter &set_koefficient(T delta, T time_constant)
+        {
+            koeff = delta / time_constant;
+            return *this;
+        }
+    };
 }
 
 #endif

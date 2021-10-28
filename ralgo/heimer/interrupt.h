@@ -5,7 +5,7 @@
 
 __BEGIN_DECLS
 
-void throw_interrupt(struct signal_processor * source, char * message);
+void throw_interrupt(struct signal_processor *source, char *message);
 
 __END_DECLS
 

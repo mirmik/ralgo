@@ -3,26 +3,19 @@
 
 namespace robo
 {
-	class stepper
-	{
-	protected:
-		int64_t counter = 0;
+    class stepper
+    {
+    protected:
+        int64_t counter = 0;
 
-	public:
-		virtual void inc() { ++counter; }
-		virtual void dec() { --counter; }
+    public:
+        virtual void inc() { ++counter; }
+        virtual void dec() { --counter; }
 
-		int64_t steps_count()
-		{
-			return counter;
-		}
+        int64_t steps_count() { return counter; }
 
-		void set_counter_value(int64_t val)
-		{
-			counter = val;
-		}
-
-	};
+        void set_counter_value(int64_t val) { counter = val; }
+    };
 }
 
 #endif
