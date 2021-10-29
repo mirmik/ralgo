@@ -37,7 +37,7 @@ namespace heimer
 
 		heimer::axis_node<P, V> * controlled;
 
-		ralgo::traj1d<P, V> *    curtraj = &lintraj;
+		ralgo::traj1d<P, V> *    curtraj = nullptr;
 		ralgo::traj1d_line<P, V> lintraj;
 
 		//bool _reversed = false;
@@ -313,6 +313,9 @@ namespace heimer
 			ralgo::warn("axisctr is_alarmed");
 			return;
 		}
+
+		if (!curtraj)
+			return;
 
 		// Установить текущие целевые параметры.
 		int sts = curtraj->attime(ralgo::discrete_time(), ctrpos, ctrspd);
