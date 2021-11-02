@@ -1,4 +1,5 @@
 #include <ralgo/heimer/fast_cycle_device.h>
+#include <igris/util/bug.h>
 
 DLIST_HEAD(heimer::fast_cycle_list);
 

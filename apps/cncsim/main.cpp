@@ -103,37 +103,38 @@ void configuration() { revolver.set_steppers(steppers_ptrs, 3); }
 
 int main(int argc, char **argv)
 {
-    crow::diagnostic_setup(true, false);
-    crow::create_udpgate();
-    crow::start_spin();
 
-    configuration();
-    revolver_thread = std::thread(revolver_thread_function);
-    planner_thread = std::thread(planner_thread_function);
-    telemetry_thread = std::thread(telemetry_thread_function);
+	crow::diagnostic_setup(true, false);
+	crow::create_udpgate();
+	crow::start_spin();
 
-    std::this_thread::sleep_for(1000ms);
+	configuration();
+	revolver_thread = std::thread(revolver_thread_function);
+	planner_thread = std::thread(planner_thread_function);
+	telemetry_thread = std::thread(telemetry_thread_function);
 
-    interpreter.gains[0] = 4194304. / 10000.;
-    interpreter.gains[1] = 4194304. / 10000.;
-    interpreter.gains[2] = 4194304. / 10000.;
+	std::this_thread::sleep_for(1000ms);
 
-    interpreter.saved_acc = 10;
-    interpreter.revolver_frequency = 10000;
-    interpreter.newline("G01 X2 F5");
-    interpreter.newline("G01 Y2 F5");
-    interpreter.newline("G01 X5 F1");
-    interpreter.newline("G01 Y5 F5");
-    interpreter.newline("G01 Y5 Z3 F5");
-    interpreter.newline("G01 X20 F10");
-    interpreter.newline("G01 Y-20 F10");
-    interpreter.newline("G01 X-20 F10");
+	interpreter.gains[0] = 4194304./10000.;
+	interpreter.gains[1] = 4194304./10000.;
+	interpreter.gains[2] = 4194304./10000.;
 
-    planner.total_axes = 3;
+	interpreter.saved_acc = 10;
+	interpreter.revolver_frequency = 10000;
+	interpreter.newline("G01 X2 F5");
+	interpreter.newline("G01 Y2 F5");
+	interpreter.newline("G01 X5 F1");
+	interpreter.newline("G01 Y5 F5");
+	interpreter.newline("G01 Y5 Z3 F5");
+	interpreter.newline("G01 X20 F10");
+	interpreter.newline("G01 Y-20 F10");
+	interpreter.newline("G01 X-20 F10");
 
-    while (1)
-    {
-        auto str = nos::readline();
-        interpreter.newline(str);
-    }
+	planner.total_axes = 3;
+
+	while (1)
+	{
+		auto str = nos::readline();
+		interpreter.newline(str);
+	}
 }

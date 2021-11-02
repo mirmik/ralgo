@@ -456,6 +456,7 @@ namespace ralgo
                 return elementwise(vec, ralgo::log2<value_t<V>>);
             }
 #endif
+
             template <class V> V &log10(V &vec)
             {
                 return elementwise(vec, ralgo::log10<value_t<V>>);
