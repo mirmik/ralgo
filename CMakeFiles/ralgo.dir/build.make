@@ -99,9 +99,22 @@ submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/disctime-chrono-millis.cpp.s: cmake_
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ralgo.dir/ralgo/disctime-chrono-millis.cpp.s"
 	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/disctime-chrono-millis.cpp -o CMakeFiles/ralgo.dir/ralgo/disctime-chrono-millis.cpp.s
 
+submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/global_protection.cpp.o: submodules/ralgo/CMakeFiles/ralgo.dir/flags.make
+submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/global_protection.cpp.o: submodules/ralgo/ralgo/global_protection.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/global_protection.cpp.o"
+	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ralgo.dir/ralgo/global_protection.cpp.o -c /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/global_protection.cpp
+
+submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/global_protection.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ralgo.dir/ralgo/global_protection.cpp.i"
+	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/global_protection.cpp > CMakeFiles/ralgo.dir/ralgo/global_protection.cpp.i
+
+submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/global_protection.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ralgo.dir/ralgo/global_protection.cpp.s"
+	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/global_protection.cpp -o CMakeFiles/ralgo.dir/ralgo/global_protection.cpp.s
+
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axis_stub_processor.cpp.o: submodules/ralgo/CMakeFiles/ralgo.dir/flags.make
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axis_stub_processor.cpp.o: submodules/ralgo/ralgo/heimer/axis_stub_processor.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axis_stub_processor.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axis_stub_processor.cpp.o"
 	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ralgo.dir/ralgo/heimer/axis_stub_processor.cpp.o -c /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/heimer/axis_stub_processor.cpp
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axis_stub_processor.cpp.i: cmake_force
@@ -114,7 +127,7 @@ submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axis_stub_processor.cpp.s: cm
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axisapi.cpp.o: submodules/ralgo/CMakeFiles/ralgo.dir/flags.make
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axisapi.cpp.o: submodules/ralgo/ralgo/heimer/axisapi.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axisapi.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axisapi.cpp.o"
 	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ralgo.dir/ralgo/heimer/axisapi.cpp.o -c /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/heimer/axisapi.cpp
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axisapi.cpp.i: cmake_force
@@ -127,7 +140,7 @@ submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axisapi.cpp.s: cmake_force
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axisctr.cpp.o: submodules/ralgo/CMakeFiles/ralgo.dir/flags.make
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axisctr.cpp.o: submodules/ralgo/ralgo/heimer/axisctr.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axisctr.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axisctr.cpp.o"
 	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ralgo.dir/ralgo/heimer/axisctr.cpp.o -c /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/heimer/axisctr.cpp
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axisctr.cpp.i: cmake_force
@@ -140,7 +153,7 @@ submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axisctr.cpp.s: cmake_force
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_linear_processor.cpp.o: submodules/ralgo/CMakeFiles/ralgo.dir/flags.make
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_linear_processor.cpp.o: submodules/ralgo/ralgo/heimer/axstate_linear_processor.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_linear_processor.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_linear_processor.cpp.o"
 	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ralgo.dir/ralgo/heimer/axstate_linear_processor.cpp.o -c /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/heimer/axstate_linear_processor.cpp
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_linear_processor.cpp.i: cmake_force
@@ -153,7 +166,7 @@ submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_linear_processor.cpp.
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_pid_processor.cpp.o: submodules/ralgo/CMakeFiles/ralgo.dir/flags.make
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_pid_processor.cpp.o: submodules/ralgo/ralgo/heimer/axstate_pid_processor.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_pid_processor.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_pid_processor.cpp.o"
 	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ralgo.dir/ralgo/heimer/axstate_pid_processor.cpp.o -c /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/heimer/axstate_pid_processor.cpp
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_pid_processor.cpp.i: cmake_force
@@ -166,7 +179,7 @@ submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_pid_processor.cpp.s: 
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_pose3_chain_processor.cpp.o: submodules/ralgo/CMakeFiles/ralgo.dir/flags.make
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_pose3_chain_processor.cpp.o: submodules/ralgo/ralgo/heimer/axstate_pose3_chain_processor.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_pose3_chain_processor.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_pose3_chain_processor.cpp.o"
 	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ralgo.dir/ralgo/heimer/axstate_pose3_chain_processor.cpp.o -c /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/heimer/axstate_pose3_chain_processor.cpp
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_pose3_chain_processor.cpp.i: cmake_force
@@ -179,7 +192,7 @@ submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_pose3_chain_processor
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_signal_processor.cpp.o: submodules/ralgo/CMakeFiles/ralgo.dir/flags.make
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_signal_processor.cpp.o: submodules/ralgo/ralgo/heimer/axstate_signal_processor.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_signal_processor.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_signal_processor.cpp.o"
 	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ralgo.dir/ralgo/heimer/axstate_signal_processor.cpp.o -c /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/heimer/axstate_signal_processor.cpp
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_signal_processor.cpp.i: cmake_force
@@ -192,7 +205,7 @@ submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_signal_processor.cpp.
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_sincos_processor.cpp.o: submodules/ralgo/CMakeFiles/ralgo.dir/flags.make
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_sincos_processor.cpp.o: submodules/ralgo/ralgo/heimer/axstate_sincos_processor.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_sincos_processor.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_sincos_processor.cpp.o"
 	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ralgo.dir/ralgo/heimer/axstate_sincos_processor.cpp.o -c /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/heimer/axstate_sincos_processor.cpp
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_sincos_processor.cpp.i: cmake_force
@@ -205,7 +218,7 @@ submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axstate_sincos_processor.cpp.
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/command.cpp.o: submodules/ralgo/CMakeFiles/ralgo.dir/flags.make
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/command.cpp.o: submodules/ralgo/ralgo/heimer/command.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/command.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/command.cpp.o"
 	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ralgo.dir/ralgo/heimer/command.cpp.o -c /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/heimer/command.cpp
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/command.cpp.i: cmake_force
@@ -218,7 +231,7 @@ submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/command.cpp.s: cmake_force
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/convex_zone_approval.cpp.o: submodules/ralgo/CMakeFiles/ralgo.dir/flags.make
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/convex_zone_approval.cpp.o: submodules/ralgo/ralgo/heimer/convex_zone_approval.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/convex_zone_approval.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/convex_zone_approval.cpp.o"
 	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ralgo.dir/ralgo/heimer/convex_zone_approval.cpp.o -c /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/heimer/convex_zone_approval.cpp
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/convex_zone_approval.cpp.i: cmake_force
@@ -231,7 +244,7 @@ submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/convex_zone_approval.cpp.s: c
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/dof6_controller.cpp.o: submodules/ralgo/CMakeFiles/ralgo.dir/flags.make
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/dof6_controller.cpp.o: submodules/ralgo/ralgo/heimer/dof6_controller.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/dof6_controller.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/dof6_controller.cpp.o"
 	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ralgo.dir/ralgo/heimer/dof6_controller.cpp.o -c /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/heimer/dof6_controller.cpp
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/dof6_controller.cpp.i: cmake_force
@@ -244,7 +257,7 @@ submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/dof6_controller.cpp.s: cmake_
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/dof6_signal.cpp.o: submodules/ralgo/CMakeFiles/ralgo.dir/flags.make
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/dof6_signal.cpp.o: submodules/ralgo/ralgo/heimer/dof6_signal.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/dof6_signal.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/dof6_signal.cpp.o"
 	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ralgo.dir/ralgo/heimer/dof6_signal.cpp.o -c /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/heimer/dof6_signal.cpp
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/dof6_signal.cpp.i: cmake_force
@@ -257,7 +270,7 @@ submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/dof6_signal.cpp.s: cmake_forc
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/executor.cpp.o: submodules/ralgo/CMakeFiles/ralgo.dir/flags.make
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/executor.cpp.o: submodules/ralgo/ralgo/heimer/executor.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/executor.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/executor.cpp.o"
 	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ralgo.dir/ralgo/heimer/executor.cpp.o -c /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/heimer/executor.cpp
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/executor.cpp.i: cmake_force
@@ -270,7 +283,7 @@ submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/executor.cpp.s: cmake_force
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/fast_cycle_device.cpp.o: submodules/ralgo/CMakeFiles/ralgo.dir/flags.make
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/fast_cycle_device.cpp.o: submodules/ralgo/ralgo/heimer/fast_cycle_device.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/fast_cycle_device.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/fast_cycle_device.cpp.o"
 	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ralgo.dir/ralgo/heimer/fast_cycle_device.cpp.o -c /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/heimer/fast_cycle_device.cpp
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/fast_cycle_device.cpp.i: cmake_force
@@ -283,7 +296,7 @@ submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/fast_cycle_device.cpp.s: cmak
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/scalar_signal.cpp.o: submodules/ralgo/CMakeFiles/ralgo.dir/flags.make
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/scalar_signal.cpp.o: submodules/ralgo/ralgo/heimer/scalar_signal.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/scalar_signal.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/scalar_signal.cpp.o"
 	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ralgo.dir/ralgo/heimer/scalar_signal.cpp.o -c /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/heimer/scalar_signal.cpp
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/scalar_signal.cpp.i: cmake_force
@@ -296,7 +309,7 @@ submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/scalar_signal.cpp.s: cmake_fo
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/signal.cpp.o: submodules/ralgo/CMakeFiles/ralgo.dir/flags.make
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/signal.cpp.o: submodules/ralgo/ralgo/heimer/signal.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/signal.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/signal.cpp.o"
 	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ralgo.dir/ralgo/heimer/signal.cpp.o -c /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/heimer/signal.cpp
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/signal.cpp.i: cmake_force
@@ -309,7 +322,7 @@ submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/signal.cpp.s: cmake_force
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/signal_processor.cpp.o: submodules/ralgo/CMakeFiles/ralgo.dir/flags.make
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/signal_processor.cpp.o: submodules/ralgo/ralgo/heimer/signal_processor.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/signal_processor.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/signal_processor.cpp.o"
 	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ralgo.dir/ralgo/heimer/signal_processor.cpp.o -c /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/heimer/signal_processor.cpp
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/signal_processor.cpp.i: cmake_force
@@ -322,7 +335,7 @@ submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/signal_processor.cpp.s: cmake
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/velocity_applier.cpp.o: submodules/ralgo/CMakeFiles/ralgo.dir/flags.make
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/velocity_applier.cpp.o: submodules/ralgo/ralgo/heimer/velocity_applier.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/velocity_applier.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/velocity_applier.cpp.o"
 	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ralgo.dir/ralgo/heimer/velocity_applier.cpp.o -c /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/heimer/velocity_applier.cpp
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/velocity_applier.cpp.i: cmake_force
@@ -335,7 +348,7 @@ submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/velocity_applier.cpp.s: cmake
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/log/log-console.cpp.o: submodules/ralgo/CMakeFiles/ralgo.dir/flags.make
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/log/log-console.cpp.o: submodules/ralgo/ralgo/log/log-console.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/log/log-console.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/log/log-console.cpp.o"
 	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ralgo.dir/ralgo/log/log-console.cpp.o -c /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/log/log-console.cpp
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/log/log-console.cpp.i: cmake_force
@@ -348,7 +361,7 @@ submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/log/log-console.cpp.s: cmake_force
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/log/log.cpp.o: submodules/ralgo/CMakeFiles/ralgo.dir/flags.make
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/log/log.cpp.o: submodules/ralgo/ralgo/log/log.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/log/log.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/log/log.cpp.o"
 	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ralgo.dir/ralgo/log/log.cpp.o -c /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/log/log.cpp
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/log/log.cpp.i: cmake_force
@@ -361,7 +374,7 @@ submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/log/log.cpp.s: cmake_force
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/lp/gradient.c.o: submodules/ralgo/CMakeFiles/ralgo.dir/flags.make
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/lp/gradient.c.o: submodules/ralgo/ralgo/lp/gradient.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building C object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/lp/gradient.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Building C object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/lp/gradient.c.o"
 	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/ralgo.dir/ralgo/lp/gradient.c.o   -c /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/lp/gradient.c
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/lp/gradient.c.i: cmake_force
@@ -374,7 +387,7 @@ submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/lp/gradient.c.s: cmake_force
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/lp/point_in_hexagon.c.o: submodules/ralgo/CMakeFiles/ralgo.dir/flags.make
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/lp/point_in_hexagon.c.o: submodules/ralgo/ralgo/lp/point_in_hexagon.c
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Building C object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/lp/point_in_hexagon.c.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_26) "Building C object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/lp/point_in_hexagon.c.o"
 	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/cc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -o CMakeFiles/ralgo.dir/ralgo/lp/point_in_hexagon.c.o   -c /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/lp/point_in_hexagon.c
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/lp/point_in_hexagon.c.i: cmake_force
@@ -387,7 +400,7 @@ submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/lp/point_in_hexagon.c.s: cmake_force
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/oldheimer/command_center.cpp.o: submodules/ralgo/CMakeFiles/ralgo.dir/flags.make
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/oldheimer/command_center.cpp.o: submodules/ralgo/ralgo/oldheimer/command_center.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_26) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/oldheimer/command_center.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_27) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/oldheimer/command_center.cpp.o"
 	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ralgo.dir/ralgo/oldheimer/command_center.cpp.o -c /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/oldheimer/command_center.cpp
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/oldheimer/command_center.cpp.i: cmake_force
@@ -400,7 +413,7 @@ submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/oldheimer/command_center.cpp.s: cmak
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/oldheimer/control.cpp.o: submodules/ralgo/CMakeFiles/ralgo.dir/flags.make
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/oldheimer/control.cpp.o: submodules/ralgo/ralgo/oldheimer/control.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_27) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/oldheimer/control.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_28) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/oldheimer/control.cpp.o"
 	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ralgo.dir/ralgo/oldheimer/control.cpp.o -c /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/oldheimer/control.cpp
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/oldheimer/control.cpp.i: cmake_force
@@ -410,19 +423,6 @@ submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/oldheimer/control.cpp.i: cmake_force
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/oldheimer/control.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ralgo.dir/ralgo/oldheimer/control.cpp.s"
 	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/oldheimer/control.cpp -o CMakeFiles/ralgo.dir/ralgo/oldheimer/control.cpp.s
-
-submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/oldheimer/protect.cpp.o: submodules/ralgo/CMakeFiles/ralgo.dir/flags.make
-submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/oldheimer/protect.cpp.o: submodules/ralgo/ralgo/oldheimer/protect.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/mirmik/project/radioline/rfmeask/CMakeFiles --progress-num=$(CMAKE_PROGRESS_28) "Building CXX object submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/oldheimer/protect.cpp.o"
-	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/ralgo.dir/ralgo/oldheimer/protect.cpp.o -c /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/oldheimer/protect.cpp
-
-submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/oldheimer/protect.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/ralgo.dir/ralgo/oldheimer/protect.cpp.i"
-	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/oldheimer/protect.cpp > CMakeFiles/ralgo.dir/ralgo/oldheimer/protect.cpp.i
-
-submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/oldheimer/protect.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/ralgo.dir/ralgo/oldheimer/protect.cpp.s"
-	cd /home/mirmik/project/radioline/rfmeask/submodules/ralgo && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/mirmik/project/radioline/rfmeask/submodules/ralgo/ralgo/oldheimer/protect.cpp -o CMakeFiles/ralgo.dir/ralgo/oldheimer/protect.cpp.s
 
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/robo/stepper_controller.cpp.o: submodules/ralgo/CMakeFiles/ralgo.dir/flags.make
 submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/robo/stepper_controller.cpp.o: submodules/ralgo/ralgo/robo/stepper_controller.cpp
@@ -494,6 +494,7 @@ ralgo_OBJECTS = \
 "CMakeFiles/ralgo.dir/ralgo/clinalg/matops_square_inverse.cpp.o" \
 "CMakeFiles/ralgo.dir/ralgo/clinalg/solve.cpp.o" \
 "CMakeFiles/ralgo.dir/ralgo/disctime-chrono-millis.cpp.o" \
+"CMakeFiles/ralgo.dir/ralgo/global_protection.cpp.o" \
 "CMakeFiles/ralgo.dir/ralgo/heimer/axis_stub_processor.cpp.o" \
 "CMakeFiles/ralgo.dir/ralgo/heimer/axisapi.cpp.o" \
 "CMakeFiles/ralgo.dir/ralgo/heimer/axisctr.cpp.o" \
@@ -518,7 +519,6 @@ ralgo_OBJECTS = \
 "CMakeFiles/ralgo.dir/ralgo/lp/point_in_hexagon.c.o" \
 "CMakeFiles/ralgo.dir/ralgo/oldheimer/command_center.cpp.o" \
 "CMakeFiles/ralgo.dir/ralgo/oldheimer/control.cpp.o" \
-"CMakeFiles/ralgo.dir/ralgo/oldheimer/protect.cpp.o" \
 "CMakeFiles/ralgo.dir/ralgo/robo/stepper_controller.cpp.o" \
 "CMakeFiles/ralgo.dir/ralgo/trajectory/linetraj.cpp.o" \
 "CMakeFiles/ralgo.dir/ralgo/trajectory/trajectory.cpp.o" \
@@ -531,6 +531,7 @@ ralgo_EXTERNAL_OBJECTS =
 submodules/ralgo/libralgo.so: submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/clinalg/matops_square_inverse.cpp.o
 submodules/ralgo/libralgo.so: submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/clinalg/solve.cpp.o
 submodules/ralgo/libralgo.so: submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/disctime-chrono-millis.cpp.o
+submodules/ralgo/libralgo.so: submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/global_protection.cpp.o
 submodules/ralgo/libralgo.so: submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axis_stub_processor.cpp.o
 submodules/ralgo/libralgo.so: submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axisapi.cpp.o
 submodules/ralgo/libralgo.so: submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/heimer/axisctr.cpp.o
@@ -555,7 +556,6 @@ submodules/ralgo/libralgo.so: submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/lp/gra
 submodules/ralgo/libralgo.so: submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/lp/point_in_hexagon.c.o
 submodules/ralgo/libralgo.so: submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/oldheimer/command_center.cpp.o
 submodules/ralgo/libralgo.so: submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/oldheimer/control.cpp.o
-submodules/ralgo/libralgo.so: submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/oldheimer/protect.cpp.o
 submodules/ralgo/libralgo.so: submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/robo/stepper_controller.cpp.o
 submodules/ralgo/libralgo.so: submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/trajectory/linetraj.cpp.o
 submodules/ralgo/libralgo.so: submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/trajectory/trajectory.cpp.o
