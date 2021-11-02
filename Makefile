@@ -281,6 +281,33 @@ ralgo/disctime-chrono-millis.cpp.s:
 	cd /home/mirmik/project/radioline/rfmeask && $(MAKE) -f submodules/ralgo/CMakeFiles/ralgo.dir/build.make submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/disctime-chrono-millis.cpp.s
 .PHONY : ralgo/disctime-chrono-millis.cpp.s
 
+ralgo/global_protection.o: ralgo/global_protection.cpp.o
+
+.PHONY : ralgo/global_protection.o
+
+# target to build an object file
+ralgo/global_protection.cpp.o:
+	cd /home/mirmik/project/radioline/rfmeask && $(MAKE) -f submodules/ralgo/CMakeFiles/ralgo.dir/build.make submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/global_protection.cpp.o
+.PHONY : ralgo/global_protection.cpp.o
+
+ralgo/global_protection.i: ralgo/global_protection.cpp.i
+
+.PHONY : ralgo/global_protection.i
+
+# target to preprocess a source file
+ralgo/global_protection.cpp.i:
+	cd /home/mirmik/project/radioline/rfmeask && $(MAKE) -f submodules/ralgo/CMakeFiles/ralgo.dir/build.make submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/global_protection.cpp.i
+.PHONY : ralgo/global_protection.cpp.i
+
+ralgo/global_protection.s: ralgo/global_protection.cpp.s
+
+.PHONY : ralgo/global_protection.s
+
+# target to generate assembly for a file
+ralgo/global_protection.cpp.s:
+	cd /home/mirmik/project/radioline/rfmeask && $(MAKE) -f submodules/ralgo/CMakeFiles/ralgo.dir/build.make submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/global_protection.cpp.s
+.PHONY : ralgo/global_protection.cpp.s
+
 ralgo/heimer/axis_stub_processor.o: ralgo/heimer/axis_stub_processor.cpp.o
 
 .PHONY : ralgo/heimer/axis_stub_processor.o
@@ -929,33 +956,6 @@ ralgo/oldheimer/control.cpp.s:
 	cd /home/mirmik/project/radioline/rfmeask && $(MAKE) -f submodules/ralgo/CMakeFiles/ralgo.dir/build.make submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/oldheimer/control.cpp.s
 .PHONY : ralgo/oldheimer/control.cpp.s
 
-ralgo/oldheimer/protect.o: ralgo/oldheimer/protect.cpp.o
-
-.PHONY : ralgo/oldheimer/protect.o
-
-# target to build an object file
-ralgo/oldheimer/protect.cpp.o:
-	cd /home/mirmik/project/radioline/rfmeask && $(MAKE) -f submodules/ralgo/CMakeFiles/ralgo.dir/build.make submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/oldheimer/protect.cpp.o
-.PHONY : ralgo/oldheimer/protect.cpp.o
-
-ralgo/oldheimer/protect.i: ralgo/oldheimer/protect.cpp.i
-
-.PHONY : ralgo/oldheimer/protect.i
-
-# target to preprocess a source file
-ralgo/oldheimer/protect.cpp.i:
-	cd /home/mirmik/project/radioline/rfmeask && $(MAKE) -f submodules/ralgo/CMakeFiles/ralgo.dir/build.make submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/oldheimer/protect.cpp.i
-.PHONY : ralgo/oldheimer/protect.cpp.i
-
-ralgo/oldheimer/protect.s: ralgo/oldheimer/protect.cpp.s
-
-.PHONY : ralgo/oldheimer/protect.s
-
-# target to generate assembly for a file
-ralgo/oldheimer/protect.cpp.s:
-	cd /home/mirmik/project/radioline/rfmeask && $(MAKE) -f submodules/ralgo/CMakeFiles/ralgo.dir/build.make submodules/ralgo/CMakeFiles/ralgo.dir/ralgo/oldheimer/protect.cpp.s
-.PHONY : ralgo/oldheimer/protect.cpp.s
-
 ralgo/robo/stepper_controller.o: ralgo/robo/stepper_controller.cpp.o
 
 .PHONY : ralgo/robo/stepper_controller.o
@@ -1358,6 +1358,9 @@ help:
 	@echo "... ralgo/disctime-chrono-millis.o"
 	@echo "... ralgo/disctime-chrono-millis.i"
 	@echo "... ralgo/disctime-chrono-millis.s"
+	@echo "... ralgo/global_protection.o"
+	@echo "... ralgo/global_protection.i"
+	@echo "... ralgo/global_protection.s"
 	@echo "... ralgo/heimer/axis_stub_processor.o"
 	@echo "... ralgo/heimer/axis_stub_processor.i"
 	@echo "... ralgo/heimer/axis_stub_processor.s"
@@ -1430,9 +1433,6 @@ help:
 	@echo "... ralgo/oldheimer/control.o"
 	@echo "... ralgo/oldheimer/control.i"
 	@echo "... ralgo/oldheimer/control.s"
-	@echo "... ralgo/oldheimer/protect.o"
-	@echo "... ralgo/oldheimer/protect.i"
-	@echo "... ralgo/oldheimer/protect.s"
 	@echo "... ralgo/robo/stepper_controller.o"
 	@echo "... ralgo/robo/stepper_controller.i"
 	@echo "... ralgo/robo/stepper_controller.s"
