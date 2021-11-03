@@ -21,8 +21,8 @@ namespace ralgo
 
         float trigger_level;
 
-        float start;
-        float last;
+        float start = 0;
+        float last = 0;
 
         bool prevent_halfspaces_area = true;
 

@@ -35,6 +35,10 @@ namespace ralgo
             resize(size);
         }
 
+        void invalidate() { delete[] dataarr; }
+
+        ~sliding_array() { invalidate(); }
+
         void resize(size_t halfsize)
         {
             if (dataarr)
