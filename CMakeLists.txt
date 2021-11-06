@@ -19,7 +19,6 @@ file(GLOB HEADERS
 
 file(GLOB RALGO_SOURCES 
 	ralgo/heimer/*.cpp 
-	ralgo/oldheimer/*.cpp
 	ralgo/*.cpp
 	ralgo/trajectory/*.c
 	ralgo/trajectory/*.cpp
@@ -36,15 +35,15 @@ file(GLOB RALGO_SOURCES
 set(RALGO_SOURCES ${RALGO_SOURCES} PARENT_SCOPE)
 
 file(GLOB SOURCES_TEST 
-	test/*.cpp
+	tests/*.cpp
 )
 
-add_executable(ralgo_test ${SOURCES_TEST})
+add_executable(ralgo_test ${SOURCES_TEST} ${RALGO_SOURCES})
 add_library(ralgo SHARED ${RALGO_SOURCES})
 
-target_include_directories(ralgo_test PRIVATE . test)
+target_include_directories(ralgo_test PRIVATE . tests)
 target_include_directories(ralgo PRIVATE .)
-target_link_libraries(ralgo_test ralgo nos igris)
+target_link_libraries(ralgo_test nos igris)
 
 if (UNIX AND NOT APPLE)
 	install(TARGETS ${PROJECT_NAME}
