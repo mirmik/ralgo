@@ -19,12 +19,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - uses: actions/checkout@master
+      with:
+          repository: mirmik/igris
+
     - uses: actions/checkout@v2
-    
+
     - name: Install igris library
       run: |
         git clone https://github.com/mirmik/igris
         cd igris
+        cmake .
+        cmake --build .
+        sudo cmake --install .
+        cd ..
+
+    - name: Install nos library
+      run: |
+        git clone https://github.com/mirmik/nos
+        cd nos
+        cmake .
+        cmake --build .
+        sudo cmake --install .
+        cd ..
+
+    - name: Install crow library
+      run: |
+        git clone https://github.com/mirmik/crow
+        cd crow
         cmake .
         cmake --build .
         sudo cmake --install .
