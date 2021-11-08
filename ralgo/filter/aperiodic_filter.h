@@ -11,8 +11,8 @@ namespace ralgo
 {
     template <class T> class aperiodic_filter : public ralgo::inout<T, T>
     {
-        T koeff;
-        T state;
+        T koeff = 0;
+        T state = 0;
 
     public:
         aperiodic_filter() {}

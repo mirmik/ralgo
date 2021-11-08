@@ -14,7 +14,7 @@ TEST_CASE("fft")
     auto ret = ralgo::signal::spectre(sig.data(), sig.size(), sig.size());
 
     freqs.resize((1 << 8) / 2);
-    ralgo::signal::rfftfreq(freqs.data(), 1 << 8, (1.) / (1 << 8));
+    ralgo::signal::rfftfreq(freqs.data(), (1 << 8) / 2, (1.) / (1 << 8));
 }
 /*
 TEST_CASE("fft.2")
