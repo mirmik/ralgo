@@ -1,9 +1,0 @@
-/home/mirmik/project/radioline/rfmeask/submodules/ralgo/CMakeFiles/install/strip.dir
-/home/mirmik/project/radioline/rfmeask/submodules/ralgo/CMakeFiles/install/local.dir
-/home/mirmik/project/radioline/rfmeask/submodules/ralgo/CMakeFiles/edit_cache.dir
-/home/mirmik/project/radioline/rfmeask/submodules/ralgo/CMakeFiles/test.dir
-/home/mirmik/project/radioline/rfmeask/submodules/ralgo/CMakeFiles/ralgo.dir
-/home/mirmik/project/radioline/rfmeask/submodules/ralgo/CMakeFiles/install.dir
-/home/mirmik/project/radioline/rfmeask/submodules/ralgo/CMakeFiles/list_install_components.dir
-/home/mirmik/project/radioline/rfmeask/submodules/ralgo/CMakeFiles/rebuild_cache.dir
-/home/mirmik/project/radioline/rfmeask/submodules/ralgo/CMakeFiles/ralgo_test.dir
