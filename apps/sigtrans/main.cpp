@@ -13,6 +13,7 @@
 #include <nos/print.h>
 
 #include <crow/address.h>
+#include <crow/nodes/publisher_node.h>
 #include <crow/gates/udpgate.h>
 #include <crow/tower.h>
 
@@ -48,7 +49,6 @@ void execute_routine()
         if (cancel_token)
             return;
         heimer::executor.execute_if_allowed(discrete_time());
-        heimer::executor.notify();
         std::this_thread::sleep_until(target_time += 10000us);
     }
 }
@@ -86,7 +86,7 @@ void start_routine()
         heimer::executor.append_processor(proc);
     }
     heimer::executor.order_sort();
-    heimer::executor.notification_prepare("sigtrans/feedpos", crowaddr);
+    //heimer::executor.notification_prepare("sigtrans/feedpos", crowaddr);
 
     execute_thread.reset(new std::thread(execute_routine));
     fast_execute_thread.reset(new std::thread(fast_execute_routine));
@@ -194,7 +194,7 @@ int main(int argc, char **argv)
     cli.parse(argc, argv);
 
     if (cli.get_option("crowdiag"))
-        crow::diagnostic_setup(true, false);
+        crow::diagnostic_setup(true);
 
     DEBUG = cli.get_option("debug");
     auto script_path = cli.get_string("script").unwrap();

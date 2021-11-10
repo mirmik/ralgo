@@ -175,42 +175,6 @@ void heimer::executor_class::allocate_order_table(int size)
     u.f.dynamic = 1;
 }
 
-#if HEIMER_CROW_SUPPORT
-void heimer::executor_class::notification_prepare(const char *theme,
-                                                  crow::hostaddr_view addrview)
-{
-    count_of_axstates = 0;
-
-    signal_head *sig;
-    dlist_for_each_entry(sig, &signals_list, list_lnk)
-    {
-        if (sig->type == SIGNAL_TYPE_AXIS_STATE)
-        {
-            ++count_of_axstates;
-        }
-    }
-
-    coordinate_publisher.init(addrview, theme, 0, 50);
-}
-
-void heimer::executor_class::notify()
-{
-    float arr[count_of_axstates];
-    float *it = arr;
-
-    signal_head *sig;
-    dlist_for_each_entry(sig, &signals_list, list_lnk)
-    {
-        if (sig->type == SIGNAL_TYPE_AXIS_STATE)
-        {
-            *it++ = static_cast<heimer::axis_state *>(sig)->feedpos;
-        }
-    }
-
-    coordinate_publisher.publish({(void *)arr, sizeof(arr)});
-}
-#endif
-
 heimer::executor_class heimer::executor;
 int heimer::executor_command(int, char **argv, char *output, int maxsize)
 {
