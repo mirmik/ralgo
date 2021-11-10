@@ -8,8 +8,7 @@
 
 #include <crow/address.h>
 #include <crow/gates/udpgate.h>
-#include <crow/pubsub/publisher.h>
-#include <crow/pubsub/pubsub.h>
+#include <crow/nodes/publisher_node.h>
 #include <crow/tower.h>
 
 igris::ring<cnc::planner_block, 40> blocks;
@@ -71,7 +70,7 @@ void telemetry_thread_function()
         // nos::println(steppers[0].steps_count(), steppers[1].steps_count(),
         // steppers[2].steps_count());
 
-        publisher.publish(igris::buffer(poses, sizeof(poses)), 0, 0);
+        publisher.publish(igris::buffer(poses, sizeof(poses)));
     }
 }
 
@@ -104,7 +103,7 @@ void configuration() { revolver.set_steppers(steppers_ptrs, 3); }
 int main(int argc, char **argv)
 {
 
-	crow::diagnostic_setup(true, false);
+	crow::diagnostic_setup(true);
 	crow::create_udpgate();
 	crow::start_spin();
 

@@ -3,10 +3,6 @@
 
 #include <ralgo/heimer/signal_processor.h>
 
-#if HEIMER_CROW_SUPPORT
-#include <crow/pubsub/publisher.h>
-#endif
-
 namespace heimer
 {
     extern bool global_protection;
@@ -30,10 +26,6 @@ namespace heimer
             } f;
         } u;
 
-#if HEIMER_CROW_SUPPORT
-        crow::publisher coordinate_publisher;
-#endif
-
     public:
         executor_class() = default;
         void set_order_table(signal_processor **order_table, int capacity,
@@ -52,12 +44,6 @@ namespace heimer
         void exec_fast_cycle();
         void activate_process();
         void deactivate_process();
-
-#if HEIMER_CROW_SUPPORT
-        void notification_prepare(const char *theme,
-                                  crow::hostaddr_view addrview);
-        void notify();
-#endif
 
         ~executor_class();
     };
