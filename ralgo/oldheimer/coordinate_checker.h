@@ -1,10 +1,9 @@
-#ifndef RALGO_HEIMER_COORDINATE_CHECKER_H
-#define RALGO_HEIMER_COORDINATE_CHECKER_H
+#ifndef RALGO_OLDHEIMER_COORDINATE_CHECKER_H
+#define RALGO_OLDHEIMER_COORDINATE_CHECKER_H
 
 #include <igris/container/array_view.h>
 #include <ralgo/geom/zone_check.h>
 #include <ralgo/linalg/linalg.h>
-#include <ralgo/oldheimer/interpolation_group.h>
 
 namespace heimer
 {

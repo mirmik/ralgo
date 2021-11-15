@@ -1,5 +1,5 @@
-#ifndef RALGO_HEIMER_INTERPOLATION_GROUP_H
-#define RALGO_HEIMER_INTERPOLATION_GROUP_H
+#ifndef RALGO_OLDHEIMER_INTERPOLATION_GROUP_H
+#define RALGO_OLDHEIMER_INTERPOLATION_GROUP_H
 
 #include <igris/binreader.h>
 
@@ -17,7 +17,7 @@ namespace heimer
 
         bool enable_full_spattern = false;
 
-        coordinate_checker<Position> *coord_checker = nullptr;
+        heimer::coordinate_checker<Position> *coord_checker = nullptr;
 
         igris::delegate<void, linintctr_basic *> operation_finish_signal;
         igris::delegate<void, linintctr_basic *> operation_start_signal;

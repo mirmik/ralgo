@@ -60,12 +60,13 @@ licant.module("ralgo",
 		"ralgo.include",
 		"ralgo.log",
 		"ralgo.disctime",
-		"ralgo.signal"
+		"ralgo.signal",
+		"ralgo.oldheimer"
 	],
 )
 
 licant.module("ralgo.oldheimer",
-	source=["ralgo/oldheimer/*.cpp",]
+	sources=["ralgo/oldheimer/*.cpp",]
 )
 
 licant.module("f2clib.internal",
