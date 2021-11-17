@@ -11,9 +11,6 @@
 #include <ralgo/cnc/planblock.h>
 #include <ralgo/log.h>
 
-#include <nos/fprint.h>
-#include <nos/print.h>
-
 namespace cnc
 {
     struct interpreter_control_task
@@ -54,32 +51,24 @@ namespace cnc
                 case 'C':
                     poses[5] = val;
                     continue;
-                case 'S':
+                case 'I':
                     poses[6] = val;
                     continue;
-                case 'T':
+                case 'J':
                     poses[7] = val;
                     continue;
-                case 'V':
+                case 'K':
                     poses[8] = val;
                     continue;
                 }
             }
         }
-
-        template <class O> int print_to(O &os) const
-        {
-            return nos::fprint_to(os, "{},{}",
-                                  igris::array_view(poses, NMAX_AXES), feed);
-        }
-
-        void strinfo(char *ans, int) { nos::format_buffer(ans, "{}", *this); }
     };
 
     class interpreter
     {
         static constexpr char alphabet[9] = {'X', 'Y', 'Z', 'A', 'B',
-                                             'C', 'S', 'T', 'V'};
+                                             'C', 'I', 'J', 'K'};
 
     public:
         bool info_mode = false;
@@ -174,11 +163,11 @@ namespace cnc
             system_unlock();
         }
 
-        void command_M204(int argc, char **argv, char *ans, int)
+        void command_M204(int argc, char **argv, char *ans, int ansmax)
         {
             if (argc == 0)
             {
-                nos::format_buffer(ans, "{}", saved_acc);
+                snprintf(ans, ansmax, "%f", saved_acc);
                 return;
             }
 

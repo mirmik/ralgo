@@ -11,6 +11,9 @@ licant.module("ralgo.log", "console",
 licant.module("ralgo.log", "silent",
 	sources=["ralgo/log/log-silent.cpp"]
 )
+licant.module("ralgo.log", "stub",
+	sources=["ralgo/log/log-silent.cpp"]
+)
 
 licant.module("ralgo.signal",
 	sources=["ralgo/signal/fft.cpp"]

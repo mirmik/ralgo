@@ -83,13 +83,6 @@ namespace ralgo
                 ftim == stim ? 0
                              : (double)(time - stim) / (double)(ftim - stim);
 
-            if (isnan(time_unit))
-            {
-                DPRINT(time);
-                DPRINT(stim);
-                DPRINT(ftim);
-            }
-
             assert(!isnan(time_unit));
 
             auto posmod = tsdeform_posmod(&spddeform, time_unit);

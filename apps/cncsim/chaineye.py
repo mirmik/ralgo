@@ -11,9 +11,9 @@ X = 0
 Y = 0
 Z = 0
 
-def position_handler(pack):
+def position_handler(message):
 	global X, Y, Z
-	data = pack.message()
+	data = message
 	ndata = numpy.frombuffer(data, numpy.float32)
 	X = ndata[0]
 	Y = ndata[1]
@@ -29,6 +29,6 @@ sphere = zencad.disp(zencad.sphere(10))
 
 def animate(arg):
 	sphere.relocate(zencad.movX(X) * zencad.movY(Y) * zencad.movZ(Z))
-
+	print(X,Y,Z)
 
 zencad.show(animate = animate)

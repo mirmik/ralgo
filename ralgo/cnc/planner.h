@@ -10,7 +10,6 @@
 #include <igris/datastruct/dlist.h>
 #include <igris/sync/syslock.h>
 
-#include <nos/print.h>
 #include <ralgo/log.h>
 
 #define NMAX_AXES 10
@@ -142,17 +141,6 @@ namespace cnc
             system_unlock();
             return ret;
         }
-
-        /*void start_with_first_block()
-        {
-            active_block = &blocks->tail();
-            nos::println();
-            nos::println("start_with_first_block", active_block->blockno);
-            PRINT(active_block->nominal_velocity);
-            nos::println();
-            iteration_counter = 0;
-            need_to_reevaluate = true;
-        }*/
 
         void change_active_block()
         {
