@@ -1,11 +1,11 @@
 #ifndef RALGO_CNC_PLANBLOCK_H
 #define RALGO_CNC_PLANBLOCK_H
 
-#include <nos/print.h>
 #include <ralgo/cnc/defs.h>
 #include <stdint.h>
 
 #include <assert.h>
+#include <math.h>
 
 namespace cnc
 {
@@ -37,13 +37,12 @@ namespace cnc
         bool validation()
         {
             // TODO: remove assertation
-            assert(fabs(acceleration_before_ic * acceleration -
-                        nominal_velocity) < 1e-5);
-            assert(fabs(nominal_velocity * deceleration_after_ic - fullpath) <
-                   1e-5);
-            assert(nominal_velocity * major_multiplier < 1);
-            assert(acceleration * major_multiplier * acceleration_before_ic <
-                   1);
+            /*            assert(fabs(acceleration_before_ic * acceleration -
+                                    nominal_velocity) < 1e-5);
+                        assert(fabs(nominal_velocity * deceleration_after_ic -
+               fullpath) < 1e-5); assert(nominal_velocity * major_multiplier <
+               1); assert(acceleration * major_multiplier *
+               acceleration_before_ic < 1);*/
 
             if (fabs(acceleration_before_ic * acceleration - nominal_velocity) >
                 1e-5)

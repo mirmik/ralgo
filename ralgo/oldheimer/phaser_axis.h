@@ -75,17 +75,7 @@ namespace heimer
             // Скорость вычисляется как
             // сумма уставной скорости на
             compspd = parent::ctrspd + compkoeff * diff;
-
-            if (isnan(compspd))
-            {
-                irqs_disable();
-                cpu_delay(100000);
-                DPRINT(compkoeff);
-                DPRINT(parent::ctrspd);
-                DPRINT(diff);
-            }
             assert(!isnan(compspd));
-
             controlled->set_speed(compspd);
         }
 
