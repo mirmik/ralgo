@@ -3,6 +3,7 @@
 
 #include <ralgo/cnc/defs.h>
 #include <stdint.h>
+#include <string.h>
 
 #include <assert.h>
 #include <math.h>
