@@ -376,6 +376,8 @@ namespace heimer
         bool on_interrupt(control_node *slave, control_node *source,
                           interrupt_args *data) override
         {
+            (void) slave;
+            (void) source;
             if (data->code() == HEIMER_INTERRUPT_TYPE_CONTROL_UPDATE)
             {
                 // update_from_controlled();
