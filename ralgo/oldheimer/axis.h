@@ -66,9 +66,11 @@ namespace heimer
 
         virtual P request_feedback_position() = 0;
 
-        virtual bool on_interrupt(control_node *slave, control_node *source,
-                                  interrupt_args *data)
+        bool on_interrupt(control_node *slave, control_node *source,
+                                  interrupt_args *data) override
         {
+            (void) slave;
+            (void) source;
             if (data->code() == HEIMER_INTERRUPT_TYPE_CONTROL_UPDATE)
             {
                 P error = position_error();

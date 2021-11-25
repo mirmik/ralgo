@@ -169,6 +169,8 @@ namespace heimer
         bool on_interrupt(control_node *slave, control_node *source,
                           interrupt_args *args) override
         {
+            (void) slave;
+            (void) source;
             if (args->code() == HEIMER_INTERRUPT_TYPE_CONTROL_UPDATE)
             {
                 stop();

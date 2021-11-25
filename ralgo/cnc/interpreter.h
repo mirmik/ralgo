@@ -11,6 +11,8 @@
 #include <ralgo/cnc/planblock.h>
 #include <ralgo/log.h>
 
+#include <string>
+
 namespace cnc
 {
     struct interpreter_control_task
