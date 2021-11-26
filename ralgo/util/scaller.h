@@ -8,13 +8,14 @@ namespace ralgo
 {
     template <class K, class X = K> class scaller
     {
-        K _gain;
+        K _gain = {};
 
     public:
         scaller() = default;
         scaller(const K &koeff) : _gain(koeff) {}
 
         void set_gain(const K &koeff) { _gain = koeff; }
+        K gain() { return _gain; }
 
         void set_gain(const K &koeff, bool reverse)
         {

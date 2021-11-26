@@ -5,15 +5,23 @@ namespace ralgo
 {
     template <class T> class clamper
     {
+    public:
         T lo = T();
         T hi = T();
-        bool enabled = false;
+        bool enabled = true;
+        bool _inited = false;
 
     public:
-        clamper() = default;
+        clamper(bool en=true) : enabled(en) { }
+
+        bool inited() 
+        {
+            return _inited; 
+        }
 
         void set_limits(const T &lo, const T &hi)
         {
+            _inited = true;
             this->lo = lo;
             this->hi = hi;
         }
