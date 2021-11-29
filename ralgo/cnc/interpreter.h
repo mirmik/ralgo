@@ -91,7 +91,7 @@ namespace cnc
         {
             memset(final_positions, 0, sizeof(final_positions));
             for (auto &gain : gains)
-                gain = 1000;
+                gain = 1;
         }
 
         void evaluate_multipliers(double *multipliers, int64_t *steps)
