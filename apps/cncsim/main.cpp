@@ -14,9 +14,9 @@
 igris::ring<cnc::planner_block, 40> blocks;
 igris::ring<cnc::control_shift, 400> shifts;
 
-cnc::interpreter interpreter(&blocks);
 cnc::planner planner(&blocks, &shifts);
 cnc::revolver revolver(&shifts);
+cnc::interpreter interpreter(&blocks, &planner, &revolver);
 
 #include <chrono>
 #include <thread>

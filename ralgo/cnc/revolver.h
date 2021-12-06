@@ -63,6 +63,14 @@ namespace cnc
             return size;
         }
 
+        void current_velocity(float *velocity)
+        {
+            system_lock();
+            for (int i = 0; i < steppers_total; ++i)
+                velocity[i] = shifts_ring->tail().speed[i];
+            system_unlock();
+        }
+
         int room()
         {
             // Операция взятия оставшегося места над кольцевым буфером

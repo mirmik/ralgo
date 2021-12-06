@@ -11,6 +11,9 @@
 #include <ralgo/cnc/planblock.h>
 #include <ralgo/log.h>
 
+#include <ralgo/cnc/planner.h>
+#include <ralgo/cnc/revolver.h>
+
 #include <string>
 
 namespace cnc
@@ -34,6 +37,9 @@ namespace cnc
                 {
                 case 'F':
                     feed = val;
+                    continue;
+                case 'M':
+                    acc = val;
                     continue;
                 case 'X':
                     poses[0] = val;
@@ -86,8 +92,13 @@ namespace cnc
         double saved_acc = 1;
         double saved_feed = 1;
 
+        cnc::planner *planner;
+        cnc::revolver *revolver;
+
     public:
-        interpreter(igris::ring<planner_block> *blocks) : blocks(blocks)
+        interpreter(igris::ring<planner_block> *blocks, cnc::planner *planner,
+                    cnc::revolver *revolver)
+            : blocks(blocks), revolver(revolver), planner(planner)
         {
             memset(final_positions, 0, sizeof(final_positions));
             for (auto &gain : gains)
@@ -176,6 +187,28 @@ namespace cnc
             saved_acc = atof64(argv[0], nullptr);
         }
 
+        // Включить режим остановки.
+        void command_M112(int argc, char **argv, char *ans, int ansmax)
+        {
+            system_lock();
+            blocks->clear();
+            plan_stop_task();
+            system_unlock();
+        }
+
+        void plan_stop_task()
+        {
+            float velocity[NMAX_AXES];
+            revolver->current_velocity(velocity);
+
+            auto &block = blocks->head_place();
+            // planer
+            // block.set_stop_pattern(steps, total_axes, reduced_feed,
+            // reduced_acc,
+            //        multipliers);
+            blocks->move_head_one();
+        }
+
         void g_command(int argc, char **argv, char *ans, int ansmax)
         {
             int cmd = atoi(&argv[0][1]);
@@ -194,6 +227,9 @@ namespace cnc
             int cmd = atoi(&argv[0][1]);
             switch (cmd)
             {
+            case 112:
+                command_M204(argc - 1, argv + 1, ans, ansmax);
+                break;
             case 204:
                 command_M204(argc - 1, argv + 1, ans, ansmax);
                 break;
