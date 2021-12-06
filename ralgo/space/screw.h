@@ -5,7 +5,6 @@
 
 namespace ralgo
 {
-    template <class T> class htrans3;
     template <class T> class pose3;
 
     template <class T, int N> struct screw;
@@ -38,7 +37,10 @@ namespace ralgo
 
         screw operator-() const { return {-ang, -lin}; }
 
-        screw rotate_by(const htrans3<T> &);
+        screw rotate_by(const pose3<T> &tr)
+        {
+            return {tr.rotate_vector(ang), tr.rotate_vector(lin)};
+        }
 
         /// |w v||E r| = |w w*r+v|
         /// |0 0||0 1|   |0     0|

@@ -20,7 +20,6 @@ namespace cnc
         double fullpath = 0;
 
         double multipliers[NMAX_AXES];
-        double major_multiplier = 0;
 
         // отметки времени хранят инкрементное время до планирования и
         // абсолютное время после активации блока.
@@ -37,14 +36,6 @@ namespace cnc
     public:
         bool validation()
         {
-            // TODO: remove assertation
-            /*            assert(fabs(acceleration_before_ic * acceleration -
-                                    nominal_velocity) < 1e-5);
-                        assert(fabs(nominal_velocity * deceleration_after_ic -
-               fullpath) < 1e-5); assert(nominal_velocity * major_multiplier <
-               1); assert(acceleration * major_multiplier *
-               acceleration_before_ic < 1);*/
-
             if (fabs(acceleration_before_ic * acceleration - nominal_velocity) >
                 1e-5)
                 return false;
@@ -139,8 +130,6 @@ namespace cnc
             for (int i = 0; i < axes; ++i)
             {
                 this->multipliers[i] = multipliers[i];
-                if (multipliers[i] > major_multiplier)
-                    major_multiplier = multipliers[i];
             }
 
             assert(velocity < 1);

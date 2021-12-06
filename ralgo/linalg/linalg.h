@@ -2604,4 +2604,13 @@ linalg::mat<T, 4, 4> linalg::frustum_matrix(T x0, T x1, T y0, T y1, T n, T f,
             {0, 0, -(n + o) * f / (f - n), 0}};
 }
 
+namespace std
+{
+    template <class T, int N>
+    constexpr size_t size(const linalg::vec<T, N> &) noexcept
+    {
+        return N;
+    }
+}
+
 #endif

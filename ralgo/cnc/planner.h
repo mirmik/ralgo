@@ -265,7 +265,7 @@ namespace cnc
                 }
                 velocities[i] += accelerations[i]; // * delta;
             }
-            shifts->emplace(dir, step);
+            shifts->emplace(dir, step, velocities, total_axes);
 
             iteration_counter++;
         }
