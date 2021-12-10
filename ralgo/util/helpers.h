@@ -8,6 +8,7 @@
 #include <cmath>
 #include <complex>
 #include <numeric>
+#include <ralgo/linalg/vector.h>
 #include <vector>
 
 namespace ralgo
@@ -186,7 +187,7 @@ namespace ralgo
     };
     template <class V> struct defvec<void, V>
     {
-        using type = std::vector<
+        using type = ralgo::vector<
             std::remove_reference_t<decltype(std::declval<V>()[0])>>;
     };
     template <class R, class V> using defvec_t = typename defvec<R, V>::type;
@@ -199,7 +200,7 @@ namespace ralgo
     };
     template <class V> struct defvec_of<void, V>
     {
-        using type = std::vector<V>;
+        using type = ralgo::vector<V>;
     };
     template <class R, class V>
     using defvec_of_t = typename defvec_of<R, V>::type;
@@ -212,7 +213,7 @@ namespace ralgo
     };
     template <class F> struct fretvec<void, F>
     {
-        using type = std::vector<std::result_of<F>>;
+        using type = ralgo::vector<std::result_of<F>>;
     };
     template <class R, class F> using fretvec_t = typename fretvec<R, F>::type;
 

@@ -3,6 +3,7 @@
 
 #include <nos/print.h>
 #include <vector>
+#include <ralgo/linalg/vector.h>
 
 TEST_CASE("linspace")
 {
@@ -32,4 +33,10 @@ TEST_CASE("bilinear")
     CHECK_EQ(ralgo::bilinear_interpolation(1.f, 0.f, 1.f, 2.f, 3.f, 4.f), 2.f);
     CHECK_EQ(ralgo::bilinear_interpolation(0.f, 1.f, 1.f, 2.f, 3.f, 4.f), 3.f);
     CHECK_EQ(ralgo::bilinear_interpolation(1.f, 1.f, 1.f, 2.f, 3.f, 4.f), 4.f);
+}
+
+TEST_CASE("vector linspace")
+{
+    auto ls = ralgo::linspace(ralgo::vector{1,1}, ralgo::vector{4,4}, 4);
+    CHECK_EQ(ls[0], ralgo::vector{1,1});
 }

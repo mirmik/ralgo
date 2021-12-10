@@ -36,16 +36,9 @@ namespace ralgo
 
         template <class R = void, class V> defvec_t<R, V> list(const V &u)
         {
-            defvec_t<R, V> ret;
-
-#if __cplusplus >= 201703L
-            if constexpr (has_reserve<defvec_t<R, V>>())
-                ret.reserve(u.size());
-#endif
-
-            for (const auto &a : u)
-                ret.push_back(a);
-
+            defvec_t<R, V> ret(u.size());
+            for (int i = 0; i < u.size(); ++i)
+                ret[i] = u[i];
             return ret;
         }
 

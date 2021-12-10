@@ -15,7 +15,7 @@ namespace ralgo
 
     template <class A, class B, class K> auto lerp(A a, B b, K k)
     {
-        return (1 - k) * a + k * b;
+        return a * (1 - k) + b * k;
     }
 
     template <class A, class B, class U>
@@ -61,7 +61,7 @@ namespace ralgo
         {
             if (!endpoint)
             {
-                T k = (T)(points - 1) / (T)(points);
+                double k = (double)(points - 1) / (double)(points);
                 b = lerp(a, b, k);
             }
         }
@@ -70,7 +70,7 @@ namespace ralgo
 
         T operator[](int p)
         {
-            T koeff = (T)p / (T)(points - 1);
+            double koeff = (double)p / (double)(points - 1);
             return lerp(a, b, koeff);
         }
 
