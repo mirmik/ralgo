@@ -19,7 +19,7 @@ namespace ralgo
     }
 
     template <class A, class B, class U>
-    auto lerpkoeff(A left, B right, U target)
+    auto lerpcoeff(A left, B right, U target)
     {
         return (target - left) / (right - left);
     }

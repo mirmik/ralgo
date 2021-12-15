@@ -86,6 +86,20 @@ namespace ralgo
             return *this;
         }
         vector &operator=(vector &&oth) = default;
+
+        vector &operator+=(const vector &vec)
+        {
+            for (size_t i = 0; i < this->size(); ++i)
+                (*this)[i] += vec[i];
+            return *this;
+        }
+
+        vector &operator-=(const vector &vec)
+        {
+            for (size_t i = 0; i < this->size(); ++i)
+                (*this)[i] -= vec[i];
+            return *this;
+        }
     };
 }
 
