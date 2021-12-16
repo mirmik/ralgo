@@ -452,7 +452,7 @@ namespace ralgo
             template <class V> V &normalize(V &vec)
             {
                 double norm = ralgo::vecops::norm(vec);
-                ralgo::vecops::inplace::div(vec, norm);
+                return ralgo::vecops::inplace::div(vec, norm);
             }
         }
 
