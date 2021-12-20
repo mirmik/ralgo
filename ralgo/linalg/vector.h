@@ -26,6 +26,8 @@ namespace ralgo
         const auto data() const { return vec.data(); }
         auto data() { return vec.data(); }
 
+        void push_back(const T &val) { vec.push_back(val); }
+
         const T &operator[](int idx) const { return vec[idx]; }
         T &operator[](int idx) { return vec[idx]; }
 
