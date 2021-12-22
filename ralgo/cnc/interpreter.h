@@ -79,11 +79,14 @@ namespace cnc
                                              'C', 'I', 'J', 'K'};
 
     public:
+        igris::ring<planner_block> *blocks;
+        cnc::planner *planner;
+        cnc::revolver *revolver;
+
         bool info_mode = false;
 
         int total_axes = 3;
         double final_positions[NMAX_AXES];
-        igris::ring<planner_block> *blocks;
         double revolver_frequency = 0;
         double gains[NMAX_AXES];
 
@@ -92,13 +95,10 @@ namespace cnc
         double saved_acc = 1;
         double saved_feed = 1;
 
-        cnc::planner *planner;
-        cnc::revolver *revolver;
-
     public:
         interpreter(igris::ring<planner_block> *blocks, cnc::planner *planner,
                     cnc::revolver *revolver)
-            : blocks(blocks), revolver(revolver), planner(planner)
+            : blocks(blocks), planner(planner), revolver(revolver)
         {
             memset(final_positions, 0, sizeof(final_positions));
             for (auto &gain : gains)
@@ -188,7 +188,7 @@ namespace cnc
         }
 
         // Включить режим остановки.
-        void command_M112(int argc, char **argv, char *ans, int ansmax)
+        void command_M112(int, char **, char *, int)
         {
             system_lock();
             blocks->clear();
@@ -201,7 +201,7 @@ namespace cnc
             float velocity[NMAX_AXES];
             revolver->current_velocity(velocity);
 
-            auto &block = blocks->head_place();
+            // auto &block = blocks->head_place();
             // planer
             // block.set_stop_pattern(steps, total_axes, reduced_feed,
             // reduced_acc,

@@ -41,7 +41,6 @@ auto now() { return std::chrono::steady_clock::now(); }
 
 void planner_thread_function()
 {
-    auto start = now();
     auto awake = now();
 
     while (1)
@@ -55,7 +54,6 @@ void planner_thread_function()
 
 void telemetry_thread_function()
 {
-    auto start = now();
     auto awake = now();
     float poses[3];
 
@@ -81,7 +79,6 @@ namespace heimer
 
 void revolver_thread_function()
 {
-    auto start = now();
     auto awake = now();
 
     while (1)
@@ -100,7 +97,7 @@ void revolver_thread_function()
 robo::stepper *steppers_ptrs[] = {&steppers[0], &steppers[1], &steppers[2]};
 void configuration() { revolver.set_steppers(steppers_ptrs, 3); }
 
-int main(int argc, char **argv)
+int main(int, char **)
 {
 
 	crow::diagnostic_setup(true);
