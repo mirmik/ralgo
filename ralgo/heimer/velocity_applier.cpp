@@ -1,5 +1,5 @@
 #include <igris/math.h>
-#include <igris/util/numconvert.h>
+#include <cstdlib>
 #include <ralgo/heimer/executor.h>
 #include <ralgo/heimer/velocity_applier.h>
 #include <ralgo/log.h>
@@ -174,7 +174,7 @@ int velocity_applier::command(int argc, char **argv, char *output, int outmax)
 
     if (strcmp("setgear", argv[0]) == 0)
     {
-        set_gear(atof32(argv[1], nullptr));
+        set_gear(strtof(argv[1], nullptr));
         return 0;
     }
 
@@ -196,7 +196,7 @@ int velocity_applier::command(int argc, char **argv, char *output, int outmax)
 
     if (strcmp("setsteps", argv[0]) == 0)
     {
-        int64_t pos = atoi64(argv[1], 10, nullptr);
+        int64_t pos = strtoll(argv[1], nullptr, 10);
         int sts = set_current_steps_protected(pos);
         if (sts)
         {

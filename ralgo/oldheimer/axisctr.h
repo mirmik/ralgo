@@ -6,9 +6,9 @@
 #include <ralgo/oldheimer/axis.h>
 #include <ralgo/trajectory/traj1d.h>
 
+#include <cstdlib>
 #include <igris/event/delegate.h>
 #include <igris/math.h>
-#include <igris/util/numconvert.h>
 
 #include <nos/fprint.h>
 #include <nos/print.h>
@@ -169,8 +169,8 @@ namespace heimer
         bool on_interrupt(control_node *slave, control_node *source,
                           interrupt_args *args) override
         {
-            (void) slave;
-            (void) source;
+            (void)slave;
+            (void)source;
             if (args->code() == HEIMER_INTERRUPT_TYPE_CONTROL_UPDATE)
             {
                 stop();
@@ -353,14 +353,14 @@ namespace heimer
 
         if (strcmp(argv[0], "mov") == 0)
         {
-            fltarg = atof32(argv[1], nullptr);
+            fltarg = strtof(argv[1], nullptr);
             int ret = absmove(fltarg);
             return ret;
         }
 
         else if (strcmp(argv[0], "incmov") == 0)
         {
-            fltarg = atof32(argv[1], nullptr);
+            fltarg = strtof(argv[1], nullptr);
             int ret = incmove(fltarg);
             return ret;
         }
@@ -373,21 +373,21 @@ namespace heimer
 
         else if (strcmp(argv[0], "setspd") == 0)
         {
-            fltarg = atof32(argv[1], nullptr);
+            fltarg = strtof(argv[1], nullptr);
             set_speed(fltarg);
             return 0;
         }
 
         else if (strcmp(argv[0], "setacc") == 0)
         {
-            fltarg = atof32(argv[1], nullptr);
+            fltarg = strtof(argv[1], nullptr);
             set_accdcc(fltarg, fltarg);
             return 0;
         }
 
         else if (strcmp(argv[0], "setgain") == 0)
         {
-            fltarg = atof32(argv[1], nullptr);
+            fltarg = strtof(argv[1], nullptr);
             set_gain(fltarg);
             return 0;
         }
@@ -400,8 +400,8 @@ namespace heimer
                 return -1;
             }
 
-            P a = atof32(argv[1], nullptr);
-            P b = atof32(argv[2], nullptr);
+            P a = strtof(argv[1], nullptr);
+            P b = strtof(argv[2], nullptr);
 
             if (a > b)
                 return -1;

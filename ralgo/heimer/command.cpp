@@ -1,7 +1,7 @@
 #include <ralgo/heimer/command.h>
 
 #include <errno.h>
-#include <igris/util/numconvert.h>
+#include <cstdlib>
 #include <stdio.h>
 #include <string.h>
 
@@ -73,7 +73,7 @@ static int ctrnew(int argc, char **argv, char *output, int maxsize)
             return -1;
         }
 
-        int dim = atoi32(argv[1], 10, NULL);
+        int dim = strtol(argv[1], NULL, 10);
         for (int i = 2; i < argc; ++i)
         {
             create_axis_controller(argv[i], dim);
@@ -89,7 +89,7 @@ static int ctrnew(int argc, char **argv, char *output, int maxsize)
             return -1;
         }
 
-        int dim = atoi32(argv[2], 10, NULL);
+        int dim = strtol(argv[2], NULL, 10);
         auto ptr = new heimer::axstate_linear_processor(
             argv[1], dim, nullptr, nullptr, nullptr, nullptr);
         ptr->allocate_resources();
@@ -143,7 +143,7 @@ static int ctrnew(int argc, char **argv, char *output, int maxsize)
             return -1;
         }
 
-        int dim = atoi32(argv[1], 10, NULL);
+        int dim = strtol(argv[1], NULL, 10);
         auto ptr =
             new heimer::axstate_chain3_translation_processor(argv[2], dim);
         ptr->allocate_resources();

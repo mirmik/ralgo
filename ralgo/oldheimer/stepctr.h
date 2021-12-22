@@ -2,11 +2,11 @@
 #define RALGO_HEIMER_STEPCTR_H
 
 #include <assert.h>
+#include <cstdlib>
 #include <igris/dprint.h>
 #include <igris/dtrace.h>
 #include <igris/math.h>
 #include <igris/sync/syslock.h>
-#include <igris/util/numconvert.h>
 #include <ralgo/oldheimer/interrupt_args.h>
 #include <ralgo/oldheimer/phaser.h>
 
