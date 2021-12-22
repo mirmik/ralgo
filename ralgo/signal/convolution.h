@@ -66,17 +66,6 @@ namespace ralgo
             double g = g1 - g0;
             double t = t1 - t0;
 
-            nos::println();
-            PRINT(f0);
-            PRINT(f1);
-            PRINT(f);
-            PRINT(g0);
-            PRINT(g1);
-            PRINT(g);
-            PRINT(t0);
-            PRINT(t1);
-            PRINT(t);
-
             return (f0 * g0 * t + f0 * g * t / 2 + f * g0 * t / 2 +
                     f * g * t / 3);
         }
@@ -93,7 +82,6 @@ namespace ralgo
             {
                 double a =
                     convolution(k[i], k[i + 1], v[i], v[i + 1], w[i], w[i + 1]);
-                PRINT(a);
                 acc += a;
             }
 
