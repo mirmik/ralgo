@@ -174,3 +174,5 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 Makefile
+
+ralgo_test
