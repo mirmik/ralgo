@@ -3,9 +3,9 @@
 
 #include <stdint.h>
 
+#include <cstdlib>
 #include <igris/container/ring.h>
 #include <igris/sync/syslock.h>
-#include <igris/util/numconvert.h>
 
 #include <ralgo/cnc/shift.h>
 #include <ralgo/log.h>

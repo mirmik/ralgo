@@ -1,11 +1,11 @@
 #ifndef RALGO_CNC_INTERPRETER_H
 #define RALGO_CNC_INTERPRETER_H
 
+#include <cstdlib>
 #include <igris/container/array_view.h>
 #include <igris/container/ring.h>
 #include <igris/datastruct/argvc.h>
 #include <igris/sync/syslock.h>
-#include <igris/util/numconvert.h>
 
 #include <ralgo/cnc/defs.h>
 #include <ralgo/cnc/planblock.h>
@@ -184,7 +184,7 @@ namespace cnc
                 return;
             }
 
-            saved_acc = atof64(argv[0], nullptr);
+            saved_acc = strtod(argv[0], nullptr);
         }
 
         // Включить режим остановки.

@@ -30,7 +30,7 @@ namespace heimer
         {
             if (isdigit(*name))
             {
-                unsigned int axno = atoi32(name, 10, nullptr);
+                unsigned int axno = strtol(name, nullptr, 10);
                 if (axno < axes.size())
                     return axes[axno];
             }
@@ -123,7 +123,7 @@ namespace heimer
                 return 0;
             }
 
-            unsigned int igno = atoi32(argv[1], 10, nullptr);
+            unsigned int igno = strtol(argv[1], nullptr, 10);
 
             if (igno >= igroups.size())
             {

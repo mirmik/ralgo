@@ -87,8 +87,8 @@ namespace heimer
                     return -1;
                 }
 
-                float a = atof32(argv[1], nullptr);
-                float b = atof32(argv[2], nullptr);
+                float a = strtof(argv[1], nullptr);
+                float b = strtof(argv[2], nullptr);
 
                 return add({a, b});
             }

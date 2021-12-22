@@ -88,7 +88,7 @@ namespace heimer
 
                 for (int i = 0; i < dim(); ++i)
                 {
-                    fltargs[i] = atof32(argv[1 + i], nullptr);
+                    fltargs[i] = strtof(argv[1 + i], nullptr);
                 }
 
                 return absmove(fltargs);
@@ -104,7 +104,7 @@ namespace heimer
 
                 for (int i = 0; i < dim(); ++i)
                 {
-                    fltargs[i] = atof32(argv[1 + i], nullptr);
+                    fltargs[i] = strtof(argv[1 + i], nullptr);
                 }
 
                 return incmove(fltargs);
@@ -120,7 +120,7 @@ namespace heimer
 
                 for (int i = 0; i < dim(); ++i)
                 {
-                    fltargs[i] = atof32(argv[1 + i], nullptr);
+                    fltargs[i] = strtof(argv[1 + i], nullptr);
                 }
 
                 set_gains({fltargs, (size_t)dim()});
@@ -129,14 +129,14 @@ namespace heimer
 
             else if (strcmp(argv[0], "setspd") == 0)
             {
-                auto fltarg = atof32(argv[1], nullptr);
+                auto fltarg = strtof(argv[1], nullptr);
                 set_speed(fltarg);
                 return 0;
             }
 
             else if (strcmp(argv[0], "setacc") == 0)
             {
-                auto fltarg = atof32(argv[1], nullptr);
+                auto fltarg = strtof(argv[1], nullptr);
                 set_accdcc(fltarg, fltarg);
                 return 0;
             }
