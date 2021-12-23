@@ -58,8 +58,8 @@ namespace ralgo
                 c = t_t / znam;
                 d = T_T / znam;
                 e = t / znam;
-                PRINT(a);PRINT(b);PRINT(c);
-                PRINT(e);PRINT(d);
+
+
                     }
 
             V operator()(V g) override
@@ -144,10 +144,10 @@ namespace ralgo
 
             void print_internal() override
             {
-                PRINT(_a);
-                PRINT(_b);
-                PRINT(A);
-                PRINT(B);
+
+
+
+
             }
         };*/
 
@@ -178,9 +178,9 @@ namespace ralgo
 
             void print_internal() override
             {
-                PRINT(_kp);
-                PRINT(ki_discr);
-                PRINT(delta);
+
+
+
             }
         };
 
@@ -216,9 +216,9 @@ namespace ralgo
 
             void print_internal() override
             {
-                PRINT(kp_discr);
-                PRINT(ki_discr);
-                PRINT(kd_discr);
+
+
+
             }
         };
     } // namespace lintrans
