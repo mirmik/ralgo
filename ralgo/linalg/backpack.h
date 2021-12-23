@@ -53,7 +53,7 @@ namespace ralgo
                 }
             }
 
-            // PRINT(delta);
+
             lastcurrent = current;
             current = decltype(current)();
             for (int i = 0; i < dim; ++i)

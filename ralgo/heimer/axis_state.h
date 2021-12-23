@@ -25,9 +25,9 @@ namespace heimer
             {
                 feedpos = atof(argv[1]);
                 ctrpos = atof(argv[1]);
-                PRINT(ctrpos);
-                PRINT(feedpos);
-                PRINT(ctrvel);
+
+
+
                 return 0;
             }
 
