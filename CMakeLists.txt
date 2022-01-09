@@ -30,6 +30,8 @@ file(GLOB RALGO_SOURCES
 	ralgo/lp/*.cpp
 	ralgo/util/*.c
 	ralgo/robo/*.cpp
+	ralgo/imu/*.cpp
+	ralgo/signal/*.cpp
 )
 
 set(RALGO_SOURCES ${RALGO_SOURCES} PARENT_SCOPE)
