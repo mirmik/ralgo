@@ -23,7 +23,7 @@ namespace ralgo
 
         auto size() const { return vec.size(); }
         auto resize(int arg) { return vec.resize(arg); }
-        const auto data() const { return vec.data(); }
+        const value_type * data() const { return vec.data(); }
         auto data() { return vec.data(); }
 
         void push_back(const T &val) { vec.push_back(val); }
@@ -31,9 +31,9 @@ namespace ralgo
         const T &operator[](int idx) const { return vec[idx]; }
         T &operator[](int idx) { return vec[idx]; }
 
-        const auto begin() const { return vec.begin(); }
+        auto begin() const { return vec.begin(); }
         auto begin() { return vec.begin(); }
-        const auto end() const { return vec.end(); }
+        auto end() const { return vec.end(); }
         auto end() { return vec.end(); }
 
         vector operator-(const vector &oth) const
