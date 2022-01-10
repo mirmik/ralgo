@@ -59,9 +59,9 @@ namespace ralgo
         {
             defvec_t<R, V> r(keys.size());
 
-            /*PRINT(vals);
-            PRINT(stamp);
-            PRINT(keys);*/
+
+
+
 
             lerp_values(vals.begin(), vals.end(), stamp.begin(), stamp.end(),
                         keys.begin(), keys.end(), r.begin());
