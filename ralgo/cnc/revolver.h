@@ -71,6 +71,14 @@ namespace cnc
             system_unlock();
         }
 
+        void current_steps(int64_t *steps)
+        {
+            system_lock();
+            for (int i = 0; i < steppers_total; ++i)
+                steps[i] = steppers[i]->steps_count();
+            system_unlock();
+        }
+
         int room()
         {
             // Операция взятия оставшегося места над кольцевым буфером

@@ -3,6 +3,7 @@
 
 #include <ralgo/cnc/defs.h>
 #include <nos/io/ostream.h>
+#include <nos/print.h>
 
 #include <stdint.h>
 #include <string.h>

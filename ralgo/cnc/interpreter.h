@@ -14,6 +14,7 @@
 #include <ralgo/cnc/planner.h>
 #include <ralgo/cnc/revolver.h>
 #include <nos/shell/executor.h>
+#include <nos/io/string_writer.h>
 
 #include <string>
 
@@ -86,15 +87,13 @@ namespace cnc
 
         bool info_mode = false;
 
-        int total_axes = 3;
+        int total_axes = 0;
         double final_positions[NMAX_AXES];
         double revolver_frequency = 0;
         double gains[NMAX_AXES];
-
         int blockno = 0;
-
-        double saved_acc = 1;
-        double saved_feed = 1;
+        double saved_acc = 0;
+        double saved_feed = 0;
 
     public:
         interpreter(igris::ring<planner_block> *blocks, cnc::planner *planner,
@@ -121,8 +120,24 @@ namespace cnc
             }
         }
 
+        int check_correctness() 
+        {
+            if (saved_feed == 0) { 
+                ralgo::warn("saved_feed is null"); return 1; }
+            if (saved_acc == 0) { 
+                ralgo::warn("saved_acc is null"); return 1; }
+            if (revolver_frequency == 0) { 
+                ralgo::warn("revolver_frequency is null"); return 1; }
+            return 0;
+        }
+
         void command_G1(const nos::argv& argv, nos::ostream& os)
         {
+            if(check_correctness()) 
+            {
+                return;
+            }
+
             interpreter_control_task task;
             memset(&task, 0, sizeof(task));
 
@@ -285,9 +300,12 @@ namespace cnc
             return command(argv.without(1), os);
         }
 
-        std::vector<double> command_get_current_poses()
+        std::vector<int64_t> command_get_current_steps()
         {
-            return std::vector<double>{ 56, 78.5, 88.9873432 };
+            std::vector<int64_t> vect(total_axes);
+            for (int i = 0; i < total_axes; ++i)
+                revolver->current_steps(vect.data());
+            return vect;
         }
 
         int cmdinfo(const nos::argv& argv, nos::ostream& os) 
@@ -307,9 +325,9 @@ Commands:
                 os.println(arg);
             }
 
-            if (argv[1] == "poses") 
+            if (argv[1] == "steps") 
             {
-                return os.println(command_get_current_poses());
+                return os.println(command_get_current_steps());
             }
             
             os.println("Wrong subcommand");
@@ -321,7 +339,7 @@ Commands:
             {"cncinfo", "cmdinfo", nos::make_delegate(&interpreter::cmdinfo, this)},
         });
 
-        void newline(const char *line, size_t size)
+        void newline(const char *line, size_t)
         {
             nos::string_buffer output;
             executor.execute(nos::tokens(line), output);
