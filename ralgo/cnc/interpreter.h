@@ -13,6 +13,7 @@
 
 #include <ralgo/cnc/planner.h>
 #include <ralgo/cnc/revolver.h>
+#include <nos/shell/executor.h>
 
 #include <string>
 
@@ -24,14 +25,14 @@ namespace cnc
         double feed;
         double acc;
 
-        void parse(char **argv, int argc)
+        void parse(const nos::argv& argv)
         {
             memset(poses, 0, sizeof(poses));
 
-            for (int i = 0; i < argc; ++i)
+            for (unsigned int i = 0; i < argv.size(); ++i)
             {
-                char symb = argv[i][0];
-                double val = atof(&argv[i][1]);
+                char symb = argv[i].data()[0];
+                double val = atof(&argv[i].data()[1]);
 
                 switch (symb)
                 {
@@ -120,14 +121,14 @@ namespace cnc
             }
         }
 
-        void command_G1(int argc, char **argv, char *, int)
+        void command_G1(const nos::argv& argv, nos::ostream& os)
         {
             interpreter_control_task task;
             memset(&task, 0, sizeof(task));
 
             task.feed = saved_feed;
             task.acc = saved_acc;
-            task.parse(argv, argc);
+            task.parse(argv);
 
             if (task.feed == 0 || task.acc == 0)
             {
@@ -166,6 +167,8 @@ namespace cnc
                             multipliers);
             block.blockno = blockno++;
 
+            os.println("Add new block:\r\n", block);
+
             if (info_mode)
             {
                 ralgo::info("interpreter: add new block");
@@ -176,19 +179,31 @@ namespace cnc
             system_unlock();
         }
 
-        void command_M204(int argc, char **argv, char *ans, int ansmax)
+        void inspect_args(const nos::argv& argv, nos::ostream& os) 
         {
-            if (argc == 0)
+            PRINTTO(os, argv.size());
+            for (auto& arg : argv) 
             {
-                snprintf(ans, ansmax, "%f", saved_acc);
+                PRINTTO(os,arg);
+            }
+        }
+
+        void command_M204(const nos::argv& argv, nos::ostream& os)
+        {
+            if (argv.size() == 0)
+            {
+                os.print("%f", saved_acc);
                 return;
             }
 
-            saved_acc = strtod(argv[0], nullptr);
+            inspect_args(argv,os);
+
+            saved_acc = strtod(argv[0].data(), nullptr);
+            PRINTTO(os, saved_acc);
         }
 
         // Включить режим остановки.
-        void command_M112(int, char **, char *, int)
+        void command_M112(const nos::argv&, nos::ostream&)
         {
             system_lock();
             blocks->clear();
@@ -209,73 +224,107 @@ namespace cnc
             blocks->move_head_one();
         }
 
-        void g_command(int argc, char **argv, char *ans, int ansmax)
+        void g_command(const nos::argv& argv, nos::ostream& os)
         {
-            int cmd = atoi(&argv[0][1]);
+            int cmd = atoi(&argv[0].data()[1]);
             switch (cmd)
             {
             case 1:
-                command_G1(argc - 1, argv + 1, ans, ansmax);
+                command_G1(argv.without(1), os);
                 break;
             default:
-                snprintf(ans, ansmax, "Unresolved G command");
+                os.println("Unresolved G command");
             }
         }
 
-        void m_command(int argc, char **argv, char *ans, int ansmax)
+        void m_command(const nos::argv& argv, nos::ostream& os)
         {
-            int cmd = atoi(&argv[0][1]);
+            int cmd = atoi(&argv[0].data()[1]);
             switch (cmd)
             {
             case 112:
-                command_M204(argc - 1, argv + 1, ans, ansmax);
+                command_M204(argv.without(1), os);
                 break;
             case 204:
-                command_M204(argc - 1, argv + 1, ans, ansmax);
+                command_M204(argv.without(1), os);
                 break;
             default:
-                snprintf(ans, ansmax, "Unresolved M command");
+                os.println("Unresolved M command");
             }
         }
 
-        int command(int argc, char **argv, char *ans, int ansmax)
+        int command(const nos::argv& argv, nos::ostream& os)
         {
-            assert(revolver_frequency != 0);
-
-            if (argc == 0)
+            if (argv.size() == 0)
                 return 0;
 
             char cmdsymb = argv[0][0];
-
             switch (cmdsymb)
             {
-            case 'G':
-            {
-                g_command(argc, argv, ans, ansmax);
-                break;
-            }
+                case 'G':
+                {
+                    g_command(argv, os);
+                    break;
+                }
 
-            case 'M':
-            {
-                m_command(argc, argv, ans, ansmax);
-                break;
-            }
+                case 'M':
+                {
+                    m_command(argv, os);
+                    break;
+                }
+
+                default:
+                    os.println("Unresolved command");
             }
 
             return 0;
         }
 
+        int command_drop_first(const nos::argv& argv, nos::ostream& os)
+        {
+            return command(argv.without(1), os);
+        }
+
+        std::vector<double> command_get_current_poses()
+        {
+            return std::vector<double>{ 56, 78.5, 88.9873432 };
+        }
+
+        int cmdinfo(const nos::argv& argv, nos::ostream& os) 
+        {
+            if (argv.size() <= 1) 
+            {
+                os.println(R"(Need subcmd:
+Commands:
+    poses
+)");
+                return 0;
+            }
+
+            os.println(argv.size());
+            for(auto& arg : argv) 
+            {
+                os.println(arg);
+            }
+
+            if (argv[1] == "poses") 
+            {
+                return os.println(command_get_current_poses());
+            }
+            
+            os.println("Wrong subcommand");
+            return 0;
+        }
+
+        nos::executor executor = nos::executor({
+            {"cnc", "commands", nos::make_delegate(&interpreter::command_drop_first, this)},
+            {"cncinfo", "cmdinfo", nos::make_delegate(&interpreter::cmdinfo, this)},
+        });
+
         void newline(const char *line, size_t size)
         {
-            char buf[48];
-            char ans[48];
-            memcpy(buf, line, size);
-            buf[size] = 0;
-
-            char *argv[10];
-            int argc = argvc_internal_split(buf, argv, size);
-
-            command(argc, argv, ans, 48);
+            nos::string_buffer output;
+            executor.execute(nos::tokens(line), output);
         }
 
         void newline(const std::string &line)
@@ -283,9 +332,13 @@ namespace cnc
             newline(line.data(), line.size());
         }
 
-        void set_revolver_frequency(double freq) { revolver_frequency = freq; }
+        void set_revolver_frequency(double freq) { 
+            revolver_frequency = freq; 
+        }
 
-        void set_axes_count(int total) { total_axes = total; }
+        void set_axes_count(int total) { 
+            total_axes = total; 
+        }
     };
 }
 
