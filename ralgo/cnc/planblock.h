@@ -2,6 +2,8 @@
 #define RALGO_CNC_PLANBLOCK_H
 
 #include <ralgo/cnc/defs.h>
+#include <nos/io/ostream.h>
+
 #include <stdint.h>
 #include <string.h>
 
@@ -34,6 +36,21 @@ namespace cnc
         uint8_t exact_stop = 0;
 
     public:
+        size_t print_to(nos::ostream& os) const
+        {
+            PRINTTO(os, nominal_velocity);
+            PRINTTO(os, acceleration);
+            PRINTTO(os, fullpath);
+            PRINTTO(os, start_ic);
+            PRINTTO(os, acceleration_before_ic);
+            PRINTTO(os, deceleration_after_ic);
+            PRINTTO(os, block_finish_ic);
+            PRINTTO(os, active_finish_ic);
+            PRINTTO(os, blockno);
+            PRINTTO(os, exact_stop);
+            return 0;
+        } 
+
         bool validation()
         {
             if (fabs(acceleration_before_ic * acceleration - nominal_velocity) >
