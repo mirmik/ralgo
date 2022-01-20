@@ -2,6 +2,7 @@
 #define RALGO_GEOM_POSE2_H
 
 #include <ralgo/linalg/linalg.h>
+#include <ralgo/space/screw.h>
 
 namespace ralgo
 {
@@ -48,6 +49,19 @@ namespace ralgo
         {
             return linalg::rot(ang, vec) + lin;
         }
+
+        ralgo::screw<T,2> rotate(ralgo::screw<T,2> scr) const 
+        {
+            return { scr.ang, rotate(scr.lin) };
+        }
+
+
+        linalg::vec<T, 2> rotate(linalg::vec<T, 2> vec) const
+        {
+            return linalg::rot(ang, vec);
+        }
+
+        linalg::vec<T,2> translation() { return lin; }
     };
 
     template <class T> T vector_angle(linalg::vec<T, 2> vec)
