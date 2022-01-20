@@ -22,5 +22,5 @@ igris::console_command heimer::command_center_cmdtable[] = {
     {"ax", axcmd},
     {"ig", igcmd},
     {"ctr", ctrcmd},
-    {"setprotect", set_global_protection_command},
+    {"setprotect", ralgo::set_global_protection_command},
     {nullptr, (void *)nullptr}};

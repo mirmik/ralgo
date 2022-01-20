@@ -1,19 +1,19 @@
-#include <ralgo/global_protection.h>
-
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <ralgo/global_protection.h>
 #include <igris/dprint.h>
 
-volatile bool heimer::global_protection = true;
+volatile bool ralgo::global_protection = true;
 
-void heimer::set_global_protection(bool en) { global_protection = en; }
+void ralgo::set_global_protection(bool en) 
+{ 
+	global_protection = en; 
+}
 
-int heimer::set_global_protection_command(int argc, char *argv[])
+int ralgo::set_global_protection_command(int argc, char *argv[])
 {
     if (argc != 2)
     {
-        printf("global_protection %d\r\n", (int)global_protection);
         return 0;
     }
 
