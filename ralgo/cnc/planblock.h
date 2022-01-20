@@ -142,9 +142,6 @@ namespace cnc
         void set_state(int64_t *steps, int axes, double velocity,
                        double acceleration, double *multipliers)
         {
-            (void)steps;
-            (void)axes;
-
             for (int i = 0; i < axes; ++i)
             {
                 this->multipliers[i] = multipliers[i];

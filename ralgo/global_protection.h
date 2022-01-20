@@ -1,7 +1,7 @@
-#ifndef HEIMER_PROTECT_H
-#define HEIMER_PROTECT_H
+#ifndef RALGO_PROTECT_H
+#define RALGO_PROTECT_H
 
-namespace heimer
+namespace ralgo
 {
     extern volatile bool global_protection;
 
