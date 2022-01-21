@@ -42,6 +42,7 @@ crow::publisher publisher(crowker, "cncsim/feedpos");
 crow::service_node control_service(crowker, "cncsim/cli", +[]
     (char *cmd, int, crow::service_node& srv)
 {
+	nos::println("input: ", nos::buffer(cmd));
     nos::string_buffer answer;
     interpreter.executor.execute(nos::tokens(cmd), answer);
     srv.reply(answer.str().data(), answer.str().size());
