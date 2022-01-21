@@ -2,11 +2,10 @@
 #define RALGO_HEIMER_EXECUTOR_H
 
 #include <ralgo/heimer/signal_processor.h>
+#include <ralgo/global_protection.h>
 
 namespace heimer
 {
-    extern bool global_protection;
-
     class executor_class
     {
     public:

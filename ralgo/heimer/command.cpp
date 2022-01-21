@@ -342,7 +342,7 @@ static int confcmd(int, char **argv, char *, int)
 
     if (strcmp(argv[0], "protect") == 0)
     {
-        heimer::global_protection = atoi(argv[1]);
+        ralgo::global_protection = atoi(argv[1]);
     }
 
     if (strcmp(argv[0], "initaxapi") == 0)
