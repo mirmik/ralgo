@@ -38,7 +38,7 @@ using std::chrono::operator""us;
 
 robo::stepper steppers[3];
 
-crow::publisher publisher(crowker, "cncsim/feedpos");
+crow::publisher publisher(crowker, "cncsim/mon/pose");
 crow::service_node control_service(crowker, "cncsim/cli", +[]
     (char *cmd, int, crow::service_node& srv)
 {
