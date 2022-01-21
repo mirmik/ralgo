@@ -6,6 +6,7 @@
 */
 
 #include <ralgo/util/helpers.h>
+
 #include <type_traits>
 
 namespace ralgo
@@ -42,7 +43,7 @@ namespace ralgo
                 };*/
 
         // Свёртка списка по функции func.
-        template <class F, class A, class R = std::result_of_t<F(A)>>
+        template <class F, class A, class R = std::invoke_result_t<F(A)>>
         R fold(F &&func, const R &initval, const A &a)
         {
             R accum = initval;
