@@ -64,7 +64,7 @@ int signal_processor::activate(disctime_t curtim)
 {
     int success = 1;
 
-    if (global_protection)
+    if (ralgo::global_protection)
         return -1;
 
     if (is_active())
