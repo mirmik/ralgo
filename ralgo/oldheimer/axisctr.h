@@ -220,7 +220,7 @@ namespace heimer
         auto dist = tgtpos - curpos;
         int64_t curtim = ralgo::discrete_time();
 
-        if (heimer::global_protection)
+        if (ralgo::global_protection)
         {
             ralgo::warn(mnemo(), ": cannot start: global protection is setted");
             return -1;

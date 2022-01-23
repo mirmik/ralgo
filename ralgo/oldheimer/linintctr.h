@@ -71,7 +71,7 @@ namespace heimer
                   igris::array_view<Position> tgtpos,
                   bool without_checker = false)
         {
-            if (heimer::global_protection)
+            if (ralgo::global_protection)
             {
                 ralgo::warn(parent::mnemo(),
                             ": cannot start: global protection is setted");

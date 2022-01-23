@@ -1,6 +1,7 @@
 #ifndef RALGO_HEIMER2_AXISCTR_H
 #define RALGO_HEIMER2_AXISCTR_H
 
+#include <initializer_list>
 #include <ralgo/disctime.h>
 #include <ralgo/heimer/axis_state.h>
 #include <ralgo/heimer/axisctr_approval.h>

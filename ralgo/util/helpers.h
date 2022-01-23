@@ -213,7 +213,7 @@ namespace ralgo
     };
     template <class F> struct fretvec<void, F>
     {
-        using type = ralgo::vector<std::result_of<F>>;
+        using type = ralgo::vector<std::invoke_result<F>>;
     };
     template <class R, class F> using fretvec_t = typename fretvec<R, F>::type;
 

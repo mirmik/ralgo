@@ -42,11 +42,11 @@ namespace ralgo
                 return *this;
             }
 
-            bool operator==(const linspace_iterator &oth)
+            bool operator==(const linspace_iterator &oth) const
             {
                 return p == oth.p && ls == oth.ls;
             }
-            bool operator!=(const linspace_iterator &oth)
+            bool operator!=(const linspace_iterator &oth) const
             {
                 return p != oth.p || ls != oth.ls;
             }
