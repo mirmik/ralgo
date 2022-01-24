@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <ralgo/linalg/vector_view.h>
 #include <initializer_list>
 
 namespace ralgo
@@ -22,11 +23,15 @@ namespace ralgo
         vector(const vector &oth) = default;
         vector(vector &&oth) = default;
 
+        operator vector_view<T>() {
+            return vector_view<T>(data(), size());
+        }
+
         auto size() const { return vec.size(); }
         auto resize(int arg) { return vec.resize(arg); }
         const value_type * data() const { return vec.data(); }
-        auto data() { return vec.data(); }
-
+        value_type* data() { return vec.data(); }
+        
         void push_back(const T &val) { vec.push_back(val); }
 
         const T &operator[](int idx) const { return vec[idx]; }

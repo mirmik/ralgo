@@ -5,10 +5,12 @@
 #include <igris/container/array_view.h>
 #include <igris/container/ring.h>
 #include <igris/datastruct/argvc.h>
+#include <igris/container/static_vector.h>
 #include <igris/sync/syslock.h>
 
-#include <ralgo/cnc/defs.h>
 #include <ralgo/cnc/planblock.h>
+#include <ralgo/cnc/control_task.h>
+#include <ralgo/linalg/vecops.h>
 #include <ralgo/log.h>
 
 #include <ralgo/global_protection.h>
@@ -21,81 +23,19 @@
 
 namespace cnc
 {
-    struct interpreter_control_task
-    {
-        bool isok;
-        double poses[NMAX_AXES];
-        double feed;
-        double acc;
-
-        int parse(const nos::argv& argv)
-        {
-            memset(poses, 0, sizeof(poses));
-
-            for (unsigned int i = 0; i < argv.size(); ++i)
-            {
-                char symb = argv[i].data()[0];
-                double val = atof(&argv[i].data()[1]);
-
-                switch (symb)
-                {
-                case 'F':
-                    feed = val;
-                    continue;
-                case 'M':
-                    acc = val;
-                    continue;
-                case 'X':
-                    poses[0] = val;
-                    continue;
-                case 'Y':
-                    poses[1] = val;
-                    continue;
-                case 'Z':
-                    poses[2] = val;
-                    continue;
-                case 'A':
-                    poses[3] = val;
-                    continue;
-                case 'B':
-                    poses[4] = val;
-                    continue;
-                case 'C':
-                    poses[5] = val;
-                    continue;
-                case 'I':
-                    poses[6] = val;
-                    continue;
-                case 'J':
-                    poses[7] = val;
-                    continue;
-                case 'K':
-                    poses[8] = val;
-                    continue;
-                default:
-                    return -1;
-                }
-            }
-            return 0;
-        }
-    };
-
     class interpreter
     {
-        static constexpr char alphabet[9] = {'X', 'Y', 'Z', 'A', 'B',
-                                             'C', 'I', 'J', 'K'};
+        //static constexpr char alphabet[9] = {'X', 'Y', 'Z', 'A', 'B',
+        //                                     'C', 'I', 'J', 'K'};
 
-    public:
+    private:
         igris::ring<planner_block> *blocks;
         cnc::planner *planner;
         cnc::revolver *revolver;
-
-        bool info_mode = false;
-
         int total_axes = 0;
         double revolver_frequency = 0;
-        double gains[NMAX_AXES];
-        int64_t final_steps[NMAX_AXES];
+        igris::static_vector<double, NMAX_AXES> ext2int_scale;
+        igris::static_vector<double, NMAX_AXES> final_position;
         int blockno = 0;
         double saved_acc = 0;
         double saved_feed = 0;
@@ -104,25 +44,13 @@ namespace cnc
         interpreter(igris::ring<planner_block> *blocks, cnc::planner *planner,
                     cnc::revolver *revolver)
             : blocks(blocks), planner(planner), revolver(revolver)
-        {
-            memset(gains, 0, sizeof(gains));
-            memset(final_steps, 0, sizeof(final_steps));
-            for (auto &gain : gains) gain = 1;
-        }
+        {}
 
-        void evaluate_fractions(double *fractions_out, const int64_t *steps)
+        void init_axes(int total_axes) 
         {
-            int64_t accum = 0;
-            for (int i = 0; i < total_axes; ++i)
-            {
-                accum += steps[i] * steps[i];
-            }
-
-            double dist = sqrt(accum);
-            for (int i = 0; i < total_axes; ++i)
-            {
-                fractions_out[i] = (double)steps[i] / dist;
-            }
+            this->total_axes = total_axes;
+            ext2int_scale.resize(total_axes); 
+            final_position.resize(total_axes);
         }
 
         int check_correctness(nos::ostream& os) 
@@ -138,9 +66,9 @@ namespace cnc
             return 0;
         }
 
-        interpreter_control_task g1_parse_task(const nos::argv& argv) 
+        control_task g1_parse_task(const nos::argv& argv) 
         {
-            interpreter_control_task task;
+            control_task task;
             memset(&task, 0, sizeof(task));
 
             task.feed = saved_feed;
@@ -163,8 +91,8 @@ namespace cnc
             return task;            
         }
 
-        double evaluate_steps_array(
-            const interpreter_control_task& task, 
+        /*double evaluate_steps_array(
+            const control_task& task, 
             int64_t * steps) 
         {
             memset(steps, 0, sizeof(int64_t)*total_axes);
@@ -175,63 +103,87 @@ namespace cnc
                 accum += steps[i] * steps[i];
             }
             return accum;
-        }
+        }*/
 
-        double evaluate_dists_array(
-            const interpreter_control_task& task, 
+        /*double evaluate_dists_array(
+            const control_task& task, 
             double * dists) 
         {
             memset(dists, 0, sizeof(double)*total_axes);
             double accum = 0;
             for (int i = 0; i < total_axes; ++i)
             {
-                dists[i] = task.poses[i];
+                dists[i] = task.poses()[i];
                 accum += dists[i] * dists[i];
             }   
             return accum;
-        }
+        }*/
 
-        void evaluate_interpreter_task(const interpreter_control_task& task, nos::ostream& os) 
+        void evaluate_interpreter_task(
+            const control_task& task, 
+            planner_block& block, 
+            nos::ostream&) 
         {
-            int64_t steps[NMAX_AXES];
-            double dists[NMAX_AXES];
-            double Saccum = evaluate_steps_array(task, steps);
-            double saccum = evaluate_dists_array(task, dists);
+            auto intdists = ralgo::vecops::mul_vv<ralgo::vector<double>>(
+                task.poses(total_axes), ext2int_scale);
+            auto direction = ralgo::vecops::normalize<ralgo::vector<double>>(
+                task.poses(total_axes));
+            auto dirgain = ralgo::vecops::norm(
+                ralgo::vecops::mul_vv(direction, ext2int_scale));
 
-            // vecgain - scale coefficient with target direction
-            double vecgain = sqrt(Saccum) / sqrt(saccum);
-            double feed = task.feed * vecgain;
-            double acc = task.acc * vecgain;
-
+            double feed = task.feed * dirgain;
+            double acc = task.acc * dirgain;
+            
             // scale feed and acc by revolver freqs settings. 
             double reduced_feed = feed / revolver_frequency;
             double reduced_acc =
                 acc / (revolver_frequency * revolver_frequency);
 
             // Eval fractions 
-            double fractions[total_axes];
-            evaluate_fractions(fractions, steps);
+            auto fractions = ralgo::vecops::normalize<>(intdists);
 
-            auto &block = blocks->head_place();
-            block.set_state(steps, total_axes, reduced_feed, reduced_acc,
+            // output
+            block.set_state(intdists, total_axes, reduced_feed, reduced_acc,
                             fractions);
-            block.blockno = blockno++;
-
-            for (int i=0; i < total_axes; ++i)
-                final_steps[i] += steps[i];
-
-            os.println("Add new block:\r\n", block);
-            system_lock();
-            blocks->move_head_one();
-            system_unlock();
         }
 
         std::vector<double> final_gained_position() 
         {
             std::vector<double> ret(total_axes);
             for (int i = 0; i < total_axes; ++i) 
-                ret[i] = final_steps[i] / gains[i];
+                ret[i] = final_position[i] / ext2int_scale[i];
             return ret;   
+        }
+
+        void set_scale(const ralgo::vector_view<double>& vec) 
+        {
+            ext2int_scale = vec;
+        }
+
+        void set_saved_acc(double acc) 
+        {
+            saved_acc = acc;
+        }
+
+        void set_saved_feed(double feed) 
+        {
+            saved_feed = feed;
+        }
+
+        void evaluate_task(const control_task& task, 
+            nos::ostream& os) 
+        {
+            auto poses = task.poses(total_axes);
+            auto &block = blocks->head_place();
+            evaluate_interpreter_task(task, block, os);
+            block.blockno = blockno++;
+
+            for (int i=0; i < total_axes; ++i)
+                final_position[i] += poses[i];
+
+            system_lock();
+            blocks->move_head_one();
+            system_unlock();
         }
 
         void command_incremental_move(const nos::argv& argv, nos::ostream& os)
@@ -239,7 +191,7 @@ namespace cnc
             if(check_correctness(os)) return;
             auto task = g1_parse_task(argv);
             if (!task.isok) return;
-            evaluate_interpreter_task(task, os);
+            evaluate_task(task, os);
         }
 
         void command_absolute_move(const nos::argv& argv, nos::ostream& os)
@@ -250,9 +202,9 @@ namespace cnc
             auto curpos = final_gained_position();
             for (int i = 0; i < total_axes; ++i) 
             {
-                task.poses[i] = task.poses[i] - curpos[i];       
+                task.poses(total_axes)[i] = task.poses(total_axes)[i] - curpos[i];       
             }
-            evaluate_interpreter_task(task, os);
+            evaluate_task(task, os);
         }
 
         void inspect_args(const nos::argv& argv, nos::ostream& os) 
@@ -372,7 +324,7 @@ namespace cnc
             if (argv.size() == 0)
                 return 0;
 
-            if (argv[0] == "gprotection") 
+            if (argv[0] == "setprotect") 
             {
                 ralgo::global_protection = false;
                 return 0;
@@ -408,16 +360,31 @@ namespace cnc
                 return 0;
             }
 
-            else if (argv[0] == "incmov") 
+            else if (argv[0] == "relmove") 
             {
                 command_incremental_move(argv.without(1), os);
                 return 0;
             }
 
-            else if (argv[0] == "absmov") 
+            else if (argv[0] == "absmove") 
             {
                 command_absolute_move(argv.without(1), os);
                 return 0;
+            }
+
+            else if (argv[0] == "steps") 
+            {
+                 return os.println(current_steps());   
+            }
+
+            else if (argv[0] == "poses") 
+            {
+                 return os.println(current_poses());   
+            }
+
+            else if (argv[0] == "gains") 
+            {
+                 //return os.println(ext2int_scale);   
             }
 
             os.println("Unresolved command");
@@ -436,10 +403,21 @@ namespace cnc
 
         std::vector<int64_t> current_steps()
         {
-            std::vector<int64_t> vect(total_axes);
-            for (int i = 0; i < total_axes; ++i)
-                revolver->current_steps(vect.data());
-            return vect;
+        //    std::vector<int64_t> vect(total_axes);
+        //    revolver->current_steps(vect.data());
+        //    return vect;
+            return {0,0,0};
+        }
+
+        std::vector<double> current_poses()
+        {
+        //    std::vector<int64_t> steps(total_axes);
+        //    std::vector<double> poses(total_axes);
+        //    revolver->current_steps(steps.data());
+        //    for (int i = 0; i < total_axes; ++i)
+        //        poses[i] = steps[i] / ext2int_scale[i];
+        //    return poses;
+            return {0,0,0};
         }
 
         int print_interpreter_state(nos::ostream& os) 

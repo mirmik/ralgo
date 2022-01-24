@@ -22,7 +22,7 @@ application("runtests",
 		"physics/*.cpp",
 	],
 
-	cxx_flags = "-g -pedantic -Wno-vla -Werror=extra -Werror=all -Werror=reorder",
+	cxx_flags = "-g -pedantic -Wno-vla -Werror=extra -Werror=all -Werror=reorder -Wno-ambiguous-reversed-operator",
 	cc_flags = "-g -Werror=incompatible-pointer-types -pedantic -Werror=extra -Werror=all",
 	ld_flags = "-L/usr/local/lib/",
 	cxxstd= "c++20",
