@@ -2,6 +2,7 @@
 #define RALGO_CNC_PLANBLOCK_H
 
 #include <ralgo/cnc/defs.h>
+#include <ralgo/linalg/vector_view.h>
 #include <nos/io/ostream.h>
 #include <nos/print.h>
 
@@ -16,8 +17,7 @@ namespace cnc
     class planner_block
     {
     public:
-        int64_t steps[NMAX_AXES];
-
+        double axdist[NMAX_AXES];
         double nominal_velocity = 0;
         double acceleration = 0;
         double fullpath = 0;
@@ -139,8 +139,8 @@ namespace cnc
             }
         }
 
-        void set_state(int64_t *steps, int axes, double velocity,
-                       double acceleration, double *multipliers)
+        void set_state(ralgo::vector_view<double> axdist, int axes, double velocity,
+                       double acceleration, ralgo::vector_view<double> multipliers)
         {
             for (int i = 0; i < axes; ++i)
             {
@@ -152,7 +152,7 @@ namespace cnc
 
             double pathsqr = 0;
             for (int i = 0; i < axes; ++i)
-                pathsqr += steps[i] * steps[i];
+                pathsqr += axdist[i] * axdist[i];
             double path = sqrt(pathsqr); // area
             double time = path / velocity;
 
@@ -162,7 +162,7 @@ namespace cnc
             this->active_finish_ic = itime;
             this->fullpath = path;
             this->start_ic = 0;
-            memcpy(this->steps, steps, sizeof(steps[0]) * axes);
+            memcpy(this->axdist, axdist.data(), sizeof(axdist[0]) * axes);
 
             if (itime > preftime)
             {

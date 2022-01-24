@@ -196,6 +196,26 @@ namespace ralgo
             _stride = 0;
         }
 
+        bool operator==(const matrix_view &oth) const
+        {
+            if (rows() != oth.rows())
+                return false;
+            if (cols() != oth.cols())
+                return false;
+
+            for (int i = 0; i < oth.rows(); ++i)
+                for (int j = 0; j < oth.cols(); ++j)
+                    if (at(i, j) != oth.at(i, j))
+                        return false;
+
+            return true;
+        }
+
+        bool operator!=(const matrix_view &oth) const
+        {
+            return !operator==(oth);
+        }
+        
         template <class M> bool operator==(const M &oth) const
         {
             if (rows() != oth.rows())
@@ -209,6 +229,11 @@ namespace ralgo
                         return false;
 
             return true;
+        }
+
+        template <class M> bool operator!=(const M &oth) const
+        {
+            return !operator==(oth);
         }
     };
 

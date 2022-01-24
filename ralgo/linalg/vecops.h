@@ -359,6 +359,14 @@ namespace ralgo
             elementwise_to(res, ralgo::op_mul(), a, b);
         }
 
+        template <class R = void, class A>
+        defsame_t<R, A> normalize(const A &a)
+        {
+            double norm = ralgo::vecops::norm(a);
+            return ralgo::vecops::div_vs<defsame_t<R, A>, A, double>(a, norm);
+        }
+
+
         template <class R = void, class Head, class... Args>
         auto zip(Head &&head, Args &&... args)
             -> defsame_t<R, std::vector<std::tuple<Args...>>>

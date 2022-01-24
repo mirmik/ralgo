@@ -50,7 +50,7 @@ namespace cnc
         double accelerations[NMAX_AXES];
         double velocities[NMAX_AXES];
         int64_t steps[NMAX_AXES];
-        int64_t synced_steps[NMAX_AXES];
+        //int64_t synced_steps[NMAX_AXES];
 
         double dda_counters[NMAX_AXES];
 
@@ -83,46 +83,29 @@ namespace cnc
             memset(accelerations, 0, sizeof(accelerations));
             memset(velocities, 0, sizeof(velocities));
             memset(steps, 0, sizeof(steps));
-            memset(synced_steps, 0, sizeof(synced_steps));
+        //    memset(synced_steps, 0, sizeof(synced_steps));
             memset(dda_counters, 0, sizeof(dda_counters));
         }
 
         int block_index(planner_block *it) { return blocks->index_of(it); }
 
-        void synchronize_finished_block(planner_block &block)
-        {
-            for (int i = 0; i < total_axes; ++i)
-            {
-                synced_steps[i] += block.steps[i];
-            }
-        }
+        //void synchronize_finished_block(planner_block &block)
+        //{
+        //    for (int i = 0; i < total_axes; ++i)
+        //    {
+        //        synced_steps[i] += block.steps[i];
+        //    }
+        //}
 
         void fixup_postactive_blocks()
         {
             while (blocks->tail_index() != active)
             {
                 if (!blocks->tail().is_active_or_postactive(iteration_counter))
-                {
-                    synchronize_finished_block(blocks->tail());
-                    if (info_mode)
-                    {
-                        ralgo::info("planner: discard_finished_block");
-                    }
                     blocks->pop();
-                }
 
                 else
                     break;
-            }
-
-            if (active_block == nullptr && !has_postactive_blocks())
-            {
-                for (int i = 0; i < total_axes; ++i)
-                {
-                    assert(steps[i] == synced_steps[i]);
-                }
-                if (info_mode)
-                    ralgo::info("planner: all blocks resolved");
             }
         }
 
