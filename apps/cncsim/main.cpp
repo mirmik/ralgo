@@ -41,9 +41,10 @@ robo::stepper steppers[3];
 
 crow::publisher publisher(crowker, "cncsim/mon/pose");
 crow::service_node control_service(crowker, "cncsim/cli", +[]
-    (char *cmd, int, crow::service_node& srv)
+    (char *cmd, int len, crow::service_node& srv)
 {
-	nos::println("input: ", nos::buffer(cmd));
+	cmd[len] = 0;
+	nos::println("input: ", std::string(cmd, len), "END");
     nos::string_buffer answer;
     interpreter.executor.execute(nos::tokens(cmd), answer);
     srv.reply(answer.str().data(), answer.str().size());
@@ -150,8 +151,8 @@ int main(int argc, char ** argv)
     interpreter.init_axes(3);
 	interpreter.set_scale(ralgo::vector<double>{
 		4194304./10000., 4194304./10000., 4194304./10000.});
-	interpreter.set_saved_acc(10);
-    interpreter.set_saved_feed(10);
+	//interpreter.set_saved_acc(10);
+    //interpreter.set_saved_feed(10);
 	interpreter.set_revolver_frequency(10000);
 
 	/*interpreter.newline("cnc G01 X2 F5");

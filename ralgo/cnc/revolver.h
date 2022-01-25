@@ -34,6 +34,7 @@ namespace cnc
     {
     public:
         bool info_mode = false;
+        int steppers_total = 0;
 
     private:
         bool first_iteration_label = false;
@@ -41,7 +42,6 @@ namespace cnc
         igris::ring<cnc::control_shift> *shifts_ring;
 
         robo::stepper **steppers = nullptr;
-        int steppers_total = 0;
 
     public:
         revolver(igris::ring<cnc::control_shift> *ring) : shifts_ring(ring) {}

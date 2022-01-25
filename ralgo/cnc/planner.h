@@ -10,6 +10,7 @@
 #include <igris/datastruct/dlist.h>
 #include <igris/sync/syslock.h>
 
+#include <nos/fprint.h>
 #include <ralgo/log.h>
 
 #define NMAX_AXES 10
@@ -154,6 +155,7 @@ namespace cnc
             }
 
             active_block = &blocks->get(active);
+            ralgo::info("GET_NEW_BLOCK: {}", nos::format("{}", *active_block).c_str());
 
             assert(active_block->blockno == waited);
             waited++;
@@ -168,10 +170,7 @@ namespace cnc
             if (first_iteration_label == false)
             {
                 first_iteration_label = true;
-                if (info_mode)
-                {
-                    ralgo::info("planner: first start. success");
-                }
+                ralgo::info("planner: first start. success");
             }
 
             system_lock();

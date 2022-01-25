@@ -17,12 +17,11 @@ namespace cnc
     class planner_block
     {
     public:
-        double axdist[NMAX_AXES];
+        std::array<double, NMAX_AXES> axdist;
         double nominal_velocity = 0;
         double acceleration = 0;
         double fullpath = 0;
-
-        double multipliers[NMAX_AXES];
+        std::array<double, NMAX_AXES> multipliers;
 
         // отметки времени хранят инкрементное время до планирования и
         // абсолютное время после активации блока.
@@ -37,11 +36,18 @@ namespace cnc
         uint8_t exact_stop = 0;
 
     public:
+        planner_block() {}
+        planner_block(const planner_block&) = default;
+        planner_block& operator=(const planner_block&) = default;
+
         size_t print_to(nos::ostream& os) const
         {
+            PRINTTO(os, axdist);
             PRINTTO(os, nominal_velocity);
             PRINTTO(os, acceleration);
             PRINTTO(os, fullpath);
+            PRINTTO(os, multipliers);
+            
             PRINTTO(os, start_ic);
             PRINTTO(os, acceleration_before_ic);
             PRINTTO(os, deceleration_after_ic);
@@ -145,6 +151,7 @@ namespace cnc
             for (int i = 0; i < axes; ++i)
             {
                 this->multipliers[i] = multipliers[i];
+                this->axdist[i] = axdist[i];
             }
 
             assert(velocity < 1);
@@ -162,8 +169,7 @@ namespace cnc
             this->active_finish_ic = itime;
             this->fullpath = path;
             this->start_ic = 0;
-            memcpy(this->axdist, axdist.data(), sizeof(axdist[0]) * axes);
-
+            
             if (itime > preftime)
             {
                 // trapecidal pattern
