@@ -38,6 +38,9 @@ namespace cnc
      * */
     class planner
     {
+    private:
+        int total_axes = 0;
+
     public:
         bool info_mode = false;
         bool first_iteration_label = false;
@@ -48,6 +51,9 @@ namespace cnc
         double delta = 1;
         double delta_sqr_div_2 = 0.5;
 
+        igris::static_vector<double, NMAX_AXES> gears;
+        igris::static_vector<double, NMAX_AXES> gears_low_trigger;
+        igris::static_vector<double, NMAX_AXES> gears_high_trigger;
         double accelerations[NMAX_AXES];
         double velocities[NMAX_AXES];
         int64_t steps[NMAX_AXES];
@@ -61,12 +67,20 @@ namespace cnc
         igris::ring<cnc::planner_block> *blocks;
         igris::ring<cnc::control_shift> *shifts;
 
-        int total_axes = 0;
         bool need_to_reevaluate = false;
         uint8_t state = 0;
         int count_of_reevaluation = 0;
 
     public:
+        void update_triggers() 
+        {
+            for (unsigned int i = 0; i < gears.size(); ++i) 
+            {
+                gears_low_trigger[i] = gears[i] * 0.1;
+                gears_high_trigger[i] = gears[i] * 0.9;
+            }
+        }
+
         void set_dim(int axes) { total_axes = axes; }
 
         /*void set_revolver_delta(double delta)
@@ -230,17 +244,17 @@ namespace cnc
                 dda_counters[i] += velocities[i] +         //* delta +
                                    accelerations[i] * 0.5; //* delta_sqr_div_2;
 
-                if (dda_counters[i] > 0.9)
+                if (dda_counters[i] > gears_high_trigger[i])
                 {
-                    dda_counters[i] -= 1;
+                    dda_counters[i] -= gears[i];
                     steps[i] += 1;
 
                     dir |= mask;
                     step |= mask;
                 }
-                else if (dda_counters[i] < -0.9)
+                else if (dda_counters[i] < -gears_high_trigger[i])
                 {
-                    dda_counters[i] += 1;
+                    dda_counters[i] += gears[i];
                     steps[i] -= 1;
 
                     dir |= mask;
@@ -311,7 +325,26 @@ namespace cnc
             return 0;
         }
 
-        void set_axes_count(int total) { total_axes = total; }
+        void set_axes_count(int total) 
+        { 
+            total_axes = total;
+            gears.resize(total);
+            gears_low_trigger.resize(total);
+            gears_high_trigger.resize(total);
+            ralgo::vecops::fill(gears, 100000);
+            update_triggers(); 
+        }
+
+        void set_gears(igris::array_view<double> arr) 
+        {
+            ralgo::vecops::copy(arr, gears);
+            update_triggers();
+        }
+
+        size_t get_total_axes() 
+        {
+            return total_axes;
+        }
     };
 }
 

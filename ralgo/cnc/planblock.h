@@ -154,8 +154,8 @@ namespace cnc
                 this->axdist[i] = axdist[i];
             }
 
-            assert(velocity < 1);
-            assert(acceleration < 1);
+            //assert(velocity < 1);
+            //assert(acceleration < 1);
 
             double pathsqr = 0;
             for (int i = 0; i < axes; ++i)

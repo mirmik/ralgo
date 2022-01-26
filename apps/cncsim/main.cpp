@@ -149,8 +149,8 @@ int main(int argc, char ** argv)
 	std::this_thread::sleep_for(1000ms);
 
     interpreter.init_axes(3);
-	interpreter.set_scale(ralgo::vector<double>{
-		4194304./10000., 4194304./10000., 4194304./10000.});
+	interpreter.set_scale(ralgo::vector<double>{1,1,1});
+	planner.set_gears({10000, 10000, 10000});
 	//interpreter.set_saved_acc(10);
     //interpreter.set_saved_feed(10);
 	interpreter.set_revolver_frequency(10000);

@@ -66,7 +66,7 @@ namespace cnc
 
         int check_correctness(nos::ostream& os) 
         {
-            assert(total_axes == planner->total_axes);
+            assert(total_axes == (int)planner->get_total_axes());
             assert(total_axes == revolver->steppers_total);
 
             if (ralgo::global_protection) { 
