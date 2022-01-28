@@ -196,6 +196,34 @@ namespace cnc
 
             assert(validation());
         }
+
+        void set_stop_state(ralgo::vector_view<double> axdist, int axes, double velocity,
+           double acceleration, ralgo::vector_view<double> multipliers)
+        {
+            for (int i = 0; i < axes; ++i)
+            {
+                this->multipliers[i] = multipliers[i];
+                this->axdist[i] = axdist[i];
+            }
+            nos::println("axdist:"); nos::print_list(axdist);
+
+            double pathsqr = 0;
+            for (int i = 0; i < axes; ++i)
+                pathsqr += axdist[i] * axdist[i];
+            double path = sqrt(pathsqr); // area
+
+            int preftime = ceil(velocity / acceleration);
+
+            PRINT(path);
+            PRINT(preftime);
+
+            this->acceleration_before_ic = 0;
+            this->deceleration_after_ic = 0;
+            this->block_finish_ic = preftime;
+            this->nominal_velocity = path / preftime * 2;
+            this->acceleration = this->nominal_velocity / preftime;
+        }
+
     };
 }
 

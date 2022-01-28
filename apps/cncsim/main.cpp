@@ -65,15 +65,15 @@ void planner_thread_function()
 
 void telemetry_thread_function()
 {
+    int64_t poses[NMAX_AXES];
     auto awake = now();
-    float poses[3];
     while (1)
     {
         awake += 10ms;
         std::this_thread::sleep_until(awake);
-        for (int i = 0; i < 3; ++i)
-            poses[i] = float(steppers[i].steps_count()) / 100;
-        publisher.publish(igris::buffer(poses, sizeof(poses)));
+        for (size_t i = 0; i < interpreter.get_axes_count(); ++i)
+            poses[i] = int64_t(steppers[i].steps_count());
+        publisher.publish(igris::buffer(poses, sizeof(int64_t) * interpreter.get_axes_count()));
     }
 }
 
@@ -104,12 +104,20 @@ void print_help()
 	    "Common option list:\n"
 		"  -h, --help            print this page\n"
 		"  -p, --noprotect            disable global protection\n"
+		"Crow services:\n"
+		"	cncsim/cli - cncsim control\n"
+		"Crow pulbics:\n"
+		"	cncsim/poses - cncsim axes poses\n"
 		"\n"
 	);
 }
 
 int main(int argc, char ** argv)
 {
+	publisher.set_qos(0,0);
+	control_service.set_qos(2, 50);
+	control_service.set_rqos(2, 50);
+
 	const struct option long_options[] =
 	{
 		{"help", no_argument, NULL, 'h'},
@@ -137,32 +145,22 @@ int main(int argc, char ** argv)
 		}
 	}
 
+	interpreter.init_axes(3);
+	interpreter.set_scale(ralgo::vector<double>{1,1,1});
+	planner.set_gears({10000, 10000, 10000});
+	interpreter.set_revolver_frequency(10000);
+
 	crow::create_udpgate();
 	crow::start_spin();
-    control_service.install_keepalive(2000);
+    
+    control_service.install_keepalive(2000, true);
 
 	configuration();
 	revolver_thread = std::thread(revolver_thread_function);
 	planner_thread = std::thread(planner_thread_function);
 	telemetry_thread = std::thread(telemetry_thread_function);
 
-	std::this_thread::sleep_for(1000ms);
-
-    interpreter.init_axes(3);
-	interpreter.set_scale(ralgo::vector<double>{1,1,1});
-	planner.set_gears({10000, 10000, 10000});
-	//interpreter.set_saved_acc(10);
-    //interpreter.set_saved_feed(10);
-	interpreter.set_revolver_frequency(10000);
-
-	/*interpreter.newline("cnc G01 X2 F5");
-	interpreter.newline("cnc G01 Y2 F5");
-	interpreter.newline("cnc G01 X5 F1");
-	interpreter.newline("cnc G01 Y5 F5");
-	interpreter.newline("cnc G01 Y5 Z3 F5");
-	interpreter.newline("cnc G01 X20 F10");
-	interpreter.newline("cnc G01 Y-20 F10");
-	interpreter.newline("cnc G01 X-20 F10");*/
+	std::this_thread::sleep_for(100ms);
 
 	while (1)
 	{
