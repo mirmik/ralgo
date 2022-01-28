@@ -68,18 +68,32 @@ namespace cnc
         void current_velocity(float *velocity)
         {
             system_lock();
-            for (int i = 0; i < steppers_total; ++i)
-                velocity[i] = shifts_ring->tail().speed[i];
+            if (shifts_ring->empty())
+            {
+                for (int i = 0; i < steppers_total; ++i)
+                    velocity[i] = 0;
+            
+            }
+            else
+                for (int i = 0; i < steppers_total; ++i)
+                    velocity[i] = shifts_ring->tail().speed[i];
             system_unlock();
         }
 
-        std::vector<double> current_velocity()
+        std::vector<double> current_velocity_no_lock()
         {
             std::vector<double> vec(steppers_total);
-            system_lock();
-            for (int i = 0; i < steppers_total; ++i)
-                vec[i] = shifts_ring->tail().speed[i];
-            system_unlock();
+            //system_lock();
+            if (shifts_ring->empty())
+            {
+                for (int i = 0; i < steppers_total; ++i)
+                    vec[i] = 0;
+            
+            }
+            else
+                for (int i = 0; i < steppers_total; ++i)
+                    vec[i] = shifts_ring->tail().speed[i];
+            //system_unlock();
             return vec;
         }
 
@@ -124,18 +138,6 @@ namespace cnc
 
         void serve()
         {
-
-            if (first_iteration_label == false)
-            {
-                assert(steppers);
-
-                first_iteration_label = true;
-                if (info_mode)
-                {
-                    ralgo::info("revolver: first start. success");
-                }
-            }
-
             // В общем случае ring_empty не атомарен. Однако, здесь должен
             // быть контекст приоритетного прерывания.
             if (shifts_ring->empty())
