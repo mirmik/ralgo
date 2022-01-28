@@ -3,6 +3,8 @@
 
 #include <ralgo/cnc/defs.h>
 #include <ralgo/linalg/vector_view.h>
+#include <algorithm>
+#include <nos/shell/argv.h>
 
 namespace cnc 
 {
