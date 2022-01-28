@@ -9,29 +9,34 @@ namespace cnc
 	class control_task 
 	{
 	public:
-        bool isok;
-        double _poses[NMAX_AXES];
-        double feed;
-        double acc;
+        bool isok = false;
+        std::array<double, NMAX_AXES> _poses = {};
+        double feed = 0;
+        double acc = 0;
+
+        control_task() = default;
 
         ralgo::vector_view<double> poses(size_t total_axes) 
         {
-        	ralgo::vector_view<double> ret(_poses, total_axes);
+        	ralgo::vector_view<double> ret(_poses.data(), total_axes);
         	std::copy(std::begin(_poses), std::end(_poses), ret.begin());
         	return ret;
         }
 
         const ralgo::vector_view<double> poses(size_t total_axes) const
         {
-        	ralgo::vector_view<double> ret((double*)_poses, total_axes);
+        	ralgo::vector_view<double> ret((double*)_poses.data(), total_axes);
         	std::copy(std::begin(_poses), std::end(_poses), ret.begin());
         	return ret;
         }
 
+        void set_poses(igris::array_view<double> arr) 
+        {
+            std::copy(arr.begin(), arr.end(), _poses.begin());
+        } 
+
         int parse(const nos::argv& argv)
         {
-            memset(_poses, 0, sizeof(_poses));
-
             for (unsigned int i = 0; i < argv.size(); ++i)
             {
                 char symb = argv[i].data()[0];

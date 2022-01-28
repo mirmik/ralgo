@@ -71,12 +71,32 @@ namespace cnc
             system_unlock();
         }
 
+        std::vector<double> current_velocity()
+        {
+            std::vector<double> vec(steppers_total);
+            system_lock();
+            for (int i = 0; i < steppers_total; ++i)
+                vec[i] = shifts_ring->tail().speed[i];
+            system_unlock();
+            return vec;
+        }
+
         void current_steps(int64_t *steps)
         {
             system_lock();
             for (int i = 0; i < steppers_total; ++i)
                 steps[i] = steppers[i]->steps_count();
             system_unlock();
+        }
+
+        std::vector<int64_t> current_steps()
+        {
+            std::vector<int64_t> vec(steppers_total);
+            system_lock();
+            for (int i = 0; i < steppers_total; ++i)
+                vec[i] = steppers[i]->steps_count();
+            system_unlock();
+            return vec;
         }
 
         int room()
@@ -154,6 +174,11 @@ namespace cnc
 
             shifts_ring->move_tail_one();
             return;
+        }
+
+        void clear() 
+        {
+            shifts_ring->clear();
         }
     };
 }

@@ -65,6 +65,7 @@ namespace ralgo
 
         vector_view() : dat(nullptr), n(0), stride(0) {}
         vector_view(T *dat, int n) : dat(dat), n(n), stride(1) {}
+        vector_view(T *dat, size_t n) : dat(dat), n((int)n), stride(1) {}
         vector_view(T *dat, int n, int stride) : dat(dat), n(n), stride(stride)
         {
         }

@@ -46,7 +46,6 @@ namespace cnc
         bool first_iteration_label = false;
 
         int64_t iteration_counter = 0;
-        int64_t *reference_position; /// < для внутреннего контроля
 
         double delta = 1;
         double delta_sqr_div_2 = 0.5;
@@ -341,9 +340,29 @@ namespace cnc
             update_triggers();
         }
 
+        igris::array_view<double> get_gears() 
+        {
+            return { gears.data(), gears.size() };
+        }
+
         size_t get_total_axes() 
         {
             return total_axes;
+        }
+
+        void set_gear(int index, double val) 
+        {
+            system_lock();
+            gears[index] = val;
+            update_triggers();
+            system_unlock();
+        }
+
+        void clear() 
+        {
+            blocks->clear();
+            ralgo::vecops::fill(dda_counters, 0);
+            change_active_block();
         }
     };
 }
