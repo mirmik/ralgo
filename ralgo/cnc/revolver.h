@@ -46,6 +46,8 @@ namespace cnc
     public:
         revolver(igris::ring<cnc::control_shift> *ring) : shifts_ring(ring) {}
 
+        robo::stepper ** get_steppers() { return steppers; }        
+
         void set_steppers(robo::stepper **steppers_table, int size)
         {
             steppers = steppers_table;

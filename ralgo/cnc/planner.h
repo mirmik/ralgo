@@ -3,9 +3,12 @@
 
 #include <stdint.h>
 
+#include <ralgo/linalg/vecops.h>
 #include <ralgo/cnc/planblock.h>
 #include <ralgo/cnc/shift.h>
 
+#include <igris/container/array_view.h>
+#include <igris/container/static_vector.h>
 #include <igris/container/ring.h>
 #include <igris/datastruct/dlist.h>
 #include <igris/sync/syslock.h>
