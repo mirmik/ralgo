@@ -58,9 +58,6 @@ namespace cnc
         igris::static_vector<double, NMAX_AXES> gears_high_trigger;
         double accelerations[NMAX_AXES];
         double velocities[NMAX_AXES];
-        int64_t steps[NMAX_AXES];
-        //int64_t synced_steps[NMAX_AXES];
-
         double dda_counters[NMAX_AXES];
 
         int active = 0; // index of active block
@@ -99,8 +96,6 @@ namespace cnc
         {
             memset(accelerations, 0, sizeof(accelerations));
             memset(velocities, 0, sizeof(velocities));
-            memset(steps, 0, sizeof(steps));
-        //    memset(synced_steps, 0, sizeof(synced_steps));
             memset(dda_counters, 0, sizeof(dda_counters));
         }
 
@@ -249,16 +244,12 @@ namespace cnc
                 if (dda_counters[i] > gears_high_trigger[i])
                 {
                     dda_counters[i] -= gears[i];
-                    steps[i] += 1;
-
                     dir |= mask;
                     step |= mask;
                 }
                 else if (dda_counters[i] < -gears_high_trigger[i])
                 {
                     dda_counters[i] += gears[i];
-                    steps[i] -= 1;
-
                     dir |= mask;
                 }
                 velocities[i] += accelerations[i]; // * delta;
