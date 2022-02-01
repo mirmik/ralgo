@@ -26,7 +26,6 @@ namespace ralgo
 
         int32_t iterations = 0;
         Alg lastcurrent;
-        float lastnorm;
         while (1)
         {
             iterations++;
@@ -42,7 +41,7 @@ namespace ralgo
             }
 
             // predelta = delta;
-            lastnorm = norm;
+            //lastnorm = norm;
 
             for (int i = 0; i < dim; ++i)
             {

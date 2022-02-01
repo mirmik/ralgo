@@ -11,6 +11,8 @@ namespace ralgo
         K _gain = {};
 
     public:
+        bool inited() { return _gain != 0; }
+
         scaller() = default;
         scaller(const K &koeff) : _gain(koeff) {}
 

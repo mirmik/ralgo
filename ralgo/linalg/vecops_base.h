@@ -5,9 +5,9 @@
 @file
 */
 
-#include <ralgo/util/helpers.h>
-
+#include <functional>
 #include <type_traits>
+#include <ralgo/util/helpers.h>
 
 namespace ralgo
 {
