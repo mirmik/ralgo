@@ -1,13 +1,16 @@
 #ifndef RALGO_VECTOR_VIEW_H
 #define RALGO_VECTOR_VIEW_H
 
+#include <memory>
+
 /**
     @file
 */
 
 namespace ralgo
 {
-    template <class T> class vector_view_iterator
+    template <class T> 
+    class vector_view_iterator : public std::iterator<std::random_access_iterator_tag, T>
     {
         T *dat;
         int stride;
@@ -15,6 +18,11 @@ namespace ralgo
     public:
         vector_view_iterator(T *dat) : dat(dat), stride(1) {}
         vector_view_iterator(T *dat, int stride) : dat(dat), stride(stride) {}
+
+        ptrdiff_t operator-(const vector_view_iterator& oth) 
+        {
+            return (dat - oth.dat) / stride;
+        }
 
         vector_view_iterator &operator++()
         {
@@ -57,6 +65,7 @@ namespace ralgo
 
         vector_view() : dat(nullptr), n(0), stride(0) {}
         vector_view(T *dat, int n) : dat(dat), n(n), stride(1) {}
+        vector_view(T *dat, size_t n) : dat(dat), n((int)n), stride(1) {}
         vector_view(T *dat, int n, int stride) : dat(dat), n(n), stride(stride)
         {
         }

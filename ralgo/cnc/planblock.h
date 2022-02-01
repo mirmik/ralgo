@@ -2,6 +2,7 @@
 #define RALGO_CNC_PLANBLOCK_H
 
 #include <ralgo/cnc/defs.h>
+#include <ralgo/linalg/vector_view.h>
 #include <nos/io/ostream.h>
 #include <nos/print.h>
 
@@ -16,13 +17,11 @@ namespace cnc
     class planner_block
     {
     public:
-        int64_t steps[NMAX_AXES];
-
+        std::array<double, NMAX_AXES> axdist;
         double nominal_velocity = 0;
         double acceleration = 0;
         double fullpath = 0;
-
-        double multipliers[NMAX_AXES];
+        std::array<double, NMAX_AXES> multipliers;
 
         // отметки времени хранят инкрементное время до планирования и
         // абсолютное время после активации блока.
@@ -37,11 +36,18 @@ namespace cnc
         uint8_t exact_stop = 0;
 
     public:
+        planner_block() {}
+        planner_block(const planner_block&) = default;
+        planner_block& operator=(const planner_block&) = default;
+
         size_t print_to(nos::ostream& os) const
         {
+            PRINTTO(os, axdist);
             PRINTTO(os, nominal_velocity);
             PRINTTO(os, acceleration);
             PRINTTO(os, fullpath);
+            PRINTTO(os, multipliers);
+            
             PRINTTO(os, start_ic);
             PRINTTO(os, acceleration_before_ic);
             PRINTTO(os, deceleration_after_ic);
@@ -139,20 +145,21 @@ namespace cnc
             }
         }
 
-        void set_state(int64_t *steps, int axes, double velocity,
-                       double acceleration, double *multipliers)
+        void set_state(ralgo::vector_view<double> axdist, int axes, double velocity,
+                       double acceleration, ralgo::vector_view<double> multipliers)
         {
             for (int i = 0; i < axes; ++i)
             {
                 this->multipliers[i] = multipliers[i];
+                this->axdist[i] = axdist[i];
             }
 
-            assert(velocity < 1);
-            assert(acceleration < 1);
+            //assert(velocity < 1);
+            //assert(acceleration < 1);
 
             double pathsqr = 0;
             for (int i = 0; i < axes; ++i)
-                pathsqr += steps[i] * steps[i];
+                pathsqr += axdist[i] * axdist[i];
             double path = sqrt(pathsqr); // area
             double time = path / velocity;
 
@@ -162,8 +169,7 @@ namespace cnc
             this->active_finish_ic = itime;
             this->fullpath = path;
             this->start_ic = 0;
-            memcpy(this->steps, steps, sizeof(steps[0]) * axes);
-
+            
             if (itime > preftime)
             {
                 // trapecidal pattern
@@ -190,6 +196,34 @@ namespace cnc
 
             assert(validation());
         }
+
+        void set_stop_state(ralgo::vector_view<double> axdist, int axes, double velocity,
+           double acceleration, ralgo::vector_view<double> multipliers)
+        {
+            for (int i = 0; i < axes; ++i)
+            {
+                this->multipliers[i] = multipliers[i];
+                this->axdist[i] = axdist[i];
+            }
+            nos::println("axdist:"); nos::print_list(axdist);
+
+            double pathsqr = 0;
+            for (int i = 0; i < axes; ++i)
+                pathsqr += axdist[i] * axdist[i];
+            double path = sqrt(pathsqr); // area
+
+            int preftime = ceil(velocity / acceleration);
+
+            PRINT(path);
+            PRINT(preftime);
+
+            this->acceleration_before_ic = 0;
+            this->deceleration_after_ic = 0;
+            this->block_finish_ic = preftime;
+            this->nominal_velocity = path / preftime * 2;
+            this->acceleration = this->nominal_velocity / preftime;
+        }
+
     };
 }
 

@@ -3,13 +3,17 @@
 
 #include <stdint.h>
 
+#include <ralgo/linalg/vecops.h>
 #include <ralgo/cnc/planblock.h>
 #include <ralgo/cnc/shift.h>
 
+#include <igris/container/array_view.h>
+#include <igris/container/static_vector.h>
 #include <igris/container/ring.h>
 #include <igris/datastruct/dlist.h>
 #include <igris/sync/syslock.h>
 
+#include <nos/fprint.h>
 #include <ralgo/log.h>
 
 #define NMAX_AXES 10
@@ -37,20 +41,25 @@ namespace cnc
      * */
     class planner
     {
+    private:
+        int total_axes = 0;
+
     public:
         bool info_mode = false;
         bool first_iteration_label = false;
 
         int64_t iteration_counter = 0;
-        int64_t *reference_position; /// < для внутреннего контроля
 
         double delta = 1;
         double delta_sqr_div_2 = 0.5;
 
+        igris::static_vector<double, NMAX_AXES> gears;
+        igris::static_vector<double, NMAX_AXES> gears_low_trigger;
+        igris::static_vector<double, NMAX_AXES> gears_high_trigger;
         double accelerations[NMAX_AXES];
         double velocities[NMAX_AXES];
         int64_t steps[NMAX_AXES];
-        int64_t synced_steps[NMAX_AXES];
+        //int64_t synced_steps[NMAX_AXES];
 
         double dda_counters[NMAX_AXES];
 
@@ -60,12 +69,20 @@ namespace cnc
         igris::ring<cnc::planner_block> *blocks;
         igris::ring<cnc::control_shift> *shifts;
 
-        int total_axes = 0;
         bool need_to_reevaluate = false;
         uint8_t state = 0;
         int count_of_reevaluation = 0;
 
     public:
+        void update_triggers() 
+        {
+            for (unsigned int i = 0; i < gears.size(); ++i) 
+            {
+                gears_low_trigger[i] = gears[i] * 0.1;
+                gears_high_trigger[i] = gears[i] * 0.9;
+            }
+        }
+
         void set_dim(int axes) { total_axes = axes; }
 
         /*void set_revolver_delta(double delta)
@@ -83,46 +100,29 @@ namespace cnc
             memset(accelerations, 0, sizeof(accelerations));
             memset(velocities, 0, sizeof(velocities));
             memset(steps, 0, sizeof(steps));
-            memset(synced_steps, 0, sizeof(synced_steps));
+        //    memset(synced_steps, 0, sizeof(synced_steps));
             memset(dda_counters, 0, sizeof(dda_counters));
         }
 
         int block_index(planner_block *it) { return blocks->index_of(it); }
 
-        void synchronize_finished_block(planner_block &block)
-        {
-            for (int i = 0; i < total_axes; ++i)
-            {
-                synced_steps[i] += block.steps[i];
-            }
-        }
+        //void synchronize_finished_block(planner_block &block)
+        //{
+        //    for (int i = 0; i < total_axes; ++i)
+        //    {
+        //        synced_steps[i] += block.steps[i];
+        //    }
+        //}
 
         void fixup_postactive_blocks()
         {
             while (blocks->tail_index() != active)
             {
                 if (!blocks->tail().is_active_or_postactive(iteration_counter))
-                {
-                    synchronize_finished_block(blocks->tail());
-                    if (info_mode)
-                    {
-                        ralgo::info("planner: discard_finished_block");
-                    }
                     blocks->pop();
-                }
 
                 else
                     break;
-            }
-
-            if (active_block == nullptr && !has_postactive_blocks())
-            {
-                for (int i = 0; i < total_axes; ++i)
-                {
-                    assert(steps[i] == synced_steps[i]);
-                }
-                if (info_mode)
-                    ralgo::info("planner: all blocks resolved");
             }
         }
 
@@ -171,6 +171,7 @@ namespace cnc
             }
 
             active_block = &blocks->get(active);
+            ralgo::info("GET_NEW_BLOCK: {}", nos::format("{}", *active_block).c_str());
 
             assert(active_block->blockno == waited);
             waited++;
@@ -185,10 +186,7 @@ namespace cnc
             if (first_iteration_label == false)
             {
                 first_iteration_label = true;
-                if (info_mode)
-                {
-                    ralgo::info("planner: first start. success");
-                }
+                ralgo::info("planner: first start. success");
             }
 
             system_lock();
@@ -248,17 +246,17 @@ namespace cnc
                 dda_counters[i] += velocities[i] +         //* delta +
                                    accelerations[i] * 0.5; //* delta_sqr_div_2;
 
-                if (dda_counters[i] > 0.9)
+                if (dda_counters[i] > gears_high_trigger[i])
                 {
-                    dda_counters[i] -= 1;
+                    dda_counters[i] -= gears[i];
                     steps[i] += 1;
 
                     dir |= mask;
                     step |= mask;
                 }
-                else if (dda_counters[i] < -0.9)
+                else if (dda_counters[i] < -gears_high_trigger[i])
                 {
-                    dda_counters[i] += 1;
+                    dda_counters[i] += gears[i];
                     steps[i] -= 1;
 
                     dir |= mask;
@@ -329,7 +327,46 @@ namespace cnc
             return 0;
         }
 
-        void set_axes_count(int total) { total_axes = total; }
+        void set_axes_count(int total) 
+        { 
+            total_axes = total;
+            gears.resize(total);
+            gears_low_trigger.resize(total);
+            gears_high_trigger.resize(total);
+            ralgo::vecops::fill(gears, 100000);
+            update_triggers(); 
+        }
+
+        void set_gears(igris::array_view<double> arr) 
+        {
+            ralgo::vecops::copy(arr, gears);
+            update_triggers();
+        }
+
+        igris::array_view<double> get_gears() 
+        {
+            return { gears.data(), gears.size() };
+        }
+
+        size_t get_total_axes() 
+        {
+            return total_axes;
+        }
+
+        void set_gear(int index, double val) 
+        {
+            system_lock();
+            gears[index] = val;
+            update_triggers();
+            system_unlock();
+        }
+
+        void clear() 
+        {
+            blocks->clear();
+            ralgo::vecops::fill(dda_counters, 0);
+            change_active_block();
+        }
     };
 }
 
