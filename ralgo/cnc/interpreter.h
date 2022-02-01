@@ -408,13 +408,13 @@ namespace cnc
                 return 0;
             }
 
-            else if (argv[0] == "incmov") 
+            else if (argv[0] == "relmove") 
             {
                 command_incremental_move(argv.without(1), os);
                 return 0;
             }
 
-            else if (argv[0] == "absmov") 
+            else if (argv[0] == "absmove") 
             {
                 command_absolute_move(argv.without(1), os);
                 return 0;
