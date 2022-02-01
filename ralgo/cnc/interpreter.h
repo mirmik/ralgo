@@ -65,11 +65,20 @@ namespace cnc
             revolver->final_shift_pushed = igris::make_delegate(&interpreter::final_shift_handle, this);
         }
 
+        void restore_finishes() 
+        {
+                auto steps = revolver->current_steps();
+                for (int i=0 ; i < total_axes; ++i)
+                    final_position[i] = steps[i] * planner->gears[i]; 
+        }
+
         void final_shift_handle() 
         {
             nos::println("FINAL_SHIFT_HANDLE");
             nos::print("finishes: "); nos::print_list(final_position); nos::println();
             nos::print("steps: "); nos::print_list(revolver->current_steps()); nos::println();
+            if (blocks->avail() == 0)
+                restore_finishes();
         }
 
         int check_correctness(nos::ostream& os) 
@@ -349,6 +358,7 @@ namespace cnc
                 // allready stopped
                 planner->clear();
                 revolver->clear();
+                restore_finishes();
                 system_unlock();
                 return;
             }
