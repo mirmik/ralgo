@@ -10,6 +10,7 @@
 #include <ralgo/cnc/shift.h>
 #include <ralgo/log.h>
 #include <ralgo/robo/stepper.h>
+#include <igris/event/delegate.h>
 
 namespace cnc
 {
@@ -44,6 +45,7 @@ namespace cnc
         robo::stepper **steppers = nullptr;
 
     public:
+        igris::delegate<void> final_shift_pushed;
         revolver(igris::ring<cnc::control_shift> *ring) : shifts_ring(ring) {}
 
         robo::stepper ** get_steppers() { return steppers; }        
@@ -65,9 +67,15 @@ namespace cnc
             return size;
         }
 
-        void current_velocity(float *velocity)
+        void current_velocity(double *velocity)
         {
             system_lock();
+            if (shifts_ring->avail() == 0) 
+            {
+                memset(velocity, 0, sizeof(double)*steppers_total);
+                system_unlock();
+                return;
+            }
             for (int i = 0; i < steppers_total; ++i)
                 velocity[i] = shifts_ring->tail().speed[i];
             system_unlock();
@@ -77,6 +85,13 @@ namespace cnc
         {
             std::vector<double> vec(steppers_total);
             system_lock();
+            if (shifts_ring->avail() == 0) 
+            {
+                for (int i = 0; i < steppers_total; ++i)
+                    vec[i] = 0;
+                system_unlock();
+                return vec;
+            }
             for (int i = 0; i < steppers_total; ++i)
                 vec[i] = shifts_ring->tail().speed[i];
             system_unlock();
@@ -143,10 +158,7 @@ namespace cnc
                 if (all_blocks_resolved == false)
                 {
                     all_blocks_resolved = true;
-                    if (info_mode)
-                    {
-                        ralgo::info("revolver: all blocks resolved");
-                    }
+                    final_shift_pushed();
                 }
                 return;
             }

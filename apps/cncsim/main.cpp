@@ -14,14 +14,16 @@
 #include <crow/nodes/publisher_node.h>
 #include <crow/nodes/service_node.h>
 #include <crow/tower.h>
+#include <mutex>
 
-igris::ring<cnc::planner_block, 40> blocks;
-igris::ring<cnc::control_shift, 400> shifts;
+igris::ring<cnc::planner_block> blocks{40};
+igris::ring<cnc::control_shift> shifts{400};
 
 cnc::planner planner(&blocks, &shifts);
 cnc::revolver revolver(&shifts);
 cnc::interpreter interpreter(&blocks, &planner, &revolver);
 
+std::mutex mtx;
 #include <chrono>
 #include <thread>
 
@@ -43,6 +45,7 @@ crow::publisher publisher(crowker, "cncsim/mon/pose");
 crow::service_node control_service(crowker, "cncsim/cli", +[]
     (char *cmd, int len, crow::service_node& srv)
 {
+	std::lock_guard<std::mutex> lock(mtx);
 	cmd[len] = 0;
 	nos::println("input: ", std::string(cmd, len), "END");
     nos::string_buffer answer;
@@ -59,7 +62,9 @@ void planner_thread_function()
     {
         awake += 1ms;
         std::this_thread::sleep_until(awake);
+        mtx.lock();
         planner.serve();
+        mtx.unlock();
     }
 }
 
@@ -89,7 +94,10 @@ void revolver_thread_function()
     {
         awake += 100us;
         std::this_thread::sleep_until(awake);
+        
+        mtx.lock();
         revolver.serve();
+        mtx.unlock();
     }
 }
 
