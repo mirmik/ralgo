@@ -62,6 +62,10 @@ namespace cnc
             max_axes_velocities.resize(total_axes);
             max_axes_acellerations.resize(total_axes);
             planner->set_axes_count(total_axes);
+            ralgo::vecops::fill(ext2int_scale, 1);
+            ralgo::vecops::fill(final_position, 0);
+            ralgo::vecops::fill(max_axes_acellerations, 0);
+            ralgo::vecops::fill(max_axes_velocities, 0);
             revolver->final_shift_pushed = igris::make_delegate(&interpreter::final_shift_handle, this);
         }
 
@@ -222,9 +226,6 @@ namespace cnc
                 return true;
             }
 
-            PRINT(evalacc);
-            PRINT(evalfeed);
-
             double feed = evalfeed * dirgain;
             double acc = evalacc * dirgain;
             
@@ -348,14 +349,13 @@ namespace cnc
         void smooth_stop(nos::ostream& os)
         {
             system_lock();
-            auto curvels = revolver->current_velocity();
+            auto curvels = revolver->current_velocity_no_lock();
             double accnorm = saved_acc;
-
-            nos::println("smooth_stop");
             double velnorm = ralgo::vecops::norm(curvels) * revolver_frequency;
+
             if (velnorm == 0) 
             {
-                // allready stopped
+                restore_final_position_by_steps();
                 planner->clear();
                 revolver->clear();
                 restore_finishes();
@@ -373,23 +373,10 @@ namespace cnc
             double distnorm = velnorm * time - accnorm * time * time / 2; 
             auto dists = ralgo::vecops::mul_vs(direction, distnorm);
 
-            PRINT(time);
-            PRINT(time);
-            PRINT(distnorm);
+            planner->clear();
+            revolver->clear();
 
-            {
-                planner->clear();
-                revolver->clear();
-            }
-
-            nos::println("restore final position:");
-            nos::print_list(final_position);
             restore_final_position_by_steps();
-            nos::print_list(final_position);nos::println();
-
-            PRINTTO(os, velnorm);
-            PRINTTO(os, accnorm);
-
             auto &placeblock = blocks->head_place();
             placeblock.blockno = blockno++;
             placeblock.set_stop_state(
@@ -403,8 +390,6 @@ namespace cnc
             for (int i = 0; i < total_axes; ++i)
                 final_position[i] += dists[i];
 
-            nos::println("finals after increment:");
-            nos::print_list(final_position);nos::println();
             system_unlock();
         }
 
