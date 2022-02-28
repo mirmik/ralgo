@@ -78,9 +78,9 @@ namespace cnc
 
         void final_shift_handle() 
         {
-            nos::println("FINAL_SHIFT_HANDLE");
-            nos::print("finishes: "); nos::print_list(final_position); nos::println();
-            nos::print("steps: "); nos::print_list(revolver->current_steps()); nos::println();
+            //ralgo::info("FINAL_SHIFT_HANDLE");
+            //nos::print("finishes: "); nos::print_list(final_position); nos::println();
+            //nos::print("steps: "); nos::print_list(revolver->current_steps()); nos::println();
             if (blocks->avail() == 0)
                 restore_finishes();
         }
@@ -273,10 +273,12 @@ namespace cnc
         void evaluate_task(const control_task& task, 
             nos::ostream& os) 
         {
+            //ralgo::info("evaluate_task");
+            
             // lastblock - out
             bool fastfinish = evaluate_interpreter_task(task, lastblock, os);
             if (fastfinish) {
-                ralgo::info("fastfinish block");
+                //ralgo::info("fastfinish block");
                 print_interpreter_state(os);
                 return;
             }   
@@ -364,10 +366,6 @@ namespace cnc
             }
 
             auto direction = ralgo::vecops::normalize(curvels);
-
-            nos::println("curvels:"); nos::print_list(curvels); nos::println();
-            PRINT(velnorm);
-            PRINT(accnorm);
 
             double time = velnorm / accnorm;
             double distnorm = velnorm * time - accnorm * time * time / 2; 
@@ -577,6 +575,12 @@ namespace cnc
             {
                  return print_interpreter_state(os);   
             }
+
+            else if (argv[0] == "simulator") 
+            {
+                revolver->enable_simulator_mode();
+                return 0;   
+            }
             
             os.println("Unresolved command");
             return 0;
@@ -613,12 +617,13 @@ namespace cnc
         int print_interpreter_state(nos::ostream& os) 
         {
             PRINTTO(os, revolver_frequency);
-            nos::print_to(os, "velmax_abs:");  nos::print_to(os, saved_feed); os.println();
-            nos::print_to(os, "accmax_abs:");  nos::print_to(os, saved_acc); os.println();
-            nos::print_to(os, "velmax_axs:"); nos::print_list_to(os, max_axes_velocities); nos::println_to(os);
-            nos::print_to(os, "accmax_axs:"); nos::print_list_to(os, max_axes_acellerations); nos::println_to(os);
+            nos::print_to(os, "vel: "); nos::print_list_to(os, planner->velocities); nos::println_to(os);
+            nos::print_to(os, "acc:"); nos::print_list_to(os, planner->accelerations); nos::println_to(os);
             nos::print_to(os, "gains:"); nos::print_list_to(os, ext2int_scale); nos::println_to(os);
             nos::print_to(os, "gears:"); nos::print_list_to(os, planner->get_gears()); nos::println_to(os);
+            nos::print_to(os, "active_block: "); nos::println_to(os, planner->active_block != nullptr);
+            nos::print_to(os, "active: "); nos::println_to(os, planner->active);
+            nos::print_to(os, "head: "); nos::println_to(os, planner->head);
             return 0;
         }
 

@@ -60,6 +60,7 @@ namespace cnc
         double velocities[NMAX_AXES];
         double dda_counters[NMAX_AXES];
 
+        int head = 0;
         int active = 0; // index of active block
         planner_block *active_block = nullptr;
 
@@ -146,6 +147,7 @@ namespace cnc
                 ralgo::info("planner: change_active_block");
             }
 
+            system_lock();
             if (active_block && has_postactive_blocks() == 0 &&
                 iteration_counter == active_block->active_finish_ic)
             {
@@ -155,8 +157,7 @@ namespace cnc
             if (active_block)
                 active = blocks->fixup_index(active + 1);
 
-            system_lock();
-            int head = blocks->head_index();
+            head = blocks->head_index();
             system_unlock();
 
             if (active == head)
@@ -356,6 +357,12 @@ namespace cnc
         {
             blocks->clear();
             ralgo::vecops::fill(dda_counters, 0);
+            ralgo::vecops::fill(accelerations, 0);
+            ralgo::vecops::fill(velocities, 0);
+            active_block = nullptr;
+            active = blocks->head_index();
+            need_to_reevaluate = true;
+            state = 0;
             change_active_block();
         }
     };

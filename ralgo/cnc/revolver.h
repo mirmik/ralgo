@@ -50,6 +50,16 @@ namespace cnc
 
         robo::stepper ** get_steppers() { return steppers; }        
 
+        void enable_simulator_mode() 
+        {
+            system_lock();
+            for (int i = 0; i< steppers_total; ++i) 
+            {
+                steppers[i]->simulator_mode(true);
+            }
+            system_unlock();
+        }
+
         void set_steppers(robo::stepper **steppers_table, int size)
         {
             steppers = steppers_table;
@@ -112,6 +122,14 @@ namespace cnc
             for (int i = 0; i < steppers_total; ++i)
                 vec[i] = steppers[i]->steps_count();
             system_unlock();
+            return vec;
+        }
+
+        std::vector<int64_t> current_steps_no_lock()
+        {
+            std::vector<int64_t> vec(steppers_total);
+            for (int i = 0; i < steppers_total; ++i)
+                vec[i] = steppers[i]->steps_count();
             return vec;
         }
 
@@ -180,6 +198,7 @@ namespace cnc
         void clear() 
         {
             shifts_ring->clear();
+            all_blocks_resolved = true;
         }
     };
 }
