@@ -529,6 +529,17 @@ namespace cnc
                 planner->set_gear(axno, val);
             }
 
+            else if (argv[0] == "setpos") 
+            {
+                auto axno = symbol_to_index(argv[1][0]);
+                double val = strtod(argv[2].data(), NULL);
+                system_lock();
+                final_position[axno] = val;
+                revolver->get_steppers()[axno]->set_counter_value(
+                    final_position[axno] / ext2int_scale[axno]);
+                system_unlock();
+            }
+
             else if (argv[0] == "velmaxs") 
             {
                 auto axes = argv.size() - 1;
