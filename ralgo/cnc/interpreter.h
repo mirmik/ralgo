@@ -534,6 +534,7 @@ namespace cnc
                 auto axno = symbol_to_index(argv[1][0]);
                 double val = strtod(argv[2].data(), NULL);
                 planner->set_gear(axno, val);
+                return 0;
             }
 
             else if (argv[0] == "setpos") 
@@ -541,10 +542,10 @@ namespace cnc
                 auto axno = symbol_to_index(argv[1][0]);
                 double val = strtod(argv[2].data(), NULL);
                 system_lock();
-                final_position[axno] = val;
-                revolver->get_steppers()[axno]->set_counter_value(
-                    final_position[axno] / ext2int_scale[axno]);
+                final_position[axno] = val * planner->gears[axno];                
+                revolver->get_steppers()[axno]->set_counter_value(val);
                 system_unlock();
+                return 0;
             }
 
             else if (argv[0] == "velmaxs") 
