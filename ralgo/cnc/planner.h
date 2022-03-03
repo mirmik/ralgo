@@ -60,7 +60,6 @@ namespace cnc
         double velocities[NMAX_AXES];
         double dda_counters[NMAX_AXES];
 
-        int head = 0;
         int active = 0; // index of active block
         planner_block *active_block = nullptr;
 
@@ -157,7 +156,7 @@ namespace cnc
             if (active_block)
                 active = blocks->fixup_index(active + 1);
 
-            head = blocks->head_index();
+            int head = blocks->head_index();
             system_unlock();
 
             if (active == head)
@@ -364,6 +363,11 @@ namespace cnc
             need_to_reevaluate = true;
             state = 0;
             change_active_block();
+        }
+
+        void clear_queue() 
+        {
+            blocks->set_last_index(active);
         }
     };
 }

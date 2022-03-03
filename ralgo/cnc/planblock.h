@@ -36,6 +36,14 @@ namespace cnc
         uint8_t exact_stop = 0;
 
     public:
+        void immedeate_smooth_stop(int64_t iteration_counter) 
+        {
+           int64_t shift = deceleration_after_ic - iteration_counter;
+           deceleration_after_ic = deceleration_after_ic - shift;
+           block_finish_ic = block_finish_ic - shift;
+           active_finish_ic = active_finish_ic - shift;
+        }
+
         planner_block() {}
         planner_block(const planner_block&) = default;
         planner_block& operator=(const planner_block&) = default;
@@ -211,13 +219,13 @@ namespace cnc
             double path = sqrt(pathsqr); // area
 
             int preftime = ceil(velocity / acceleration);
+            this->fullpath = 
             this->acceleration_before_ic = 0;
             this->deceleration_after_ic = 0;
             this->block_finish_ic = preftime;
             this->nominal_velocity = path / preftime * 2;
             this->acceleration = this->nominal_velocity / preftime;
         }
-
     };
 }
 

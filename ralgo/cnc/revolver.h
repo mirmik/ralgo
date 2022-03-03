@@ -8,6 +8,7 @@
 #include <igris/sync/syslock.h>
 
 #include <ralgo/cnc/shift.h>
+#include <ralgo/cnc/planblock.h>
 #include <ralgo/log.h>
 #include <ralgo/robo/stepper.h>
 #include <igris/event/delegate.h>
@@ -40,11 +41,12 @@ namespace cnc
     private:
         bool first_iteration_label = false;
         bool all_blocks_resolved = true;
-        igris::ring<cnc::control_shift> *shifts_ring;
 
         robo::stepper **steppers = nullptr;
 
     public:
+        igris::ring<cnc::control_shift> *shifts_ring;
+        igris::ring<cnc::planner_block> *blocks;
         igris::delegate<void> final_shift_pushed;
         revolver(igris::ring<cnc::control_shift> *ring) : shifts_ring(ring) {}
 
@@ -80,7 +82,7 @@ namespace cnc
         void current_velocity(double *velocity)
         {
             system_lock();
-            if (shifts_ring->empty())
+            if (shifts_ring->empty() && blocks->avail() == 0)
             {
                 for (int i = 0; i < steppers_total; ++i)
                     velocity[i] = 0;
@@ -92,18 +94,20 @@ namespace cnc
             system_unlock();
         }
 
-        std::vector<double> current_velocity_no_lock()
+        std::vector<double> current_velocity_no_lock(nos::ostream & os)
         {
             std::vector<double> vec(steppers_total);
-            if (shifts_ring->empty())
+            if (shifts_ring->empty() && blocks->avail() == 0)
             {
                 for (int i = 0; i < steppers_total; ++i)
                     vec[i] = 0;
             
             }
-            else
+            else 
+            {
                 for (int i = 0; i < steppers_total; ++i)
                     vec[i] = shifts_ring->tail().speed[i];
+            }
             return vec;
         }
 
