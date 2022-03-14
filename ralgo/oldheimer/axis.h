@@ -19,6 +19,7 @@ namespace heimer
         bool updated_flag = false;
 
         constexpr axis_node(const char *mnemo) : control_node(mnemo) {}
+        virtual ~axis_node() = default;
 
         void print_info() override
         {

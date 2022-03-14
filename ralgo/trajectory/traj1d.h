@@ -49,6 +49,7 @@ namespace ralgo
         int64_t ftim = 0;
 
     public:
+        virtual ~traj1d() = default;
         virtual int attime(int64_t time, P &pos, V &spd) = 0;
         bool is_finished(int64_t time) { return time > ftim; }
     };

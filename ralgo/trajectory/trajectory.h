@@ -13,6 +13,7 @@ public:
 public:
     virtual int attime(disctime_t timestamp, position_t *outpos,
                        position_t *outspd) = 0;
+    virtual ~trajectory() = default;
     void init(int dim);
 };
 
