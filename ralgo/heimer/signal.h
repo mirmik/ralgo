@@ -39,6 +39,7 @@ namespace heimer
 
     public:
         signal_head() = default;
+        virtual ~signal_head() = default;
         signal_head(uint8_t type);
         signal_head(const char *name, uint8_t type);
         void set_name(const char *name);

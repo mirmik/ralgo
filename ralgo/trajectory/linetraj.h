@@ -26,7 +26,8 @@ public:
 
 public:
     line_trajectory() = default;
-
+    virtual ~line_trajectory() = default;
+    
     line_trajectory(int dim, sf_position_t *sfpos_array,
                     int sfpos_stride = sizeof(sf_position_t))
     {

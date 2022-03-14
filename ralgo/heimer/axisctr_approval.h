@@ -10,6 +10,7 @@ namespace heimer
     {
     public:
         virtual int check(int dim, position_t *strt, position_t *fini) = 0;
+        virtual ~axisctr_approval() = default;
     };
 }
 

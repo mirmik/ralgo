@@ -12,6 +12,7 @@ namespace robo
     public:
         virtual void inc() { ++counter; }
         virtual void dec() { --counter; }
+        virtual ~stepper() = default;
 
         int64_t steps_count() { return counter; }
 

@@ -7,30 +7,35 @@ namespace robo
     {
     public:
         virtual void set_torque(double val) = 0;
+        virtual ~i_torque_setter() = default;
     };
 
     class i_velocity_setter
     {
     public:
         virtual void set_velocity(double vel) = 0;
+        virtual ~i_velocity_setter() = default;
     };
 
     class i_position_setter
     {
     public:
         virtual void set_position(double vel) = 0;
+        virtual ~i_position_setter() = default;
     };
 
     class i_velocity_feedback
     {
     public:
         virtual double feedback_velocity() = 0;
+        virtual ~i_velocity_feedback() = default;
     };
 
     class i_position_feedback
     {
     public:
         virtual double feedback_position() = 0;
+        virtual ~i_position_feedback() = default;
     };
 
     class i_velocity_driver : public i_velocity_setter,

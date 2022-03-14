@@ -44,6 +44,7 @@ namespace heimer
         } u;
 
     public:
+        virtual ~signal_processor() = default;
         signal_processor() = default;
         signal_processor(int ldim, int rdim);
         signal_processor(const char *name, int ldim, int rdim);

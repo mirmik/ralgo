@@ -47,6 +47,7 @@ namespace heimer
         bool operation_finished_flag = true;
 
     public:
+        virtual ~axisctr() = default;
         igris::delegate<void, axisctr *> operation_finish_signal;
         igris::delegate<void, axisctr *> operation_start_signal;
 

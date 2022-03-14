@@ -13,6 +13,7 @@ namespace heimer
         virtual const char *what() { return "interrupt"; }
 
         virtual uint8_t code() { return HEIMER_INTERRUPT_TYPE_USER; }
+        virtual ~interrupt_args() = default;
     };
 
     class interrupt_args_message : public interrupt_args
