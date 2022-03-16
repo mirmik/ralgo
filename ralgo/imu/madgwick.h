@@ -30,7 +30,7 @@ namespace ralgo
         float q3 = 0;
 
     public:
-        float hx, hy;
+        float hx=0, hy=0;
 
         madgwick();
 
