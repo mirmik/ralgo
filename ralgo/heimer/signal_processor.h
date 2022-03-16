@@ -23,25 +23,25 @@ namespace heimer
     class signal_processor
     {
     public:
-        struct dlist_head list_lnk;
+        struct dlist_head list_lnk = DLIST_HEAD_INIT(list_lnk);
 
     private:
-        char _name[SIGNAL_PROCESSOR_NAME_MAX_LENGTH];
+        char _name[SIGNAL_PROCESSOR_NAME_MAX_LENGTH] = {};
 
-        uint8_t _leftdim;
-        uint8_t _rightdim;
+        uint8_t _leftdim = 0;
+        uint8_t _rightdim = 0;
 
     protected:
         union union_t
         {
-            uint8_t flags;
+            uint8_t flags = 0;
             struct flags_t
             {
                 uint8_t active : 1;
                 uint8_t dynamic_resources : 1;
                 uint8_t is_axisctr : 1;
             } f;
-        } u;
+        } u = {};
 
     public:
         virtual ~signal_processor() = default;

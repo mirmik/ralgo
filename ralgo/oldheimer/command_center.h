@@ -10,8 +10,8 @@ namespace heimer
     // TODO: Переработать интерфейсы, чтобы класс мог стать нешаблонным
     template <class P, class V> class command_center_cls
     {
-        igris::array_view<axisctr<P, V> *> axes;
-        igris::array_view<linintctr_basic<P, V> *> igroups;
+        igris::array_view<axisctr<P, V> *> axes = {};
+        igris::array_view<linintctr_basic<P, V> *> igroups = {};
 
     public:
         command_center_cls() {}

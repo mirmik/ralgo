@@ -10,12 +10,14 @@ namespace heimer
     {
         dof6_signal *controlled = nullptr;
 
-        velocity_t vel;
-        acceleration_t acc;
-        acceleration_t dcc;
+        velocity_t vel = 0;
+        acceleration_t acc = 0;
+        acceleration_t dcc = 0;
 
     public:
         dof6_controller() = default;
+        dof6_controller(const dof6_controller&) = delete;
+        dof6_controller& operator=(const dof6_controller&) = delete;
         dof6_controller(const char *name);
 
         void set_controlled(dof6_signal *controlled);

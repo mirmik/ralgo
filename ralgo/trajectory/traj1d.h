@@ -21,25 +21,25 @@ namespace ralgo
 {
     template <class P, class V> struct traj1d_nominal_speed_params
     {
-        int64_t stim;
-        P spos;
-        P fpos;
+        int64_t stim=0;
+        P spos=0;
+        P fpos=0;
 
-        V speed;
-        V acc;
-        V dcc;
+        V speed=0;
+        V acc=0;
+        V dcc=0;
 
         bool full_spattern = false;
     };
 
     template <class P, class V> struct traj1d_timestamp_params
     {
-        int64_t stim;
-        int64_t ftim;
-        int64_t acctime;
-        int64_t dcctime;
-        P spos;
-        P fpos;
+        int64_t stim=0;
+        int64_t ftim=0;
+        int64_t acctime=0;
+        int64_t dcctime=0;
+        P spos=0;
+        P fpos=0;
     };
 
     template <class P, class V> class traj1d

@@ -11,10 +11,10 @@ namespace heimer
 {
     class dof6_signal : public signal_head
     {
-        ralgo::pose3<position_t> ctrpos;
-        ralgo::screw3<velocity_t> ctrvel;
-        ralgo::pose3<position_t> feedpos;
-        ralgo::screw3<velocity_t> feedvel;
+        ralgo::pose3<position_t> ctrpos = {};
+        ralgo::screw3<velocity_t> ctrvel = {};
+        ralgo::pose3<position_t> feedpos = {};
+        ralgo::screw3<velocity_t> feedvel = {};
 
     public:
         dof6_signal(const char *name);
