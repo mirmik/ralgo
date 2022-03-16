@@ -14,9 +14,9 @@ namespace heimer
 {
     class position_applier : public signal_processor
     {
-        robo::i_position_setter *posset;
-        robo::i_position_feedback *posget;
-        axis_state *state;
+        robo::i_position_setter *posset = nullptr;
+        robo::i_position_feedback *posget = nullptr;
+        axis_state *state = nullptr;
 
     public:
         position_applier(const char *name, robo::i_position_driver *driver,
@@ -28,8 +28,11 @@ namespace heimer
             this->state = state;
         }
 
-        position_t offset;
-        position_t scale;
+        position_applier(const position_applier&) = default;
+        position_applier& operator=(const position_applier&) = default;
+
+        position_t offset = {};
+        position_t scale = {};
 
         int serve(disctime_t)
         {
