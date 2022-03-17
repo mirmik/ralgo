@@ -65,7 +65,7 @@ namespace ralgo
         V setted_speed = 0;
 
     private:
-        struct trajectory_speed_deformer spddeform;
+        struct trajectory_speed_deformer spddeform={};
 
     public:
         void init_timestamp_mode(struct traj1d_timestamp_params<P, V> *args)
