@@ -29,28 +29,18 @@ namespace ralgo
 {
     template <class T, class MU, class MV, class V> struct SVD
     {
-        int m, n;
-        MU u;
-        MV v;
-        V w;
-        T eps;
-        T tsh;
+        int m=0, n=0;
+        MU u={};
+        MV v={};
+        V w={};
+        T eps={};
+        T tsh={};
 
         template <class MA>
         SVD(const MA &_a, const MU &_u, const MV &_v, const V &_w)
             : m(_a.size1()), n(_a.size2()), // берём размерность.
               u(_u), v(_v), w(_w)
         {
-            // u = _u;
-            // v = _v;
-            // w = _w;
-
-            // assert(u.size1() == (unsigned)m);
-            // assert(u.size2() == (unsigned)n);
-            // assert(v.size1() == (unsigned)n);
-            // assert(v.size2() == (unsigned)n);
-            // assert(w.size() == (unsigned)n);
-
             u.resize(_a.rows(), _a.cols());
             v.resize(_a.cols(), _a.cols());
             w.resize(_a.cols());

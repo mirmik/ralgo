@@ -13,14 +13,16 @@ namespace heimer
     class linintctr_basic : public control_node
     {
     public:
-        linintctr_basic(const char *name) : control_node(name) {}
 
         bool enable_full_spattern = false;
-
         heimer::coordinate_checker<Position> *coord_checker = nullptr;
+        igris::delegate<void, linintctr_basic *> operation_finish_signal = {};
+        igris::delegate<void, linintctr_basic *> operation_start_signal = {};
 
-        igris::delegate<void, linintctr_basic *> operation_finish_signal;
-        igris::delegate<void, linintctr_basic *> operation_start_signal;
+    public:
+        linintctr_basic(const char *name) : control_node(name) {}
+        linintctr_basic(const linintctr_basic&) = delete;
+        linintctr_basic& operator=(const linintctr_basic&) = delete;
 
         virtual int incmove(Position *mov) = 0;
         virtual int absmove(Position *pos) = 0;

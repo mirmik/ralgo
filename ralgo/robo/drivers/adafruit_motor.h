@@ -33,7 +33,7 @@ namespace robo
     class adafruit_motor_driver : public robo::motor
     {
     public:
-        Adafruit_DCMotor *M;
+        Adafruit_DCMotor *M = nullptr;
 
         uint8_t setted_mode = RELEASE;
         bool reverse = false;

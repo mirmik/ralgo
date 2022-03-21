@@ -39,7 +39,6 @@ namespace cnc
         int steppers_total = 0;
 
     private:
-        bool first_iteration_label = false;
         bool all_blocks_resolved = true;
 
         robo::stepper **steppers = nullptr;
@@ -94,7 +93,7 @@ namespace cnc
             system_unlock();
         }
 
-        std::vector<double> current_velocity_no_lock(nos::ostream & os)
+        std::vector<double> current_velocity_no_lock(nos::ostream &)
         {
             std::vector<double> vec(steppers_total);
             if (shifts_ring->empty() && blocks->avail() == 0)

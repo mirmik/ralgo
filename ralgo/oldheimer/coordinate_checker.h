@@ -12,6 +12,7 @@ namespace heimer
         coordinate_checker *next = nullptr;
 
     public:
+        virtual ~coordinate_checker() = default;
         bool check(control_node *dev, P *val, int dim, char *msgbuf)
         {
             if (check_impl(dev, val, dim, msgbuf))
