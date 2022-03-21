@@ -208,7 +208,7 @@ namespace ralgo
             int pivrow;     // keeps track of current pivot row
             int k, i, j;    // k: overall index along diagonal; i: row index; j:
                             // col index
-            int pivrows[n]; // keeps track of rows swaps to undo at end
+            std::vector<int> pivrows(n); // keeps track of rows swaps to undo at end
             double tmp; // used for finding max value and making column swaps
 
             b.resize(a.cols(), a.cols());

@@ -94,8 +94,8 @@ namespace ralgo
 
         template <class X, class B> void solve(const B &b, X &&x)
         {
-            vector_value_t<B> ybuf[b.size()];
-            vector_view y(ybuf, b.size());
+            std::vector<vector_value_t<B>> ybuf(b.size());
+            vector_view y(ybuf.data(), b.size());
 
             x.resize(b.size());
 
