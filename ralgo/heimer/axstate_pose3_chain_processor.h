@@ -190,25 +190,25 @@ namespace heimer
             nos::println(feedback_position.lin);
             nos::println(length(poserr));
 
-            double Rdata[leftdim()];
-            double Rdata_correction[leftdim()];
-            double Adata[3 * leftdim()];
-            double Wdata[leftdim()];
-            double Udata[3 * leftdim()];
-            double Vdata[leftdim() * leftdim()];
+            TEMPORARY_STORAGE(double, leftdim(), Rdata);
+            TEMPORARY_STORAGE(double, leftdim(), Rdata_correction);
+            TEMPORARY_STORAGE(double, 3 * leftdim(), Adata);
+            TEMPORARY_STORAGE(double, leftdim(), Wdata);
+            TEMPORARY_STORAGE(double, 3 * leftdim(), Udata);
+            TEMPORARY_STORAGE(double, leftdim() * leftdim(), Vdata);
 
-            ralgo::matrix_view<double> A(Adata, 3,
+            ralgo::matrix_view<double> A(std::data(Adata), 3,
                                          leftdim()); // Матрица чуствительности
-            ralgo::matrix_view<double> U(Udata, 3,
+            ralgo::matrix_view<double> U(std::data(Udata), 3,
                                          leftdim()); // Левая матрица разложения
             ralgo::matrix_view<double> V(
-                Vdata, leftdim(), leftdim()); // Правая матрица разложения
-            ralgo::vector_view<double> W(Wdata,
+                std::data(Vdata), leftdim(), leftdim()); // Правая матрица разложения
+            ralgo::vector_view<double> W(std::data(Wdata),
                                          leftdim()); // Центральная матрица.
             ralgo::vector_view<double> R(
-                Rdata, leftdim()); // Вектор результата (скорости звеньев).
+                std::data(Rdata), leftdim()); // Вектор результата (скорости звеньев).
             ralgo::vector_view<double> R_correction(
-                Rdata_correction, leftdim()); // Вектор коррекции.
+                std::data(Rdata_correction), leftdim()); // Вектор коррекции.
             ralgo::vector_view<double> T(&target[0],
                                          3); // Вектор целевой скорости
 

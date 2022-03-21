@@ -22,7 +22,7 @@ licant.cxx_shared_library("libralgo.so",
 	mdepends=[
 		"ralgo"
 	],
-	cxx_flags = "-fPIC -g -pedantic -Wno-vla -Werror=extra -Werror=all -Weffc++",
+	cxx_flags = "-fPIC -g -pedantic -Werror=extra -Werror=all -Weffc++",
 	cc_flags = "-fPIC -Werror=implicit-function-declaration -g -Werror=incompatible-pointer-types -pedantic -Werror=extra -Werror=all",
 	libs=["igris", "nos"]
 )

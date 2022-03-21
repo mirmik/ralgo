@@ -1,6 +1,7 @@
 #include <ralgo/heimer/executor.h>
 #include <ralgo/heimer/signal.h>
 #include <ralgo/heimer/signal_processor.h>
+#include <ralgo/util/helpers.h>
 #include <ralgo/log.h>
 
 #include <igris/math.h>
@@ -206,7 +207,7 @@ static int bindleft(signal_processor *axctr, int argc, char **argv,
     }
 
     {
-        signal_head *arr[argc];
+        TEMPORARY_STORAGE(signal_head*, argc, arr);
 
         for (int i = 0; i < argc; ++i)
         {
@@ -230,7 +231,7 @@ static int bindleft(signal_processor *axctr, int argc, char **argv,
             arr[i] = sig;
         }
 
-        axctr->set_leftside(arr);
+        axctr->set_leftside(std::data(arr));
     }
 
     return 0;
@@ -247,7 +248,7 @@ static int bindright(signal_processor *axctr, int argc, char **argv,
     }
 
     {
-        signal_head *arr[argc];
+        TEMPORARY_STORAGE(signal_head*, argc, arr);
 
         for (int i = 0; i < argc; ++i)
         {
@@ -271,7 +272,7 @@ static int bindright(signal_processor *axctr, int argc, char **argv,
             arr[i] = sig;
         }
 
-        axctr->set_rightside(arr);
+        axctr->set_rightside(std::data(arr));
     }
 
     return 0;
