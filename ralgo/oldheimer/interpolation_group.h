@@ -48,12 +48,12 @@ namespace heimer
         int command(int argc, char **argv)
         {
             int sts;
-            float fltargs[dim()];
+            TEMPORARY_STORAGE(float, dim(), fltargs);
 
             // parted absolute move
             if (strcmp(argv[0], "pmov") == 0)
             {
-                int axnums[dim()];
+                TEMPORARY_STORAGE(int, dim(), axnums);
 
                 if (argc > dim() + 1)
                 {
@@ -76,7 +76,7 @@ namespace heimer
                         return -1;
                 }
 
-                return parted_absmove(axnums, fltargs, argc - 1);
+                return parted_absmove(std::data(axnums), std::data(fltargs), argc - 1);
             }
 
             // absolute move
@@ -93,7 +93,7 @@ namespace heimer
                     fltargs[i] = strtof(argv[1 + i], nullptr);
                 }
 
-                return absmove(fltargs);
+                return absmove(std::data(fltargs));
             }
 
             if (strcmp(argv[0], "incmov") == 0)
@@ -109,7 +109,7 @@ namespace heimer
                     fltargs[i] = strtof(argv[1 + i], nullptr);
                 }
 
-                return incmove(fltargs);
+                return incmove(std::data(fltargs));
             }
 
             else if (strcmp(argv[0], "setgain") == 0)
@@ -125,7 +125,7 @@ namespace heimer
                     fltargs[i] = strtof(argv[1 + i], nullptr);
                 }
 
-                set_gains({fltargs, (size_t)dim()});
+                set_gains({std::data(fltargs), (size_t)dim()});
                 return 0;
             }
 

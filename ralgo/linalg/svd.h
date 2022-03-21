@@ -111,7 +111,7 @@ namespace ralgo
         if (std::size(b) != (unsigned)m || x.size() != (unsigned)n)
             ralgo::fault("SVD::solve bad sizes");
 
-        T tmp[n];
+        TEMPORARY_STORAGE(T, n, tmp);
         tsh = (thresh >= 0. ? thresh : 0.5 * sqrt(m + n + 1.) * w[0] * eps);
         for (j = 0; j < n; j++)
         {
@@ -190,7 +190,8 @@ namespace ralgo
         int i, its, j, jj, k, l, nm;
         T anorm, c, f, g, h, s, scale, x, y, z;
         // vector_t<M> rv1(n);
-        T rv1[n];
+
+        TEMPORARY_STORAGE(T, n, rv1);
 
         g = scale = anorm = 0.0;
         for (i = 0; i < n; i++)
@@ -425,8 +426,11 @@ namespace ralgo
         int i, j, k, s, inc = 1;
         T sw;
         // vector_t<M> su(m), sv(n);
-        T su[m];
-        T sv[n];
+        //T su[m];
+        TEMPORARY_STORAGE(T, m, su);
+        //T sv[n];
+        TEMPORARY_STORAGE(T, n, sv);
+
         do
         {
             inc *= 3;

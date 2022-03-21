@@ -11,6 +11,8 @@
 #include <ralgo/linalg/vector.h>
 #include <vector>
 
+#define TEMPORARY_STORAGE(type, size, name) std::vector<type> name(size) 
+
 namespace ralgo
 {
     constexpr const double epsilon = std::numeric_limits<double>::epsilon();
