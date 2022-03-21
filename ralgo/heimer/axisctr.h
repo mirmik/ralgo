@@ -31,7 +31,7 @@ namespace heimer
     public:
         union union_t
         {
-            uint8_t flags;
+            uint8_t flags = 0;
             struct flags_t
             {
                 uint8_t operation_finished_flag : 1;
@@ -39,25 +39,27 @@ namespace heimer
                 uint8_t dynamic_resources : 1;
                 uint8_t spattern_enabled : 1;
             } f;
-        } u;
+        } u={};
 
-        void (*operation_start_handler)(void *priv, axis_controller *ax);
-        void (*operation_finish_handler)(void *priv, axis_controller *ax);
-        void *operation_handlers_priv;
+        void (*operation_start_handler)(void *priv, axis_controller *ax) = nullptr;
+        void (*operation_finish_handler)(void *priv, axis_controller *ax) = nullptr;
+        void *operation_handlers_priv = nullptr;
 
-        line_trajectory lintraj;
-        trajectory *curtraj;
+        line_trajectory lintraj = {};
+        trajectory *curtraj = nullptr;
 
-        axisctr_approval **approvals;
-        int approvals_total;
+        axisctr_approval **approvals = nullptr;
+        int approvals_total = 0;
 
-        axis_settings *settings;
+        axis_settings *settings = nullptr;
 
     public:
         axis_controller(const char *name, axis_settings *setings, int dim);
         axis_controller(const char *name, int dim);
         axis_controller(const char *name,
                         const std::initializer_list<axis_state *> &states);
+        axis_controller(const axis_controller&) = delete;
+        axis_controller& operator=(const axis_controller&) = delete;
 
         int feedback(disctime_t time) override;
         int serve(disctime_t time) override;

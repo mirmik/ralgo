@@ -13,24 +13,29 @@ namespace heimer
         virtual const char *what() { return "interrupt"; }
 
         virtual uint8_t code() { return HEIMER_INTERRUPT_TYPE_USER; }
+        virtual ~interrupt_args() = default;
     };
 
     class interrupt_args_message : public interrupt_args
     {
-        const char *msg;
+        const char *msg = nullptr;
 
     public:
         interrupt_args_message(const char *str) : msg(str) {}
+        interrupt_args_message(const interrupt_args_message&) = delete;
+        interrupt_args_message& operator=(const interrupt_args_message&) = delete;
 
         const char *what() override { return msg; }
     };
 
     class force_stop_interrupt_args : public interrupt_args
     {
-        const char *msg;
+        const char *msg = nullptr;
 
     public:
         force_stop_interrupt_args(const char *str) : msg(str) {}
+        force_stop_interrupt_args(const force_stop_interrupt_args&) = delete;
+        force_stop_interrupt_args& operator=(const force_stop_interrupt_args&) = delete;
 
         const char *what() override { return msg; }
 

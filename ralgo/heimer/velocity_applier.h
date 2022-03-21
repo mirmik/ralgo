@@ -19,10 +19,10 @@ namespace heimer
     */
     class velocity_applier : public signal_processor
     {
-        robo::i_velocity_setter *controlled_velset;
-        robo::i_velocity_feedback *controlled_velget;
-        robo::i_position_feedback *controlled_posget;
-        axis_state *state;
+        robo::i_velocity_setter *controlled_velset = nullptr;
+        robo::i_velocity_feedback *controlled_velget = nullptr;
+        robo::i_position_feedback *controlled_posget = nullptr;
+        axis_state *state = nullptr;
 
         position_t deviation_error_limit = 0.1;
         double compkoeff = compkoeff_timeconst(
@@ -33,16 +33,16 @@ namespace heimer
         // Количество импульсов в системной единице (миллиметре или радиане).
         double gear = 1;
 
-        disctime_t last_time;
+        disctime_t last_time = 0;
 
-        robo::fixed_frequency_stepper_controller *stepctr;
+        robo::fixed_frequency_stepper_controller *stepctr = nullptr;
 
         bool deactivation_enabled = false;
         bool interrupt_situation = false;
 
     public:
         // debug
-        velocity_t compspd;
+        velocity_t compspd = 0;
 
     public:
         velocity_applier();
@@ -53,6 +53,9 @@ namespace heimer
         velocity_applier(const char *name,
                          robo::fixed_frequency_stepper_controller *stepctr,
                          axis_state *state);
+
+        velocity_applier(const velocity_applier&) = delete;
+        velocity_applier& operator=(const velocity_applier&) = delete;
 
         void set_gear(double gear);
 

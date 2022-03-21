@@ -11,7 +11,7 @@ namespace ralgo
     template <class T, class Alloc = std::allocator<T>> class vector
     {
         using Parent = std::vector<T, Alloc>;
-        Parent vec;
+        Parent vec = {};
 
     public:
         using value_type = typename Parent::value_type;

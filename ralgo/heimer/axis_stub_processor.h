@@ -15,13 +15,15 @@ namespace heimer
         bool _apply_speed_mode = false;
 
     public:
-        position_t pos;
-        velocity_t vel;
+        position_t pos = {};
+        velocity_t vel = {};
 
-        disctime_t lasttime;
+        disctime_t lasttime = {};
 
     public:
         axis_stub_processor(const char *name);
+        axis_stub_processor(const axis_stub_processor&) = delete;
+        axis_stub_processor& operator=(const axis_stub_processor&) = delete;
 
         int feedback(disctime_t time) override;
         int serve(disctime_t time) override;

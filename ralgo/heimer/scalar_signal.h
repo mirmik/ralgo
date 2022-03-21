@@ -8,7 +8,7 @@ namespace heimer
     class scalar_signal : public signal_head
     {
     public:
-        double value;
+        double value=0;
 
     public:
         scalar_signal(const char *name);
