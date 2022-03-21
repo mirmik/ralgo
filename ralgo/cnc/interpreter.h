@@ -28,8 +28,6 @@ namespace cnc
 {
     class interpreter
     {
-        //static constexpr char alphabet[9] = {'X', 'Y', 'Z', 'A', 'B',
-        //                                     'C', 'I', 'J', 'K'};
     public:
         cnc::planner *planner;
         cnc::revolver *revolver;
@@ -46,12 +44,19 @@ namespace cnc
         double saved_acc = 0;
         double saved_feed = 0;
 
+        igris::delegate<void> _external_final_shift_handle; 
         planner_block lastblock;
+    
     public:
         interpreter(igris::ring<planner_block> *blocks, cnc::planner *planner,
                     cnc::revolver *revolver)
             : planner(planner), revolver(revolver), blocks(blocks)
         {
+        }
+
+        void set_final_shift_handler(const igris::delegate<void>& dlg) 
+        {
+            _external_final_shift_handle = dlg;
         }
 
         void init_axes(int total_axes) 
@@ -78,11 +83,11 @@ namespace cnc
 
         void final_shift_handle() 
         {
-            //ralgo::info("FINAL_SHIFT_HANDLE");
-            //nos::print("finishes: "); nos::print_list(final_position); nos::println();
-            //nos::print("steps: "); nos::print_list(revolver->current_steps()); nos::println();
             if (blocks->avail() == 0)
                 restore_finishes();
+
+            if (_external_final_shift_handle)
+                _external_final_shift_handle();
         }
 
         int check_correctness(nos::ostream& os) 
@@ -118,6 +123,11 @@ namespace cnc
             task.isok = true;
             return task;            
         }
+
+        //void set_start_operation_handle(const igris::delegate<void>& dlg) 
+        //{
+        //    planner.set_start_operation_handle(dlg);
+        //}
 
         control_task g1_parse_task(const nos::argv& argv, igris::array_view<double> fposes) 
         {

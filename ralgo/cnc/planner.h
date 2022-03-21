@@ -11,6 +11,7 @@
 #include <igris/container/static_vector.h>
 #include <igris/container/ring.h>
 #include <igris/datastruct/dlist.h>
+#include <igris/event/delegate.h>
 #include <igris/sync/syslock.h>
 
 #include <nos/fprint.h>
@@ -70,7 +71,14 @@ namespace cnc
         uint8_t state = 0;
         int count_of_reevaluation = 0;
 
+        igris::delegate<void> _start_operation_handle;
+
     public:
+        void set_start_operation_handle() 
+        {
+            _start_operation_handle();
+        }
+
         void update_triggers() 
         {
             for (unsigned int i = 0; i < gears.size(); ++i) 
@@ -80,15 +88,15 @@ namespace cnc
             }
         }
 
-        void set_dim(int axes) { total_axes = axes; }
-
-        /*void set_revolver_delta(double delta)
+        void set_dim(int axes) 
         {
-            this->delta = delta;
-            this->delta_sqr_div_2 = delta * delta / 2;
-        }*/
+            total_axes = axes;
+        }
 
-        void reset_iteration_counter() { iteration_counter = 0; }
+        void reset_iteration_counter() 
+        { 
+            iteration_counter = 0; 
+        }
 
         planner(igris::ring<cnc::planner_block> *blocks,
                 igris::ring<cnc::control_shift> *shifts)
@@ -99,15 +107,10 @@ namespace cnc
             memset(dda_counters, 0, sizeof(dda_counters));
         }
 
-        int block_index(planner_block *it) { return blocks->index_of(it); }
-
-        //void synchronize_finished_block(planner_block &block)
-        //{
-        //    for (int i = 0; i < total_axes; ++i)
-        //    {
-        //        synced_steps[i] += block.steps[i];
-        //    }
-        //}
+        int block_index(planner_block *it) 
+        { 
+            return blocks->index_of(it); 
+        }
 
         void fixup_postactive_blocks()
         {
@@ -189,14 +192,10 @@ namespace cnc
             // bool empty = blocks->empty();
             system_unlock();
 
-            /*if (active_block == nullptr && !has_postactive_blocks())
+            if (active_block == nullptr && room != 0) 
             {
-                if (empty)
-                    return 1;
-
-                else
-                    start_with_first_block();
-            }*/
+                _start_operation_handle();
+            } 
 
             while (room--)
             {
