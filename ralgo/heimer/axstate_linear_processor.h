@@ -30,6 +30,9 @@ namespace heimer
                                  double *matrix, double *invert_matrix);
         axstate_linear_processor(const char *name, int dim);
 
+        axstate_linear_processor(const axstate_linear_processor&) = delete;
+        axstate_linear_processor& operator=(const axstate_linear_processor&) = delete;
+
         int dim() { return leftdim(); }
 
         int feedback(disctime_t time) override;

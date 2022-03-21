@@ -8,7 +8,7 @@
 class trajectory
 {
 public:
-    int dim;
+    int dim = 0;
 
 public:
     virtual int attime(disctime_t timestamp, position_t *outpos,

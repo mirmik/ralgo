@@ -16,12 +16,12 @@ namespace ralgo
     template <class M, class TP, class TL, class TU> class PLUD
     {
     public:
-        M a;
-        TP p;
-        TL l;
-        TU u;
+        M a = {};
+        TP p = {};
+        TL l = {};
+        TU u = {};
 
-        int status;
+        int status = 0;
 
         PLUD(const M &_mat) : PLUD(_mat, TP{}, TL{}, TU{}) {}
 

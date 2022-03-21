@@ -17,8 +17,8 @@ namespace heimer
     class axstate_pose3_chain_settings
     {
     public:
-        ralgo::pose3<double> constant_transform;
-        ralgo::screw3<double> local_sensivity;
+        ralgo::pose3<double> constant_transform = {};
+        ralgo::screw3<double> local_sensivity = {};
         heimer::axis_state *controlled = nullptr;
 
         bool is_rotation_link()
@@ -35,11 +35,10 @@ namespace heimer
     {
     public:
         // Винта ошибки, возникающий из-за нелинейности вращающих звеньев.
-        ralgo::screw3<double> second_pow_error_screw;
-
-        ralgo::pose3<double> left_transform;
-        ralgo::pose3<double> right_transform;
-        ralgo::screw3<double> result_screw;
+        ralgo::screw3<double> second_pow_error_screw = {};
+        ralgo::pose3<double> left_transform = {};
+        ralgo::pose3<double> right_transform = {};
+        ralgo::screw3<double> result_screw = {};
     };
 
     /**
@@ -48,21 +47,23 @@ namespace heimer
     class axstate_chain3_processor : public signal_processor
     {
     public:
-        ralgo::pose3<double> first_constant_transform;
+        ralgo::pose3<double> first_constant_transform={};
         axstate_pose3_chain_settings *settings = nullptr;
         axstate_pose3_chain_temporary *temporary = nullptr;
 
-        ralgo::screw3<velocity_t> feedback_velocity;
-        ralgo::screw3<velocity_t> control_velocity;
-        ralgo::pose3<position_t> feedback_position;
-        ralgo::pose3<position_t> control_position;
+        ralgo::screw3<velocity_t> feedback_velocity = {};
+        ralgo::screw3<velocity_t> control_velocity = {};
+        ralgo::pose3<position_t> feedback_position = {};
+        ralgo::pose3<position_t> control_position = {};
 
         uint8_t deactivation_enabled = 0;
         bool interrupt_situation = false;
 
-        disctime_t last_time;
+        disctime_t last_time = {};
 
     public:
+        axstate_chain3_processor(const axstate_chain3_processor&) = delete;
+        axstate_chain3_processor& operator=(const axstate_chain3_processor&) = delete;
         axstate_chain3_processor(const char *name, int leftdim);
         void set_resources(axstate_pose3_chain_settings *settings,
                            axstate_pose3_chain_temporary *tsettings);
@@ -131,7 +132,7 @@ namespace heimer
 
     class axstate_chain3_translation_processor : public axstate_chain3_processor
     {
-        heimer::phase_signal<3> *rightside;
+        heimer::phase_signal<3> *rightside = nullptr;
         double compkoeff = compkoeff_timeconst(0.0001);
 
         double last_w[3] = {0, 0, 0};
@@ -151,6 +152,9 @@ namespace heimer
             : axstate_chain3_processor(name, leftdim)
         {
         }
+
+        axstate_chain3_translation_processor(const axstate_chain3_translation_processor&) = delete;
+        axstate_chain3_translation_processor& operator=(const axstate_chain3_translation_processor&) = delete;
 
         void feedback_output(const pose3<position_t> &,
                              const screw3<velocity_t> &) override
