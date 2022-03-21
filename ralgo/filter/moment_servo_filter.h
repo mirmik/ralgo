@@ -9,8 +9,8 @@ namespace ralgo
     class moment_servo_filter
     {
     public:
-        ralgo::pi_filter vel_pi;
-        ralgo::pi_filter pos_pi;
+        ralgo::pi_filter vel_pi = {};
+        ralgo::pi_filter pos_pi = {};
 
     public:
         void setup_velocity_filter(double kp, double ki)

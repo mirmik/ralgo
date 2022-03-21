@@ -84,12 +84,12 @@ namespace ralgo
     template <class T, class O = row_order<T>> class matrix_view
     {
     protected:
-        T *_data;
-        int _rows;
-        int _cols;
-        int _stride;
+        T *_data = nullptr;
+        int _rows = 0;
+        int _cols = 0;
+        int _stride = 0;
 
-        O accessor;
+        O accessor = {};
 
     public:
         using __check_O_validity =
@@ -109,9 +109,8 @@ namespace ralgo
         {
         }
 
-        matrix_view(const matrix_view &oth)
-            : _data(oth._data), _rows(oth._rows), _cols(oth._cols),
-              _stride(oth._stride){};
+        matrix_view(const matrix_view &oth) = default;
+        matrix_view& operator= (const matrix_view &oth) = default;
 
         matrix_view(const std::initializer_list<T> &lst, int rows, int cols)
             : matrix_view((T *)std::begin(lst), rows, cols)
@@ -178,15 +177,6 @@ namespace ralgo
         T *end() { return _data + _cols * _rows; } // Stride ?
         const T *begin() const { return _data; }
         const T *end() const { return _data + _rows * _cols; } // Stride ?
-
-        matrix_view &operator=(const matrix_view &oth)
-        {
-            _data = (T *)oth.data();
-            _rows = oth._rows;
-            _cols = oth._cols;
-            _stride = accessor.stride(_rows, _cols);
-            return *this;
-        }
 
         void release()
         {

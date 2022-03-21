@@ -2340,33 +2340,10 @@ namespace linalg
                        << m[3] << '}';
         }
     }
+
+    using linalg::ostream_overloads::operator<<;
 }
 
-/*namespace std
-{
-    template<class C, class T> std::basic_ostream<C> & operator <<
-(std::basic_ostream<C> & out, const linalg::vec<T, 1> & v) { return out << '{'
-<< v[0] << '}'; } template<class C, class T> std::basic_ostream<C> & operator <<
-(std::basic_ostream<C> & out, const linalg::vec<T, 2> & v) { return out << '{'
-<< v[0] << ',' << v[1] << '}'; } template<class C, class T>
-std::basic_ostream<C> & operator << (std::basic_ostream<C> & out, const
-linalg::vec<T, 3> & v) { return out << '{' << v[0] << ',' << v[1] << ',' << v[2]
-<< '}'; } template<class C, class T> std::basic_ostream<C> & operator <<
-(std::basic_ostream<C> & out, const linalg::vec<T, 4> & v) { return out << '{'
-<< v[0] << ',' << v[1] << ',' << v[2] << ',' << v[3] << '}'; }
-
-    template<class C, class T, int M> std::basic_ostream<C> & operator <<
-(std::basic_ostream<C> & out, const linalg::mat<T, M, 1> & m) { return out <<
-'{' << m[0] << '}'; } template<class C, class T, int M> std::basic_ostream<C> &
-operator << (std::basic_ostream<C> & out, const linalg::mat<T, M, 2> & m) {
-return out << '{' << m[0] << ',' << m[1] << '}'; } template<class C, class T,
-int M> std::basic_ostream<C> & operator << (std::basic_ostream<C> & out, const
-linalg::mat<T, M, 3> & m) { return out << '{' << m[0] << ',' << m[1] << ',' <<
-m[2] << '}'; } template<class C, class T, int M> std::basic_ostream<C> &
-operator << (std::basic_ostream<C> & out, const linalg::mat<T, M, 4> & m) {
-return out << '{' << m[0] << ',' << m[1] << ',' << m[2] << ',' << m[3] << '}'; }
-
-}*/
 
 #include <nos/fprint.h>
 #include <nos/print.h>
@@ -2398,38 +2375,6 @@ namespace nos
 
 namespace std
 {
-
-    /*       template<class C, class T> std::basic_ostream<C> & operator <<
-       (std::basic_ostream<C> & out, const vec<T,1> & v) { return out << '{' <<
-       v[0] << '}'; } template<class C, class T> std::basic_ostream<C> &
-       operator << (std::basic_ostream<C> & out, const vec<T,2> & v) { return
-       out << '{' << v[0] << ',' << v[1] << '}'; } template<class C, class T>
-       std::basic_ostream<C> & operator << (std::basic_ostream<C> & out, const
-       vec<T,3> & v) { return out << '{' << v[0] << ',' << v[1] << ',' << v[2]
-       << '}'; } template<class C, class T> std::basic_ostream<C> & operator <<
-       (std::basic_ostream<C> & out, const vec<T,4> & v) { return out << '{' <<
-       v[0] << ',' << v[1] << ',' << v[2] << ',' << v[3] << '}'; }
-           template<class C, class T, int M> std::basic_ostream<C> & operator <<
-       (std::basic_ostream<C> & out, const mat<T,M,1> & m) { return out << '{'
-       << m[0] << '}'; } template<class C, class T, int M> std::basic_ostream<C>
-       & operator << (std::basic_ostream<C> & out, const mat<T,M,2> & m) {
-       return out << '{' << m[0] << ',' << m[1] << '}'; } template<class C,
-       class T, int M> std::basic_ostream<C> & operator <<
-       (std::basic_ostream<C> & out, const mat<T,M,3> & m) { return out << '{'
-       << m[0] << ',' << m[1] << ',' << m[2] << '}'; } template<class C, class
-       T, int M> std::basic_ostream<C> & operator << (std::basic_ostream<C> &
-       out, const mat<T,M,4> & m) { return out << '{' << m[0] << ',' << m[1] <<
-       ',' << m[2] << ',' << m[3] << '}'; } template<class C, class T>
-       std::basic_ostream<C> & operator << (std::basic_ostream<C> & out, const
-       quat<T> & q) { return out << '{' << q.x << ',' << q.y << ',' << q.z <<
-       ',' << q.w << '}'; } template<class C, class T, class A, int... I>
-       std::basic_ostream<C> & operator << (std::basic_ostream<C> & out, const
-       _lswizzle<T,A,I...> & s) { vec<T,sizeof...(I)> v = s; return out << v; }
-           template<class C, class T, class A, int... I> std::basic_ostream<C> &
-       operator << (std::basic_ostream<C> & out, const _rswizzle<T,A,I...> & s)
-       { vec<T,sizeof...(I)> v = s; return out << v; }
-    */
-
     // Provide specializations for std::hash<...> with linalg types
     template <class T> struct hash<linalg::vec<T, 1>>
     {

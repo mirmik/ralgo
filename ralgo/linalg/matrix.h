@@ -15,7 +15,7 @@ namespace ralgo
     class matrix : public matrix_view<T, O>
     {
         using parent = matrix_view<T, O>;
-        Alloc alloc;
+        Alloc alloc={};
 
     public:
         matrix() : parent() {}
