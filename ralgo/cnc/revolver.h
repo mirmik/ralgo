@@ -11,6 +11,7 @@
 #include <ralgo/cnc/planblock.h>
 #include <ralgo/log.h>
 #include <ralgo/robo/stepper.h>
+#include <ralgo/cnc/planner.h>
 #include <igris/event/delegate.h>
 
 namespace cnc
@@ -39,15 +40,17 @@ namespace cnc
         int steppers_total = 0;
 
     private:
-        bool all_blocks_resolved = true;
+        volatile bool all_blocks_resolved = true;
 
         robo::stepper **steppers = nullptr;
-
+ 
     public:
         igris::ring<cnc::control_shift> *shifts_ring;
         igris::ring<cnc::planner_block> *blocks;
-        igris::delegate<void> final_shift_pushed;
-        revolver(igris::ring<cnc::control_shift> *ring) : shifts_ring(ring) {}
+        cnc::planner * planner = nullptr;
+       igris::delegate<void> final_shift_pushed;
+        revolver(igris::ring<cnc::control_shift> *ring, igris::ring<cnc::planner_block> *blocks, cnc::planner * planner) : 
+            shifts_ring(ring), blocks(blocks) , planner(planner) {}
 
         robo::stepper ** get_steppers() { return steppers; }        
 
@@ -163,7 +166,10 @@ namespace cnc
             // быть контекст приоритетного прерывания.
             if (shifts_ring->empty())
             {
-                if (all_blocks_resolved == false)
+                if (all_blocks_resolved == false && 
+                    blocks->empty() && 
+                    planner->active_block == nullptr &&
+                    planner->active == blocks->tail_index())
                 {
                     all_blocks_resolved = true;
                     final_shift_pushed();

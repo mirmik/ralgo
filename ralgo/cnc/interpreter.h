@@ -44,7 +44,7 @@ namespace cnc
         double saved_acc = 0;
         double saved_feed = 0;
 
-        igris::delegate<void> _external_final_shift_handle; 
+        igris::delegate<void> _external_final_shift_handle = {}; 
         planner_block lastblock;
     
     public:
@@ -57,6 +57,11 @@ namespace cnc
         void set_final_shift_handler(const igris::delegate<void>& dlg) 
         {
             _external_final_shift_handle = dlg;
+        }
+
+        void set_start_shift_handler(const igris::delegate<void>& dlg) 
+        {
+            planner->set_start_operation_handle(dlg);
         }
 
         void init_axes(int total_axes) 
@@ -83,11 +88,12 @@ namespace cnc
 
         void final_shift_handle() 
         {
-            if (blocks->avail() == 0)
+            if (blocks->avail() == 0) {
                 restore_finishes();
 
-            if (_external_final_shift_handle)
-                _external_final_shift_handle();
+                if (_external_final_shift_handle)
+                    _external_final_shift_handle();
+            }
         }
 
         int check_correctness(nos::ostream& os) 
