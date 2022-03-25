@@ -74,9 +74,9 @@ namespace cnc
         igris::delegate<void> _start_operation_handle;
 
     public:
-        void set_start_operation_handle() 
+        void set_start_operation_handle(igris::delegate<void> dlg) 
         {
-            _start_operation_handle();
+            _start_operation_handle = dlg;
         }
 
         void update_triggers() 
@@ -162,6 +162,12 @@ namespace cnc
             int head = blocks->head_index();
             system_unlock();
 
+
+            if (active_block == nullptr && active != head) 
+            {
+                _start_operation_handle();                
+            }
+
             if (active == head)
             {
                 active_block = nullptr;
@@ -191,11 +197,6 @@ namespace cnc
             int room = shifts->room();
             // bool empty = blocks->empty();
             system_unlock();
-
-            if (active_block == nullptr && room != 0) 
-            {
-                _start_operation_handle();
-            } 
 
             while (room--)
             {
@@ -253,7 +254,9 @@ namespace cnc
                 }
                 velocities[i] += accelerations[i]; // * delta;
             }
+            system_lock();
             shifts->emplace(dir, step, velocities, total_axes);
+            system_unlock();
 
             iteration_counter++;
         }
@@ -312,6 +315,9 @@ namespace cnc
                 need_to_reevaluate = false;
                 count_of_reevaluation++;
             }
+
+            if (active_block == nullptr && !has_postactive_blocks())
+                return 1;
 
             iteration_planning_phase();
             return 0;
