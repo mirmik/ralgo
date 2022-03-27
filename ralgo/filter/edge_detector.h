@@ -2,6 +2,7 @@
 #define RALGO_EDGE_DETECTOR_H
 
 #include <cmath>
+#include <any>
 
 namespace ralgo
 {
@@ -14,31 +15,54 @@ namespace ralgo
         None
     };
 
+    enum class SignalTone 
+    {
+        Rising,
+        Falling,
+        NoInited
+    };
+
     class edge_detector
     {
-        bool phase = false;
-        bool last_direction = false;
+        SignalTone phase = SignalTone::Rising;
+        SignalTone last_direction = SignalTone::NoInited;
 
-        float trigger_level;
+        double trigger_level = {};
 
-        float start = 0;
-        float last = 0;
+        double start = 0;
+        double last = 0;
 
-        bool prevent_halfspaces_area = true;
+        // Запретить срабатывание в зоне выше нуля для нисходящих сигналов
+        bool prevent_halfspaces_area = false; 
+
+        std::any _candidate_privdata = {};
 
     public:
-        edge_detector(float trigger_level) : trigger_level(trigger_level) {}
+        edge_detector(double trigger_level) : trigger_level(trigger_level) {}
 
-        EdgeDetectorStatus serve(float signal)
+        void set_prevent_halfspaces_area(bool en) 
+        {
+            prevent_halfspaces_area = en;
+        }
+
+        const std::any& candidate_privdata() 
+        {
+            return _candidate_privdata;
+        }
+
+        EdgeDetectorStatus serve(double signal)
         {
             EdgeDetectorStatus status = EdgeDetectorStatus::None;
-            bool direction = signal - last > 0;
+            if (signal == last)
+                return EdgeDetectorStatus::None;
+
+            SignalTone direction = signal - last > 0 ? SignalTone::Rising : SignalTone::Falling;
 
             if (last_direction != direction)
             {
                 start = signal;
 
-                if (direction)
+                if (direction == SignalTone::Rising)
                     status = EdgeDetectorStatus::UpdateRisingCandidate;
                 else
                     status = EdgeDetectorStatus::UpdateFallingCandidate;
@@ -48,22 +72,22 @@ namespace ralgo
             {
                 if (fabs(signal - start) > trigger_level)
                 {
-                    if (direction == false)
+                    if (direction == SignalTone::Falling)
                     {
-                        if (phase == true)
+                        if (phase == SignalTone::Rising)
                         {
-                            phase = false;
+                            phase = SignalTone::Falling;
 
                             if (!prevent_halfspaces_area || start > 0)
                                 status = EdgeDetectorStatus::FallingEvent;
                         }
                     }
 
-                    if (direction == true)
+                    if (direction == SignalTone::Rising)
                     {
-                        if (phase == false)
+                        if (phase == SignalTone::Falling)
                         {
-                            phase = true;
+                            phase = SignalTone::Rising;
 
                             if (!prevent_halfspaces_area || start < 0)
                                 status = EdgeDetectorStatus::RisingEvent;
@@ -76,6 +100,17 @@ namespace ralgo
             last = signal;
 
             return status;
+        }
+
+        EdgeDetectorStatus serve(double signal, const std::any& candidate_privdata) 
+        {
+            auto state = serve(signal);
+            if (state == EdgeDetectorStatus::UpdateFallingCandidate || 
+                state == EdgeDetectorStatus::UpdateRisingCandidate) 
+            {
+                this->_candidate_privdata = candidate_privdata;
+            }
+            return state;
         }
     };
 
