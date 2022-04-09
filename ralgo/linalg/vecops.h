@@ -12,6 +12,7 @@
 #include <tuple>
 
 #include <igris/util/signature.h>
+#include <igris/math.h>
 #include <ralgo/linalg/vecops_base.h>
 
 namespace ralgo
@@ -106,6 +107,13 @@ namespace ralgo
         {
             b.resize(a.size());
             for (unsigned int i = 0; i < a.size(); ++i)
+                b[i] = a[i];
+        }
+
+        template <class A, class B> void copy_without_resize(const A &a, B &&b)
+        {
+            size_t size = __MIN__(a.size(), b.size());
+            for (unsigned int i = 0; i < size; ++i)
                 b[i] = a[i];
         }
 
