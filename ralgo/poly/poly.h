@@ -3,6 +3,7 @@
 
 #include <ralgo/linalg/vector.h>
 #include <ralgo/linalg/vecops.h>
+#include <ralgo/linalg/roots.h>
 
 namespace ralgo 
 {
@@ -154,10 +155,15 @@ namespace ralgo
             else
                 return r1;
         }
+
+        std::vector<T> roots() const 
+        {
+            return ralgo::roots(coeffs);
+        }
     };
 
 
-    std::ostream& operator<< (std::ostream &os, const ralgo::poly<double> &p)
+    static inline std::ostream& operator<< (std::ostream &os, const ralgo::poly<double> &p)
     {
         return os << p.coeffs;
     }
