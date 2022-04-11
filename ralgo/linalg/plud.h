@@ -8,6 +8,8 @@
 #include <ralgo/linalg/matops.h>
 #include <ralgo/linalg/matrix.h>
 #include <ralgo/linalg/trivial_solve.h>
+#include <ralgo/linalg/trivial_inverse.h>
+#include <ralgo/linalg/proxy.h>
 
 #include <nos/print.h>
 
@@ -118,6 +120,16 @@ namespace ralgo
             defvec_t<X, B> x;
             solve(b, x);
             return x;
+        }
+
+        void inverse(M &inv) const
+        {
+            ralgo::matrix<typename M::value_type> temp;
+            TL l_inv = L_triangle_inverse(l);
+            TU u_inv = U_triangle_inverse(u);
+            auto p_inv = ralgo::transposed_matrix_proxy(p);
+            ralgo::matops::multiply(u_inv, l_inv, temp);
+            ralgo::matops::multiply(temp, p_inv, inv);
         }
     };
 
