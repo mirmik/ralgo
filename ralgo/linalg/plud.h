@@ -131,6 +131,18 @@ namespace ralgo
             ralgo::matops::multiply(u_inv, l_inv, temp);
             ralgo::matops::multiply(temp, p_inv, inv);
         }
+
+        M inverse() const
+        {
+            ralgo::matrix<typename M::value_type> inv;
+            ralgo::matrix<typename M::value_type> temp;
+            TL l_inv = L_triangle_inverse(l);
+            TU u_inv = U_triangle_inverse(u);
+            auto p_inv = ralgo::transposed_matrix_proxy(p);
+            ralgo::matops::multiply(u_inv, l_inv, temp);
+            ralgo::matops::multiply(temp, p_inv, inv);
+            return inv;
+        }
     };
 
     template <class M,

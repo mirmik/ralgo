@@ -10,9 +10,8 @@ namespace ralgo
     template <class R=void, class A>
     defsame_t<R, ralgo::matrix<typename A::value_type>> inverse(const A &a)
     {
-        defsame_t<R, ralgo::matrix<typename A::value_type>> inv;
         auto plud = ralgo::plud(a);
-        plud.inverse(inv);
+        auto inv = plud.inverse();
         return inv;
     }
 }
