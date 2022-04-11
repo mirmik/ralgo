@@ -49,6 +49,11 @@ namespace ralgo
                 a = val;
         }
 
+        template <class M> void clean(M &arr)
+        {
+            vecops::fill(arr, typename M::value_type{});
+        }
+
         // построить целочисленный вектор арифметической прогрессии [start;stop)
         // с шагом step.
         // TODO: дополнить нецелочисленным вариантом
