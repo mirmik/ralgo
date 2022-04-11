@@ -342,6 +342,14 @@ namespace ralgo
 
             return ret;
         }
+
+        template <class M = void>
+        defsame_t<M, ralgo::matrix<double>> eye(size_t N) 
+        {
+            defsame_t<M, ralgo::matrix<double>> ret(N,N);
+            eye(ret);
+            return ret;
+        }
     }
 }
 
