@@ -110,6 +110,7 @@ namespace ralgo
             // Последовательно применяем решения матриц простого вида.
             // Данная процедура эквивалентна последовательному
             // умножению на обращенные P, L, U.
+            // details : x в первом выражении используется как промежуточное хранилище.
             pivot_solve(p, b, x);
             L_triangle_solve(l, x, y);
             U_triangle_solve(u, y, x);
@@ -122,6 +123,7 @@ namespace ralgo
             return x;
         }
 
+        /// A_inv = U_inv * L_inv * P_inv
         void inverse(M &inv) const
         {
             ralgo::matrix<typename M::value_type> temp;
@@ -135,12 +137,7 @@ namespace ralgo
         M inverse() const
         {
             ralgo::matrix<typename M::value_type> inv;
-            ralgo::matrix<typename M::value_type> temp;
-            TL l_inv = L_triangle_inverse(l);
-            TU u_inv = U_triangle_inverse(u);
-            auto p_inv = ralgo::transposed_matrix_proxy(p);
-            ralgo::matops::multiply(u_inv, l_inv, temp);
-            ralgo::matops::multiply(temp, p_inv, inv);
+            inverse(inv);
             return inv;
         }
     };
