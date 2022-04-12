@@ -43,6 +43,7 @@ TEST_CASE("plud")
              mat);
 
     CHECK_EQ(lu.solve(std::vector<double>{7, 9}), std::vector<double>{1, 1});
+    CHECK_EQ(lu.determinant(), doctest::Approx(-6));
 }
 
 TEST_CASE("plud2")
