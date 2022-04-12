@@ -30,6 +30,7 @@ namespace ralgo
         TU u = {};
 
         int status = 0;
+        int swap_counter = 0;
 
         PLUD(const M &_mat) : PLUD(_mat, TP{}, TL{}, TU{}) {}
 
@@ -62,6 +63,7 @@ namespace ralgo
         void decompose()
         {
             const int n = a.rows();
+            swap_counter = 0;
 
             for (int i = 0; i < n; i++)
             {
@@ -77,8 +79,13 @@ namespace ralgo
                 }
                 if (pivotValue != 0)
                 {
-                    ralgo::vecops::swap(p.row(pivot), p.row(i));
-                    ralgo::vecops::swap(u.row(pivot), u.row(i));
+                    if (pivot != i)
+                    {
+                        ralgo::vecops::swap(p.row(pivot), p.row(i));
+                        ralgo::vecops::swap(u.row(pivot), u.row(i));
+                        swap_counter++;
+                    }
+                    
                     for (int j = i + 1; j < n; j++)
                     {
                         u(j, i) /= u(i, i);
@@ -132,6 +139,14 @@ namespace ralgo
             auto p_inv = ralgo::transposed_matrix_proxy(p);
             ralgo::matops::multiply(u_inv, l_inv, temp);
             ralgo::matops::multiply(temp, p_inv, inv);
+        }
+
+        typename M::value_type determinant() const
+        {
+            auto lprod = ralgo::matops::diagprod(l);
+            auto uprod = ralgo::matops::diagprod(u);
+            int pivot_det = swap_counter % 2 == 0 ? 1 : -1;
+            return lprod * uprod * pivot_det;
         }
 
         M inverse() const

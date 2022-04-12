@@ -31,6 +31,17 @@ namespace ralgo
             vecops::fill(arr, typename M::value_type{});
         }
 
+        template <class M> 
+        typename M::value_type diagprod(M &a)
+        {
+            typename M::value_type acc = 1;
+            for (auto i = 0; i < a.rows(); i++)
+            {
+                acc *= a.at(i, i);
+            }
+            return acc;
+        }
+
         template <class M> void square_inline_transpose(M &a)
         {
             for (int i = 0; i < a.rows(); ++i)
