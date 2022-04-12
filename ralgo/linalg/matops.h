@@ -42,6 +42,17 @@ namespace ralgo
             return acc;
         }
 
+        template <class M>
+        typename M::value_type trace(M &a)
+        {
+            typename M::value_type acc = 0;
+            for (auto i = 0; i < a.rows(); i++)
+            {
+                acc += a.at(i, i);
+            }
+            return acc;
+        }
+
         template <class M> void square_inline_transpose(M &a)
         {
             for (int i = 0; i < a.rows(); ++i)
