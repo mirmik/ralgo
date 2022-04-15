@@ -12,9 +12,6 @@ namespace ralgo
         T ang;
         linalg::vec<T, 2> lin;
 
-        T &orient = ang;
-        linalg::vec<T, 2> &center = lin;
-
     public:
         pose2() : ang{}, lin{} {}
 
@@ -48,6 +45,16 @@ namespace ralgo
         linalg::vec<T, 2> transform_point(const linalg::vec<T, 2> &vec) const
         {
             return linalg::rot(ang, vec) + lin;
+        }
+
+        linalg::vec<T, 2> inverse_transform_vector(const linalg::vec<T, 2> &vec) const
+        {
+            return linalg::rot(-ang, vec);
+        }
+
+        linalg::vec<T, 2> inverse_transform_point(const linalg::vec<T, 2> &vec) const
+        {
+            return linalg::rot(-ang, vec - lin);
         }
 
         ralgo::screw<T,2> rotate(ralgo::screw<T,2> scr) const 
