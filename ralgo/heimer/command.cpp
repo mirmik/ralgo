@@ -304,7 +304,7 @@ static int siglist(int, char **, char *output, int maxsize)
     {
         memset(buf, 0, 48);
         snprintf(buf, 48, "%*s controlled: %d\r\n",
-                 SIGNAL_PROCESSOR_NAME_MAX_LENGTH, it->name,
+                 SIGNAL_PROCESSOR_NAME_MAX_LENGTH, it->name.c_str(),
                  it->current_controller != nullptr);
         strncat(output, buf, maxsize);
     }

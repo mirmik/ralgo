@@ -51,15 +51,16 @@ namespace heimer
         axisctr_approval **approvals = nullptr;
         int approvals_total = 0;
 
-        axis_settings *settings = nullptr;
+        std::vector<axis_settings> settings = {};
 
     public:
-        axis_controller(const char *name, axis_settings *setings, int dim);
-        axis_controller(const char *name, int dim);
-        axis_controller(const char *name,
-                        const std::initializer_list<axis_state *> &states);
+        axis_controller(const std::string& name);
+        axis_controller(const std::string& name, 
+                        const std::vector<axis_state*> &states);
         axis_controller(const axis_controller&) = delete;
         axis_controller& operator=(const axis_controller&) = delete;
+
+        void add_state(axis_state *state);
 
         int feedback(disctime_t time) override;
         int serve(disctime_t time) override;
@@ -77,6 +78,7 @@ namespace heimer
             void (*operation_finish_handler)(void *priv, axis_controller *ax));
 
         void set_gain(double *gain);
+        void set_gain(double gain) { set_gain(&gain); }
         void set_gain(const std::initializer_list<double> &gain);
 
         void set_limits_external(double *back, double *forw);
@@ -98,15 +100,16 @@ namespace heimer
                     const std::initializer_list<double> &dist_real);
         int absmove(disctime_t current_time,
                     const std::initializer_list<double> &pos_real);
+        int incmove(disctime_t current_time, double dist_real) 
+        { return incmove(current_time, &dist_real); }
+        int absmove(disctime_t current_time, double pos_real)
+        { return absmove(current_time, &pos_real); }
         int stop(disctime_t);
         int hardstop(disctime_t);
 
         double feedpos_external(int axno);
         double ctrpos_external(int axno);
         double ctrvel_external(int axno);
-
-        void collect_feedpos(position_t *pos);
-        void collect_feedvel(velocity_t *pos);
 
         velocity_t restore_internal_velocity_from_axstates();
 
@@ -116,9 +119,11 @@ namespace heimer
 
         void finish_trajectory(disctime_t time, position_t *ctrpos);
         bool on_interrupt(disctime_t) override;
-
-        void _init();
+        void reinit();
         void allocate_resources();
+        void collect_feedpos(position_t *pos);
+        void collect_feedvel(velocity_t *pos);
+
     };
 
     axis_controller *create_axis_controller(const char *name, int dim);

@@ -194,7 +194,6 @@ int axis_controller::incmove(disctime_t current_time, const double *dist_real)
 
 int axis_controller::absmove(disctime_t current_time, const double *pos_real)
 {
-
     std::vector<position_t> curpos(leftdim());
     std::vector<position_t> tgtpos(leftdim());
     double extdist_accumulator = 0;
@@ -232,16 +231,8 @@ double axis_controller::ctrvel_external(int axno)
 
 axis_controller *heimer::create_axis_controller(const char *name, int dim)
 {
-    axis_settings *settings = new axis_settings[dim];
-    axis_controller *ptr = new heimer::axis_controller(name, settings, dim);
-    ptr->u.f.dynamic_resources = 1;
+    axis_controller *ptr = new heimer::axis_controller(name);
     return ptr;
-}
-
-void axis_controller::allocate_resources()
-{
-    settings = new axis_settings[leftdim()];
-    u.f.dynamic_resources = 1;
 }
 
 void axis_controller::release_controlled()
@@ -250,7 +241,7 @@ void axis_controller::release_controlled()
     {
         if (settings[i].controlled)
         {
-            settings[i].controlled->deattach_possible_controller(this);
+            settings[i].controlled->detach_possible_controller(this);
             settings[i].controlled = NULL;
         }
     }
@@ -362,7 +353,7 @@ int axis_controller::hardstop(disctime_t time)
     return 0;
 }
 
-void axis_controller::_init()
+void axis_controller::reinit()
 {
     vel = 0;
     acc = 0;
@@ -381,33 +372,32 @@ void axis_controller::_init()
     lintraj.init(1, &settings[0].sfpos, leftdim());
 }
 
-axis_controller::axis_controller(const char *name, axis_settings *settings,
-                                 int dim)
-    : signal_processor(name, dim, 0), settings(settings)
+axis_controller::axis_controller(const std::string& name)
+    : signal_processor(name, 0, 0)
 {
-    _init();
-}
-
-axis_controller::axis_controller(const char *name, int dim)
-    : signal_processor(name, dim, 0)
-{
-    allocate_resources();
-    _init();
+    //_init();
 }
 
 axis_controller::axis_controller(
-    const char *name, const std::initializer_list<axis_state *> &states)
+    const std::string& name, const std::vector<axis_state *> &states)
     : signal_processor(name, states.size(), 0)
 {
-    allocate_resources();
-    _init();
-
-    int i = 0;
-    for (auto *ax : states)
+    settings.resize(states.size());
+    for (unsigned int i = 0; i < states.size(); ++i)
     {
-        settings[i].controlled = ax;
-        settings[i++].controlled->attach_possible_controller(this);
+        settings[i].controlled = states[i];
+        settings[i].controlled->attach_possible_controller(this);
     }
+    reinit();
+}
+
+void axis_controller::add_state(axis_state *state)
+{
+    settings.push_back(axis_settings());
+    settings.back().controlled = state;
+    settings.back().controlled->attach_possible_controller(this);
+    set_dims(settings.size(), 0);
+    reinit();
 }
 
 bool axis_controller::on_interrupt(disctime_t time)
@@ -533,7 +523,7 @@ static inline int bind(axis_controller *axctr, int argc, char **argv,
             if (sig->type != SIGNAL_TYPE_AXIS_STATE)
             {
                 snprintf(output, outmax, "Wrong signal type. name:(%s)",
-                         sig->name);
+                         sig->name.c_str());
                 return -1;
             }
 
@@ -597,13 +587,13 @@ static inline int info(axis_controller *axctr, int argc, char **argv,
         }
         else
         {
-            snprintf(buf, bufsize, "%s,", axctr->settings[i].controlled->name);
+            snprintf(buf, bufsize, "%s,", axctr->settings[i].controlled->name.c_str());
             strncat(output, buf, outmax);
         }
     }
     memset(buf, 0, bufsize);
     snprintf(buf, bufsize, "%s\r\n",
-             axctr->settings[axctr->leftdim() - 1].controlled->name);
+             axctr->settings[axctr->leftdim() - 1].controlled->name.c_str());
     strncat(output, buf, outmax);
 
     memset(buf, 0, bufsize);
