@@ -6,6 +6,7 @@
 
 #include <errno.h>
 #include <ralgo/disctime.h>
+#include <string>
 
 #define SIGNAL_NAME_MAX_LENGTH 12
 
@@ -18,7 +19,7 @@ namespace heimer
     {
     public:
         struct dlist_head list_lnk = DLIST_HEAD_INIT(list_lnk);
-        char name[SIGNAL_NAME_MAX_LENGTH] = {};
+        std::string name = {};
         uint8_t type = 0;
 
         /// Количество ссылок. Каждый контроллер, имеющий указатель
@@ -44,6 +45,8 @@ namespace heimer
         virtual ~signal_head() = default;
         signal_head(uint8_t type);
         signal_head(const char *name, uint8_t type);
+        signal_head(const std::string& name, uint8_t type) 
+            : name(name), type(type) {}
         void set_name(const char *name);
 
         virtual int info(char *buffer, int maxsize) = 0;
@@ -55,8 +58,8 @@ namespace heimer
 
         int attach_listener(signal_processor *);
         void attach_possible_controller(signal_processor *);
-        int deattach_listener(signal_processor *);
-        void deattach_possible_controller(signal_processor *);
+        int detach_listener(signal_processor *);
+        void detach_possible_controller(signal_processor *);
 
         virtual int command_v(int argc, char **argv, char *output, int maxsize);
 

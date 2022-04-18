@@ -3,8 +3,8 @@
 
 int line_trajectory::attime(disctime_t time, position_t *pos, velocity_t *spd)
 {
-    int local_time = time - stim;
-    int full_time = ftim - stim;
+    disctime_t local_time = time - stim;
+    disctime_t full_time = ftim - stim;
 
     assert(full_time > 0);
 
@@ -61,7 +61,7 @@ void line_trajectory::init_nominal_speed(disctime_t stim, disctime_t ftim,
         pair->fpos = fpos[i];
     }
 
-    int time = ftim - stim;
+    disctime_t time = ftim - stim;
 
     double acc_part = (double)acc_time / (double)time;
     double dcc_part = (double)dcc_time / (double)time;

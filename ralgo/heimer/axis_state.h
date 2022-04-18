@@ -17,6 +17,10 @@ namespace heimer
             : phase_signal_base<position_t, velocity_t>(
                   name, SIGNAL_TYPE_AXIS_STATE){};
 
+        axis_state(const std::string& name)
+            : phase_signal_base<position_t, velocity_t>(
+                  name, SIGNAL_TYPE_AXIS_STATE){};
+
         int command_v(int argc, char **argv, char *output, int maxsize) override
         {
             int status = ENOENT;
@@ -25,9 +29,6 @@ namespace heimer
             {
                 feedpos = atof(argv[1]);
                 ctrpos = atof(argv[1]);
-
-
-
                 return 0;
             }
 
