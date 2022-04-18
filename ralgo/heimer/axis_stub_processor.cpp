@@ -1,31 +1,41 @@
 #include <ralgo/heimer/axis_stub_processor.h>
 #include <ralgo/heimer/sigtypes.h>
 
-heimer::axis_stub_processor::axis_stub_processor(const char *name)
+heimer::axis_stub_processor::axis_stub_processor(const std::string& name)
     : signal_processor(name, 0, 1)
+{}
+
+heimer::axis_stub_processor::axis_stub_processor(const std::string& name, 
+            const std::vector<axis_state*>& axstates) 
+        : signal_processor(name, 0, axstates.size()), axstates(axstates)
 {
+    for (auto axstate : axstates)
+        bind(axstate);
 }
 
-int heimer::axis_stub_processor::feedback(disctime_t)
+int heimer::axis_stub_processor::feedback(disctime_t time)
 {
-    _axstate->feedpos = pos;
-    _axstate->feedvel = vel;
-
-    return 0;
-}
-
-int heimer::axis_stub_processor::serve(disctime_t time)
-{
-    pos = _axstate->ctrpos;
-    vel = _axstate->ctrvel;
-
-    if (_apply_speed_mode)
+    for (auto _axstate : axstates) 
     {
-        disctime_t delta = time - lasttime;
-        pos = pos + vel * delta / discrete_time_frequency();
+        auto pos = _axstate->ctrpos;
+        auto vel = _axstate->ctrvel;
+
+        if (_apply_speed_mode)
+        {
+            disctime_t delta = time - lasttime;
+            pos = pos + vel * delta / discrete_time_frequency();
+        }
+
+        _axstate->feedpos = pos;
+        _axstate->feedvel = vel;
     }
 
     lasttime = time;
+    return 0;
+}
+
+int heimer::axis_stub_processor::serve(disctime_t)
+{
     return 0;
 }
 
@@ -50,7 +60,7 @@ static inline int bind(heimer::axis_stub_processor *axctr, int argc,
 
     if (sig->type != SIGNAL_TYPE_AXIS_STATE)
     {
-        snprintf(output, outmax, "Wrong signal type. name:(%s)", sig->name);
+        snprintf(output, outmax, "Wrong signal type. name:(%s)", sig->name.c_str());
         return -1;
     }
 
@@ -88,10 +98,9 @@ int heimer::axis_stub_processor::command(int argc, char **argv, char *output,
 
 void heimer::axis_stub_processor::deinit()
 {
-    if (_axstate)
-        _axstate->deattach_listener(this);
-
-    _axstate = nullptr;
+    for (auto axstate : axstates)
+        axstate->detach_listener(this);
+    axstates.clear();
 }
 
 heimer::signal_head *
@@ -104,15 +113,24 @@ heimer::signal_head *
 heimer::axis_stub_processor::iterate_right(heimer::signal_head *iter)
 {
     if (iter == NULL)
-        return _axstate;
-    else
-        return NULL;
+        return axstates.front();
+
+    for (auto it = axstates.begin(); it != axstates.end(); ++it)
+    {
+        if (*it == iter)
+        {
+            if (++it == axstates.end())
+                return NULL;
+            else
+                return *it;
+        }
+    }
+    return NULL;
 }
 
 void heimer::axis_stub_processor::bind(heimer::axis_state *iter)
 {
-    _axstate = iter;
-    _axstate->attach_listener(this);
+    iter->attach_listener(this);
 }
 
 void heimer::axis_stub_processor::apply_speed_mode(bool en)
