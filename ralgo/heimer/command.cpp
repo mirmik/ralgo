@@ -67,16 +67,15 @@ static int ctrnew(int argc, char **argv, char *output, int maxsize)
 
     if (strcmp(argv[0], "axisctr") == 0)
     {
-        if (argc < 3)
+        if (argc < 2)
         {
-            snprintf(output, maxsize, "usage: ctrnew axisctr NAME DIM\r\n");
+            snprintf(output, maxsize, "usage: ctrnew axisctr NAME [NAME2] [NAME3] [...]\r\n");
             return -1;
         }
 
-        int dim = strtol(argv[1], NULL, 10);
-        for (int i = 2; i < argc; ++i)
+        for (int i = 1; i < argc; ++i)
         {
-            create_axis_controller(argv[i], dim);
+            create_axis_controller(argv[i]);
         }
         return 0;
     }

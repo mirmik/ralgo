@@ -126,7 +126,7 @@ namespace heimer
 
     };
 
-    axis_controller *create_axis_controller(const char *name, int dim);
+    axis_controller *create_axis_controller(const char *name);
 }
 
 #endif

@@ -135,10 +135,12 @@ namespace cnc
         //    planner.set_start_operation_handle(dlg);
         //}
 
-        control_task g1_parse_task(const nos::argv& argv, igris::array_view<double> fposes) 
+        control_task g1_parse_task(
+            const nos::argv& argv, 
+            const igris::array_view<double>& fposes) 
         {
             control_task task;
-            task.set_poses({fposes.data(), fposes.size()});
+            task.set_poses(igris::array_view<double>((double*)fposes.data(), fposes.size()));
 
             task.feed = saved_feed;
             task.acc = saved_acc;
@@ -157,7 +159,7 @@ namespace cnc
         }
 
         double evaluate_external_accfeed(
-            ralgo::vector_view<double> direction,
+            const ralgo::vector_view<double>& direction,
             double absmax,
             const igris::static_vector<double, NMAX_AXES>& elmax
         ) 

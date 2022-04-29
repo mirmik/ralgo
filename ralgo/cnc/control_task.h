@@ -32,7 +32,7 @@ namespace cnc
         	return ret;
         }
 
-        void set_poses(igris::array_view<double> arr) 
+        void set_poses(const igris::array_view<double>& arr) 
         {
             std::copy(arr.begin(), arr.end(), _poses.begin());
         } 

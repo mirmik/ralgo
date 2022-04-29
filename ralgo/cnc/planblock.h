@@ -153,8 +153,8 @@ namespace cnc
             }
         }
 
-        void set_state(ralgo::vector_view<double> axdist, int axes, double velocity,
-                       double acceleration, ralgo::vector_view<double> multipliers)
+        void set_state(const ralgo::vector_view<double>& axdist, int axes, double velocity,
+                       double acceleration, const ralgo::vector_view<double>& multipliers)
         {
             for (int i = 0; i < axes; ++i)
             {
