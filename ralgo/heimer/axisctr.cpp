@@ -229,7 +229,7 @@ double axis_controller::ctrvel_external(int axno)
     return settings[axno].controlled->ctrvel / settings[axno].gain;
 }
 
-axis_controller *heimer::create_axis_controller(const char *name, int dim)
+axis_controller *heimer::create_axis_controller(const char *name)
 {
     axis_controller *ptr = new heimer::axis_controller(name);
     return ptr;
