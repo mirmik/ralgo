@@ -1,6 +1,7 @@
 #include <ralgo/heimer/executor.h>
 #include <ralgo/heimer/signal.h>
 #include <ralgo/heimer/signal_processor.h>
+#include <ralgo/util/helpers.h>
 #include <ralgo/log.h>
 
 #include <igris/math.h>
@@ -19,12 +20,21 @@ bool heimer::debug_activations = false;
 
 signal_processor::signal_processor(const char *name, int ldim, int rdim)
 {
-    _leftdim = ldim;
-    _rightdim = rdim;
+    set_dims(ldim, rdim);
     set_name(name);
     rebind();
     this->u.flags = 0;
 }
+
+void signal_processor::set_dims(int ldim, int rdim)
+{
+    _leftdim = ldim;
+    _rightdim = rdim;
+}
+
+signal_processor::signal_processor(const std::string& name, int ldim, int rdim)
+    : signal_processor(name.c_str(), ldim, rdim)
+{}
 
 signal_processor::signal_processor(int ldim, int rdim)
     : signal_processor("undef", ldim, rdim)
@@ -38,9 +48,7 @@ void signal_processor::rebind()
 
 void signal_processor::set_name(const char *name)
 {
-    int len = MIN(strlen(name), SIGNAL_PROCESSOR_NAME_MAX_LENGTH);
-    memset(_name, 0, SIGNAL_PROCESSOR_NAME_MAX_LENGTH);
-    memcpy(_name, name, len);
+    _name = name;
 }
 
 void signal_processor::deinit() { dlist_del(&list_lnk); }
@@ -164,7 +172,7 @@ signal_processor *heimer::signal_processor_get_by_name(const char *name)
 
 igris::buffer signal_processor::name()
 {
-    return {_name, strnlen(_name, SIGNAL_PROCESSOR_NAME_MAX_LENGTH)};
+    return {_name.data(), _name.size()};
 }
 
 bool signal_processor::is_active() { return u.f.active; }
@@ -185,13 +193,13 @@ void signal_processor::release_signals()
     iter = nullptr;
     while ((iter = iterate_left(iter)))
     {
-        iter->deattach_possible_controller(this);
+        iter->detach_possible_controller(this);
     }
 
     iter = nullptr;
     while ((iter = iterate_left(iter)))
     {
-        iter->deattach_listener(this);
+        iter->detach_listener(this);
     }
 }
 
@@ -206,7 +214,7 @@ static int bindleft(signal_processor *axctr, int argc, char **argv,
     }
 
     {
-        signal_head *arr[argc];
+        TEMPORARY_STORAGE(signal_head*, argc, arr);
 
         for (int i = 0; i < argc; ++i)
         {
@@ -223,14 +231,14 @@ static int bindleft(signal_processor *axctr, int argc, char **argv,
             if (sig->type != axctr->leftsigtype(i))
             {
                 snprintf(output, outmax, "Wrong signal type. name:(%s)",
-                         sig->name);
+                         sig->name.c_str());
                 return -1;
             }
 
             arr[i] = sig;
         }
 
-        axctr->set_leftside(arr);
+        axctr->set_leftside(std::data(arr));
     }
 
     return 0;
@@ -247,7 +255,7 @@ static int bindright(signal_processor *axctr, int argc, char **argv,
     }
 
     {
-        signal_head *arr[argc];
+        TEMPORARY_STORAGE(signal_head*, argc, arr);
 
         for (int i = 0; i < argc; ++i)
         {
@@ -264,14 +272,14 @@ static int bindright(signal_processor *axctr, int argc, char **argv,
             if (sig->type != axctr->rightsigtype(i))
             {
                 snprintf(output, outmax, "Wrong signal type. name:(%s)",
-                         sig->name);
+                         sig->name.c_str());
                 return -1;
             }
 
             arr[i] = sig;
         }
 
-        axctr->set_rightside(arr);
+        axctr->set_rightside(std::data(arr));
     }
 
     return 0;

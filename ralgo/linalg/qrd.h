@@ -34,14 +34,20 @@
 
 namespace ralgo
 {
+    /**
+     *  QRD разложение или QRD ортоганализация. Выполняется над квадратной
+     * матрицей путём последовательного выбора векторов и доворота их до
+     * ортогонального состояния. На выходе алгоритма - ортогональная матрица Q и
+     * диагональная матрица R.
+     */
     template <class M, class TQ, class TR> class QRD_gramschmidt
     {
     public:
-        M a;
-        TQ q;
-        TR r;
+        M a = {};
+        TQ q = {};
+        TR r = {};
 
-        int status;
+        int status = 0;
 
     public:
         using value_type = typename M::value_type;

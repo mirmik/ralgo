@@ -17,6 +17,9 @@ namespace heimer
     public:
         axstate_signal_processor() = default;
         axstate_signal_processor(const char *, int ldim, int rdim);
+        axstate_signal_processor(const axstate_signal_processor &) = delete;
+        axstate_signal_processor &
+        operator=(const axstate_signal_processor &) = delete;
 
         void attach_leftside_table(axis_state **table);
         void attach_rightside_table(axis_state **table);

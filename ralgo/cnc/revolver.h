@@ -7,10 +7,12 @@
 #include <igris/container/ring.h>
 #include <igris/sync/syslock.h>
 
+#include <igris/event/delegate.h>
+#include <ralgo/cnc/planblock.h>
+#include <ralgo/cnc/planner.h>
 #include <ralgo/cnc/shift.h>
 #include <ralgo/log.h>
 #include <ralgo/robo/stepper.h>
-#include <igris/event/delegate.h>
 
 namespace cnc
 {
@@ -38,17 +40,32 @@ namespace cnc
         int steppers_total = 0;
 
     private:
-        bool first_iteration_label = false;
-        bool all_blocks_resolved = true;
-        igris::ring<cnc::control_shift> *shifts_ring;
+        volatile bool all_blocks_resolved = true;
 
         robo::stepper **steppers = nullptr;
 
     public:
+        igris::ring<cnc::control_shift> *shifts_ring;
+        igris::ring<cnc::planner_block> *blocks;
+        cnc::planner *planner = nullptr;
         igris::delegate<void> final_shift_pushed;
-        revolver(igris::ring<cnc::control_shift> *ring) : shifts_ring(ring) {}
+        revolver(igris::ring<cnc::control_shift> *ring,
+                 igris::ring<cnc::planner_block> *blocks, cnc::planner *planner)
+            : shifts_ring(ring), blocks(blocks), planner(planner)
+        {
+        }
 
-        robo::stepper ** get_steppers() { return steppers; }        
+        robo::stepper **get_steppers() { return steppers; }
+
+        void enable_simulator_mode()
+        {
+            system_lock();
+            for (int i = 0; i < steppers_total; ++i)
+            {
+                steppers[i]->simulator_mode(true);
+            }
+            system_unlock();
+        }
 
         void set_steppers(robo::stepper **steppers_table, int size)
         {
@@ -70,31 +87,30 @@ namespace cnc
         void current_velocity(double *velocity)
         {
             system_lock();
-            if (shifts_ring->avail() == 0) 
+            if (shifts_ring->empty() && blocks->avail() == 0)
             {
-                memset(velocity, 0, sizeof(double)*steppers_total);
-                system_unlock();
-                return;
+                for (int i = 0; i < steppers_total; ++i)
+                    velocity[i] = 0;
             }
-            for (int i = 0; i < steppers_total; ++i)
-                velocity[i] = shifts_ring->tail().speed[i];
+            else
+                for (int i = 0; i < steppers_total; ++i)
+                    velocity[i] = shifts_ring->tail().speed[i];
             system_unlock();
         }
 
-        std::vector<double> current_velocity()
+        std::vector<double> current_velocity_no_lock(nos::ostream &)
         {
             std::vector<double> vec(steppers_total);
-            system_lock();
-            if (shifts_ring->avail() == 0) 
+            if (shifts_ring->empty() && blocks->avail() == 0)
             {
                 for (int i = 0; i < steppers_total; ++i)
                     vec[i] = 0;
-                system_unlock();
-                return vec;
             }
-            for (int i = 0; i < steppers_total; ++i)
-                vec[i] = shifts_ring->tail().speed[i];
-            system_unlock();
+            else
+            {
+                for (int i = 0; i < steppers_total; ++i)
+                    vec[i] = shifts_ring->tail().speed[i];
+            }
             return vec;
         }
 
@@ -113,6 +129,14 @@ namespace cnc
             for (int i = 0; i < steppers_total; ++i)
                 vec[i] = steppers[i]->steps_count();
             system_unlock();
+            return vec;
+        }
+
+        std::vector<int64_t> current_steps_no_lock()
+        {
+            std::vector<int64_t> vec(steppers_total);
+            for (int i = 0; i < steppers_total; ++i)
+                vec[i] = steppers[i]->steps_count();
             return vec;
         }
 
@@ -139,23 +163,13 @@ namespace cnc
 
         void serve()
         {
-
-            if (first_iteration_label == false)
-            {
-                assert(steppers);
-
-                first_iteration_label = true;
-                if (info_mode)
-                {
-                    ralgo::info("revolver: first start. success");
-                }
-            }
-
             // В общем случае ring_empty не атомарен. Однако, здесь должен
             // быть контекст приоритетного прерывания.
             if (shifts_ring->empty())
             {
-                if (all_blocks_resolved == false)
+                if (all_blocks_resolved == false && blocks->empty() &&
+                    planner->active_block == nullptr &&
+                    planner->active == blocks->tail_index())
                 {
                     all_blocks_resolved = true;
                     final_shift_pushed();
@@ -190,9 +204,10 @@ namespace cnc
             return;
         }
 
-        void clear() 
+        void clear()
         {
             shifts_ring->clear();
+            all_blocks_resolved = true;
         }
     };
 }

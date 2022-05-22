@@ -15,17 +15,20 @@ typedef struct sf_position
 class line_trajectory : public trajectory
 {
 public:
-    disctime_t stim;
-    disctime_t ftim;
+    disctime_t stim = 0;
+    disctime_t ftim = 0;
 
     /// Специфика использования траекторного объекта такова,
     /// что данные о крайних точках удобно хранить в распределённой структуре
     /// (см. axisctr) sfpos ссылается на элементы sf_position_t
-    struct sparse_array sfpos;
-    struct trajectory_speed_deformer tsd;
+    struct sparse_array sfpos = {};
+    struct trajectory_speed_deformer tsd = {};
 
 public:
     line_trajectory() = default;
+    line_trajectory(const line_trajectory &) = default;
+    line_trajectory &operator=(const line_trajectory &) = default;
+    virtual ~line_trajectory() = default;
 
     line_trajectory(int dim, sf_position_t *sfpos_array,
                     int sfpos_stride = sizeof(sf_position_t))

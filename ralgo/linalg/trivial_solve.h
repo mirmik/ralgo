@@ -4,13 +4,18 @@
 #include <ralgo/linalg/proxy.h>
 #include <ralgo/util/helpers.h>
 
+// Решение матричных уравнений вида B = MX для тривиальных случаев.
+
 namespace ralgo
 {
+
+    // Решение матричного уравнения B = MX
+    // для случая, когда M - унарная матрица, тоесть M * trans(M) = E,
+    // где E - единичная матрица.
     template <class X, class M, class B>
     void unary_solve(const M &a, const B &b, X &&x)
     {
         ralgo::resize(x, ralgo::size(b));
-
         ralgo::transposed_matrix_proxy a_transposed(a);
         ralgo::matops::multiply(a_transposed, b, x);
     }
@@ -23,7 +28,8 @@ namespace ralgo
         return x;
     }
 
-    // B = MX -> X
+    // Решение матричного уравнения B = MX
+    // для случая, когда M - селективно-перестановочная матрица.
     template <class X, class M, class B>
     void pivot_solve(const M &a, const B &b, X &&x)
     {
@@ -48,7 +54,8 @@ namespace ralgo
         return x;
     }
 
-    // B = MX -> X
+    // Решение матричного уравнения B = MX
+    // для случая, когда M - нижнетреугольная матрица.
     template <class X, class M, class B>
     void L_triangle_solve(const M &a, const B &b, X &&x)
     {
@@ -76,7 +83,8 @@ namespace ralgo
         return x;
     }
 
-    // B = MX -> X
+    // Решение матричного уравнения B = MX
+    // для случая, когда M - верхнетреугольная матрица.
     template <class X, class M, class B>
     void U_triangle_solve(const M &a, const B &b, X &&x)
     {

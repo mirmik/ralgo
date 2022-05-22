@@ -19,6 +19,7 @@ namespace heimer
         bool updated_flag = false;
 
         constexpr axis_node(const char *mnemo) : control_node(mnemo) {}
+        virtual ~axis_node() = default;
 
         void print_info() override
         {
@@ -67,10 +68,10 @@ namespace heimer
         virtual P request_feedback_position() = 0;
 
         bool on_interrupt(control_node *slave, control_node *source,
-                                  interrupt_args *data) override
+                          interrupt_args *data) override
         {
-            (void) slave;
-            (void) source;
+            (void)slave;
+            (void)source;
             if (data->code() == HEIMER_INTERRUPT_TYPE_CONTROL_UPDATE)
             {
                 P error = position_error();

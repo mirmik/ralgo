@@ -33,28 +33,32 @@ namespace heimer
 
         float gain = 1;
 
-        heimer::axis_node<P, V> *controlled;
+        heimer::axis_node<P, V> *controlled = nullptr;
 
         ralgo::traj1d<P, V> *curtraj = nullptr;
-        ralgo::traj1d_line<P, V> lintraj;
+        ralgo::traj1d_line<P, V> lintraj = {};
 
         // bool _reversed = false;
         bool _limited = false;
 
-        P _forw;
-        P _back;
+        P _forw = 0;
+        P _back = 0;
 
         bool operation_finished_flag = true;
 
     public:
-        igris::delegate<void, axisctr *> operation_finish_signal;
-        igris::delegate<void, axisctr *> operation_start_signal;
+        igris::delegate<void, axisctr *> operation_finish_signal = {};
+        igris::delegate<void, axisctr *> operation_start_signal = {};
 
-        igris::delegate<bool, P, P, char *> move_protector;
+        igris::delegate<bool, P, P, char *> move_protector = {};
 
         bool enable_full_spattern = false;
 
     public:
+        virtual ~axisctr() = default;
+        axisctr(const axisctr &) = delete;
+        axisctr &operator=(const axisctr &) = delete;
+
         auto *current_trajectory() { return curtraj; }
         auto *linear_trajectory() { return &lintraj; }
 

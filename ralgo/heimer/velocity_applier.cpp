@@ -43,7 +43,7 @@ void velocity_applier::init(const char *name,
 void velocity_applier::deinit()
 {
     signal_processor::deinit();
-    state->deattach_listener(this);
+    state->detach_listener(this);
 }
 
 int velocity_applier::serve(disctime_t time)
@@ -135,7 +135,7 @@ int velocity_applier::bind(int argc, char **argv, char *output, int outmax)
 
     if (sig->type != SIGNAL_TYPE_AXIS_STATE)
     {
-        snprintf(output, outmax, "Wrong signal type. name:(%s)", sig->name);
+        snprintf(output, outmax, "Wrong signal type. name:(%s)", sig->name.c_str());
         return -1;
     }
 

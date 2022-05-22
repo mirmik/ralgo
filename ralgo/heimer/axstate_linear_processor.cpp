@@ -82,11 +82,11 @@ static inline int info(axstate_linear_processor *axctr, int argc, char **argv,
     for (int i = 0; i < axctr->dim() - 1; ++i)
     {
         memset(buf, 0, bufsize);
-        snprintf(buf, bufsize, "%s,", axctr->leftax(i)->name);
+        snprintf(buf, bufsize, "%s,", axctr->leftax(i)->name.c_str());
         strncat(output, buf, outmax);
     }
     memset(buf, 0, bufsize);
-    snprintf(buf, bufsize, "%s\r\n", axctr->leftax(axctr->dim() - 1)->name);
+    snprintf(buf, bufsize, "%s\r\n", axctr->leftax(axctr->dim() - 1)->name.c_str());
     strncat(output, buf, outmax);
 
     memset(buf, 0, bufsize);
@@ -96,12 +96,12 @@ static inline int info(axstate_linear_processor *axctr, int argc, char **argv,
     for (int i = 0; i < axctr->dim() - 1; ++i)
     {
         memset(buf, 0, bufsize);
-        snprintf(buf, bufsize, "%s,", axctr->rightax(i)->name);
+        snprintf(buf, bufsize, "%s,", axctr->rightax(i)->name.c_str());
         strncat(output, buf, outmax);
     }
 
     memset(buf, 0, bufsize);
-    snprintf(buf, bufsize, "%s\r\n", axctr->rightax(axctr->dim() - 1)->name);
+    snprintf(buf, bufsize, "%s\r\n", axctr->rightax(axctr->dim() - 1)->name.c_str());
     strncat(output, buf, outmax);
 
     memset(buf, 0, bufsize);
@@ -158,8 +158,8 @@ void axstate_linear_processor::deinit()
 {
     for (int i = 0; i < dim(); ++i)
     {
-        leftax(i)->deattach_possible_controller(this);
-        rightax(i)->deattach_listener(this);
+        leftax(i)->detach_possible_controller(this);
+        rightax(i)->detach_listener(this);
     }
 }
 

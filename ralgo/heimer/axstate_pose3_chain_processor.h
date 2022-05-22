@@ -17,8 +17,8 @@ namespace heimer
     class axstate_pose3_chain_settings
     {
     public:
-        ralgo::pose3<double> constant_transform;
-        ralgo::screw3<double> local_sensivity;
+        ralgo::pose3<double> constant_transform = {};
+        ralgo::screw3<double> local_sensivity = {};
         heimer::axis_state *controlled = nullptr;
 
         bool is_rotation_link()
@@ -35,11 +35,10 @@ namespace heimer
     {
     public:
         // Винта ошибки, возникающий из-за нелинейности вращающих звеньев.
-        ralgo::screw3<double> second_pow_error_screw;
-
-        ralgo::pose3<double> left_transform;
-        ralgo::pose3<double> right_transform;
-        ralgo::screw3<double> result_screw;
+        ralgo::screw3<double> second_pow_error_screw = {};
+        ralgo::pose3<double> left_transform = {};
+        ralgo::pose3<double> right_transform = {};
+        ralgo::screw3<double> result_screw = {};
     };
 
     /**
@@ -48,21 +47,24 @@ namespace heimer
     class axstate_chain3_processor : public signal_processor
     {
     public:
-        ralgo::pose3<double> first_constant_transform;
+        ralgo::pose3<double> first_constant_transform = {};
         axstate_pose3_chain_settings *settings = nullptr;
         axstate_pose3_chain_temporary *temporary = nullptr;
 
-        ralgo::screw3<velocity_t> feedback_velocity;
-        ralgo::screw3<velocity_t> control_velocity;
-        ralgo::pose3<position_t> feedback_position;
-        ralgo::pose3<position_t> control_position;
+        ralgo::screw3<velocity_t> feedback_velocity = {};
+        ralgo::screw3<velocity_t> control_velocity = {};
+        ralgo::pose3<position_t> feedback_position = {};
+        ralgo::pose3<position_t> control_position = {};
 
         uint8_t deactivation_enabled = 0;
         bool interrupt_situation = false;
 
-        disctime_t last_time;
+        disctime_t last_time = {};
 
     public:
+        axstate_chain3_processor(const axstate_chain3_processor &) = delete;
+        axstate_chain3_processor &
+        operator=(const axstate_chain3_processor &) = delete;
         axstate_chain3_processor(const char *name, int leftdim);
         void set_resources(axstate_pose3_chain_settings *settings,
                            axstate_pose3_chain_temporary *tsettings);
@@ -131,7 +133,7 @@ namespace heimer
 
     class axstate_chain3_translation_processor : public axstate_chain3_processor
     {
-        heimer::phase_signal<3> *rightside;
+        heimer::phase_signal<3> *rightside = nullptr;
         double compkoeff = compkoeff_timeconst(0.0001);
 
         double last_w[3] = {0, 0, 0};
@@ -151,6 +153,11 @@ namespace heimer
             : axstate_chain3_processor(name, leftdim)
         {
         }
+
+        axstate_chain3_translation_processor(
+            const axstate_chain3_translation_processor &) = delete;
+        axstate_chain3_translation_processor &
+        operator=(const axstate_chain3_translation_processor &) = delete;
 
         void feedback_output(const pose3<position_t> &,
                              const screw3<velocity_t> &) override
@@ -186,25 +193,27 @@ namespace heimer
             nos::println(feedback_position.lin);
             nos::println(length(poserr));
 
-            double Rdata[leftdim()];
-            double Rdata_correction[leftdim()];
-            double Adata[3 * leftdim()];
-            double Wdata[leftdim()];
-            double Udata[3 * leftdim()];
-            double Vdata[leftdim() * leftdim()];
+            TEMPORARY_STORAGE(double, leftdim(), Rdata);
+            TEMPORARY_STORAGE(double, leftdim(), Rdata_correction);
+            TEMPORARY_STORAGE(double, 3 * leftdim(), Adata);
+            TEMPORARY_STORAGE(double, leftdim(), Wdata);
+            TEMPORARY_STORAGE(double, 3 * leftdim(), Udata);
+            TEMPORARY_STORAGE(double, leftdim() * leftdim(), Vdata);
 
-            ralgo::matrix_view<double> A(Adata, 3,
+            ralgo::matrix_view<double> A(std::data(Adata), 3,
                                          leftdim()); // Матрица чуствительности
-            ralgo::matrix_view<double> U(Udata, 3,
+            ralgo::matrix_view<double> U(std::data(Udata), 3,
                                          leftdim()); // Левая матрица разложения
             ralgo::matrix_view<double> V(
-                Vdata, leftdim(), leftdim()); // Правая матрица разложения
-            ralgo::vector_view<double> W(Wdata,
+                std::data(Vdata), leftdim(),
+                leftdim()); // Правая матрица разложения
+            ralgo::vector_view<double> W(std::data(Wdata),
                                          leftdim()); // Центральная матрица.
             ralgo::vector_view<double> R(
-                Rdata, leftdim()); // Вектор результата (скорости звеньев).
+                std::data(Rdata),
+                leftdim()); // Вектор результата (скорости звеньев).
             ralgo::vector_view<double> R_correction(
-                Rdata_correction, leftdim()); // Вектор коррекции.
+                std::data(Rdata_correction), leftdim()); // Вектор коррекции.
             ralgo::vector_view<double> T(&target[0],
                                          3); // Вектор целевой скорости
 

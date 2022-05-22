@@ -2,6 +2,7 @@
 #define RALGO_INTERPOLATE_H
 
 #include <iterator>
+#include <vector>
 
 namespace ralgo
 {
@@ -78,6 +79,16 @@ namespace ralgo
 
         linspace_iterator begin() { return linspace_iterator(this, 0); }
         linspace_iterator end() { return linspace_iterator(this, points); }
+
+        std::vector<T> to_vector()
+        {
+            std::vector<T> ret(points);
+            for (int i = 0; i < points; i++)
+            {
+                ret[i] = operator[](i);
+            }
+            return ret;
+        }
     };
 }
 

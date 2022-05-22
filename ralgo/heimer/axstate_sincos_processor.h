@@ -88,6 +88,9 @@ namespace heimer
     public:
         axstate_sincos_processor() = default;
         axstate_sincos_processor(const char *name);
+        axstate_sincos_processor(const axstate_sincos_processor &) = delete;
+        axstate_sincos_processor &
+        operator=(const axstate_sincos_processor &) = delete;
 
         int feedback(disctime_t time) override;
         int serve(disctime_t time) override;

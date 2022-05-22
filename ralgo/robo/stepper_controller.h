@@ -24,7 +24,7 @@ namespace robo
     class stepper_controller : public i_position_feedback
     {
     public:
-        robo::stepper *stepper;
+        robo::stepper *stepper = nullptr;
         double trigger_level = 0.75;
 
     public:
@@ -40,6 +40,7 @@ namespace robo
         stepper_controller();
         stepper_controller(robo::stepper *stepper);
         stepper_controller(const stepper_controller &) = delete;
+        stepper_controller &operator=(const stepper_controller &) = delete;
 
         void reset_current_position(double pos)
         {
@@ -116,8 +117,11 @@ namespace robo
     public:
         fixed_frequency_stepper_controller();
         fixed_frequency_stepper_controller(robo::stepper *stepper);
+
         fixed_frequency_stepper_controller(
             const fixed_frequency_stepper_controller &) = delete;
+        fixed_frequency_stepper_controller &
+        operator=(const fixed_frequency_stepper_controller &) = delete;
 
         void set_frequency(double _freq)
         {

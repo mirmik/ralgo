@@ -29,6 +29,28 @@ namespace ralgo
         linalg::vec<T, 3> transform(linalg::vec<T, 3> vec) const;
         linalg::vec<T, 3> rotate_vector(linalg::vec<T, 3> vec) const;
 
+        linalg::vec<T, 3> transform_vector(const linalg::vec<T, 3> &vec) const
+        {
+            return linalg::qrot(ang, vec);
+        }
+
+        linalg::vec<T, 3> transform_point(const linalg::vec<T, 3> &vec) const
+        {
+            return linalg::qrot(ang, vec) + lin;
+        }
+
+        linalg::vec<T, 3>
+        inverse_transform_vector(const linalg::vec<T, 3> &vec) const
+        {
+            return linalg::qrot(linalg::qconj(ang), vec);
+        }
+
+        linalg::vec<T, 3>
+        inverse_transform_point(const linalg::vec<T, 3> &vec) const
+        {
+            return linalg::qrot(linalg::qconj(ang), vec - lin);
+        }
+
         screw<T, 3> rotate_screw(screw<T, 3> v) const;
 
         linalg::vec<T, 3> xdir() const;

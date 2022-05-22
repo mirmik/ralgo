@@ -11,6 +11,7 @@
 #include <ralgo/util/helpers.h>
 #include <tuple>
 
+#include <igris/math.h>
 #include <igris/util/signature.h>
 #include <ralgo/linalg/vecops_base.h>
 
@@ -46,6 +47,11 @@ namespace ralgo
         {
             for (auto &a : arr)
                 a = val;
+        }
+
+        template <class M> void clean(M &arr)
+        {
+            vecops::fill(arr, typename M::value_type{});
         }
 
         // построить целочисленный вектор арифметической прогрессии [start;stop)
@@ -106,6 +112,13 @@ namespace ralgo
         {
             b.resize(a.size());
             for (unsigned int i = 0; i < a.size(); ++i)
+                b[i] = a[i];
+        }
+
+        template <class A, class B> void copy_without_resize(const A &a, B &&b)
+        {
+            size_t size = __MIN__(a.size(), b.size());
+            for (unsigned int i = 0; i < size; ++i)
                 b[i] = a[i];
         }
 
@@ -359,13 +372,11 @@ namespace ralgo
             elementwise_to(res, ralgo::op_mul(), a, b);
         }
 
-        template <class R = void, class A>
-        defsame_t<R, A> normalize(const A &a)
+        template <class R = void, class A> defsame_t<R, A> normalize(const A &a)
         {
             double norm = ralgo::vecops::norm(a);
             return ralgo::vecops::div_vs<defsame_t<R, A>, A, double>(a, norm);
         }
-
 
         template <class R = void, class Head, class... Args>
         auto zip(Head &&head, Args &&... args)

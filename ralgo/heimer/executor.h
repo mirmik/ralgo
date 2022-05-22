@@ -1,8 +1,8 @@
 #ifndef RALGO_HEIMER_EXECUTOR_H
 #define RALGO_HEIMER_EXECUTOR_H
 
-#include <ralgo/heimer/signal_processor.h>
 #include <ralgo/global_protection.h>
+#include <ralgo/heimer/signal_processor.h>
 
 namespace heimer
 {
@@ -23,10 +23,12 @@ namespace heimer
             {
                 uint8_t dynamic : 1;
             } f;
-        } u;
+        } u = {};
 
     public:
         executor_class() = default;
+        executor_class(const executor_class &) = delete;
+        executor_class &operator=(const executor_class &) = delete;
         void set_order_table(signal_processor **order_table, int capacity,
                              int size);
 

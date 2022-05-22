@@ -23,7 +23,7 @@ namespace robo
 {
     class quadgen4_arduino : public robo::quadgen
     {
-        uint8_t apin0, apin1, bpin0, bpin1;
+        uint8_t apin0 = 0, apin1 = 0, bpin0 = 0, bpin1 = 0;
 
     public:
         quadgen4_arduino(uint8_t a, uint8_t b, uint8_t c, uint8_t d)

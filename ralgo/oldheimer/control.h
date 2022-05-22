@@ -40,7 +40,7 @@ namespace heimer
         uint16_t flags = 0;
 
     private:
-        const char *_mnemo;
+        const char *_mnemo = nullptr;
         int alarm_code = 0;
 
         // контроллер, взявший управление над объектом
@@ -51,10 +51,13 @@ namespace heimer
     public:
         const control_node *last_controller() { return controller; }
 
+        virtual ~control_node() = default;
         constexpr control_node(const char *mnemo) : _mnemo(mnemo)
         {
             dlist_add(&control_node_list_lnk, &control_node_list);
         }
+        control_node(const control_node &) = delete;
+        control_node &operator=(const control_node &) = delete;
 
         void set_alarm(int errcode)
         {
