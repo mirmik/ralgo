@@ -31,6 +31,11 @@ namespace heimer
         {
         }
 
+        phase_signal_base(const std::string &name, uint8_t type)
+            : signal_head(name, type)
+        {
+        }
+
         int info(char *data, int) override
         {
             nos::format_buffer(data, "(cpos:{}, cvel:{}, fpos:{}, fvel:{})\r\n",
@@ -67,6 +72,11 @@ namespace heimer
     {
     public:
         phase_signal(const char *name)
+            : phase_signal_base<linalg::vec<position_t, Dim>,
+                                linalg::vec<velocity_t, Dim>>(
+                  name, SIGNAL_TYPE_PHASE_SIGNAL_BASE + Dim - 1){};
+
+        phase_signal(const std::string &name)
             : phase_signal_base<linalg::vec<position_t, Dim>,
                                 linalg::vec<velocity_t, Dim>>(
                   name, SIGNAL_TYPE_PHASE_SIGNAL_BASE + Dim - 1){};

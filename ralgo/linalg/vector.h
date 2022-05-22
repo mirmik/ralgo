@@ -1,17 +1,17 @@
 #ifndef RALGO_LINALG_VECTOR_H
 #define RALGO_LINALG_VECTOR_H
 
-#include <iostream>
-#include <vector>
-#include <ralgo/linalg/vector_view.h>
 #include <initializer_list>
+#include <iostream>
+#include <ralgo/linalg/vector_view.h>
+#include <vector>
 
 namespace ralgo
 {
     template <class T, class Alloc = std::allocator<T>> class vector
     {
         using Parent = std::vector<T, Alloc>;
-        Parent vec;
+        Parent vec = {};
 
     public:
         using value_type = typename Parent::value_type;
@@ -23,15 +23,13 @@ namespace ralgo
         vector(const vector &oth) = default;
         vector(vector &&oth) = default;
 
-        operator vector_view<T>() {
-            return vector_view<T>(data(), size());
-        }
+        operator vector_view<T>() { return vector_view<T>(data(), size()); }
 
         auto size() const { return vec.size(); }
         auto resize(int arg) { return vec.resize(arg); }
-        const value_type * data() const { return vec.data(); }
-        value_type* data() { return vec.data(); }
-        
+        const value_type *data() const { return vec.data(); }
+        value_type *data() { return vec.data(); }
+
         void push_back(const T &val) { vec.push_back(val); }
 
         const T &operator[](int idx) const { return vec[idx]; }

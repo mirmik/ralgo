@@ -18,6 +18,8 @@ namespace robo
         void inc() override
         {
             ++counter;
+            if (_simulator_mode)
+                return;
             state = state == 3 ? 0 : state + 1;
             set_state(state);
         }
@@ -25,6 +27,8 @@ namespace robo
         void dec() override
         {
             --counter;
+            if (_simulator_mode)
+                return;
             state = state == 0 ? 3 : state - 1;
             set_state(state);
         }

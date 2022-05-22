@@ -80,8 +80,8 @@ int axis_controller::feedback(disctime_t) { return 0; }
 
 int axis_controller::serve(disctime_t time)
 {
-    position_t ctrpos[leftdim()];
-    velocity_t ctrvel[leftdim()];
+    std::vector<position_t> ctrpos(leftdim());
+    std::vector<velocity_t> ctrvel(leftdim());
 
     if (u.f.release_control_flag)
     {
@@ -102,7 +102,7 @@ int axis_controller::serve(disctime_t time)
     if (!curtraj)
         return SIGNAL_PROCESSOR_RETURN_RUNTIME_ERROR;
 
-    int sts = curtraj->attime(time, ctrpos, ctrvel);
+    int sts = curtraj->attime(time, ctrpos.data(), ctrvel.data());
 
     for (int i = 0; i < leftdim(); ++i)
     {
@@ -115,7 +115,7 @@ int axis_controller::serve(disctime_t time)
 
     if (sts && !u.f.operation_finished_flag)
     {
-        finish_trajectory(time, ctrpos);
+        finish_trajectory(time, ctrpos.data());
     }
 
     return 0;
@@ -170,8 +170,8 @@ int axis_controller::_absmove(disctime_t curtim, position_t *curpos,
 
 int axis_controller::incmove(disctime_t current_time, const double *dist_real)
 {
-    position_t curpos[leftdim()];
-    position_t tgtpos[leftdim()];
+    std::vector<position_t> curpos(leftdim());
+    std::vector<position_t> tgtpos(leftdim());
     double extdist_accumulator = 0;
 
     for (int i = 0; i < leftdim(); ++i)
@@ -189,14 +189,13 @@ int axis_controller::incmove(disctime_t current_time, const double *dist_real)
         extdist_accumulator += extdist * extdist;
     }
 
-    return _absmove(current_time, curpos, tgtpos, sqrt(extdist_accumulator));
+    return _absmove(current_time, curpos.data(), tgtpos.data(), sqrt(extdist_accumulator));
 }
 
 int axis_controller::absmove(disctime_t current_time, const double *pos_real)
 {
-
-    position_t curpos[leftdim()];
-    position_t tgtpos[leftdim()];
+    std::vector<position_t> curpos(leftdim());
+    std::vector<position_t> tgtpos(leftdim());
     double extdist_accumulator = 0;
 
     for (int i = 0; i < leftdim(); ++i)
@@ -212,7 +211,7 @@ int axis_controller::absmove(disctime_t current_time, const double *pos_real)
         extdist_accumulator += extdist * extdist;
     }
 
-    return _absmove(current_time, curpos, tgtpos, sqrt(extdist_accumulator));
+    return _absmove(current_time, curpos.data(), tgtpos.data(), sqrt(extdist_accumulator));
 }
 
 double axis_controller::ctrpos_external(int axno)
@@ -230,18 +229,10 @@ double axis_controller::ctrvel_external(int axno)
     return settings[axno].controlled->ctrvel / settings[axno].gain;
 }
 
-axis_controller *heimer::create_axis_controller(const char *name, int dim)
+axis_controller *heimer::create_axis_controller(const char *name)
 {
-    axis_settings *settings = new axis_settings[dim];
-    axis_controller *ptr = new heimer::axis_controller(name, settings, dim);
-    ptr->u.f.dynamic_resources = 1;
+    axis_controller *ptr = new heimer::axis_controller(name);
     return ptr;
-}
-
-void axis_controller::allocate_resources()
-{
-    settings = new axis_settings[leftdim()];
-    u.f.dynamic_resources = 1;
 }
 
 void axis_controller::release_controlled()
@@ -250,7 +241,7 @@ void axis_controller::release_controlled()
     {
         if (settings[i].controlled)
         {
-            settings[i].controlled->deattach_possible_controller(this);
+            settings[i].controlled->detach_possible_controller(this);
             settings[i].controlled = NULL;
         }
     }
@@ -304,11 +295,11 @@ int axis_controller::stop(disctime_t curtim)
         return -1;
     }
 
-    position_t feedpos[leftdim()];
-    velocity_t feedspd[leftdim()];
+    std::vector<position_t> feedpos(leftdim());
+    std::vector<velocity_t> feedspd(leftdim());
 
-    collect_feedpos(feedpos);
-    collect_feedvel(feedspd);
+    collect_feedpos(feedpos.data());
+    collect_feedvel(feedspd.data());
 
     for (int i = 0; i < leftdim(); ++i)
         feedspd[i] /= discrete_time_frequency();
@@ -320,7 +311,7 @@ int axis_controller::stop(disctime_t curtim)
     double stoptime = restore_internal_velocity_from_axstates() / dcc *
                       discrete_time_frequency();
 
-    lintraj.set_stop_pattern(feedpos, feedspd, curtim, stoptime);
+    lintraj.set_stop_pattern(feedpos.data(), feedspd.data(), curtim, stoptime);
 
     u.f.operation_finished_flag = 0;
     u.f.release_control_flag = 0;
@@ -346,7 +337,7 @@ velocity_t axis_controller::restore_internal_velocity_from_axstates()
 
 int axis_controller::hardstop(disctime_t time)
 {
-    position_t curpos[leftdim()];
+    std::vector<position_t> curpos(leftdim());
     for (int i = 0; i < leftdim(); ++i)
     {
         curpos[i] = settings[i].controlled->feedpos;
@@ -358,11 +349,11 @@ int axis_controller::hardstop(disctime_t time)
         settings[i].controlled->ctrpos = curpos[i];
     }
 
-    finish_trajectory(time, curpos);
+    finish_trajectory(time, curpos.data());
     return 0;
 }
 
-void axis_controller::_init()
+void axis_controller::reinit()
 {
     vel = 0;
     acc = 0;
@@ -381,33 +372,32 @@ void axis_controller::_init()
     lintraj.init(1, &settings[0].sfpos, leftdim());
 }
 
-axis_controller::axis_controller(const char *name, axis_settings *settings,
-                                 int dim)
-    : signal_processor(name, dim, 0), settings(settings)
+axis_controller::axis_controller(const std::string& name)
+    : signal_processor(name, 0, 0)
 {
-    _init();
-}
-
-axis_controller::axis_controller(const char *name, int dim)
-    : signal_processor(name, dim, 0)
-{
-    allocate_resources();
-    _init();
+    //_init();
 }
 
 axis_controller::axis_controller(
-    const char *name, const std::initializer_list<axis_state *> &states)
+    const std::string& name, const std::vector<axis_state *> &states)
     : signal_processor(name, states.size(), 0)
 {
-    allocate_resources();
-    _init();
-
-    int i = 0;
-    for (auto *ax : states)
+    settings.resize(states.size());
+    for (unsigned int i = 0; i < states.size(); ++i)
     {
-        settings[i].controlled = ax;
-        settings[i++].controlled->attach_possible_controller(this);
+        settings[i].controlled = states[i];
+        settings[i].controlled->attach_possible_controller(this);
     }
+    reinit();
+}
+
+void axis_controller::add_state(axis_state *state)
+{
+    settings.push_back(axis_settings());
+    settings.back().controlled = state;
+    settings.back().controlled->attach_possible_controller(this);
+    set_dims(settings.size(), 0);
+    reinit();
 }
 
 bool axis_controller::on_interrupt(disctime_t time)
@@ -516,7 +506,7 @@ static inline int bind(axis_controller *axctr, int argc, char **argv,
     }
 
     {
-        axis_state *arr[argc];
+        std::vector<axis_state*> arr(argc);
 
         for (int i = 0; i < argc; ++i)
         {
@@ -533,7 +523,7 @@ static inline int bind(axis_controller *axctr, int argc, char **argv,
             if (sig->type != SIGNAL_TYPE_AXIS_STATE)
             {
                 snprintf(output, outmax, "Wrong signal type. name:(%s)",
-                         sig->name);
+                         sig->name.c_str());
                 return -1;
             }
 
@@ -541,7 +531,7 @@ static inline int bind(axis_controller *axctr, int argc, char **argv,
         }
 
         axctr->release_controlled();
-        axctr->set_controlled(arr);
+        axctr->set_controlled(arr.data());
     }
 
     return 0;
@@ -572,7 +562,7 @@ static inline int info(axis_controller *axctr, int argc, char **argv,
     (void)argc;
     (void)argv;
 
-    int bufsize = 96;
+    constexpr int bufsize = 96;
     char buf[bufsize];
 
     memset(buf, 0, bufsize);
@@ -597,13 +587,13 @@ static inline int info(axis_controller *axctr, int argc, char **argv,
         }
         else
         {
-            snprintf(buf, bufsize, "%s,", axctr->settings[i].controlled->name);
+            snprintf(buf, bufsize, "%s,", axctr->settings[i].controlled->name.c_str());
             strncat(output, buf, outmax);
         }
     }
     memset(buf, 0, bufsize);
     snprintf(buf, bufsize, "%s\r\n",
-             axctr->settings[axctr->leftdim() - 1].controlled->name);
+             axctr->settings[axctr->leftdim() - 1].controlled->name.c_str());
     strncat(output, buf, outmax);
 
     memset(buf, 0, bufsize);
@@ -645,14 +635,14 @@ static inline int incmov(axis_controller *axctr, int argc, char **argv,
     }
 
     int dim = axctr->leftdim();
-    position_t dist[dim];
+    std::vector<position_t> dist(dim);
 
     for (int i = 0; i < dim; ++i)
     {
         dist[i] = atof(argv[i]);
     }
 
-    return axctr->incmove(discrete_time(), dist);
+    return axctr->incmove(discrete_time(), dist.data());
 }
 
 static inline int absmov(axis_controller *axctr, int argc, char **argv,
@@ -666,13 +656,13 @@ static inline int absmov(axis_controller *axctr, int argc, char **argv,
     }
 
     int dim = axctr->leftdim();
-    position_t pos[dim];
+    std::vector<position_t> pos(dim);
 
     for (int i = 0; i < dim; ++i)
     {
         pos[i] = atof(argv[i]);
     }
-    return axctr->absmove(discrete_time(), pos);
+    return axctr->absmove(discrete_time(), pos.data());
 }
 
 static inline int stop(axis_controller *axctr, int, char **, char *, int)

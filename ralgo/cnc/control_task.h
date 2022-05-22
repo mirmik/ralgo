@@ -1,16 +1,16 @@
 #ifndef CONTROL_TASK_H
 #define CONTROL_TASK_H
 
-#include <ralgo/cnc/defs.h>
-#include <ralgo/linalg/vector_view.h>
 #include <algorithm>
 #include <nos/shell/argv.h>
+#include <ralgo/cnc/defs.h>
+#include <ralgo/linalg/vector_view.h>
 
-namespace cnc 
+namespace cnc
 {
-	class control_task 
-	{
-	public:
+    class control_task
+    {
+    public:
         bool isok = false;
         std::array<double, NMAX_AXES> _poses = {};
         double feed = 0;
@@ -18,26 +18,26 @@ namespace cnc
 
         control_task() = default;
 
-        ralgo::vector_view<double> poses(size_t total_axes) 
+        ralgo::vector_view<double> poses(size_t total_axes)
         {
-        	ralgo::vector_view<double> ret(_poses.data(), total_axes);
-        	std::copy(std::begin(_poses), std::end(_poses), ret.begin());
-        	return ret;
+            ralgo::vector_view<double> ret(_poses.data(), total_axes);
+            std::copy(std::begin(_poses), std::end(_poses), ret.begin());
+            return ret;
         }
 
         const ralgo::vector_view<double> poses(size_t total_axes) const
         {
-        	ralgo::vector_view<double> ret((double*)_poses.data(), total_axes);
-        	std::copy(std::begin(_poses), std::end(_poses), ret.begin());
-        	return ret;
+            ralgo::vector_view<double> ret((double *)_poses.data(), total_axes);
+            std::copy(std::begin(_poses), std::end(_poses), ret.begin());
+            return ret;
         }
 
-        void set_poses(igris::array_view<double> arr) 
+        void set_poses(const igris::array_view<double> &arr)
         {
             std::copy(arr.begin(), arr.end(), _poses.begin());
-        } 
+        }
 
-        int parse(const nos::argv& argv)
+        int parse(const nos::argv &argv)
         {
             for (unsigned int i = 0; i < argv.size(); ++i)
             {
@@ -85,7 +85,7 @@ namespace cnc
             }
             return 0;
         }
-	};
+    };
 }
 
 #endif

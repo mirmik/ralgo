@@ -20,7 +20,7 @@ igris::ring<cnc::planner_block> blocks{40};
 igris::ring<cnc::control_shift> shifts{400};
 
 cnc::planner planner(&blocks, &shifts);
-cnc::revolver revolver(&shifts);
+cnc::revolver revolver(&shifts, &blocks, &planner);
 cnc::interpreter interpreter(&blocks, &planner, &revolver);
 
 std::mutex mtx;

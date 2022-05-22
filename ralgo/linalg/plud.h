@@ -7,21 +7,30 @@
 
 #include <ralgo/linalg/matops.h>
 #include <ralgo/linalg/matrix.h>
+#include <ralgo/linalg/proxy.h>
+#include <ralgo/linalg/trivial_inverse.h>
 #include <ralgo/linalg/trivial_solve.h>
 
 #include <nos/print.h>
 
 namespace ralgo
 {
+    /**
+     *  Разложение квадратной матрицы A на верхнедиагональную U и
+     * нижнедиагональную L. P - вспомогательная перестановочная матрица.
+     *
+     *  PLUD разложение является формальным-аналогом метода Гаусса.
+     */
     template <class M, class TP, class TL, class TU> class PLUD
     {
     public:
-        M a;
-        TP p;
-        TL l;
-        TU u;
+        M a = {};
+        TP p = {};
+        TL l = {};
+        TU u = {};
 
-        int status;
+        int status = 0;
+        int swap_counter = 0;
 
         PLUD(const M &_mat) : PLUD(_mat, TP{}, TL{}, TU{}) {}
 
@@ -54,6 +63,7 @@ namespace ralgo
         void decompose()
         {
             const int n = a.rows();
+            swap_counter = 0;
 
             for (int i = 0; i < n; i++)
             {
@@ -69,8 +79,13 @@ namespace ralgo
                 }
                 if (pivotValue != 0)
                 {
-                    ralgo::vecops::swap(p.row(pivot), p.row(i));
-                    ralgo::vecops::swap(u.row(pivot), u.row(i));
+                    if (pivot != i)
+                    {
+                        ralgo::vecops::swap(p.row(pivot), p.row(i));
+                        ralgo::vecops::swap(u.row(pivot), u.row(i));
+                        swap_counter++;
+                    }
+
                     for (int j = i + 1; j < n; j++)
                     {
                         u(j, i) /= u(i, i);
@@ -94,14 +109,16 @@ namespace ralgo
 
         template <class X, class B> void solve(const B &b, X &&x)
         {
-            vector_value_t<B> ybuf[b.size()];
-            vector_view y(ybuf, b.size());
+            std::vector<vector_value_t<B>> ybuf(b.size());
+            vector_view y(ybuf.data(), b.size());
 
             x.resize(b.size());
 
             // Последовательно применяем решения матриц простого вида.
             // Данная процедура эквивалентна последовательному
             // умножению на обращенные P, L, U.
+            // details : x в первом выражении используется как промежуточное
+            // хранилище.
             pivot_solve(p, b, x);
             L_triangle_solve(l, x, y);
             U_triangle_solve(u, y, x);
@@ -112,6 +129,32 @@ namespace ralgo
             defvec_t<X, B> x;
             solve(b, x);
             return x;
+        }
+
+        /// A_inv = U_inv * L_inv * P_inv
+        void inverse(M &inv) const
+        {
+            ralgo::matrix<typename M::value_type> temp;
+            TL l_inv = L_triangle_inverse(l);
+            TU u_inv = U_triangle_inverse(u);
+            auto p_inv = ralgo::transposed_matrix_proxy(p);
+            ralgo::matops::multiply(u_inv, l_inv, temp);
+            ralgo::matops::multiply(temp, p_inv, inv);
+        }
+
+        typename M::value_type determinant() const
+        {
+            auto lprod = ralgo::matops::diagprod(l);
+            auto uprod = ralgo::matops::diagprod(u);
+            int pivot_det = swap_counter % 2 == 0 ? 1 : -1;
+            return lprod * uprod * pivot_det;
+        }
+
+        M inverse() const
+        {
+            ralgo::matrix<typename M::value_type> inv;
+            inverse(inv);
+            return inv;
         }
     };
 

@@ -9,13 +9,16 @@ namespace heimer
 {
     template <int Dim> class phase_mux_processor : public signal_processor
     {
-        phase_signal<Dim> *leftside;
-        axis_state *rightside[Dim];
+        phase_signal<Dim> *leftside = nullptr;
+        axis_state *rightside[Dim] = {};
 
     public:
         phase_mux_processor(const char *name) : signal_processor(name, 1, Dim)
         {
         }
+
+        phase_mux_processor(const phase_mux_processor &) = delete;
+        phase_mux_processor &operator=(const phase_mux_processor &) = delete;
 
         int feedback(disctime_t)
         {

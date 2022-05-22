@@ -51,6 +51,7 @@ licant.module("ralgo",
 
 		"ralgo/clinalg/matops_square_inverse.cpp",  
 		"ralgo/clinalg/solve.cpp",
+		"ralgo/linalg/roots_finder.cpp",
 
 		"ralgo/lp/gradient.c",
 		"ralgo/lp/point_in_hexagon.c",
@@ -64,7 +65,7 @@ licant.module("ralgo",
 		"ralgo.log",
 		"ralgo.disctime",
 		"ralgo.signal",
-		"ralgo.oldheimer"
+		#"ralgo.oldheimer"
 	],
 )
 

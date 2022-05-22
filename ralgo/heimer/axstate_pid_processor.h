@@ -8,14 +8,17 @@ namespace heimer
 {
     class axstate_pid_processor : public signal_processor
     {
-        axis_state *state;
-        scalar_signal *target;
+        axis_state *state = nullptr;
+        scalar_signal *target = nullptr;
 
-        double compcoeff;
-        disctime_t last_serve_time;
+        double compcoeff = 0;
+        disctime_t last_serve_time = 0;
 
     public:
         axstate_pid_processor(const char *name);
+        axstate_pid_processor(const axstate_pid_processor &) = default;
+        axstate_pid_processor &
+        operator=(const axstate_pid_processor &) = default;
 
         int feedback(disctime_t time) override;
         int serve(disctime_t time) override;

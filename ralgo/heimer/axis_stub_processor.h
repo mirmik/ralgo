@@ -11,17 +11,18 @@ namespace heimer
     class axis_stub_processor : public signal_processor
     {
     private:
-        axis_state *_axstate = nullptr;
+        std::vector<axis_state *> axstates = {};
         bool _apply_speed_mode = false;
 
     public:
-        position_t pos;
-        velocity_t vel;
-
-        disctime_t lasttime;
+        disctime_t lasttime = {};
 
     public:
-        axis_stub_processor(const char *name);
+        axis_stub_processor(const std::string &name);
+        axis_stub_processor(const std::string &name,
+                            const std::vector<axis_state *> &axstates);
+        axis_stub_processor(const axis_stub_processor &) = delete;
+        axis_stub_processor &operator=(const axis_stub_processor &) = delete;
 
         int feedback(disctime_t time) override;
         int serve(disctime_t time) override;

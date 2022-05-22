@@ -1,10 +1,10 @@
 #ifndef RALGO_CNC_PLANBLOCK_H
 #define RALGO_CNC_PLANBLOCK_H
 
-#include <ralgo/cnc/defs.h>
-#include <ralgo/linalg/vector_view.h>
 #include <nos/io/ostream.h>
 #include <nos/print.h>
+#include <ralgo/cnc/defs.h>
+#include <ralgo/linalg/vector_view.h>
 
 #include <stdint.h>
 #include <string.h>
@@ -36,18 +36,26 @@ namespace cnc
         uint8_t exact_stop = 0;
 
     public:
-        planner_block() {}
-        planner_block(const planner_block&) = default;
-        planner_block& operator=(const planner_block&) = default;
+        void immedeate_smooth_stop(int64_t iteration_counter)
+        {
+            int64_t shift = deceleration_after_ic - iteration_counter;
+            deceleration_after_ic = deceleration_after_ic - shift;
+            block_finish_ic = block_finish_ic - shift;
+            active_finish_ic = active_finish_ic - shift;
+        }
 
-        size_t print_to(nos::ostream& os) const
+        planner_block() {}
+        planner_block(const planner_block &) = default;
+        planner_block &operator=(const planner_block &) = default;
+
+        size_t print_to(nos::ostream &os) const
         {
             PRINTTO(os, axdist);
             PRINTTO(os, nominal_velocity);
             PRINTTO(os, acceleration);
             PRINTTO(os, fullpath);
             PRINTTO(os, multipliers);
-            
+
             PRINTTO(os, start_ic);
             PRINTTO(os, acceleration_before_ic);
             PRINTTO(os, deceleration_after_ic);
@@ -56,7 +64,7 @@ namespace cnc
             PRINTTO(os, blockno);
             PRINTTO(os, exact_stop);
             return 0;
-        } 
+        }
 
         bool validation()
         {
@@ -145,8 +153,9 @@ namespace cnc
             }
         }
 
-        void set_state(ralgo::vector_view<double> axdist, int axes, double velocity,
-                       double acceleration, ralgo::vector_view<double> multipliers)
+        void set_state(const ralgo::vector_view<double> &axdist, int axes,
+                       double velocity, double acceleration,
+                       const ralgo::vector_view<double> &multipliers)
         {
             for (int i = 0; i < axes; ++i)
             {
@@ -154,8 +163,8 @@ namespace cnc
                 this->axdist[i] = axdist[i];
             }
 
-            //assert(velocity < 1);
-            //assert(acceleration < 1);
+            // assert(velocity < 1);
+            // assert(acceleration < 1);
 
             double pathsqr = 0;
             for (int i = 0; i < axes; ++i)
@@ -169,7 +178,7 @@ namespace cnc
             this->active_finish_ic = itime;
             this->fullpath = path;
             this->start_ic = 0;
-            
+
             if (itime > preftime)
             {
                 // trapecidal pattern
@@ -197,33 +206,27 @@ namespace cnc
             assert(validation());
         }
 
-        void set_stop_state(ralgo::vector_view<double> axdist, int axes, double velocity,
-           double acceleration, ralgo::vector_view<double> multipliers)
+        void set_stop_state(ralgo::vector_view<double> axdist, int axes,
+                            double velocity, double acceleration,
+                            ralgo::vector_view<double> multipliers)
         {
             for (int i = 0; i < axes; ++i)
             {
                 this->multipliers[i] = multipliers[i];
                 this->axdist[i] = axdist[i];
             }
-            nos::println("axdist:"); nos::print_list(axdist);
-
             double pathsqr = 0;
             for (int i = 0; i < axes; ++i)
                 pathsqr += axdist[i] * axdist[i];
             double path = sqrt(pathsqr); // area
 
             int preftime = ceil(velocity / acceleration);
-
-            PRINT(path);
-            PRINT(preftime);
-
-            this->acceleration_before_ic = 0;
+            this->fullpath = this->acceleration_before_ic = 0;
             this->deceleration_after_ic = 0;
             this->block_finish_ic = preftime;
             this->nominal_velocity = path / preftime * 2;
             this->acceleration = this->nominal_velocity / preftime;
         }
-
     };
 }
 

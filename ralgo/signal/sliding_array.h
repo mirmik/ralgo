@@ -25,15 +25,17 @@ namespace ralgo
     template <class T> class sliding_array
     {
     public:
-        size_t halfsize;
-        size_t cursor;
-        T *dataarr;
+        size_t halfsize = {};
+        size_t cursor = {};
+        T *dataarr = nullptr;
 
     public:
         sliding_array(size_t size) : cursor(0), dataarr(nullptr)
         {
             resize(size);
         }
+        sliding_array(const sliding_array &) = delete;
+        sliding_array &operator=(const sliding_array &) = delete;
 
         void invalidate() { delete[] dataarr; }
 
@@ -49,9 +51,9 @@ namespace ralgo
             memset(dataarr, 0, halfsize * 2 * sizeof(T));
         }
 
-        igris::array_view<double> window()
+        igris::array_view<T> window()
         {
-            return igris::array_view<double>(dataarr + cursor, halfsize);
+            return igris::array_view<T>(dataarr + cursor, halfsize);
         }
 
         void cursor_fixup()

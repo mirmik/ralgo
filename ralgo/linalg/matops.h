@@ -31,6 +31,26 @@ namespace ralgo
             vecops::fill(arr, typename M::value_type{});
         }
 
+        template <class M> typename M::value_type diagprod(M &a)
+        {
+            typename M::value_type acc = 1;
+            for (auto i = 0; i < a.rows(); i++)
+            {
+                acc *= a.at(i, i);
+            }
+            return acc;
+        }
+
+        template <class M> typename M::value_type trace(M &a)
+        {
+            typename M::value_type acc = 0;
+            for (auto i = 0; i < a.rows(); i++)
+            {
+                acc += a.at(i, i);
+            }
+            return acc;
+        }
+
         template <class M> void square_inline_transpose(M &a)
         {
             for (int i = 0; i < a.rows(); ++i)
@@ -205,10 +225,11 @@ namespace ralgo
             // b = result matrix
             // n = number of rows = number of columns in b (n x n)
             int n = a.cols();
-            int pivrow;     // keeps track of current pivot row
-            int k, i, j;    // k: overall index along diagonal; i: row index; j:
-                            // col index
-            int pivrows[n]; // keeps track of rows swaps to undo at end
+            int pivrow;  // keeps track of current pivot row
+            int k, i, j; // k: overall index along diagonal; i: row index; j:
+                         // col index
+            std::vector<int> pivrows(
+                n);     // keeps track of rows swaps to undo at end
             double tmp; // used for finding max value and making column swaps
 
             b.resize(a.cols(), a.cols());
@@ -340,6 +361,14 @@ namespace ralgo
 
             square_matrix_inverse(mat, ret);
 
+            return ret;
+        }
+
+        template <class M = void>
+        defsame_t<M, ralgo::matrix<double>> eye(size_t N)
+        {
+            defsame_t<M, ralgo::matrix<double>> ret(N, N);
+            eye(ret);
             return ret;
         }
     }

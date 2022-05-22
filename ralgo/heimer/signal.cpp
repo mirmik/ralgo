@@ -25,13 +25,14 @@ void signal_head::init(const char *name, uint8_t type)
     dlist_add_tail(&list_lnk, &signals_list);
     current_controller = NULL;
     listener = NULL;
+    sorting_mark = 0;
 }
 
 void signal_head::deinit() { dlist_del(&list_lnk); }
 
 void signal_head::set_name(const char *name)
 {
-    strncpy(this->name, name, SIGNAL_NAME_MAX_LENGTH);
+    this->name = name;
 }
 
 int signal_head::attach_listener(signal_processor *proc)
@@ -47,7 +48,7 @@ int signal_head::attach_listener(signal_processor *proc)
 
 void signal_head::attach_possible_controller(signal_processor *) { refs++; }
 
-int signal_head::deattach_listener(signal_processor *proc)
+int signal_head::detach_listener(signal_processor *proc)
 {
     if (listener != proc)
         return -1;
@@ -58,7 +59,7 @@ int signal_head::deattach_listener(signal_processor *proc)
     return 0;
 }
 
-void signal_head::deattach_possible_controller(signal_processor *) { refs--; }
+void signal_head::detach_possible_controller(signal_processor *) { refs--; }
 
 int heimer::signals_count() { return dlist_size(&signals_list); }
 
@@ -77,7 +78,7 @@ signal_head *heimer::signal_get_by_name(const char *name)
     signal_head *sig;
     dlist_for_each_entry(sig, &signals_list, list_lnk)
     {
-        if (strncmp(sig->name, name, SIGNAL_NAME_MAX_LENGTH) == 0)
+        if (sig->name == name)
             return sig;
     }
     return NULL;
@@ -118,7 +119,7 @@ int signal_head::activate(signal_processor *proc, disctime_t tim)
         if (current_controller == proc)
         {
             ralgo::warn("signal is reactivated from curcontroller name: ",
-                        name);
+                        name.c_str());
             return 0;
         }
 

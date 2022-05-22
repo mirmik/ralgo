@@ -12,11 +12,11 @@ namespace ralgo
 {
     class spherical_cloud_collector
     {
-        int yaw_total;
-        int pitch_total; // Количество уровней без учёта вершин.
+        int yaw_total = 0;
+        int pitch_total = 0; // Количество уровней без учёта вершин.
 
-        linalg::vec<float, 3>
-            *points_array; // (size : yaw_total + pitch_total + 2)
+        linalg::vec<float, 3> *points_array =
+            {}; // (size : yaw_total + pitch_total + 2)
 
     public:
         spherical_cloud_collector(int _yaw_total, int _pitch_total,
