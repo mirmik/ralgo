@@ -51,9 +51,9 @@ namespace ralgo
             memset(dataarr, 0, halfsize * 2 * sizeof(T));
         }
 
-        igris::array_view<double> window()
+        igris::array_view<T> window()
         {
-            return igris::array_view<double>(dataarr + cursor, halfsize);
+            return igris::array_view<T>(dataarr + cursor, halfsize);
         }
 
         void cursor_fixup()
