@@ -14,7 +14,7 @@ namespace ralgo
         double koeff = 0;
         double timeconst = 1;
         double invert_timeconst = 1;
-        T state = 0;
+        T state = {};
 
     public:
         aperiodic_filter() {}
@@ -34,7 +34,7 @@ namespace ralgo
 
         T serve(const T &in, double delta)
         {
-            state += (in - state) * ( delta / timeconst );
+            state += (in - state) * (delta / timeconst);
             return state;
         }
 
@@ -55,7 +55,6 @@ namespace ralgo
             timeconst = time_constant;
             return *this;
         }
-
     };
 }
 
