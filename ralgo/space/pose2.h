@@ -47,9 +47,6 @@ namespace ralgo
             return linalg::rot(ang, vec) + lin;
         }
 
-<<<<<<< HEAD
-        ralgo::screw<T, 2> rotate(ralgo::screw<T, 2> scr) const
-=======
         linalg::vec<T, 2>
         inverse_transform_vector(const linalg::vec<T, 2> &vec) const
         {
@@ -63,7 +60,6 @@ namespace ralgo
         }
 
         ralgo::screw<T, 2> rotate(ralgo::screw<T, 2> scr) const 
->>>>>>> 359b4ea4486512a29cad64e2a51cd167eaafc576
         {
             return {scr.ang, rotate(scr.lin)};
         }
