@@ -22,9 +22,9 @@ application("runtests",
 		"physics/*.cpp",
 	],
 
-	cxx_flags = "-g -pedantic -Wno-vla -Werror=extra -Werror=all -Werror=reorder -Weffc++",
-	cc_flags = "-g -Werror=incompatible-pointer-types -pedantic -Werror=extra -Werror=all",
-	ld_flags = "-L/usr/local/lib/",
+	cxx_flags = "-O0 -g -pedantic -Wno-vla -Werror=extra -Werror=all -Werror=reorder -Weffc++",
+	cc_flags = "-O0 -g -Werror=incompatible-pointer-types -pedantic -Werror=extra -Werror=all",
+	ld_flags = "-O0 -L/usr/local/lib/",
 	cxxstd= "c++20",
 
 	include_paths = ["."],

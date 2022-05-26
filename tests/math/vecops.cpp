@@ -1,6 +1,5 @@
 #include <nos/print.h>
 #include <ralgo/linalg/vecops.h>
-#include <ralgo/util/gen.h>
 
 #include <main.h>
 
@@ -24,13 +23,13 @@ LT_BEGIN_TEST(ralgo_test_suite, vecops)
     CHECK(vecops::equal_all(vecops::sub_vv(dvec{1, 2, 3}, dvec{2, 3, 5}),
                             dvec{-1, -1, -2}) == true);
 
-    CHECK(vecops::equal_all(ralgo::gen::range(4), ralgo::vecops::arange(4)));
+/*    CHECK(vecops::equal_all(ralgo::gen::range(4), ralgo::vecops::arange(4)));
     CHECK(vecops::equal_all(ralgo::vecops::list(ralgo::gen::range(4)),
-                            ralgo::vecops::arange(4)));
+                            ralgo::vecops::arange(4)));*/
 }
 LT_END_TEST(vecops)
 
-LT_BEGIN_TEST(ralgo_test_suite, range_gen)
+/*LT_BEGIN_TEST(ralgo_test_suite, range_gen)
 {
     auto rng0 = ralgo::gen::range(1, 7, 3);
     auto rng1 = ralgo::gen::range(1, 7);
@@ -45,4 +44,4 @@ LT_BEGIN_TEST(ralgo_test_suite, range_gen)
     CHECK(
         ralgo::vecops::equal_all(rng2, std::vector<int>{0, 1, 2, 3, 4, 5, 6}));
 }
-LT_END_TEST(range_gen)
+LT_END_TEST(range_gen)*/
