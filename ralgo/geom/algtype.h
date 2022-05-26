@@ -245,10 +245,25 @@ namespace ralgo
         }
 
         template <class U>
+        SBD<U> exp(const BD<U>& a) 
+        {
+            U theta = linalg::length(a.xyz());
+            scalar<U> s = cos(theta);
+            bivector<U> B = sin(theta) * (a.xyz() / theta);
+            return SBD<U>(s, B, a.D);
+        }
+
+        template <class U>
         SB<U> rotor(const bivector<U>& a) 
         {
             return exp(a/2);
-        }        
+        }     
+
+        template <class U>
+        SBD<U> motor(const BD<U>& a) 
+        {
+            return exp(a/2);
+        }   
 
         template <class U>
         bivector<U> log(const SB<U>& a)
@@ -259,7 +274,21 @@ namespace ralgo
         }
 
         template <class U>
+        BD<U> log(const SBD<U>& a)
+        {
+            U theta = acos(a.e);
+            bivector<U> B = theta * (a.bivector_xyz() / sin(theta));
+            return BD<U>(B, a.D);
+        }
+
+        template <class U>
         bivector<U> unrotor(const SB<U>& a)
+        {
+            return log(a) * 2.;
+        }
+
+        template <class U>
+        BD<U> unmotor(const SBD<U>& a)
         {
             return log(a) * 2.;
         }
