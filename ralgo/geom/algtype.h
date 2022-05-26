@@ -2,6 +2,7 @@
 #define RALGO_GEOM_ALGEBRA_H
 
 #include <iostream>
+#include <ralgo/linalg/linalg.h>
 
 namespace ralgo 
 {
@@ -18,13 +19,15 @@ namespace ralgo
         };
 
         template <class T>
-        class vector 
+        class vector
         {
         public:
             T e1, e2, e3;
             vector(T e1, T e2, T e3) : e1(e1), e2(e2), e3(e3) {}
+            vector(const linalg::vec<T,3>& v) : e1(v[0]), e2(v[1]), e3(v[2]) {}
             vector(const vector&) = default;
             bool operator<=>(const vector&) const = default;
+            const linalg::vec<T,3>& xyz() const { return *(linalg::vec<T,3>*)this; }
         };
 
         template <class T>
@@ -33,8 +36,10 @@ namespace ralgo
         public:
             T e23, e31, e12;
             bivector(T e23, T e31, T e12) : e23(e23), e31(e31), e12(e12) {}
+            bivector(const linalg::vec<T,3>& v) : e23(v[0]), e31(v[1]), e12(v[2]) {}
             bivector(const bivector&) = default;
             bool operator<=>(const bivector&) const = default;
+            const linalg::vec<T,3>& xyz() const { return *(linalg::vec<T,3>*)this; }
         };
 
         template <class T>
@@ -61,9 +66,11 @@ namespace ralgo
         {
         public:
             scalar_bivector(T e, T e23, T e31, T e12) : scalar<T>(e), bivector<T>(e23, e31, e12) {}
-            scalar_bivector(scalar<T> e, bivector<T> b) : scalar<T>(e), bivector<T>(b) {}
+            scalar_bivector(const scalar<T>& e, const bivector<T>& b) : scalar<T>(e), bivector<T>(b) {}
             scalar_bivector(const scalar_bivector&) = default;
             bool operator<=>(const scalar_bivector&) const = default;
+            linalg::vec<T,3> bivector_xyz() const { return bivector<T>::xyz(); }
+            linalg::vec<T,3> vector_xyz() const { return vector<T>::xyz(); }
         };
 
         
@@ -98,6 +105,10 @@ namespace ralgo
         template <class T> bivector<T> operator-(const bivector<T>& a, const bivector<T>& b) { return bivector(a.e23 - b.e23, a.e31 - b.e31, a.e12 - b.e12); }
         template <class T> trivector<T> operator+(const trivector<T>& a, const trivector<T>& b) { return trivector(a.e123 + b.e123); }
         template <class T> trivector<T> operator-(const trivector<T>& a, const trivector<T>& b) { return trivector(a.e123 - b.e123); }
+        template <class T> bivector<T> operator/(const bivector<T>& a, const scalar<T>& b) { return bivector(a.e23 / b.e, a.e31 / b.e, a.e12 / b.e); }
+        template <class T> bivector<T> operator/(const bivector<T>& a, double s) { return bivector(a.e23 / s, a.e31 / s, a.e12 / s); }
+        template <class T> bivector<T> operator*(const bivector<T>& a, const scalar<T>& b) { return bivector(a.e23 * b.e, a.e31 * b.e, a.e12 * b.e); }
+        template <class T> bivector<T> operator*(const bivector<T>& a, double s) { return bivector(a.e23 * s, a.e31 * s, a.e12 * s); }
 
         template <class T>
         scalar_bivector<T> geommul(const scalar_bivector<T>& a, const scalar_bivector<T>& b) 
@@ -152,6 +163,41 @@ namespace ralgo
             return os;
         }
 
+
+        template <class T>
+        scalar_bivector<T> operator*(const scalar_bivector<T>& a, const scalar_bivector<T>& b)
+        {
+            return geommul(a, b);
+        }
+
+        template <class T>
+        scalar_bivector<T> exp(const bivector<T>& a)
+        {
+            T theta = linalg::length(a.xyz());
+            scalar<T> s = cos(theta);
+            bivector<T> B = sin(theta) * (a.xyz() / theta);
+            return scalar_bivector<T>(s, B);
+        }
+
+        template <class T>
+        scalar_bivector<T> rotor(const bivector<T>& a) 
+        {
+            return exp(a/2);
+        }        
+
+        template <class T>
+        bivector<T> log(const scalar_bivector<T>& a)
+        {
+            T theta = acos(a.e);
+            bivector<T> B = theta * (a.bivector_xyz() / sin(theta));
+            return B; 
+        }
+
+        template <class T>
+        bivector<T> unrotor(const scalar_bivector<T>& a)
+        {
+            return log(a) * 2.;
+        }
     }
 }
 
