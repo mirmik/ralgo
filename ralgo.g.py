@@ -65,7 +65,7 @@ licant.module("ralgo",
 		"ralgo.log",
 		"ralgo.disctime",
 		"ralgo.signal",
-		#"ralgo.oldheimer"
+		"ralgo.oldheimer"
 	],
 )
 
