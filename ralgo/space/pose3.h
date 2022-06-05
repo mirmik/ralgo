@@ -59,7 +59,7 @@ namespace ralgo
 
         // |A a||B b| = |AB Ab+a|
         // |0 1||0 1|   | 0    1|
-        pose3 operator*(const pose3 &oth);
+        pose3 operator*(const pose3 &oth) const;
         pose3 &operator*=(const pose3 &oth);
 
         bool operator==(const pose3 &oth) const;
@@ -69,7 +69,7 @@ namespace ralgo
         pose3 inverse();
 
         screw<T, 3> to_screw() const;
-        linalg::mat<T, 4, 4> to_mat4();
+        linalg::mat<T, 4, 4> to_mat4() const;
 
         static pose3 from_screw(const screw<T, 3> &scr);
 
@@ -148,7 +148,7 @@ template <class T> linalg::vec<T, 3> ralgo::pose3<T>::zdir() const
 }
 
 template <class T>
-ralgo::pose3<T> ralgo::pose3<T>::operator*(const ralgo::pose3<T> &oth)
+ralgo::pose3<T> ralgo::pose3<T>::operator*(const ralgo::pose3<T> &oth) const
 {
     return ralgo::pose3<T>(linalg::qmul(ang, oth.ang),
                            linalg::qrot(ang, oth.lin) + lin);
@@ -201,7 +201,7 @@ ralgo::pose3<T> &ralgo::pose3<T>::operator*=(const ralgo::pose3<T> &oth)
     return *this;
 }
 
-template <class T> linalg::mat<T, 4, 4> ralgo::pose3<T>::to_mat4()
+template <class T> linalg::mat<T, 4, 4> ralgo::pose3<T>::to_mat4() const
 {
     return {{qxdir(ang), 0}, {qydir(ang), 0}, {qzdir(ang), 0}, {lin, 1}};
 }
