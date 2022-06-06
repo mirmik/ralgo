@@ -1,6 +1,8 @@
 #ifndef RALGO_UTIL_MATH
 #define RALGO_UTIL_MATH
 
+#include <igris/math.h>
+
 namespace ralgo
 {
     //Функция ограничения в заданном диапазоне.
@@ -34,6 +36,21 @@ namespace ralgo
     }
 
     template <class A> constexpr A sqr(const A &a) { return a * a; }
+
+    template <class T> constexpr T angdiff(T a, T b) 
+    {
+        std::complex<T> ac = std::polar<T>(1, a);
+        std::complex<T> bc = std::polar<T>(1, b);
+        return std::arg(std::conj(bc) * ac);
+    }
+
+    template <class T> constexpr T angdiff_deg(T a, T b) 
+    {
+        auto _a = igris::deg2rad(a);
+        auto _b = igris::deg2rad(b);
+        return igris::rad2deg(angdiff(_a, _b));
+    }
+
 } // namespace ralgo
 
 #endif
