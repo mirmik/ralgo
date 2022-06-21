@@ -28,8 +28,6 @@ namespace ralgo
             torq_pi.init(kp, ki);
         }
 
-        // T**2 = 1/ki
-        // 2*ksi*T = kp/ki
         void setup_velocity_parameters(double T, double ksi, double A)
         {
             double ki = A / (T * T);
