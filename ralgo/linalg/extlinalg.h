@@ -72,8 +72,9 @@ namespace ralgo
     {
         auto wf_center = world_pose.transform_point(local_center);
         auto wf_inertia = rotate_quadric_form(world_pose.ang, local_inertia);
-        auto radius = target_center - wf_center;  
-		auto kroneker_prod = ralgo::diag<T>({ radius[0]*radius[0], radius[1]*radius[1], radius[2]*radius[2] });
+        auto radius = target_center - wf_center;
+        auto scalar_square = radius[0]*radius[0] + radius[1]*radius[1] + radius[2]*radius[2];  
+		auto kroneker_prod = ralgo::diag<T>({ scalar_square, scalar_square, scalar_square });
 		auto outer_prod = ralgo::outer(radius, radius);
 		auto shteiner = wf_inertia + mass * (kroneker_prod - outer_prod);
         return shteiner;
