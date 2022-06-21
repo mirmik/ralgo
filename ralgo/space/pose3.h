@@ -39,6 +39,11 @@ namespace ralgo
             return linalg::qrot(ang, vec) + lin;
         }
 
+        linalg::mat<T, 3, 3> rotation_matrix() const
+        {
+            return {qxdir(ang), qydir(ang), qzdir(ang)};        
+        }
+
         linalg::vec<T, 3>
         inverse_transform_vector(const linalg::vec<T, 3> &vec) const
         {
