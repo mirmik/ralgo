@@ -35,6 +35,14 @@ namespace ralgo
             }
         };
 
+        template <class R = void, class V, class F> 
+        defvec_t<R, V> transform(const V &u, F&& f) 
+        {
+            defvec_t<R, V> ret;
+            std::transform(std::begin(u), std::end(u), std::back_inserter(ret), f); 
+            return ret;  
+        }
+
         template <class R = void, class V> defvec_t<R, V> list(const V &u)
         {
             defvec_t<R, V> ret(u.size());
