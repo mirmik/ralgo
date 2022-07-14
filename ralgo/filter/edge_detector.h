@@ -38,7 +38,13 @@ namespace ralgo
         std::any _candidate_privdata = {};
 
     public:
+        edge_detector() = default;
         edge_detector(double trigger_level) : trigger_level(trigger_level) {}
+
+        void init(double trigger_level)
+        {
+            this->trigger_level = trigger_level;
+        }
 
         void set_prevent_halfspaces_area(bool en)
         {

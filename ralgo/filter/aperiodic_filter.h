@@ -11,17 +11,17 @@ namespace ralgo
 {
     template <class T> class aperiodic_filter : public ralgo::inout<T, T>
     {
-        double koeff = 0;
-        double timeconst = 1;
-        double invert_timeconst = 1;
+        float koeff = 0;
+        float timeconst = 1;
+        float invert_timeconst = 1;
         T state = {};
 
     public:
         aperiodic_filter() {}
 
-        aperiodic_filter(double _koeff) : koeff(_koeff) {}
+        aperiodic_filter(float _koeff) : koeff(_koeff) {}
 
-        aperiodic_filter(double delta, double time_constant)
+        aperiodic_filter(float delta, float time_constant)
         {
             set_koefficient(delta, time_constant);
         }
@@ -32,7 +32,7 @@ namespace ralgo
             return state;
         }
 
-        T serve(const T &in, double delta)
+        T serve(const T &in, float delta)
         {
             state += (in - state) * (delta / timeconst);
             return state;
@@ -42,7 +42,7 @@ namespace ralgo
 
         void reset(T val) { state = val; }
 
-        aperiodic_filter &set_koefficient(double delta, double time_constant)
+        aperiodic_filter &set_koefficient(float delta, float time_constant)
         {
             koeff = delta / time_constant;
             timeconst = time_constant;
@@ -50,9 +50,10 @@ namespace ralgo
             return *this;
         }
 
-        aperiodic_filter &set_timeconst(double time_constant)
+        aperiodic_filter &set_timeconst(float time_constant)
         {
             timeconst = time_constant;
+            invert_timeconst = 1 / time_constant;
             return *this;
         }
     };
