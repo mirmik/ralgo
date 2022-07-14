@@ -1,6 +1,9 @@
 #include <errno.h>
 #include <iostream>
 #include <string>
+#include <signal.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 #include <igris/getopt/cliopts.h>
 #include <igris/util/string.h>
@@ -210,7 +213,7 @@ int main(int argc, char **argv)
             exit(0);
         }
 
-        while ((str = fl.readline()).size())
+        while ((str = nos::readline_from(fl)).size())
         {
             str = igris::trim(str);
 
