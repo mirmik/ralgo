@@ -28,7 +28,7 @@ namespace ralgo
 
         T serve(const T &in)
         {
-            state += (in - state) * koeff;
+            state += (in - state) * (double)koeff;
             return state;
         }
 
