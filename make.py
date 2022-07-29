@@ -18,7 +18,9 @@ install_directory_path = '/usr/lib/'
 install_library_path = os.path.join(install_directory_path, target)
 
 
-licant.cxx_shared_library("libralgo.so",
+licant.cxx_static_and_shared("libs",
+	shared_lib = "libralgo.so",
+	static_lib = "libralgo.a",
 	mdepends=[
 		"ralgo"
 	],
@@ -30,7 +32,7 @@ licant.cxx_shared_library("libralgo.so",
 licant.install.install_library(
 	tgt="install_library",
 	uninstall="uninstall",
-	libtgt="libralgo.so",
+	libtgt=["libralgo.so", "libralgo.a"],
 	hroot="ralgo",
 	headers="ralgo")
 
@@ -39,7 +41,7 @@ licant.fileset("apps", targets=[
 	"cncsim"
 ], deps=["libralgo.so"])
 
-licant.fileset("all", targets=["apps", target])
+licant.fileset("all", targets=["apps", "libs"])
 
 @licant.routine(deps=["apps"])
 def install_apps():
