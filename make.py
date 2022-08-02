@@ -41,8 +41,6 @@ licant.fileset("apps", targets=[
 	"cncsim"
 ], deps=["libralgo.so"])
 
-licant.fileset("all", targets=["apps", "libs"])
-
 @licant.routine(deps=["apps"])
 def install_apps():
 	licant.do(["install_sigtrans", "makefile"])
@@ -50,5 +48,30 @@ def install_apps():
 @licant.routine(deps=["install_apps", "install_library"])
 def install():
 	pass
+
+licant.cxx_application("runtests",
+	sources = [
+		"tests/signal/*.cpp",
+		"tests/imu/*",
+		"tests/*.cpp",
+		"tests/robo/*.cpp",
+		"tests/heimer/*.cpp",
+		"tests/space/*.cpp",
+		"tests/math/*.cpp",
+		"tests/lp/*.cpp",
+#		"cnc/*.cpp",
+		"tests/filter/*.cpp",
+		"tests/physics/*.cpp",
+	],
+	cxx_flags = "-O0 -g -pedantic -Wno-vla -Werror=extra -Werror=all -Werror=reorder -Weffc++",
+	cc_flags = "-O0 -g -Werror=incompatible-pointer-types -pedantic -Werror=extra -Werror=all",
+	ld_flags = "-O0 -L/usr/local/lib/",
+	cxxstd= "c++20",
+	include_paths = [".", "tests"],
+	mdepends = ["ralgo", ("ralgo.log", "silent")],
+	libs = ["igris", "nos"],
+)
+
+licant.fileset("all", targets=["apps", "libs", "runtests"])
 
 licant.ex("all")
