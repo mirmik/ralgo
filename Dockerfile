@@ -1,7 +1,8 @@
-FROM igris-20.04
-FROM nos-20.04
-FROM crow-20.04
-FROM netricks-20.04-env
+ARG ARCH
+FROM netricks/igris:$ARCH
+FROM netricks/nos:$ARCH
+FROM netricks/crow:$ARCH
+FROM netricks/netricks-20.04-env:$ARCH
 
 COPY --from=0 /usr/local/include/igris /usr/local/include/igris
 COPY --from=0 /usr/lib/libigris.so /usr/lib/libigris.so
@@ -13,9 +14,7 @@ COPY --from=2 /usr/lib/libcrow.so /usr/lib/libcrow.so
 ADD . /root/ralgo
 
 WORKDIR /root/ralgo
+RUN /root/sanitize-check.sh
 RUN ./make.py
+#RUN ./runtests
 RUN sudo ./make.py install
-
-WORKDIR /root/ralgo/tests
-RUN ./make.py
-RUN ./runtests
