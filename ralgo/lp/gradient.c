@@ -6,14 +6,14 @@
 #include <string.h>
 #include <igris/dprint.h>
 
-void convex_gradient_descent(
+/*void convex_gradient_descent(
 	int dim,
 	int points,
 	double alpha,
 	double epsilon,
 	double * table,              // size: dim * points
 	double * target,             // size: dim
-	double * result                    // size: dim
+	double * result              // size: dim
 )
 {
 	double diff0[dim];
@@ -48,4 +48,4 @@ void convex_gradient_descent(
 
 		distance = vecops_distance_d(current, target, dim);
 	}
-}
+}*/
