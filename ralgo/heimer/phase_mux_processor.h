@@ -13,7 +13,7 @@ namespace heimer
         axis_state *rightside[Dim] = {};
 
     public:
-        phase_mux_processor(const char *name) : signal_processor(name, 1, Dim)
+        phase_mux_processor(const std::string& name) : signal_processor(name, 1, Dim)
         {
         }
 

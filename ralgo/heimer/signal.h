@@ -19,7 +19,7 @@ namespace heimer
     {
     public:
         struct dlist_head list_lnk = DLIST_HEAD_INIT(list_lnk);
-        std::string name = {};
+        std::string name = "undef";
         uint8_t type = 0;
 
         /// Количество ссылок. Каждый контроллер, имеющий указатель
@@ -42,19 +42,24 @@ namespace heimer
         signal_head() = default;
         signal_head(const signal_head &) = delete;
         signal_head &operator=(const signal_head &) = delete;
-        virtual ~signal_head() = default;
+        signal_head(signal_head &&) = delete;
+        signal_head &operator=(signal_head &&) = delete;
+
+        virtual ~signal_head() 
+        {
+            dlist_del(&list_lnk);
+        }
         signal_head(uint8_t type);
-        signal_head(const char *name, uint8_t type);
         signal_head(const std::string &name, uint8_t type)
             : name(name), type(type)
         {
         }
-        void set_name(const char *name);
+        void set_name(const std::string & name);
 
         virtual int info(char *buffer, int maxsize) = 0;
         int ctrinfo(char *buffer, int maxsize);
 
-        void init(const char *name, uint8_t type);
+        void init(const std::string & name, uint8_t type);
         void rebind();
         void deinit();
 

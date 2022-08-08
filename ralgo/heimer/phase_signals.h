@@ -26,15 +26,12 @@ namespace heimer
     public:
         phase_signal_base(uint8_t type) : signal_head(type) {}
 
-        phase_signal_base(const char *name, uint8_t type)
-            : signal_head(name, type)
-        {
-        }
-
         phase_signal_base(const std::string &name, uint8_t type)
             : signal_head(name, type)
         {
         }
+
+        ~phase_signal_base() override = default;
 
         int info(char *data, int) override
         {

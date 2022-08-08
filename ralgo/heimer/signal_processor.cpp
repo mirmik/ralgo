@@ -18,14 +18,6 @@ using namespace heimer;
 DLIST_HEAD(heimer::signal_processor_list);
 bool heimer::debug_activations = false;
 
-signal_processor::signal_processor(const char *name, int ldim, int rdim)
-{
-    set_dims(ldim, rdim);
-    set_name(name);
-    rebind();
-    this->u.flags = 0;
-}
-
 void signal_processor::set_dims(int ldim, int rdim)
 {
     _leftdim = ldim;
@@ -33,8 +25,12 @@ void signal_processor::set_dims(int ldim, int rdim)
 }
 
 signal_processor::signal_processor(const std::string& name, int ldim, int rdim)
-    : signal_processor(name.c_str(), ldim, rdim)
-{}
+{
+    set_dims(ldim, rdim);
+    set_name(name);
+    rebind();
+    this->u.flags = 0;
+}
 
 signal_processor::signal_processor(int ldim, int rdim)
     : signal_processor("undef", ldim, rdim)
@@ -46,7 +42,7 @@ void signal_processor::rebind()
     dlist_add_tail(&list_lnk, &signal_processor_list);
 }
 
-void signal_processor::set_name(const char *name)
+void signal_processor::set_name(const std::string &name)
 {
     _name = name;
 }
