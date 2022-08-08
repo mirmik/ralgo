@@ -48,7 +48,7 @@ jobs:
         cd nos
         ./make.py
         sudo ./make.py install
-        cd ..    - name: Install crow library
+        cd ..
 
     - name: Install crow library
       run: |
