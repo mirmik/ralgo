@@ -38,27 +38,23 @@ jobs:
       run: |
         git clone https://github.com/mirmik/igris
         cd igris
-        cmake .
-        cmake --build .
-        sudo cmake --install .
+        ./make.py
+        sudo ./make.py install
         cd ..
 
     - name: Install nos library
       run: |
         git clone https://github.com/mirmik/nos
         cd nos
-        cmake .
-        cmake --build .
-        sudo cmake --install .
-        cd ..
+        ./make.py
+        sudo ./make.py install
+        cd ..    - name: Install crow library
 
-    - name: Install crow library
       run: |
         git clone https://github.com/mirmik/crow
         cd crow
-        cmake .
-        cmake --build .
-        sudo cmake --install .
+        ./make.py
+        sudo ./make.py install
         cd ..
 
     - name: Build
