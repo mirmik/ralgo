@@ -138,41 +138,41 @@ namespace ralgo
             bool operator<=>(const SB&) const = default;
         };
         
-        template <class U> S<U> s_ss(const S<U>& a, const S<U>& b) { return S(a.e*b.e); } 
-        template <class U> S<U> s_vv(const V<U>& a, const V<U>& b) { return S(a.e1*b.e1 + a.e2*b.e2 + a.e3*b.e3); }
-        template <class U> S<U> s_bb(const B<U>& a, const B<U>& b) { return S( - a.e12 * b.e12 - a.e23 * b.e23 - a.e31 * b.e31); }
-        template <class U> S<U> s_tt(const T<U>& a, const T<U>& b) { return S(-a.e123*b.e123); }        
+        template <class U> S<U> s_ss(const S<U>& a, const S<U>& b) { return S<U>(a.e*b.e); } 
+        template <class U> S<U> s_vv(const V<U>& a, const V<U>& b) { return S<U>(a.e1*b.e1 + a.e2*b.e2 + a.e3*b.e3); }
+        template <class U> S<U> s_bb(const B<U>& a, const B<U>& b) { return S<U>( - a.e12 * b.e12 - a.e23 * b.e23 - a.e31 * b.e31); }
+        template <class U> S<U> s_tt(const T<U>& a, const T<U>& b) { return S<U>(-a.e123*b.e123); }        
         
-        template <class U> V<U> v_sv(const S<U>& a, const V<U>& b) { return V(a.e*b.e1, a.e*b.e2, a.e*b.e3); }
-        template <class U> V<U> v_vs(const V<U>& a, const S<U>& b) { return V(a.e1*b.e, a.e2*b.e, a.e3*b.e); }
-        template <class U> V<U> v_vb(const V<U>& a, const B<U>& b) { return V(- a.e2 * b.e12 + a.e3 * b.e31, - a.e3 * b.e23 + a.e1 * b.e12, - a.e1 * b.e31 + a.e2 * b.e23); }
-        template <class U> V<U> v_bv(const B<U>& a, const V<U>& b) { return V(- a.e31 * b.e3 + a.e12 * b.e2, - a.e12 * b.e1 + a.e23 * b.e3, - a.e23 * b.e2 + a.e31 * b.e1);}
+        template <class U> V<U> v_sv(const S<U>& a, const V<U>& b) { return V<U>(a.e*b.e1, a.e*b.e2, a.e*b.e3); }
+        template <class U> V<U> v_vs(const V<U>& a, const S<U>& b) { return V<U>(a.e1*b.e, a.e2*b.e, a.e3*b.e); }
+        template <class U> V<U> v_vb(const V<U>& a, const B<U>& b) { return V<U>(- a.e2 * b.e12 + a.e3 * b.e31, - a.e3 * b.e23 + a.e1 * b.e12, - a.e1 * b.e31 + a.e2 * b.e23); }
+        template <class U> V<U> v_bv(const B<U>& a, const V<U>& b) { return V<U>(- a.e31 * b.e3 + a.e12 * b.e2, - a.e12 * b.e1 + a.e23 * b.e3, - a.e23 * b.e2 + a.e31 * b.e1);}
 
-        template <class U> B<U> b_bs(const B<U>& a, const S<U>& b) { return B(a.e23*b.e, a.e31*b.e, a.e12*b.e); }
-        template <class U> B<U> b_sb(const S<U>& a, const B<U>& b) { return B(a.e*b.e23, a.e*b.e31, a.e*b.e12); }
-        template <class U> B<U> b_vv(const V<U>& a, const V<U>& b) { return B(a.e2*b.e3 - a.e3*b.e2, a.e3*b.e1 - a.e1*b.e3, a.e1*b.e2 - a.e2*b.e1); }
-        template <class U> B<U> b_bb(const B<U>& a, const B<U>& b) { return B(- a.e31*b.e12 + a.e12*b.e31, - a.e12*b.e23 + a.e23*b.e12, - a.e23*b.e31 + a.e31*b.e23); }
+        template <class U> B<U> b_bs(const B<U>& a, const S<U>& b) { return B<U>(a.e23*b.e, a.e31*b.e, a.e12*b.e); }
+        template <class U> B<U> b_sb(const S<U>& a, const B<U>& b) { return B<U>(a.e*b.e23, a.e*b.e31, a.e*b.e12); }
+        template <class U> B<U> b_vv(const V<U>& a, const V<U>& b) { return B<U>(a.e2*b.e3 - a.e3*b.e2, a.e3*b.e1 - a.e1*b.e3, a.e1*b.e2 - a.e2*b.e1); }
+        template <class U> B<U> b_bb(const B<U>& a, const B<U>& b) { return B<U>(- a.e31*b.e12 + a.e12*b.e31, - a.e12*b.e23 + a.e23*b.e12, - a.e23*b.e31 + a.e31*b.e23); }
 
-        template <class U> T<U> t_ts(const T<U>& a, const S<U>& b) { return T(a.e123*b.e); }
-        template <class U> T<U> t_st(const S<U>& a, const T<U>& b) { return T(a.e*b.e123); }
-        template <class U> T<U> t_vb(const V<U>& a, const B<U>& b) { return T(a.e1*b.e23 + a.e2*b.e31 + a.e3*b.e12); }
-        template <class U> T<U> t_bv(const B<U>& a, const V<U>& b) { return T(a.e23*b.e1 + a.e31*b.e2 + a.e12*b.e3); }
+        template <class U> T<U> t_ts(const T<U>& a, const S<U>& b) { return T<U>(a.e123*b.e); }
+        template <class U> T<U> t_st(const S<U>& a, const T<U>& b) { return T<U>(a.e*b.e123); }
+        template <class U> T<U> t_vb(const V<U>& a, const B<U>& b) { return T<U>(a.e1*b.e23 + a.e2*b.e31 + a.e3*b.e12); }
+        template <class U> T<U> t_bv(const B<U>& a, const V<U>& b) { return T<U>(a.e23*b.e1 + a.e31*b.e2 + a.e12*b.e3); }
 
         template <class U> V<U> sv_vs_v(const S<U>& as, const V<U>& bv, const V<U>& av, const S<U>& bs) { return sv_v(as, bv) + vs_v(av, bs); }
         template <class U> B<U> sb_bs_b(const S<U>& as, const B<U>& bb, const B<U>& ab, const S<U>& bs) { return sb_b(as, bb) + bs_b(ab, bs); }
 
-        template <class U> S<U> operator+(const S<U>& a, const S<U>& b) { return S(a.e + b.e); }
-        template <class U> S<U> operator-(const S<U>& a, const S<U>& b) { return S(a.e - b.e); }
-        template <class U> V<U> operator+(const V<U>& a, const V<U>& b) { return V(a.e1 + b.e1, a.e2 + b.e2, a.e3 + b.e3); }
-        template <class U> V<U> operator-(const V<U>& a, const V<U>& b) { return V(a.e1 - b.e1, a.e2 - b.e2, a.e3 - b.e3); }
-        template <class U> B<U> operator+(const B<U>& a, const B<U>& b) { return B(a.e23 + b.e23, a.e31 + b.e31, a.e12 + b.e12); }
-        template <class U> B<U> operator-(const B<U>& a, const B<U>& b) { return B(a.e23 - b.e23, a.e31 - b.e31, a.e12 - b.e12); }
-        template <class U> T<U> operator+(const T<U>& a, const T<U>& b) { return T(a.e123 + b.e123); }
-        template <class U> T<U> operator-(const T<U>& a, const T<U>& b) { return T(a.e123 - b.e123); }
-        template <class U> B<U> operator/(const B<U>& a, const S<U>& b) { return B(a.e23 / b.e, a.e31 / b.e, a.e12 / b.e); }
-        template <class U> B<U> operator/(const B<U>& a, double s) { return B(a.e23 / s, a.e31 / s, a.e12 / s); }
-        template <class U> B<U> operator*(const B<U>& a, const S<U>& b) { return B(a.e23 * b.e, a.e31 * b.e, a.e12 * b.e); }
-        template <class U> B<U> operator*(const B<U>& a, double s) { return B(a.e23 * s, a.e31 * s, a.e12 * s); }
+        template <class U> S<U> operator+(const S<U>& a, const S<U>& b) { return S<U>(a.e + b.e); }
+        template <class U> S<U> operator-(const S<U>& a, const S<U>& b) { return S<U>(a.e - b.e); }
+        template <class U> V<U> operator+(const V<U>& a, const V<U>& b) { return V<U>(a.e1 + b.e1, a.e2 + b.e2, a.e3 + b.e3); }
+        template <class U> V<U> operator-(const V<U>& a, const V<U>& b) { return V<U>(a.e1 - b.e1, a.e2 - b.e2, a.e3 - b.e3); }
+        template <class U> B<U> operator+(const B<U>& a, const B<U>& b) { return B<U>(a.e23 + b.e23, a.e31 + b.e31, a.e12 + b.e12); }
+        template <class U> B<U> operator-(const B<U>& a, const B<U>& b) { return B<U>(a.e23 - b.e23, a.e31 - b.e31, a.e12 - b.e12); }
+        template <class U> T<U> operator+(const T<U>& a, const T<U>& b) { return T<U>(a.e123 + b.e123); }
+        template <class U> T<U> operator-(const T<U>& a, const T<U>& b) { return T<U>(a.e123 - b.e123); }
+        template <class U> B<U> operator/(const B<U>& a, const S<U>& b) { return B<U>(a.e23 / b.e, a.e31 / b.e, a.e12 / b.e); }
+        template <class U> B<U> operator/(const B<U>& a, double s) { return B<U>(a.e23 / s, a.e31 / s, a.e12 / s); }
+        template <class U> B<U> operator*(const B<U>& a, const S<U>& b) { return B<U>(a.e23 * b.e, a.e31 * b.e, a.e12 * b.e); }
+        template <class U> B<U> operator*(const B<U>& a, double s) { return B<U>(a.e23 * s, a.e31 * s, a.e12 * s); }
 
         template <class U>
         SB<U> geommul(const SB<U>& a, const SB<U>& b) 
