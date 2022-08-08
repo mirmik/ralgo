@@ -50,6 +50,7 @@ jobs:
         sudo ./make.py install
         cd ..    - name: Install crow library
 
+    - name: Install crow library
       run: |
         git clone https://github.com/mirmik/crow
         cd crow
