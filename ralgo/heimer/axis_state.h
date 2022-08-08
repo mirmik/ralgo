@@ -13,10 +13,6 @@ namespace heimer
             : phase_signal_base<position_t, velocity_t>(
                   SIGNAL_TYPE_AXIS_STATE){};
 
-        axis_state(const char *name)
-            : phase_signal_base<position_t, velocity_t>(
-                  name, SIGNAL_TYPE_AXIS_STATE){};
-
         axis_state(const std::string &name)
             : phase_signal_base<position_t, velocity_t>(
                   name, SIGNAL_TYPE_AXIS_STATE){};
@@ -37,6 +33,8 @@ namespace heimer
 
             return signal_head::command_v(argc, argv, output, maxsize);
         }
+
+        ~axis_state() override = default;
     };
 }
 

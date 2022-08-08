@@ -13,24 +13,25 @@ using namespace heimer;
 
 DLIST_HEAD(heimer::signals_list);
 
-signal_head::signal_head(const char *name, uint8_t type) { init(name, type); }
-
 signal_head::signal_head(uint8_t type) : signal_head("undef", type) {}
 
-void signal_head::init(const char *name, uint8_t type)
+void signal_head::init(const std::string & name, uint8_t type)
 {
     refs = 0;
     this->type = type;
     set_name(name);
-    dlist_add_tail(&list_lnk, &signals_list);
+    dlist_move_tail(&list_lnk, &signals_list);
     current_controller = NULL;
     listener = NULL;
     sorting_mark = 0;
 }
 
-void signal_head::deinit() { dlist_del(&list_lnk); }
+void signal_head::deinit() 
+{ 
+    dlist_del_init(&list_lnk); 
+}
 
-void signal_head::set_name(const char *name)
+void signal_head::set_name(const std::string & name)
 {
     this->name = name;
 }
@@ -46,7 +47,10 @@ int signal_head::attach_listener(signal_processor *proc)
     return 0;
 }
 
-void signal_head::attach_possible_controller(signal_processor *) { refs++; }
+void signal_head::attach_possible_controller(signal_processor *) 
+{ 
+    refs++; 
+}
 
 int signal_head::detach_listener(signal_processor *proc)
 {

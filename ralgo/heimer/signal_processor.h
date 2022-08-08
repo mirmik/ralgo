@@ -44,13 +44,15 @@ namespace heimer
         } u = {};
 
     public:
-        virtual ~signal_processor() = default;
+        virtual ~signal_processor() 
+        {
+            dlist_del(&list_lnk);
+        }
         signal_processor() = default;
         signal_processor(int ldim, int rdim);
-        signal_processor(const char *name, int ldim, int rdim);
         signal_processor(const std::string &name, int ldim, int rdim);
         void rebind();
-        void set_name(const char *name);
+        void set_name(const std::string& name);
         bool is_axisctr() { return u.f.is_axisctr; }
 
         void set_dims(int ldim, int rdim);
