@@ -18,12 +18,20 @@ jobs:
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        compiler: 
+          - { CXX: g++-11, CC: gcc-11 } 
+          - { CXX: clang++-12, CC: clang-12 }
+      
     steps:
-    - uses: actions/checkout@master
-      with:
-          repository: mirmik/igris
-
     - uses: actions/checkout@v2
+
+    - name: Setup dependencies
+      run: |
+        sudo apt-get update && sudo apt-get install -y g++-11 clang-12
+        sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/${{matrix.compiler.CXX}} 100
+        sudo update-alternatives --install /usr/bin/cc  cc  /usr/bin/${{matrix.compiler.CC}} 100
 
     - name: Install igris library
       run: |
