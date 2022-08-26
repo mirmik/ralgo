@@ -47,11 +47,6 @@ def install_apps():
     licant.do(["install_sigtrans", "makefile"])
 
 
-@licant.routine(deps=["install_apps", "install_library"])
-def install():
-    pass
-
-
 licant.cxx_application("runtests",
                        sources=[
                            "tests/signal/*.cpp",
@@ -77,5 +72,6 @@ licant.cxx_application("runtests",
                        )
 
 licant.fileset("all", targets=["apps", "libs", "runtests"])
+licant.fileset("install", targets=["install_apps", "install_library"])
 
 licant.ex("all")
