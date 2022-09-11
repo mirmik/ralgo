@@ -105,16 +105,16 @@ namespace cnc
 
             if (ralgo::global_protection)
             {
-                os.println("need_to_disable_global_protection");
+                nos::println_to(os, "need_to_disable_global_protection");
                 return 1;
             }
             // if (saved_feed == 0) {
-            //    os.println("saved_feed is null"); return 1; }
+            //    nos::println_to(os, "saved_feed is null"); return 1; }
             // if (saved_acc == 0) {
-            //    os.println("saved_acc is null"); return 1; }
+            //    nos::println_to(os, "saved_acc is null"); return 1; }
             if (revolver_frequency == 0)
             {
-                os.println("revolver_frequency is null");
+                nos::println_to(os, "revolver_frequency is null");
                 return 1;
             }
             return 0;
@@ -326,7 +326,7 @@ namespace cnc
         {
             if (argv.size() == 0)
             {
-                os.print("%f", saved_acc);
+                nos::print_to(os, "%f", saved_acc);
                 return;
             }
 
@@ -382,7 +382,7 @@ namespace cnc
                 command_incremental_move(argv.without(1), os);
                 break;
             default:
-                os.println("Unresolved G command");
+                nos::println_to(os, "Unresolved G command");
             }
         }
 
@@ -398,7 +398,7 @@ namespace cnc
                 command_M204(argv.without(1), os);
                 break;
             default:
-                os.println("Unresolved M command");
+                nos::println_to(os, "Unresolved M command");
             }
         }
 
@@ -423,7 +423,7 @@ namespace cnc
             }
 
             default:
-                os.println("Unresolved command");
+                nos::println_to(os, "Unresolved command");
             }
 
             return 0;
@@ -448,25 +448,25 @@ namespace cnc
 
             else if (argv[0] == "axmaxspd")
             {
-                os.println("TODO");
+                nos::println_to(os, "TODO");
                 return 0;
             }
 
             else if (argv[0] == "axmaxacc")
             {
-                os.println("TODO");
+                nos::println_to(os, "TODO");
                 return 0;
             }
 
             else if (argv[0] == "maxspd")
             {
-                os.println("TODO");
+                nos::println_to(os, "TODO");
                 return 0;
             }
 
             else if (argv[0] == "maxacc")
             {
-                os.println("TODO");
+                nos::println_to(os, "TODO");
                 return 0;
             }
 
@@ -484,19 +484,19 @@ namespace cnc
 
             else if (argv[0] == "steps")
             {
-                return os.println(current_steps());
+                return nos::println_to(os, current_steps());
             }
 
             else if (argv[0] == "finishes")
             {
                 nos::print_list_to(os, final_position);
-                return os.println();
+                return nos::println_to(os);
             }
 
             else if (argv[0] == "gains")
             {
                 nos::print_list_to(os, ext2int_scale);
-                return os.println();
+                return nos::println_to(os);
             }
 
             else if (argv[0] == "setgear")
@@ -523,7 +523,7 @@ namespace cnc
                 auto axes = argv.size() - 1;
                 if (axes != (size_t)total_axes)
                 {
-                    os.println("wrong axes count");
+                    nos::println_to(os, "wrong axes count");
                     return 0;
                 }
                 for (size_t i = 0; i < axes; ++i)
@@ -538,7 +538,7 @@ namespace cnc
                 auto axes = argv.size() - 1;
                 if (axes != (size_t)total_axes)
                 {
-                    os.println("wrong axes count");
+                    nos::println_to(os, "wrong axes count");
                     return 0;
                 }
                 for (size_t i = 0; i < axes; ++i)
@@ -551,7 +551,7 @@ namespace cnc
 
             else if (argv[0] == "lastblock")
             {
-                return os.println(lastblock);
+                return nos::println_to(os, lastblock);
             }
 
             else if (argv[0] == "state")
@@ -565,7 +565,7 @@ namespace cnc
                 return 0;
             }
 
-            os.println("Unresolved command");
+            nos::println_to(os, "Unresolved command");
             return 0;
         }
 

@@ -21,6 +21,7 @@ file(GLOB RALGO_SOURCES
 	ralgo/util/*.c
 	ralgo/robo/*.cpp
 	ralgo/imu/*.cpp
+	ralgo/rxsignal/*.cpp
 	ralgo/signal/*.cpp
 )
 
