@@ -33,6 +33,16 @@ jobs:
         sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/${{matrix.compiler.CXX}} 100
         sudo update-alternatives --install /usr/bin/cc  cc  /usr/bin/${{matrix.compiler.CC}} 100
 
+      - name: Install reactivex
+        run: |
+          git clone --recursive https://github.com/ReactiveX/RxCpp.git
+          cd RxCpp
+          mkdir build
+          cd build
+          cmake ..
+          sudo make install
+          cd ..
+          
     - name: Install igris library
       run: |
         git clone https://github.com/mirmik/igris
