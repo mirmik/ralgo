@@ -22,7 +22,8 @@ licant.cxx_static_and_shared("libs",
                              shared_lib="libralgo.so",
                              static_lib="libralgo.a",
                              mdepends=[
-                                 "ralgo"
+                                 "ralgo",
+                                 "ralgo.rxsignal"
                              ],
                              cxx_flags="-fPIC -g -pedantic -Werror=extra -Werror=all -Weffc++",
                              cc_flags="-fPIC -Werror=implicit-function-declaration -g -Werror=incompatible-pointer-types -pedantic -Werror=extra -Werror=all",
