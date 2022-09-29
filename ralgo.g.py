@@ -53,7 +53,6 @@ licant.module("ralgo",
                   "ralgo/lp/point_in_hexagon.c",
                   "ralgo/util/index_brute_force.c",
                   "ralgo/kinematic/kinchain.cpp",
-                  "ralgo/rxsignal/rxpid.cpp"
               ],
               include_paths=["."],
               mdepends=[
@@ -61,9 +60,13 @@ licant.module("ralgo",
                   "ralgo.log",
                   "ralgo.disctime",
                   "ralgo.signal",
-                  "ralgo.oldheimer"
+                  "ralgo.oldheimer",
               ],
               )
+
+licant.module("ralgo.rxsignal",
+  sources=["ralgo/rxsignal/rxpid.cpp"]
+)
 
 licant.module("ralgo.oldheimer",
               sources=["ralgo/oldheimer/*.cpp", ]
