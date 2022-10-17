@@ -429,11 +429,32 @@ namespace cnc
             return 0;
         }
 
+        int command_help(nos::ostream &os)
+        {
+            nos::println_to(os, "setprotect - disable protection\n"
+                                "stop - stop all motors\n"
+                                "axmaxspd - set max speed for axis\n"
+                                "axmaxacc - set max acceleration for axis\n"
+                                "maxspd - set max speed for all axes\n"
+                                "maxacc - set max acceleration for all axes\n"
+                                "relmove - move relative to current position\n"
+                                "absmove - move absolute\n"
+                                "steps - print current steps\n"
+                                "finishes - print current finishes\n"
+                                "gains - print current gains\n"
+                                "setgear - set gear for axis\n"
+                                "setpos - set position for axis\n"
+                                "velmaxs - set max velocities for all axes\n"
+                                "accmaxs - set max accelerations for all axes\n"
+                                "lastblock - print last block\n"
+                                "state - print interpreter state\n"
+                                "simulator - enable simulator mode\n"
+                                "help - print this help\n");
+            return 0;
+        }
+
         int command(const nos::argv &argv, nos::ostream &os)
         {
-            if (argv.size() == 0)
-                return 0;
-
             if (argv[0] == "setprotect")
             {
                 ralgo::global_protection = false;
@@ -565,6 +586,11 @@ namespace cnc
                 return 0;
             }
 
+            else if (argv[0] == "help")
+            {
+                return command_help(os);
+            }
+
             nos::println_to(os, "Unresolved command");
             return 0;
         }
@@ -576,6 +602,12 @@ namespace cnc
 
         int command_drop_first(const nos::argv &argv, nos::ostream &os)
         {
+            if (argv.size() == 1)
+            {
+                nos::println_to(os, "No command");
+                return command_help(os);
+            }
+
             return command(argv.without(1), os);
         }
 
