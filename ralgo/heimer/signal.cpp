@@ -15,7 +15,7 @@ DLIST_HEAD(heimer::signals_list);
 
 signal_head::signal_head(uint8_t type) : signal_head("undef", type) {}
 
-void signal_head::init(const std::string & name, uint8_t type)
+void signal_head::init(const std::string &name, uint8_t type)
 {
     refs = 0;
     this->type = type;
@@ -26,12 +26,12 @@ void signal_head::init(const std::string & name, uint8_t type)
     sorting_mark = 0;
 }
 
-void signal_head::deinit() 
-{ 
-    dlist_del_init(&list_lnk); 
+void signal_head::deinit()
+{
+    dlist_del_init(&list_lnk);
 }
 
-void signal_head::set_name(const std::string & name)
+void signal_head::set_name(const std::string &name)
 {
     this->name = name;
 }
@@ -47,9 +47,9 @@ int signal_head::attach_listener(signal_processor *proc)
     return 0;
 }
 
-void signal_head::attach_possible_controller(signal_processor *) 
-{ 
-    refs++; 
+void signal_head::attach_possible_controller(signal_processor *)
+{
+    refs++;
 }
 
 int signal_head::detach_listener(signal_processor *proc)
@@ -63,9 +63,15 @@ int signal_head::detach_listener(signal_processor *proc)
     return 0;
 }
 
-void signal_head::detach_possible_controller(signal_processor *) { refs--; }
+void signal_head::detach_possible_controller(signal_processor *)
+{
+    refs--;
+}
 
-int heimer::signals_count() { return dlist_size(&signals_list); }
+int heimer::signals_count()
+{
+    return dlist_size(&signals_list);
+}
 
 void heimer::signal_head_list_reinit()
 {
@@ -112,7 +118,10 @@ int signal_head::ctrinfo(char *buffer, int)
     return 0;
 }
 
-void signal_head::rebind() { dlist_add_tail(&list_lnk, &signals_list); }
+void signal_head::rebind()
+{
+    dlist_add_tail(&list_lnk, &signals_list);
+}
 
 int signal_head::activate(signal_processor *proc, disctime_t tim)
 {
@@ -143,7 +152,7 @@ int signal_head::activate(signal_processor *proc, disctime_t tim)
         if (debug_activations)
         {
             ralgo::warn("fault in controller activation",
-                        listener->name().data());
+                        (const char *)listener->name().data());
         }
         return -1;
     }

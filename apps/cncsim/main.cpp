@@ -1,3 +1,4 @@
+#include <crow/addons/logger.h>
 #include <crow/address.h>
 #include <crow/gates/udpgate.h>
 #include <crow/nodes/publisher_node.h>
@@ -39,11 +40,12 @@ using std::chrono::operator""us;
 
 robo::stepper steppers[3];
 
-crow::publisher_node publisher(crowker, "cncsim/mon/pose");
+crow::publisher_node publisher(crowker, "cncsim/poses_bin");
+crow::publisher_node publisher_txt(crowker, "cncsim/poses");
+crow::publisher_node publisher_log(crowker, "cncsim/log");
+crow::publish_logger logger("ralgo", &publisher_log);
 crow::service_node control_service(
-    crowker, "cncsim/cli",
-    +[](char *cmd, int len, crow::service_node &srv)
-    {
+    crowker, "cncsim/cli", +[](char *cmd, int len, crow::service_node &srv) {
         std::lock_guard<std::mutex> lock(mtx);
         cmd[len] = 0;
         nos::println("input: ", std::string(cmd, len), "END");
@@ -52,7 +54,10 @@ crow::service_node control_service(
         srv.reply(answer.str().data(), answer.str().size());
     });
 
-auto now() { return std::chrono::steady_clock::now(); }
+auto now()
+{
+    return std::chrono::steady_clock::now();
+}
 
 void planner_thread_function()
 {
@@ -79,12 +84,21 @@ void telemetry_thread_function()
             poses[i] = int64_t(steppers[i].steps_count());
         publisher.publish(igris::buffer(
             poses, sizeof(int64_t) * interpreter.get_axes_count()));
+
+        std::string poses_str = "";
+        for (size_t i = 0; i < interpreter.get_axes_count(); ++i)
+            poses_str += std::to_string(poses[i]) + " ";
+        publisher_txt.publish(
+            igris::buffer(poses_str.data(), poses_str.size()));
     }
 }
 
 namespace heimer
 {
-    double fast_cycle_frequence() { return 10000; }
+    double fast_cycle_frequence()
+    {
+        return 10000;
+    }
 }
 
 void revolver_thread_function()
@@ -102,7 +116,10 @@ void revolver_thread_function()
 }
 
 robo::stepper *steppers_ptrs[] = {&steppers[0], &steppers[1], &steppers[2]};
-void configuration() { revolver.set_steppers(steppers_ptrs, 3); }
+void configuration()
+{
+    revolver.set_steppers(steppers_ptrs, 3);
+}
 
 void print_help()
 {
@@ -113,7 +130,8 @@ void print_help()
            "  -p, --noprotect            disable global protection\n"
            "Crow services:\n"
            "	cncsim/cli - cncsim control\n"
-           "Crow pulbics:\n"
+           "Crow topics:\n"
+           "	cncsim/poses_bin - cncsim axes poses in bin format\n"
            "	cncsim/poses - cncsim axes poses\n"
            "\n");
 }
@@ -121,6 +139,7 @@ void print_help()
 int main(int argc, char **argv)
 {
     publisher.set_qos(0, 0);
+    publisher_txt.set_qos(0, 0);
     control_service.set_qos(2, 50);
     control_service.set_rqos(2, 50);
 
@@ -131,8 +150,8 @@ int main(int argc, char **argv)
     int long_index = 0;
     int opt = 0;
 
-    while ((opt = getopt_long(argc, argv, "usvdibtn", long_options,
-                              &long_index)) != -1)
+    while ((opt = getopt_long(
+                argc, argv, "usvdibtn", long_options, &long_index)) != -1)
     {
         switch (opt)
         {
@@ -153,6 +172,8 @@ int main(int argc, char **argv)
     planner.set_gears({10000, 10000, 10000});
     interpreter.set_revolver_frequency(10000);
 
+    ralgo::set_logger(&logger);
+
     crow::create_udpgate();
     crow::start_spin();
 
@@ -164,6 +185,11 @@ int main(int argc, char **argv)
     telemetry_thread = std::thread(telemetry_thread_function);
 
     std::this_thread::sleep_for(100ms);
+
+    nos::println("crow themes:");
+    nos::println("[service] cncsim/cli - control api");
+    nos::println("[topic] cncsim/poses - show poses of axes");
+    nos::println("[topic] cncsim/log - runtime information");
 
     while (1)
     {

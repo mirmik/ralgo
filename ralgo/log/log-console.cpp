@@ -1,20 +1,39 @@
 #include <ralgo/log.h>
-
 #include <string.h>
+#include <string>
 #include <unistd.h>
 
-void ralgo::log(ralgo::LogLevel lvl, const char *a, const char *b,
+void ralgo::log(ralgo::LogLevel lvl,
+                const char *a,
+                const char *b,
                 const char *c)
 {
-    (void)lvl;
-
-    write(STDOUT_FILENO, a, strlen(a));
-
+    std::string str;
+    str += a;
     if (b)
-        write(STDOUT_FILENO, b, strlen(b));
-
+    {
+        str += " ";
+        str += b;
+    }
     if (c)
-        write(STDOUT_FILENO, c, strlen(c));
+    {
+        str += " ";
+        str += c;
+    }
 
-    write(STDOUT_FILENO, "\r\n", 2);
+    switch (lvl)
+    {
+    case RALGO_DEBUG:
+        ralgo::logger->debug(str.c_str());
+        break;
+    case RALGO_INFO:
+        ralgo::logger->info(str.c_str());
+        break;
+    case RALGO_WARN:
+        ralgo::logger->warn(str.c_str());
+        break;
+    case RALGO_FAULT:
+        ralgo::logger->error(str.c_str());
+        break;
+    }
 }
