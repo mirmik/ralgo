@@ -85,6 +85,27 @@ namespace cnc
             }
             return 0;
         }
+
+        std::string to_string() const
+        {
+            std::string ret;
+            ret += "control_task(";
+            ret += "isok=";
+            ret += isok ? "true" : "false";
+            ret += "feed=";
+            ret += std::to_string(feed);
+            ret += ", acc=";
+            ret += std::to_string(acc);
+            ret += ", poses=[";
+            for (size_t i = 0; i < _poses.size() - 1; ++i)
+            {
+                ret += std::to_string(_poses[i]);
+                ret += ", ";
+            }
+            ret += std::to_string(_poses[_poses.size() - 1]);
+            ret += "])";
+            return ret;
+        }
     };
 }
 
