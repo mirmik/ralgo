@@ -55,7 +55,6 @@ namespace cnc
         double delta_sqr_div_2 = 0.5;
 
         igris::static_vector<double, NMAX_AXES> gears;
-        igris::static_vector<double, NMAX_AXES> gears_low_trigger;
         igris::static_vector<double, NMAX_AXES> gears_high_trigger;
         double accelerations[NMAX_AXES];
         double velocities[NMAX_AXES];
@@ -83,7 +82,6 @@ namespace cnc
         {
             for (unsigned int i = 0; i < gears.size(); ++i)
             {
-                gears_low_trigger[i] = gears[i] * 0.1;
                 gears_high_trigger[i] = gears[i] * 0.9;
             }
         }
@@ -327,7 +325,6 @@ namespace cnc
         {
             total_axes = total;
             gears.resize(total);
-            gears_low_trigger.resize(total);
             gears_high_trigger.resize(total);
             ralgo::vecops::fill(gears, 100000);
             update_triggers();
