@@ -98,7 +98,7 @@ namespace heimer
 {
     double fast_cycle_frequence()
     {
-        return 10000;
+        return 5000;
     }
 }
 
@@ -107,7 +107,7 @@ void revolver_thread_function()
     auto awake = now();
     while (1)
     {
-        awake += 100us;
+        awake += 200us;
         std::this_thread::sleep_until(awake);
 
         mtx.lock();
@@ -171,7 +171,7 @@ int main(int argc, char **argv)
     interpreter.init_axes(3);
     interpreter.set_scale(ralgo::vector<double>{1, 1, 1});
     planner.set_gears({10000, 10000, 10000});
-    interpreter.set_revolver_frequency(10000);
+    interpreter.set_revolver_frequency(heimer::fast_cycle_frequence());
 
     ralgo::set_logger(&logger);
 
