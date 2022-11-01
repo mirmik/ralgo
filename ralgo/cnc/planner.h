@@ -55,7 +55,6 @@ namespace cnc
         double delta_sqr_div_2 = 0.5;
 
         igris::static_vector<double, NMAX_AXES> gears;
-        igris::static_vector<double, NMAX_AXES> gears_low_trigger;
         igris::static_vector<double, NMAX_AXES> gears_high_trigger;
         double accelerations[NMAX_AXES];
         double velocities[NMAX_AXES];
@@ -83,14 +82,19 @@ namespace cnc
         {
             for (unsigned int i = 0; i < gears.size(); ++i)
             {
-                gears_low_trigger[i] = gears[i] * 0.1;
                 gears_high_trigger[i] = gears[i] * 0.9;
             }
         }
 
-        void set_dim(int axes) { total_axes = axes; }
+        void set_dim(int axes)
+        {
+            total_axes = axes;
+        }
 
-        void reset_iteration_counter() { iteration_counter = 0; }
+        void reset_iteration_counter()
+        {
+            iteration_counter = 0;
+        }
 
         planner(igris::ring<cnc::planner_block> *blocks,
                 igris::ring<cnc::control_shift> *shifts)
@@ -101,7 +105,10 @@ namespace cnc
             memset(dda_counters, 0, sizeof(dda_counters));
         }
 
-        int block_index(planner_block *it) { return blocks->index_of(it); }
+        int block_index(planner_block *it)
+        {
+            return blocks->index_of(it);
+        }
 
         void fixup_postactive_blocks()
         {
@@ -165,8 +172,8 @@ namespace cnc
             }
 
             active_block = &blocks->get(active);
-            ralgo::info("GET_NEW_BLOCK: {}",
-                        nos::format("{}", *active_block).c_str());
+            ralgo::infof("GET_NEW_BLOCK: {}",
+                         nos::format("{}", *active_block).c_str());
 
             assert(active_block->blockno == waited);
             waited++;
@@ -205,8 +212,8 @@ namespace cnc
         void evaluate_accelerations()
         {
             if (active_block)
-                active_block->assign_accelerations(accelerations, total_axes,
-                                                   iteration_counter);
+                active_block->assign_accelerations(
+                    accelerations, total_axes, iteration_counter);
             else
             {
                 for (int i = 0; i < total_axes; ++i)
@@ -215,8 +222,8 @@ namespace cnc
 
             for (int i = blocks->tail_index(); i != active;
                  i = blocks->fixup_index(i + 1))
-                blocks->get(i).append_accelerations(accelerations, total_axes,
-                                                    iteration_counter);
+                blocks->get(i).append_accelerations(
+                    accelerations, total_axes, iteration_counter);
         }
 
         /// В этой фазе расчитывается программе револьвера
@@ -318,7 +325,6 @@ namespace cnc
         {
             total_axes = total;
             gears.resize(total);
-            gears_low_trigger.resize(total);
             gears_high_trigger.resize(total);
             ralgo::vecops::fill(gears, 100000);
             update_triggers();
@@ -335,7 +341,10 @@ namespace cnc
             return {gears.data(), gears.size()};
         }
 
-        size_t get_total_axes() { return total_axes; }
+        size_t get_total_axes()
+        {
+            return total_axes;
+        }
 
         void set_gear(int index, double val)
         {
@@ -358,7 +367,10 @@ namespace cnc
             change_active_block();
         }
 
-        void clear_queue() { blocks->set_last_index(active); }
+        void clear_queue()
+        {
+            blocks->set_last_index(active);
+        }
     };
 }
 

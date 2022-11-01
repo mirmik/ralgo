@@ -1,3 +1,4 @@
+#include <chrono>
 #include <crow/addons/logger.h>
 #include <crow/address.h>
 #include <crow/gates/udpgate.h>
@@ -13,18 +14,16 @@
 #include <ralgo/cnc/interpreter.h>
 #include <ralgo/cnc/planner.h>
 #include <ralgo/cnc/revolver.h>
+#include <ralgo/cnc/themes.h>
 #include <ralgo/robo/stepper.h>
+#include <thread>
 
 igris::ring<cnc::planner_block> blocks{40};
 igris::ring<cnc::control_shift> shifts{400};
-
 cnc::planner planner(&blocks, &shifts);
 cnc::revolver revolver(&shifts, &blocks, &planner);
 cnc::interpreter interpreter(&blocks, &planner, &revolver);
-
 std::mutex mtx;
-#include <chrono>
-#include <thread>
 
 void planner_thread_function();
 void revolver_thread_function();
@@ -40,12 +39,14 @@ using std::chrono::operator""us;
 
 robo::stepper steppers[3];
 
-crow::publisher_node publisher(crowker, "cncsim/poses_bin");
-crow::publisher_node publisher_txt(crowker, "cncsim/poses");
-crow::publisher_node publisher_log(crowker, "cncsim/log");
+crow::publisher_node publisher(crowker, "cncsim" RALGO_CNC_POSES_BIN_THEME);
+crow::publisher_node publisher_txt(crowker, "cncsim" RALGO_CNC_POSES_THEME);
+crow::publisher_node publisher_log(crowker, "cncsim" RALGO_CNC_LOG_THEME);
 crow::publish_logger logger("ralgo", &publisher_log);
 crow::service_node control_service(
-    crowker, "cncsim/cli", +[](char *cmd, int len, crow::service_node &srv) {
+    crowker,
+    "cncsim" RALGO_CNC_CLI_SERVICE,
+    +[](char *cmd, int len, crow::service_node &srv) {
         std::lock_guard<std::mutex> lock(mtx);
         cmd[len] = 0;
         nos::println("input: ", std::string(cmd, len), "END");
@@ -97,7 +98,7 @@ namespace heimer
 {
     double fast_cycle_frequence()
     {
-        return 10000;
+        return 5000;
     }
 }
 
@@ -106,7 +107,7 @@ void revolver_thread_function()
     auto awake = now();
     while (1)
     {
-        awake += 100us;
+        awake += 200us;
         std::this_thread::sleep_until(awake);
 
         mtx.lock();
@@ -170,7 +171,7 @@ int main(int argc, char **argv)
     interpreter.init_axes(3);
     interpreter.set_scale(ralgo::vector<double>{1, 1, 1});
     planner.set_gears({10000, 10000, 10000});
-    interpreter.set_revolver_frequency(10000);
+    interpreter.set_revolver_frequency(heimer::fast_cycle_frequence());
 
     ralgo::set_logger(&logger);
 
