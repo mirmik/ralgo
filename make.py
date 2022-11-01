@@ -43,9 +43,9 @@ licant.fileset("apps", targets=[
 ], deps=["libralgo.so"])
 
 
-@licant.routine(deps=["apps"])
+@licant.routine(deps=["install_sigtrans", "install_cncsim"])
 def install_apps():
-    licant.do(["install_sigtrans", "makefile"])
+    pass
 
 
 licant.cxx_application("runtests",
