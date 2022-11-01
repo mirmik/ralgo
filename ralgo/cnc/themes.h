@@ -1,10 +1,10 @@
 #ifndef RALGO_CNC_THEMES_H
 #define RALGO_CNC_THEMES_H
 
-constexpr const char *RALGO_CNC_OPSTAT_THEME = "/opstat";
-constexpr const char *RALGO_CNC_CLI_THEME = "/cli";
-constexpr const char *RALGO_CNC_LOG_THEME = "/log";
-constexpr const char *RALGO_CNC_POSEBIN_THEME = "/pose";
-constexpr const char *RALGO_CNC_POSEBIN_THEME = "/pose_bin";
+#define RALGO_CNC_OPSTAT_THEME "/opstat"
+#define RALGO_CNC_CLI_SERVICE "/cli"
+#define RALGO_CNC_LOG_THEME "/log"
+#define RALGO_CNC_POSES_THEME "/poses"
+#define RALGO_CNC_POSES_BIN_THEME "/poses_bin"
 
 #endif
