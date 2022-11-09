@@ -8,6 +8,11 @@ void ralgo::log(ralgo::LogLevel lvl,
                 const char *b,
                 const char *c)
 {
+    if (ralgo::logger == nullptr)
+    {
+        return;
+    }
+
     std::string str;
     str += a;
     if (b)
