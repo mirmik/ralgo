@@ -17,28 +17,64 @@ namespace ralgo
         using value_type = typename Parent::value_type;
 
         vector() = default;
-        vector(size_t n) : vec(n) {}
+        explicit vector(size_t n) : vec(n) {}
         vector(T *ptr, size_t n) : vec(ptr, n) {}
         vector(const std::initializer_list<T> &list) : vec(list) {}
         vector(const vector &oth) = default;
         vector(vector &&oth) = default;
 
-        operator vector_view<T>() { return vector_view<T>(data(), size()); }
+        operator vector_view<T>()
+        {
+            return vector_view<T>(data(), size());
+        }
 
-        auto size() const { return vec.size(); }
-        auto resize(int arg) { return vec.resize(arg); }
-        const value_type *data() const { return vec.data(); }
-        value_type *data() { return vec.data(); }
+        auto size() const
+        {
+            return vec.size();
+        }
+        auto resize(int arg)
+        {
+            return vec.resize(arg);
+        }
+        const value_type *data() const
+        {
+            return vec.data();
+        }
+        value_type *data()
+        {
+            return vec.data();
+        }
 
-        void push_back(const T &val) { vec.push_back(val); }
+        void push_back(const T &val)
+        {
+            vec.push_back(val);
+        }
 
-        const T &operator[](int idx) const { return vec[idx]; }
-        T &operator[](int idx) { return vec[idx]; }
+        const T &operator[](int idx) const
+        {
+            return vec[idx];
+        }
+        T &operator[](int idx)
+        {
+            return vec[idx];
+        }
 
-        auto begin() const { return vec.begin(); }
-        auto begin() { return vec.begin(); }
-        auto end() const { return vec.end(); }
-        auto end() { return vec.end(); }
+        auto begin() const
+        {
+            return vec.begin();
+        }
+        auto begin()
+        {
+            return vec.begin();
+        }
+        auto end() const
+        {
+            return vec.end();
+        }
+        auto end()
+        {
+            return vec.end();
+        }
 
         vector operator-(const vector &oth) const
         {
@@ -72,13 +108,25 @@ namespace ralgo
             return ret;
         }
 
-        bool operator==(const vector &oth) const { return vec == oth.vec; }
+        bool operator==(const vector &oth) const
+        {
+            return vec == oth.vec;
+        }
 
-        bool operator!=(const vector &oth) const { return vec != oth.vec; }
+        bool operator!=(const vector &oth) const
+        {
+            return vec != oth.vec;
+        }
 
-        bool operator==(const std::vector<T> &oth) const { return vec == oth; }
+        bool operator==(const std::vector<T> &oth) const
+        {
+            return vec == oth;
+        }
 
-        bool operator!=(const std::vector<T> &oth) const { return vec != oth; }
+        bool operator!=(const std::vector<T> &oth) const
+        {
+            return vec != oth;
+        }
 
         vector &operator=(const std::vector<T> &oth)
         {
