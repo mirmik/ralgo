@@ -35,12 +35,13 @@ namespace ralgo
             }
         };
 
-        template <class R = void, class V, class F> 
-        defvec_t<R, V> transform(const V &u, F&& f) 
+        template <class R = void, class V, class F>
+        defvec_t<R, V> transform(const V &u, F &&f)
         {
             defvec_t<R, V> ret;
-            std::transform(std::begin(u), std::end(u), std::back_inserter(ret), f); 
-            return ret;  
+            std::transform(
+                std::begin(u), std::end(u), std::back_inserter(ret), f);
+            return ret;
         }
 
         template <class R = void, class V> defvec_t<R, V> list(const V &u)
@@ -114,6 +115,15 @@ namespace ralgo
             }
 
             return r;
+        }
+
+        template <class R = void, class V>
+        auto copy(V &&v) -> defvec_of_t<R, typename V::value_type>
+        {
+            defvec_of_t<R, typename V::value_type> vec;
+            vec.reserve(v.size());
+            std::copy(std::begin(v), std::end(v), std::back_inserter(vec));
+            return vec;
         }
 
         template <class A, class B> void copy(const A &a, B &&b)
@@ -233,7 +243,10 @@ namespace ralgo
 
             return sqrt(res);
         }
-        template <typename V> double length(const V &vec) { return norm(vec); }
+        template <typename V> double length(const V &vec)
+        {
+            return norm(vec);
+        }
 
         // Вычислить расстояние между кортежами равного размера по
         // евклидовой метрике.
@@ -511,8 +524,8 @@ namespace ralgo
         }
 
         template <class V, class W, class R>
-        void merge_sorted(const V &v, const W &w, R writer, double start,
-                          double stop)
+        void merge_sorted(
+            const V &v, const W &w, R writer, double start, double stop)
         {
             auto vit = std::lower_bound(v.begin(), v.end(), start);
             auto wit = std::lower_bound(w.begin(), w.end(), start);
