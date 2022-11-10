@@ -21,10 +21,21 @@ namespace ralgo
         poly(const ralgo::vector<T> &coeffs) : coeffs(coeffs) {}
         poly(const std::initializer_list<T> &lst) : coeffs(lst) {}
 
-        size_t degree() const { return coeffs.size() - 1; }
+        explicit poly(size_t n) : poly(ralgo::vector<T>(n)) {}
 
-        bool operator==(const poly &oth) const { return coeffs == oth.coeffs; }
-        bool operator!=(const poly &oth) const { return coeffs != oth.coeffs; }
+        size_t degree() const
+        {
+            return coeffs.size() - 1;
+        }
+
+        bool operator==(const poly &oth) const
+        {
+            return coeffs == oth.coeffs;
+        }
+        bool operator!=(const poly &oth) const
+        {
+            return coeffs != oth.coeffs;
+        }
 
         T operator()(T x) const
         {
@@ -155,7 +166,10 @@ namespace ralgo
                 return r1;
         }
 
-        std::vector<T> roots() const { return ralgo::roots(coeffs); }
+        std::vector<T> roots() const
+        {
+            return ralgo::roots(coeffs);
+        }
     };
 
     static inline std::ostream &operator<<(std::ostream &os,
