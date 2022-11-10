@@ -1,7 +1,7 @@
+#include <main.h>
 #include <nos/print.h>
 #include <ralgo/linalg/vecops.h>
-
-#include <main.h>
+#include <ralgo/linalg/vector.h>
 
 using namespace ralgo;
 
@@ -22,26 +22,20 @@ LT_BEGIN_TEST(ralgo_test_suite, vecops)
                             dvec{3, 5, 7}) == true);
     CHECK(vecops::equal_all(vecops::sub_vv(dvec{1, 2, 3}, dvec{2, 3, 5}),
                             dvec{-1, -1, -2}) == true);
-
-/*    CHECK(vecops::equal_all(ralgo::gen::range(4), ralgo::vecops::arange(4)));
-    CHECK(vecops::equal_all(ralgo::vecops::list(ralgo::gen::range(4)),
-                            ralgo::vecops::arange(4)));*/
 }
 LT_END_TEST(vecops)
 
-/*LT_BEGIN_TEST(ralgo_test_suite, range_gen)
+TEST_CASE("vecops.copy_1")
 {
-    auto rng0 = ralgo::gen::range(1, 7, 3);
-    auto rng1 = ralgo::gen::range(1, 7);
-    auto rng2 = ralgo::gen::range(7);
-
-    CHECK(rng0.size() == 2);
-    CHECK(rng1.size() == 6);
-    CHECK(rng2.size() == 7);
-
-    CHECK(ralgo::vecops::equal_all(rng0, std::vector<int>{1, 4}));
-    CHECK(ralgo::vecops::equal_all(rng1, std::vector<int>{1, 2, 3, 4, 5, 6}));
-    CHECK(
-        ralgo::vecops::equal_all(rng2, std::vector<int>{0, 1, 2, 3, 4, 5, 6}));
+    ralgo::vector<double> a = {1, 2, 3, 4, 5};
+    std::vector<double> b = {0, 0, 0, 0, 0};
+    vecops::copy(a, b);
+    CHECK(vecops::equal_all(a, b));
 }
-LT_END_TEST(range_gen)*/
+
+TEST_CASE("vecops.copy_2")
+{
+    ralgo::vector<double> a = {1, 2, 3, 4, 5};
+    auto b = vecops::copy<std::vector<double>>(a);
+    CHECK(vecops::equal_all(a, b));
+}

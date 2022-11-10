@@ -20,7 +20,8 @@ namespace ralgo
     // Достать тип значения из контейнера.
     template <typename V> struct value
     {
-        using type = typename V::value_type;
+        using type =
+            typename std::remove_reference_t<std::remove_cv_t<V>>::value_type;
     };
     template <typename T, int N> struct value<T[N]>
     {
@@ -51,13 +52,31 @@ namespace ralgo
     template <typename T> using scalar_t = typename scalar<T>::type;
 
     // Шаблонные обёртки над стандартными тригонометрическими операциями.
-    template <class T> constexpr T sin(T x) { return std::sin(x); }
-    template <class T> constexpr T cos(T x) { return std::cos(x); }
-    template <class T> constexpr T tan(T x) { return std::tan(x); }
+    template <class T> constexpr T sin(T x)
+    {
+        return std::sin(x);
+    }
+    template <class T> constexpr T cos(T x)
+    {
+        return std::cos(x);
+    }
+    template <class T> constexpr T tan(T x)
+    {
+        return std::tan(x);
+    }
 
-    template <class T> constexpr T exp(T x) { return std::exp(x); }
-    template <class T> constexpr T log(T x) { return std::log(x); }
-    template <class T> constexpr T log10(T x) { return std::log10(x); }
+    template <class T> constexpr T exp(T x)
+    {
+        return std::exp(x);
+    }
+    template <class T> constexpr T log(T x)
+    {
+        return std::log(x);
+    }
+    template <class T> constexpr T log10(T x)
+    {
+        return std::log10(x);
+    }
 
     struct op_add
     {
@@ -94,11 +113,17 @@ namespace ralgo
 
     struct op_sin
     {
-        template <class A> auto operator()(const A &a) const { return sin(a); }
+        template <class A> auto operator()(const A &a) const
+        {
+            return sin(a);
+        }
     };
     struct op_cos
     {
-        template <class A> auto operator()(const A &a) const { return cos(a); }
+        template <class A> auto operator()(const A &a) const
+        {
+            return cos(a);
+        }
     };
 
     struct op_abs
@@ -233,7 +258,10 @@ namespace ralgo
 
     template <class T, int K = 0> struct optional_vector_resize_helper
     {
-        static void doit(T &a, int arg) { a.resize(arg); }
+        static void doit(T &a, int arg)
+        {
+            a.resize(arg);
+        }
     };
 
     template <class T> struct optional_vector_resize_helper<T, 0>
@@ -252,7 +280,8 @@ namespace ralgo
     private:
         template <class U>
         static decltype(
-            std::declval<U>().size(), std::declval<U>().data(),
+            std::declval<U>().size(),
+            std::declval<U>().data(),
             std::enable_if_t<
                 !is_vector_compatible<decltype(std::declval<U>()[0])>(),
                 bool>(),
@@ -273,8 +302,10 @@ namespace ralgo
     {
     private:
         template <class U>
-        static decltype(std::declval<U>().at(0, 0), std::declval<U>().rows(),
-                        std::declval<U>().cols(), std::true_type())
+        static decltype(std::declval<U>().at(0, 0),
+                        std::declval<U>().rows(),
+                        std::declval<U>().cols(),
+                        std::true_type())
         test(int);
         template <class> static std::false_type test(...);
 
@@ -292,7 +323,10 @@ namespace ralgo
         return std::size(c);
     }
 
-    template <class C> void resize(C &c, int n) { return c.resize(n); }
+    template <class C> void resize(C &c, int n)
+    {
+        return c.resize(n);
+    }
 
     template <class C> void resize(C &c, int m, int n)
     {
@@ -309,7 +343,10 @@ namespace ralgo
         return c.at(i, j);
     }
 
-    template <class C> constexpr auto &get(C &c, int i) { return c[i]; }
+    template <class C> constexpr auto &get(C &c, int i)
+    {
+        return c[i];
+    }
 
     template <class C> constexpr auto &get(C &c, int i, int j)
     {

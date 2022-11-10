@@ -118,9 +118,9 @@ namespace ralgo
         }
 
         template <class R = void, class V>
-        auto copy(V &&v) -> defvec_of_t<R, typename V::value_type>
+        auto copy(V &&v) -> defvec_of_t<R, value_t<V>>
         {
-            defvec_of_t<R, typename V::value_type> vec;
+            defvec_of_t<R, value_t<V>> vec;
             vec.reserve(v.size());
             std::copy(std::begin(v), std::end(v), std::back_inserter(vec));
             return vec;
