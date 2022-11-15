@@ -194,7 +194,7 @@ int main(int argc, char **argv)
 
     while (1)
     {
-        auto exp_str = nos::readline();
+        auto exp_str = nos::readline(1024, true);
         if (exp_str)
             interpreter.newline(*exp_str);
         else
