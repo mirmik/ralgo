@@ -1,30 +1,25 @@
+#include <chrono>
+#include <crow/address.h>
+#include <crow/gates/udpgate.h>
+#include <crow/nodes/publisher_node.h>
+#include <crow/tower.h>
 #include <errno.h>
-#include <iostream>
-#include <string>
-#include <signal.h>
-#include <unistd.h>
 #include <fcntl.h>
-
 #include <igris/getopt/cliopts.h>
+#include <igris/time/systime.h>
 #include <igris/util/string.h>
-
-#include <ralgo/heimer/command.h>
-#include <ralgo/heimer/executor.h>
-
+#include <iostream>
+#include <memory>
 #include <nos/fprint.h>
+#include <nos/input.h>
 #include <nos/io/file.h>
 #include <nos/print.h>
-
-#include <crow/address.h>
-#include <crow/nodes/publisher_node.h>
-#include <crow/gates/udpgate.h>
-#include <crow/tower.h>
-
-#include <chrono>
-#include <memory>
+#include <ralgo/heimer/command.h>
+#include <ralgo/heimer/executor.h>
+#include <signal.h>
+#include <string>
 #include <thread>
-
-#include <igris/time/systime.h>
+#include <unistd.h>
 
 using std::chrono::operator""us;
 
@@ -40,7 +35,10 @@ crow::hostaddr crowaddr;
 
 namespace heimer
 {
-    double fast_cycle_frequence() { return 10000; }
+    double fast_cycle_frequence()
+    {
+        return 10000;
+    }
 }
 
 void execute_routine()
@@ -89,7 +87,7 @@ void start_routine()
         heimer::executor.append_processor(proc);
     }
     heimer::executor.order_sort();
-    //heimer::executor.notification_prepare("sigtrans/feedpos", crowaddr);
+    // heimer::executor.notification_prepare("sigtrans/feedpos", crowaddr);
 
     execute_thread.reset(new std::thread(execute_routine));
     fast_execute_thread.reset(new std::thread(fast_execute_routine));
@@ -133,18 +131,6 @@ int exec(const std::string &line)
     if (line.size() == 0)
         return 0;
 
-    /*if (igris::trim(line) == "start")
-    {
-        start_routine();
-        return 0;
-    }
-
-    if (igris::trim(line) == "stop")
-    {
-        stop_routine();
-        return 0;
-    }*/
-
     if (igris::trim(line) == "execinfo")
     {
         execinfo();
@@ -178,7 +164,10 @@ int exec(const std::string &line)
     }
 }
 
-void sigint_handler(int) { quick_exit(0); }
+void sigint_handler(int)
+{
+    quick_exit(0);
+}
 
 int main(int argc, char **argv)
 {
@@ -213,7 +202,7 @@ int main(int argc, char **argv)
             exit(0);
         }
 
-        while ((str = nos::readline_from(fl)).size())
+        while ((str = nos::readline_from(fl, 1024, false)).size())
         {
             str = igris::trim(str);
 
