@@ -365,13 +365,16 @@ namespace cnc
             system_unlock();
         }
 
-        void smooth_stop(nos::ostream &os)
+        void smooth_stop()
         {
+            ralgo::info("smooth_stop");
             system_lock();
-            auto curvels = revolver->current_velocity_no_lock(os);
+            auto curvels = revolver->current_velocity_no_lock();
+            auto cursteps = revolver->current_steps_no_lock();
 
             if (planner->active_block == nullptr)
             {
+                nos::println("planner->active_block == nullptr");
                 restore_final_position_by_steps();
                 planner->clear();
                 revolver->clear();
@@ -380,9 +383,16 @@ namespace cnc
                 return;
             }
 
+            lastblock = *planner->active_block;
+            lastblock.immedeate_smooth_stop(planner->iteration_counter);
             planner->clear_queue();
-            planner->active_block->immedeate_smooth_stop(
-                planner->iteration_counter);
+
+            auto &placeblock = blocks->head_place();
+            nos::println(blockno);
+            lastblock.blockno = blockno++;
+            placeblock = lastblock;
+            blocks->move_head_one();
+
             system_unlock();
         }
 
@@ -488,7 +498,7 @@ namespace cnc
 
             if (argv[0] == "stop")
             {
-                smooth_stop(os);
+                smooth_stop();
                 return 0;
             }
 
