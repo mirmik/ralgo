@@ -4,19 +4,21 @@
 TEST_CASE("planblock")
 {
     cnc::planner_block block;
-
-    int64_t task[] = {10, 20};
+    double task[] = {10, 20};
     double mults[] = {1, 1};
-    block.set_state(task, 2, 0.5, 0.25, mults);
+    ralgo::vector_view<double> task_view{task, 2};
+    ralgo::vector_view<double> mults_view{mults, 2};
+    block.set_state(task_view, 2, 0.5, 0.25, mults_view);
     CHECK_EQ(block.is_triangle(), false);
 }
 
 TEST_CASE("planblock.triangle")
 {
     cnc::planner_block block;
-
-    int64_t task[] = {10, 0};
+    double task[] = {10, 0};
     double mults[] = {1, 1};
-    block.set_state(task, 2, 0.5, 0.01, mults);
+    ralgo::vector_view<double> task_view{task, 2};
+    ralgo::vector_view<double> mults_view{mults, 2};
+    block.set_state(task_view, 2, 0.5, 0.01, mults_view);
     CHECK_EQ(block.is_triangle(), true);
 }

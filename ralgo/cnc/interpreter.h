@@ -7,6 +7,7 @@
 #include <igris/container/static_vector.h>
 #include <igris/datastruct/argvc.h>
 #include <igris/sync/syslock.h>
+#include <igris/util/numconvert.h>
 #include <nos/ilist.h>
 #include <nos/io/string_writer.h>
 #include <nos/log/logger.h>
@@ -36,16 +37,15 @@ namespace cnc
         igris::ring<planner_block> *blocks;
         int total_axes = 0;
         double revolver_frequency = 0;
-        igris::static_vector<double, NMAX_AXES> ext2int_scale;
-        igris::static_vector<double, NMAX_AXES> final_position;
-        igris::static_vector<double, NMAX_AXES> max_axes_velocities;
-        igris::static_vector<double, NMAX_AXES> max_axes_accelerations;
+        igris::static_vector<double, NMAX_AXES> ext2int_scale = {};
+        igris::static_vector<double, NMAX_AXES> final_position = {};
+        igris::static_vector<double, NMAX_AXES> max_axes_velocities = {};
+        igris::static_vector<double, NMAX_AXES> max_axes_accelerations = {};
         int blockno = 0;
         double saved_acc = 0;
         double saved_feed = 0;
-
         igris::delegate<void> _external_final_shift_handle = {};
-        planner_block lastblock;
+        planner_block lastblock = {};
 
     public:
         interpreter(igris::ring<planner_block> *blocks,
@@ -54,6 +54,11 @@ namespace cnc
             : planner(planner), revolver(revolver), blocks(blocks)
         {
         }
+
+        interpreter(const interpreter &) = delete;
+        interpreter(interpreter &&) = delete;
+        interpreter &operator=(const interpreter &) = delete;
+        interpreter &operator=(interpreter &&) = delete;
 
         void set_final_shift_handler(const igris::delegate<void> &dlg)
         {
@@ -351,7 +356,7 @@ namespace cnc
 
             inspect_args(argv, os);
 
-            saved_acc = strtod(argv[0].data(), nullptr);
+            saved_acc = igris_atof64(argv[0].data(), nullptr);
             PRINTTO(os, saved_acc);
         }
 
@@ -554,7 +559,7 @@ namespace cnc
             else if (argv[0] == "setgear")
             {
                 auto axno = symbol_to_index(argv[1][0]);
-                double val = strtod(argv[2].data(), NULL);
+                double val = igris_atof64(argv[2].data(), NULL);
                 planner->set_gear(axno, val);
                 return 0;
             }
@@ -562,7 +567,7 @@ namespace cnc
             else if (argv[0] == "setpos")
             {
                 auto axno = symbol_to_index(argv[1][0]);
-                double val = strtod(argv[2].data(), NULL);
+                double val = igris_atof64(argv[2].data(), NULL);
                 system_lock();
                 final_position[axno] = val * planner->gears[axno];
                 revolver->get_steppers()[axno]->set_counter_value(val);
@@ -585,7 +590,8 @@ namespace cnc
                 }
                 for (size_t i = 0; i < axes; ++i)
                 {
-                    max_axes_velocities[i] = strtod(argv[i + 1].data(), NULL);
+                    max_axes_velocities[i] =
+                        igris_atof64(argv[i + 1].data(), NULL);
                 }
                 return 0;
             }
@@ -610,7 +616,7 @@ namespace cnc
                 for (size_t i = 0; i < axes; ++i)
                 {
                     max_axes_accelerations[i] =
-                        strtod(argv[i + 1].data(), NULL);
+                        igris_atof64(argv[i + 1].data(), NULL);
                 }
                 return 0;
             }

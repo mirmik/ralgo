@@ -9,10 +9,8 @@ TEST_CASE("revolver")
     robo::stepper _steppers[2];
     robo::stepper *steppers[2] = {&_steppers[0], &_steppers[1]};
 
-    cnc::control_shift shft_table[10];
-
-    auto shift_ring = igris::ring<cnc::control_shift>(shft_table, 10);
-    auto revolver = cnc::revolver(&shift_ring);
+    auto shift_ring = igris::ring<cnc::control_shift>(10);
+    auto revolver = cnc::revolver(&shift_ring, nullptr, nullptr);
 
     revolver.set_steppers(steppers, 2);
 
@@ -36,5 +34,5 @@ TEST_CASE("revolver")
     CHECK_EQ(_steppers[0].steps_count(), 0);
     CHECK_EQ(_steppers[1].steps_count(), 2);
 
-    CHECK_EQ(revolver.room(), 9);
+    CHECK_EQ(revolver.room(), 10);
 }

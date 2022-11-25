@@ -17,11 +17,11 @@ namespace cnc
     class planner_block
     {
     public:
-        std::array<double, NMAX_AXES> axdist;
+        std::array<double, NMAX_AXES> axdist = {};
         double nominal_velocity = 0;
         double acceleration = 0;
         double fullpath = 0;
-        std::array<double, NMAX_AXES> multipliers;
+        std::array<double, NMAX_AXES> multipliers = {};
 
         // отметки времени хранят инкрементное время до планирования и
         // абсолютное время после активации блока.
@@ -153,8 +153,10 @@ namespace cnc
             }
         }
 
-        void set_state(const ralgo::vector_view<double> &axdist, int axes,
-                       double velocity, double acceleration,
+        void set_state(const ralgo::vector_view<double> &axdist,
+                       int axes,
+                       double velocity,
+                       double acceleration,
                        const ralgo::vector_view<double> &multipliers)
         {
             for (int i = 0; i < axes; ++i)
@@ -206,8 +208,10 @@ namespace cnc
             assert(validation());
         }
 
-        void set_stop_state(ralgo::vector_view<double> axdist, int axes,
-                            double velocity, double acceleration,
+        void set_stop_state(ralgo::vector_view<double> axdist,
+                            int axes,
+                            double velocity,
+                            double acceleration,
                             ralgo::vector_view<double> multipliers)
         {
             for (int i = 0; i < axes; ++i)
