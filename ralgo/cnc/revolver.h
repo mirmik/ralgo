@@ -88,11 +88,23 @@ namespace cnc
             }
             else
                 for (int i = 0; i < steppers_total; ++i)
-                    velocity[i] = shifts_ring->tail().speed[i];
+                    velocity[i] = shifts_ring->tail().velocity()[i];
             system_unlock();
         }
 
-        std::vector<double> current_velocity_no_lock(nos::ostream &)
+        void current_velocity_no_lock(double *velocity)
+        {
+            if (shifts_ring->empty() && blocks->avail() == 0)
+            {
+                for (int i = 0; i < steppers_total; ++i)
+                    velocity[i] = 0;
+            }
+            else
+                for (int i = 0; i < steppers_total; ++i)
+                    velocity[i] = shifts_ring->tail().velocity()[i];
+        }
+
+        std::vector<double> current_velocity_no_lock()
         {
             std::vector<double> vec(steppers_total);
             if (shifts_ring->empty() && blocks->avail() == 0)
@@ -103,7 +115,7 @@ namespace cnc
             else
             {
                 for (int i = 0; i < steppers_total; ++i)
-                    vec[i] = shifts_ring->tail().speed[i];
+                    vec[i] = shifts_ring->tail().velocity()[i];
             }
             return vec;
         }

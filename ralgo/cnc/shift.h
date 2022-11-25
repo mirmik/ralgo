@@ -1,6 +1,8 @@
 #ifndef RALGO_SHIFT_H
 #define RALGO_SHIFT_H
 
+#include <igris/container/static_vector.h>
+
 typedef uint16_t revolver_t;
 
 namespace cnc
@@ -10,7 +12,7 @@ namespace cnc
     public:
         revolver_t step = {};
         revolver_t direction = {};
-        double speed[NMAX_AXES];
+        igris::static_vector<double, NMAX_AXES> _velocity = {};
 
     public:
         control_shift() {}
@@ -28,8 +30,13 @@ namespace cnc
         {
             for (int i = 0; i < total_axes; i++)
             {
-                speed[i] = velocity[i];
+                _velocity[i] = velocity[i];
             }
+        }
+
+        igris::static_vector<double, NMAX_AXES> const &velocity()
+        {
+            return _velocity;
         }
     };
 }
