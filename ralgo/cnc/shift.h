@@ -8,8 +8,8 @@ namespace cnc
     class control_shift
     {
     public:
-        revolver_t step;
-        revolver_t direction;
+        revolver_t step = {};
+        revolver_t direction = {};
         float speed[NMAX_AXES];
 
     public:
@@ -20,7 +20,9 @@ namespace cnc
         {
         }
 
-        control_shift(revolver_t step, revolver_t direction, double *velocity,
+        control_shift(revolver_t step,
+                      revolver_t direction,
+                      double *velocity,
                       int total_axes)
             : step(step), direction(direction)
         {

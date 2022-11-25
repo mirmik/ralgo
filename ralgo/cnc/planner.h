@@ -48,31 +48,29 @@ namespace cnc
     public:
         bool info_mode = false;
         bool first_iteration_label = false;
-
         int64_t iteration_counter = 0;
-
         double delta = 1;
         double delta_sqr_div_2 = 0.5;
-
-        igris::static_vector<double, NMAX_AXES> gears;
-        igris::static_vector<double, NMAX_AXES> gears_high_trigger;
+        igris::static_vector<double, NMAX_AXES> gears = {};
+        igris::static_vector<double, NMAX_AXES> gears_high_trigger = {};
         double accelerations[NMAX_AXES];
         double velocities[NMAX_AXES];
         double dda_counters[NMAX_AXES];
-
         int active = 0; // index of active block
         planner_block *active_block = nullptr;
-
-        igris::ring<cnc::planner_block> *blocks;
-        igris::ring<cnc::control_shift> *shifts;
-
+        igris::ring<cnc::planner_block> *blocks = {};
+        igris::ring<cnc::control_shift> *shifts = {};
         bool need_to_reevaluate = false;
         uint8_t state = 0;
         int count_of_reevaluation = 0;
-
-        igris::delegate<void> _start_operation_handle;
+        igris::delegate<void> _start_operation_handle = {};
 
     public:
+        planner(const planner &) = delete;
+        planner(planner &&) = delete;
+        planner &operator=(const planner &) = delete;
+        planner &operator=(planner &&) = delete;
+
         void set_start_operation_handle(igris::delegate<void> dlg)
         {
             _start_operation_handle = dlg;

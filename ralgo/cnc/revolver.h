@@ -45,17 +45,23 @@ namespace cnc
         robo::stepper **steppers = nullptr;
 
     public:
-        igris::ring<cnc::control_shift> *shifts_ring;
-        igris::ring<cnc::planner_block> *blocks;
+        igris::ring<cnc::control_shift> *shifts_ring = {};
+        igris::ring<cnc::planner_block> *blocks = {};
         cnc::planner *planner = nullptr;
-        igris::delegate<void> final_shift_pushed;
+        igris::delegate<void> final_shift_pushed = {};
+
+    public:
         revolver(igris::ring<cnc::control_shift> *ring,
-                 igris::ring<cnc::planner_block> *blocks, cnc::planner *planner)
+                 igris::ring<cnc::planner_block> *blocks,
+                 cnc::planner *planner)
             : shifts_ring(ring), blocks(blocks), planner(planner)
         {
         }
 
-        robo::stepper **get_steppers() { return steppers; }
+        robo::stepper **get_steppers()
+        {
+            return steppers;
+        }
 
         void enable_simulator_mode()
         {

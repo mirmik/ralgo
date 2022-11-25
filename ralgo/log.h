@@ -51,31 +51,36 @@ namespace ralgo
     template <class... Args>
     void logf(LogLevel lvl, const std::string_view &fmt, Args &&... args)
     {
-        logger->log(level_to_noslvl(lvl), fmt, std::forward<Args>(args)...);
+        if (logger)
+            logger->log(level_to_noslvl(lvl), fmt, std::forward<Args>(args)...);
     }
 
     template <class... Args>
     void debugf(const std::string_view &fmt, Args &&... args)
     {
-        logger->debug(fmt, std::forward<Args>(args)...);
+        if (logger)
+            logger->debug(fmt, std::forward<Args>(args)...);
     }
 
     template <class... Args>
     void infof(const std::string_view &fmt, Args &&... args)
     {
-        logger->info(fmt, std::forward<Args>(args)...);
+        if (logger)
+            logger->info(fmt, std::forward<Args>(args)...);
     }
 
     template <class... Args>
     void warnf(const std::string_view &fmt, Args &&... args)
     {
-        logger->warn(fmt, std::forward<Args>(args)...);
+        if (logger)
+            logger->warn(fmt, std::forward<Args>(args)...);
     }
 
     template <class... Args>
     void faultf(const std::string_view &fmt, Args &&... args)
     {
-        logger->error(fmt, std::forward<Args>(args)...);
+        if (logger)
+            logger->error(fmt, std::forward<Args>(args)...);
     }
 
     void set_logger(nos::log::logger *logger);

@@ -3,7 +3,6 @@
 
 TEST_CASE("interpreter")
 {
-    igris::ring<cnc::planner_block, 10> blocks_ring;
-
-    cnc::interpreter interpreter(&blocks_ring);
+    igris::ring<cnc::planner_block> blocks_ring(10);
+    cnc::interpreter interpreter(&blocks_ring, nullptr, nullptr);
 }

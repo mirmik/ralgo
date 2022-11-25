@@ -3,8 +3,8 @@
 
 TEST_CASE("planner.0")
 {
-    igris::ring<cnc::planner_block, 10> blocks;
-    igris::ring<cnc::control_shift, 10> shifts;
+    igris::ring<cnc::planner_block> blocks(10);
+    igris::ring<cnc::control_shift> shifts(10);
 
     cnc::planner planner(&blocks, &shifts);
     planner.set_dim(1);
@@ -12,19 +12,16 @@ TEST_CASE("planner.0")
     auto &block = blocks.head_place();
 
     block.nominal_velocity = 0.5;
-
     block.acceleration = 0.1;
     block.multipliers[0] = 1;
-
     block.acceleration_before_ic = 5;
     block.deceleration_after_ic = 95;
     block.block_finish_ic = 100;
 
     block.exact_stop = 0;
     blocks.move_head_one();
-
-    CHECK_EQ(blocks.room(), 8);
-    CHECK_EQ(shifts.room(), 9);
+    CHECK_EQ(blocks.room(), 9);
+    CHECK_EQ(shifts.room(), 10);
 
     planner.serve();
 
