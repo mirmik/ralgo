@@ -48,6 +48,11 @@ namespace cnc
         planner_block lastblock = {};
 
     public:
+        const igris::static_vector<double, NMAX_AXES> &get_final_position()
+        {
+            return final_position;
+        }
+
         planner_block last_block()
         {
             return lastblock;
@@ -119,10 +124,6 @@ namespace cnc
                 nos::println_to(os, "need_to_disable_global_protection");
                 return 1;
             }
-            // if (saved_feed == 0) {
-            //    nos::println_to(os, "saved_feed is null"); return 1; }
-            // if (saved_acc == 0) {
-            //    nos::println_to(os, "saved_acc is null"); return 1; }
             if (revolver_frequency == 0)
             {
                 nos::println_to(os, "revolver_frequency is null");
@@ -148,11 +149,6 @@ namespace cnc
             task.isok = true;
             return task;
         }
-
-        // void set_start_operation_handle(const igris::delegate<void>& dlg)
-        //{
-        //    planner.set_start_operation_handle(dlg);
-        //}
 
         control_task g1_parse_task(const nos::argv &argv,
                                    const igris::array_view<double> &fposes)
@@ -194,7 +190,6 @@ namespace cnc
                 minmul = absmax;
             }
 
-            // auto muls = ralgo::vecops::div_vv(elmax, direction);
             for (int i = 0; i < total_axes; i++)
             {
                 double lmul = elmax[i] / fabs(direction[i]);
@@ -286,13 +281,9 @@ namespace cnc
 
         void evaluate_task(const control_task &task, nos::ostream &os)
         {
-            // ralgo::info("evaluate_task");
-
-            // lastblock - out
             bool fastfinish = evaluate_interpreter_task(task, lastblock, os);
             if (fastfinish)
             {
-                // ralgo::info("fastfinish block");
                 print_interpreter_state(os);
                 return;
             }
