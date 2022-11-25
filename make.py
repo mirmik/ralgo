@@ -69,7 +69,7 @@ licant.cxx_application("runtests",
                        ld_flags="-fPIC -O0 -L/usr/local/lib/",
                        cxxstd="c++20",
                        include_paths=[".", "tests"],
-                       libs=["igris", "nos"],
+                       libs=["igris", "nos", "pthread"],
                        )
 
 licant.fileset("all", targets=["apps", "libs", "runtests"])

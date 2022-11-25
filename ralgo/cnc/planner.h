@@ -64,6 +64,7 @@ namespace cnc
         uint8_t state = 0;
         int count_of_reevaluation = 0;
         igris::delegate<void> _start_operation_handle = {};
+        int waited = 0;
 
     public:
         planner(const planner &) = delete;
@@ -138,8 +139,6 @@ namespace cnc
 
         void change_active_block()
         {
-            static int waited = 0;
-
             if (info_mode)
             {
                 ralgo::info("planner: change_active_block");

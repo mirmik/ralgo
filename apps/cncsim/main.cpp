@@ -23,6 +23,8 @@ igris::ring<cnc::control_shift> shifts{400};
 cnc::planner planner(&blocks, &shifts);
 cnc::revolver revolver(&shifts, &blocks, &planner);
 cnc::interpreter interpreter(&blocks, &planner, &revolver);
+robo::stepper steppers[3];
+robo::stepper *steppers_ptrs[] = {&steppers[0], &steppers[1], &steppers[2]};
 std::mutex mtx;
 
 void planner_thread_function();
@@ -36,8 +38,6 @@ auto crowker = crow::crowker_address();
 
 using std::chrono::operator""ms;
 using std::chrono::operator""us;
-
-robo::stepper steppers[3];
 
 crow::publisher_node publisher(crowker, "cncsim" RALGO_CNC_POSES_BIN_THEME);
 crow::publisher_node publisher_txt(crowker, "cncsim" RALGO_CNC_POSES_THEME);
@@ -116,12 +116,6 @@ void revolver_thread_function()
     }
 }
 
-robo::stepper *steppers_ptrs[] = {&steppers[0], &steppers[1], &steppers[2]};
-void configuration()
-{
-    revolver.set_steppers(steppers_ptrs, 3);
-}
-
 void print_help()
 {
     printf("Usage: crowker [OPTION]...\n"
@@ -172,6 +166,7 @@ int main(int argc, char **argv)
     interpreter.set_scale(ralgo::vector<double>{1, 1, 1});
     planner.set_gears({10000, 10000, 10000});
     interpreter.set_revolver_frequency(heimer::fast_cycle_frequence());
+    revolver.set_steppers(steppers_ptrs, 3);
 
     ralgo::set_logger(&logger);
 
@@ -180,7 +175,6 @@ int main(int argc, char **argv)
 
     control_service.install_keepalive(2000, true);
 
-    configuration();
     revolver_thread = std::thread(revolver_thread_function);
     planner_thread = std::thread(planner_thread_function);
     telemetry_thread = std::thread(telemetry_thread_function);

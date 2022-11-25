@@ -48,6 +48,11 @@ namespace cnc
         planner_block lastblock = {};
 
     public:
+        planner_block last_block()
+        {
+            return lastblock;
+        }
+
         interpreter(igris::ring<planner_block> *blocks,
                     cnc::planner *planner,
                     cnc::revolver *revolver)
@@ -631,12 +636,6 @@ namespace cnc
                 return print_interpreter_state(os);
             }
 
-            else if (argv[0] == "simulator")
-            {
-                revolver->enable_simulator_mode();
-                return 0;
-            }
-
             else if (argv[0] == "help")
             {
                 return command_help(os);
@@ -706,15 +705,16 @@ namespace cnc
              nos::make_delegate(&interpreter::gcode_drop_first, this)},
         });
 
-        void newline(const char *line, size_t)
+        std::string newline(const char *line, size_t)
         {
             nos::string_buffer output;
             executor.execute(nos::tokens(line), output);
+            return output.str();
         }
 
-        void newline(const std::string &line)
+        std::string newline(const std::string &line)
         {
-            newline(line.data(), line.size());
+            return newline(line.data(), line.size());
         }
 
         void set_revolver_frequency(double freq)
