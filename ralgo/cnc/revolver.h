@@ -63,16 +63,6 @@ namespace cnc
             return steppers;
         }
 
-        void enable_simulator_mode()
-        {
-            system_lock();
-            for (int i = 0; i < steppers_total; ++i)
-            {
-                steppers[i]->simulator_mode(true);
-            }
-            system_unlock();
-        }
-
         void set_steppers(robo::stepper **steppers_table, int size)
         {
             steppers = steppers_table;
