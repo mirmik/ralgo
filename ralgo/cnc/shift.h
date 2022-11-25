@@ -10,7 +10,7 @@ namespace cnc
     public:
         revolver_t step = {};
         revolver_t direction = {};
-        float speed[NMAX_AXES];
+        double speed[NMAX_AXES];
 
     public:
         control_shift() {}

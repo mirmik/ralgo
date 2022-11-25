@@ -36,12 +36,10 @@ namespace cnc
     class revolver
     {
     public:
-        bool info_mode = false;
         int steppers_total = 0;
 
     private:
         volatile bool all_blocks_resolved = true;
-
         robo::stepper **steppers = nullptr;
 
     public:

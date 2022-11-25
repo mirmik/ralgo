@@ -66,11 +66,18 @@ namespace cnc
         igris::delegate<void> _start_operation_handle = {};
         int waited = 0;
 
+        bool dda_counter_overflow_error_detected = false;
+
     public:
         planner(const planner &) = delete;
         planner(planner &&) = delete;
         planner &operator=(const planner &) = delete;
         planner &operator=(planner &&) = delete;
+
+        bool is_dda_overflow_detected()
+        {
+            return dda_counter_overflow_error_detected;
+        }
 
         void set_start_operation_handle(igris::delegate<void> dlg)
         {
@@ -169,8 +176,6 @@ namespace cnc
             }
 
             active_block = &blocks->get(active);
-            ralgo::infof("GET_NEW_BLOCK: {}",
-                         nos::format("{}", *active_block).c_str());
 
             assert(active_block->blockno == waited);
             waited++;
@@ -241,11 +246,21 @@ namespace cnc
                     dda_counters[i] -= gears[i];
                     dir |= mask;
                     step |= mask;
+
+                    if (dda_counters[i] >= gears[i])
+                    {
+                        dda_counter_overflow_error_detected = true;
+                    }
                 }
                 else if (dda_counters[i] < -gears_high_trigger[i])
                 {
                     dda_counters[i] += gears[i];
                     dir |= mask;
+
+                    if (dda_counters[i] <= gears[i])
+                    {
+                        dda_counter_overflow_error_detected = true;
+                    }
                 }
                 velocities[i] += accelerations[i]; // * delta;
             }
