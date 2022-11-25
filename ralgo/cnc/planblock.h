@@ -1,16 +1,14 @@
 #ifndef RALGO_CNC_PLANBLOCK_H
 #define RALGO_CNC_PLANBLOCK_H
 
+#include <assert.h>
+#include <math.h>
 #include <nos/io/ostream.h>
 #include <nos/print.h>
 #include <ralgo/cnc/defs.h>
 #include <ralgo/linalg/vector_view.h>
-
 #include <stdint.h>
 #include <string.h>
-
-#include <assert.h>
-#include <math.h>
 
 namespace cnc
 {
