@@ -39,8 +39,14 @@ namespace ralgo
             return ret;
         }
 
-        T &operator*() { return *dat; }
-        T &operator->() { return *dat; }
+        T &operator*()
+        {
+            return *dat;
+        }
+        T &operator->()
+        {
+            return *dat;
+        }
 
         bool operator!=(const vector_view_iterator &oth) const
         {
@@ -63,7 +69,10 @@ namespace ralgo
         using iterator = vector_view_iterator<T>;
         using value_type = T;
 
-        void resize(int sz) { n = sz; }
+        void resize(int sz)
+        {
+            n = sz;
+        }
 
         vector_view() : dat(nullptr), n(0), stride(0) {}
         vector_view(T *dat, int n) : dat(dat), n(n), stride(1) {}
@@ -72,17 +81,44 @@ namespace ralgo
         {
         }
 
-        T &operator[](int i) { return *(dat + i * stride); }
-        const T &operator[](int i) const { return *(dat + i * stride); }
+        T &operator[](int i)
+        {
+            return *(dat + i * stride);
+        }
+        const T &operator[](int i) const
+        {
+            return *(dat + i * stride);
+        }
 
-        T *data() { return dat; }
-        const T *data() const { return dat; }
-        size_t size() const { return n; }
+        T *data()
+        {
+            return dat;
+        }
+        const T *data() const
+        {
+            return dat;
+        }
+        size_t size() const
+        {
+            return n;
+        }
 
-        iterator begin() { return {dat, stride}; }
-        iterator end() { return {dat + n * stride, stride}; }
-        const iterator begin() const { return {dat, stride}; }
-        const iterator end() const { return {dat + n * stride, stride}; }
+        iterator begin()
+        {
+            return {dat, stride};
+        }
+        iterator end()
+        {
+            return {dat + n * stride, stride};
+        }
+        const iterator begin() const
+        {
+            return {dat, stride};
+        }
+        const iterator end() const
+        {
+            return {dat + n * stride, stride};
+        }
     };
 
     template <class T>

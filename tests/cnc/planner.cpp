@@ -13,7 +13,7 @@ TEST_CASE("planner.0")
 
     block.nominal_velocity = 0.5;
     block.acceleration = 0.1;
-    block.multipliers[0] = 1;
+    block.set_direction({1});
     block.acceleration_before_ic = 5;
     block.deceleration_after_ic = 95;
     block.block_finish_ic = 100;
