@@ -293,6 +293,7 @@ namespace cnc
             this->nominal_velocity = path / preftime * 2;
             this->acceleration = this->nominal_velocity / preftime;
             this->fullpath = path;
+            this->exact_stop = true;
 
             assert(validation());
         }
