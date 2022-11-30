@@ -88,8 +88,8 @@ namespace cnc
             active = blocks->head_index();
             state = 0;
             memset(accelerations, 0, sizeof(accelerations));
-            memset(velocities, 0, sizeof(velocities));
-            memset(dda_counters, 0, sizeof(dda_counters));
+            // memset(velocities, 0, sizeof(velocities));
+            //  memset(dda_counters, 0, sizeof(dda_counters));
         }
 
         void update_triggers()
