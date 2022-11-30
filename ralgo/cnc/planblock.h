@@ -126,8 +126,8 @@ namespace cnc
 
         bool validation()
         {
-            if (fabs(start_velocity + acceleration_before_ic * acceleration -
-                     nominal_velocity) > 1e-5)
+            if (fabs(start_velocity + acceleration_time() * acceleration -
+                     nominal_velocity) > 1e-3)
                 return false;
 
             if (fabs(AB_distance() + BC_distance() + CD_distance() - fullpath) >
@@ -223,6 +223,9 @@ namespace cnc
                        double velocity,
                        double acceleration)
         {
+            start_velocity = 0;
+            final_velocity = 0;
+
             auto direction =
                 ralgo::vecops::normalize<ralgo::vector<double>>(axdist);
 
@@ -279,6 +282,7 @@ namespace cnc
                               ralgo::vector_view<double> _direction)
         {
             start_velocity = velocity;
+            final_velocity = 0;
             double path = velocity * velocity / (2 * acceleration);
 
             for (int i = 0; i < axes; ++i)

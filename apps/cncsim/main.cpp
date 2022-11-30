@@ -46,7 +46,8 @@ crow::publish_logger logger("ralgo", &publisher_log);
 crow::service_node control_service(
     crowker,
     "cncsim" RALGO_CNC_CLI_SERVICE,
-    +[](char *cmd, int len, crow::service_node &srv) {
+    +[](char *cmd, int len, crow::service_node &srv)
+    {
         std::lock_guard<std::mutex> lock(mtx);
         cmd[len] = 0;
         nos::println("input: ", std::string(cmd, len), "END");
@@ -164,7 +165,7 @@ int main(int argc, char **argv)
 
     interpreter.init_axes(3);
     interpreter.set_scale(ralgo::vector<double>{1, 1, 1});
-    planner.set_gears({10000, 10000, 10000});
+    planner.set_gears({100, 100, 100});
     interpreter.set_revolver_frequency(heimer::fast_cycle_frequence());
     revolver.set_steppers(steppers_ptrs, 3);
 
@@ -190,7 +191,12 @@ int main(int argc, char **argv)
     {
         auto exp_str = nos::readline(1024, true);
         if (exp_str)
-            interpreter.newline(*exp_str);
+        {
+            mtx.lock();
+            auto ans = interpreter.newline(*exp_str);
+            mtx.unlock();
+            nos::println(ans);
+        }
         else
         {
             exit(-1);

@@ -46,7 +46,7 @@ namespace cnc
         int total_axes = 0;
 
     public:
-        bool info_mode = false;
+        bool info_mode = true;
         int64_t iteration_counter = 0;
         igris::static_vector<double, NMAX_AXES> gears = {};
         igris::static_vector<double, NMAX_AXES> gears_high_trigger = {};
