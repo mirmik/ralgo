@@ -47,10 +47,7 @@ namespace cnc
 
     public:
         bool info_mode = false;
-        bool first_iteration_label = false;
         int64_t iteration_counter = 0;
-        double delta = 1;
-        double delta_sqr_div_2 = 0.5;
         igris::static_vector<double, NMAX_AXES> gears = {};
         igris::static_vector<double, NMAX_AXES> gears_high_trigger = {};
         double accelerations[NMAX_AXES];
@@ -62,7 +59,7 @@ namespace cnc
         igris::ring<cnc::control_shift> *shifts = {};
         bool need_to_reevaluate = false;
         uint8_t state = 0;
-        int count_of_reevaluation = 0;
+        // int count_of_reevaluation = 0;
         igris::delegate<void> _start_operation_handle = {};
         int waited = 0;
 
@@ -82,6 +79,17 @@ namespace cnc
         void set_start_operation_handle(igris::delegate<void> dlg)
         {
             _start_operation_handle = dlg;
+        }
+
+        void force_skip_all_blocks()
+        {
+            blocks->clear();
+            active_block = nullptr;
+            active = blocks->head_index();
+            state = 0;
+            memset(accelerations, 0, sizeof(accelerations));
+            memset(velocities, 0, sizeof(velocities));
+            memset(dda_counters, 0, sizeof(dda_counters));
         }
 
         void update_triggers()
@@ -186,12 +194,6 @@ namespace cnc
         int serve()
         {
             int final;
-
-            if (first_iteration_label == false)
-            {
-                first_iteration_label = true;
-                ralgo::info("planner: first start. success");
-            }
 
             system_lock();
             int room = shifts->room();
@@ -323,7 +325,7 @@ namespace cnc
                 fixup_postactive_blocks();
                 evaluate_accelerations();
                 need_to_reevaluate = false;
-                count_of_reevaluation++;
+                // count_of_reevaluation++;
             }
 
             if (active_block == nullptr && !has_postactive_blocks())
