@@ -312,6 +312,8 @@ TEST_CASE("cnc.runtest move and stop")
         lasttime = std::get<0>(p);
     }
 
+    CHECK_EQ(blocks.avail(), 0);
+    CHECK_EQ(shifts.avail(), 0);
     CHECK_FALSE(planner.is_dda_overflow_detected());
 }
 
@@ -372,6 +374,8 @@ TEST_CASE("cnc.runtest with gears assigned ten")
         lasttime = std::get<0>(p);
     }
 
+    CHECK_EQ(blocks.avail(), 0);
+    CHECK_EQ(shifts.avail(), 0);
     CHECK_FALSE(planner.is_dda_overflow_detected());
     CHECK_EQ(interpreter.get_final_position()[0], 10000);
 }
@@ -467,4 +471,123 @@ TEST_CASE("cnc.runtest stop and move")
 
         CHECK_FALSE(planner.is_dda_overflow_detected());
     }
+}
+
+TEST_CASE("cnc.runtest move and stop and move")
+{
+    igris::ring<cnc::planner_block> blocks{40};
+    igris::ring<cnc::control_shift> shifts{400};
+    cnc::planner planner(&blocks, &shifts);
+    cnc::revolver revolver(&shifts, &blocks, &planner);
+    cnc::interpreter interpreter(&blocks, &planner, &revolver, &shifts);
+    robo::stepper steppers[3];
+    robo::stepper *steppers_ptrs[] = {&steppers[0], &steppers[1], &steppers[2]};
+
+    interpreter.init_axes(3);
+    interpreter.set_scale(ralgo::vector<double>{1, 1, 1});
+    planner.set_gears({10, 10, 10});
+    interpreter.set_revolver_frequency(10000);
+    revolver.set_steppers(steppers_ptrs, 3);
+    ralgo::global_protection = false;
+
+    ralgo::freq_invoke_imitation imitator = {
+        {1ms, [&]() { planner.serve(); }},
+        {100us, [&]() { revolver.serve(); }},
+    };
+
+    auto responce = interpreter.newline("cnc G1 X20000 F10000 M10000\n");
+    CHECK_EQ(responce, "");
+
+    std::vector<std::tuple<std::chrono::milliseconds, double>> points_0{
+        {100ms, 0},
+        {200ms, 5},
+        {300ms, 19},
+        {400ms, 44},
+        {500ms, 79},
+        {600ms, 124},
+        {700ms, 179},
+        {800ms, 244},
+        {900ms, 319},
+        {1000ms, 404},
+        {1100ms, 499}};
+
+    auto lasttime = 0ns;
+    for (auto &p : points_0)
+    {
+        auto steps = steppers[0].steps();
+        CHECK_EQ(steps, std::get<1>(p));
+        imitator.timeskip(std::get<0>(p) - lasttime);
+        lasttime = std::get<0>(p);
+        CHECK(planner.active_block != nullptr);
+    }
+
+    auto responce_1 = interpreter.newline("cmd stop\n");
+    CHECK_EQ(responce_1, "");
+
+    auto last_block = interpreter.last_block();
+    CHECK_EQ(last_block.blockno, 1);
+    CHECK(fabs(last_block.axdist[0] - 5000) < 1e-5);
+    CHECK_EQ(last_block.direction()[0], 1);
+    CHECK_EQ(last_block.direction()[1], 0);
+    CHECK_EQ(last_block.direction()[2], 0);
+    CHECK(fabs(last_block.nominal_velocity - 10000.0 / 10000) < 1e-5);
+    CHECK(last_block.acceleration - 10000.0 / 10000 / 10000 < 1e-5);
+
+    std::vector<std::tuple<std::chrono::milliseconds, double>> points_1{
+        {1101ms, 599},
+        {1110ms, 599},
+        {1120ms, 608},
+        {1130ms, 618},
+        {1140ms, 627},
+        {1150ms, 637},
+        {1200ms, 646},
+        {1300ms, 693},
+        {1400ms, 778},
+        {1500ms, 853},
+        {1600ms, 918},
+        {1800ms, 973},
+        {1900ms, 1053},
+        {2000ms, 1078},
+        {2100ms, 1094},
+        {2200ms, 1099},
+        {2300ms, 1099},
+        {2400ms, 1099}};
+
+    for (auto &p : points_1)
+    {
+        auto steps = steppers[0].steps();
+        CHECK_EQ(steps, std::get<1>(p));
+        imitator.timeskip(std::get<0>(p) - lasttime);
+        lasttime = std::get<0>(p);
+    }
+
+    CHECK_FALSE(planner.is_dda_overflow_detected());
+
+    auto responce3 = interpreter.newline("cnc G1 X20000 F10000 M10000\n");
+    CHECK_EQ(responce3, "");
+
+    std::vector<std::tuple<std::chrono::milliseconds, double>> points_2{
+        {2500ms, 1099}, {2600ms, 1104}, {2700ms, 1118}, {2800ms, 1143},
+        {2900ms, 1178}, {3000ms, 1223}, {3100ms, 1278}, {3200ms, 1343},
+        {3300ms, 1418}, {3400ms, 1503}, {3500ms, 1598}, {3600ms, 1698},
+        {3700ms, 1798}, {3800ms, 1898}, {3900ms, 1998}, {4000ms, 2098},
+        {4100ms, 2198}, {4200ms, 2298}, {4300ms, 2398}, {4400ms, 2498},
+        {4500ms, 2598}, {4600ms, 2698}, {4700ms, 2798}, {4800ms, 2898},
+        {4900ms, 2998}, {5000ms, 3098}, {5100ms, 3198}, {5200ms, 3298},
+        {5300ms, 3398}, {5400ms, 3498}, {5500ms, 3598}, {5600ms, 3698},
+    };
+
+    for (auto &p : points_2)
+    {
+        auto steps = steppers[0].steps();
+        CHECK_EQ(steps, std::get<1>(p));
+        imitator.timeskip(std::get<0>(p) - lasttime);
+        lasttime = std::get<0>(p);
+    }
+
+    CHECK_EQ(steppers[0].steps(), 2000);
+    CHECK(planner.active_block == nullptr);
+    CHECK_EQ(blocks.avail(), 0);
+    CHECK_EQ(shifts.avail(), 0);
+    CHECK_FALSE(planner.is_dda_overflow_detected());
 }
