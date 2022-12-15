@@ -55,6 +55,7 @@ namespace cnc
         igris::delegate<void> _external_final_shift_handle = {};
         planner_block lastblock = {};
         bool with_cleanup = true;
+	volatile bool stop_procedure_started = false;
 
     public:
         interpreter(igris::ring<planner_block> *blocks,
@@ -132,11 +133,10 @@ namespace cnc
 
         void final_shift_handle()
         {
-            nos::println("final_shift_handle");
             if (blocks->avail() == 0)
             {
-                nos::println("restore_finishes");
                 restore_finishes();
+		stop_procedure_started = false;
 
                 if (with_cleanup)
                 {
@@ -348,6 +348,9 @@ namespace cnc
 
         void command_incremental_move(const nos::argv &argv, nos::ostream &os)
         {
+            if (stop_procedure_started)
+		return;
+
             ralgo::info("command_incremental_move");
 
             if (check_correctness(os))
@@ -360,6 +363,9 @@ namespace cnc
 
         void command_absolute_move(const nos::argv &argv, nos::ostream &os)
         {
+            if (stop_procedure_started)
+                 return;
+
             ralgo::info("command_absolute_move");
 
             if (check_correctness(os))
@@ -415,6 +421,11 @@ namespace cnc
         {
             ralgo::info("smooth_stop");
             system_lock();
+            if (stop_procedure_started) {
+               system_unlock();
+               return;
+            }
+
             auto curvels = revolver->current_velocity_no_lock();
             auto cursteps = revolver->current_steps_no_lock();
 
@@ -431,8 +442,12 @@ namespace cnc
                 return;
             }
 
-            lastblock.set_stop_pattern(
+            bool is_valid = lastblock.set_stop_pattern(
                 total_axes, velocity, external_acceleration, direction);
+	    if (!is_valid) {
+                 system_unlock();
+                return;
+            }
 
             restore_finishes();
             for (int i = 0; i < total_axes; ++i)
@@ -446,6 +461,7 @@ namespace cnc
             lastblock.blockno = blockno++;
             placeblock = lastblock;
             blocks->move_head_one();
+            stop_procedure_started = true;
             system_unlock();
         }
 

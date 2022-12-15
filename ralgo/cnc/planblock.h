@@ -295,7 +295,7 @@ namespace cnc
             assert(validation());
         }
 
-        void set_stop_pattern(int axes,
+        bool set_stop_pattern(int axes,
                               double velocity,
                               double acceleration,
                               ralgo::vector_view<double> _direction)
@@ -318,7 +318,8 @@ namespace cnc
             this->fullpath = path;
             this->exact_stop = true;
 
-            assert(validation());
+            bool valid = validation();
+            return valid;
         }
     };
 }
