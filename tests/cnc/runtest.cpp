@@ -98,7 +98,7 @@ TEST_CASE("cnc.runtest")
     imitator.timeskip(100ms);
 
     CHECK_FALSE(planner.is_dda_overflow_detected());
-    CHECK_EQ(interpreter.get_final_position()[0], 10000);
+    CHECK_EQ(interpreter.final_position()[0], 10000);
 }
 
 TEST_CASE("cnc.runtest with gears assigned one")
@@ -160,7 +160,7 @@ TEST_CASE("cnc.runtest with gears assigned one")
     }
 
     CHECK_FALSE(planner.is_dda_overflow_detected());
-    CHECK_EQ(interpreter.get_final_position()[0], 10000);
+    CHECK_EQ(interpreter.final_position()[0], 10000);
 }
 
 TEST_CASE("cnc.runtest with gears assigned ten")
@@ -221,7 +221,7 @@ TEST_CASE("cnc.runtest with gears assigned ten")
     }
 
     CHECK_FALSE(planner.is_dda_overflow_detected());
-    CHECK_EQ(interpreter.get_final_position()[0], 10000);
+    CHECK_EQ(interpreter.final_position()[0], 10000);
 }
 
 TEST_CASE("cnc.runtest move and stop")
@@ -377,7 +377,7 @@ TEST_CASE("cnc.runtest with gears assigned ten")
     CHECK_EQ(blocks.avail(), 0);
     CHECK_EQ(shifts.avail(), 0);
     CHECK_FALSE(planner.is_dda_overflow_detected());
-    CHECK_EQ(interpreter.get_final_position()[0], 10000);
+    CHECK_EQ(interpreter.final_position()[0], 10000);
 }
 
 TEST_CASE("cnc.runtest stop and move")
@@ -495,8 +495,10 @@ TEST_CASE("cnc.runtest move and stop and move")
         {100us, [&]() { revolver.serve(); }},
     };
 
-    auto responce = interpreter.newline("cnc G1 X20000 F10000 M10000\n");
+    auto responce = interpreter.newline("cmd absmove X20000 F10000 M10000\n");
     CHECK_EQ(responce, "");
+
+    CHECK_EQ(interpreter.final_position()[0], 20000);
 
     std::vector<std::tuple<std::chrono::milliseconds, double>> points_0{
         {100ms, 0},
@@ -520,6 +522,9 @@ TEST_CASE("cnc.runtest move and stop and move")
         lasttime = std::get<0>(p);
         CHECK(planner.active_block != nullptr);
     }
+
+    CHECK_EQ(interpreter.last_block().blockno, 0);
+    CHECK_EQ(interpreter.final_position()[0], 20000);
 
     auto responce_1 = interpreter.newline("cmd stop\n");
     CHECK_EQ(responce_1, "");
@@ -563,19 +568,18 @@ TEST_CASE("cnc.runtest move and stop and move")
 
     CHECK_FALSE(planner.is_dda_overflow_detected());
 
-    auto responce3 = interpreter.newline("cnc G1 X20000 F10000 M10000\n");
+    auto responce3 = interpreter.newline("cmd absmove X20000 F10000 M10000\n");
     CHECK_EQ(responce3, "");
+
+    CHECK_EQ(interpreter.final_position()[0], 20000);
 
     std::vector<std::tuple<std::chrono::milliseconds, double>> points_2{
         {2500ms, 1099}, {2600ms, 1104}, {2700ms, 1118}, {2800ms, 1143},
         {2900ms, 1178}, {3000ms, 1223}, {3100ms, 1278}, {3200ms, 1343},
-        {3300ms, 1418}, {3400ms, 1503}, {3500ms, 1598}, {3600ms, 1698},
-        {3700ms, 1798}, {3800ms, 1898}, {3900ms, 1998}, {4000ms, 2098},
-        {4100ms, 2198}, {4200ms, 2298}, {4300ms, 2398}, {4400ms, 2498},
-        {4500ms, 2598}, {4600ms, 2698}, {4700ms, 2798}, {4800ms, 2898},
-        {4900ms, 2998}, {5000ms, 3098}, {5100ms, 3198}, {5200ms, 3298},
-        {5300ms, 3398}, {5400ms, 3498}, {5500ms, 3598}, {5600ms, 3698},
-    };
+        {3300ms, 1418}, {3400ms, 1503}, {3500ms, 1595}, {3600ms, 1680},
+        {3700ms, 1755}, {3800ms, 1820}, {3900ms, 1875}, {4000ms, 1920},
+        {4100ms, 1955}, {4200ms, 1980}, {4300ms, 1995}, {4400ms, 2000},
+        {4500ms, 2000}};
 
     for (auto &p : points_2)
     {

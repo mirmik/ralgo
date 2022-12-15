@@ -45,7 +45,7 @@ namespace cnc
         // заменить на единый множитель для всех осей.
         igris::static_vector<double, NMAX_AXES> gains = {};
 
-        igris::static_vector<double, NMAX_AXES> final_position = {};
+        igris::static_vector<double, NMAX_AXES> _final_position = {};
         igris::static_vector<double, NMAX_AXES> max_axes_velocities = {};
         igris::static_vector<double, NMAX_AXES> max_axes_accelerations = {};
         int blockno = 0;
@@ -54,6 +54,7 @@ namespace cnc
         double _smooth_stop_acceleration = 0;
         igris::delegate<void> _external_final_shift_handle = {};
         planner_block lastblock = {};
+        bool with_cleanup = true;
 
     public:
         interpreter(igris::ring<planner_block> *blocks,
@@ -70,6 +71,12 @@ namespace cnc
         interpreter &operator=(const interpreter &) = delete;
         interpreter &operator=(interpreter &&) = delete;
 
+        void cleanup()
+        {
+            blockno = 0;
+            lastblock = {};
+        }
+
         double
         smooth_stop_acceleration(const ralgo::vector<double> &direction) const
         {
@@ -80,9 +87,9 @@ namespace cnc
                 direction, maximum_acceleration, max_axes_accelerations);
         }
 
-        const igris::static_vector<double, NMAX_AXES> &get_final_position()
+        const igris::static_vector<double, NMAX_AXES> &final_position()
         {
-            return final_position;
+            return _final_position;
         }
 
         planner_block last_block()
@@ -104,12 +111,12 @@ namespace cnc
         {
             this->total_axes = total_axes;
             gains.resize(total_axes);
-            final_position.resize(total_axes);
+            _final_position.resize(total_axes);
             max_axes_velocities.resize(total_axes);
             max_axes_accelerations.resize(total_axes);
             planner->set_axes_count(total_axes);
             ralgo::vecops::fill(gains, 1);
-            ralgo::vecops::fill(final_position, 0);
+            ralgo::vecops::fill(_final_position, 0);
             ralgo::vecops::fill(max_axes_accelerations, 0);
             ralgo::vecops::fill(max_axes_velocities, 0);
             revolver->final_shift_pushed =
@@ -120,14 +127,23 @@ namespace cnc
         {
             auto steps = revolver->current_steps();
             for (int i = 0; i < total_axes; ++i)
-                final_position[i] = steps[i] * planner->gears[i];
+                _final_position[i] = steps[i] * planner->gears[i];
         }
 
         void final_shift_handle()
         {
+            nos::println("final_shift_handle");
             if (blocks->avail() == 0)
             {
+                nos::println("restore_finishes");
                 restore_finishes();
+
+                if (with_cleanup)
+                {
+                    planner->cleanup();
+                    revolver->cleanup();
+                    cleanup();
+                }
 
                 if (_external_final_shift_handle)
                     _external_final_shift_handle();
@@ -286,7 +302,7 @@ namespace cnc
         {
             std::vector<double> ret(total_axes);
             for (int i = 0; i < total_axes; ++i)
-                ret[i] = final_position[i] / gains[i];
+                ret[i] = _final_position[i] / gains[i];
             return ret;
         }
 
@@ -319,7 +335,7 @@ namespace cnc
             }
 
             for (int i = 0; i < total_axes; ++i)
-                final_position[i] += lastblock.axdist[i];
+                _final_position[i] += lastblock.axdist[i];
 
             auto &placeblock = blocks->head_place();
             lastblock.blockno = blockno++;
@@ -420,23 +436,17 @@ namespace cnc
 
             restore_finishes();
             for (int i = 0; i < total_axes; ++i)
-                final_position[i] += lastblock.axdist[i];
+                _final_position[i] += lastblock.axdist[i];
 
             shifts->clear();
             planner->clear_queue();
             planner->force_skip_all_blocks();
+            planner->set_current_velocity(curvels);
             auto &placeblock = blocks->head_place();
             lastblock.blockno = blockno++;
             placeblock = lastblock;
             blocks->move_head_one();
             system_unlock();
-        }
-
-        void restore_final_position_by_steps()
-        {
-            auto steps = revolver->current_steps();
-            auto fpos = ralgo::vecops::mul_vv(steps, planner->get_gears());
-            std::copy(fpos.begin(), fpos.end(), final_position.begin());
         }
 
         void g_command(const nos::argv &argv, nos::ostream &os)
@@ -538,6 +548,12 @@ namespace cnc
                 return 0;
             }
 
+            if (argv[0] == "lastblock")
+            {
+                last_block().print_to_stream(os);
+                return 0;
+            }
+
             else if (argv[0] == "axmaxspd")
             {
                 nos::println_to(os, "TODO");
@@ -581,7 +597,7 @@ namespace cnc
 
             else if (argv[0] == "finishes")
             {
-                nos::print_list_to(os, final_position);
+                nos::print_list_to(os, _final_position);
                 return nos::println_to(os);
             }
 
@@ -611,7 +627,7 @@ namespace cnc
                 auto axno = symbol_to_index(argv[1][0]);
                 double val = igris_atof64(argv[2].data(), NULL);
                 system_lock();
-                final_position[axno] = val * planner->gears[axno];
+                _final_position[axno] = val * planner->gears[axno];
                 revolver->get_steppers()[axno]->set_counter_value(val);
                 system_unlock();
                 return 0;
