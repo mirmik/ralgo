@@ -50,6 +50,25 @@ namespace cnc
         uint8_t exact_stop = 0;
 
     public:
+        void print_to_stream(nos::ostream &os)
+        {
+            nos::println_to(os, "blockno: ", blockno);
+            nos::println_to(os, "start_ic: ", start_ic);
+            nos::println_to(
+                os, "acceleration_before_ic: ", acceleration_before_ic);
+            nos::println_to(
+                os, "deceleration_after_ic: ", deceleration_after_ic);
+            nos::println_to(os, "block_finish_ic: ", block_finish_ic);
+            nos::println_to(os, "active_finish_ic: ", active_finish_ic);
+            nos::println_to(os, "nominal_velocity: ", nominal_velocity);
+            nos::println_to(os, "start_velocity: ", start_velocity);
+            nos::println_to(os, "final_velocity: ", final_velocity);
+            nos::println_to(os, "acceleration: ", acceleration);
+            nos::println_to(os, "fullpath: ", fullpath);
+            nos::println_to(os, "exact_stop: ", exact_stop);
+            nos::println_to(os, "direction: ", _direction);
+        }
+
         const std::array<double, NMAX_AXES> &direction()
         {
             return _direction;

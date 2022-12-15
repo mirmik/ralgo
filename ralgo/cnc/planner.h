@@ -71,6 +71,23 @@ namespace cnc
         planner &operator=(const planner &) = delete;
         planner &operator=(planner &&) = delete;
 
+        void cleanup()
+        {
+            blocks->clear();
+            shifts->clear();
+            shifts->reset();
+            blocks->reset();
+            active_block = nullptr;
+            active = blocks->head_index();
+            state = 0;
+            memset(accelerations, 0, sizeof(accelerations));
+            memset(velocities, 0, sizeof(velocities));
+            memset(dda_counters, 0, sizeof(dda_counters));
+            need_to_reevaluate = false;
+            state = 0;
+            waited = 0;
+        }
+
         bool is_dda_overflow_detected()
         {
             return dda_counter_overflow_error_detected;
@@ -89,7 +106,15 @@ namespace cnc
             state = 0;
             memset(accelerations, 0, sizeof(accelerations));
             // memset(velocities, 0, sizeof(velocities));
-            //  memset(dda_counters, 0, sizeof(dda_counters));
+            // memset(dda_counters, 0, sizeof(dda_counters));
+        }
+
+        void set_current_velocity(std::vector<double> vel)
+        {
+            for (int i = 0; i < total_axes; ++i)
+            {
+                velocities[i] = vel[i];
+            }
         }
 
         void update_triggers()

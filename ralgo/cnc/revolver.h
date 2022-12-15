@@ -56,6 +56,11 @@ namespace cnc
         {
         }
 
+        void cleanup()
+        {
+            shifts_ring->reset();
+        }
+
         robo::stepper **get_steppers()
         {
             return steppers;

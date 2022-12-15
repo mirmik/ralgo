@@ -12,16 +12,19 @@ Y = 0
 Z = 0
 
 def position_handler(message):
-	print("position handler")
+	#print("position handler")
 	global X, Y, Z
 	data = message
-	ndata = numpy.frombuffer(data, numpy.int64)
-	X = ndata[0]
-	Y = ndata[1]
-	Z = ndata[2]
-	print(X,Y,Z)
+	try:
+		ndata = numpy.frombuffer(data, numpy.int64)
+		X = ndata[0]
+		Y = ndata[1]
+		Z = ndata[2]
+	except:
+		pass
+	#print(X,Y,Z)
 
-pycrow.diagnostic_setup(True)
+#pycrow.diagnostic_setup(True)
 pycrow.start_spin()
 sub = pycrow.subscriber(position_handler)
 sub.bind()
