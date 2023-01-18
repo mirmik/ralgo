@@ -2,6 +2,7 @@
 #define RALGO_SPACE_POSE3_H
 
 #include <iostream>
+#include <nos/trent/trent.h>
 #include <ralgo/space/screw.h>
 
 namespace ralgo
@@ -41,7 +42,7 @@ namespace ralgo
 
         linalg::mat<T, 3, 3> rotation_matrix() const
         {
-            return {qxdir(ang), qydir(ang), qzdir(ang)};        
+            return {qxdir(ang), qydir(ang), qzdir(ang)};
         }
 
         linalg::vec<T, 3>
@@ -79,7 +80,36 @@ namespace ralgo
         static pose3 from_screw(const screw<T, 3> &scr);
 
         static pose3<T> translation(linalg::vec<T, 3> vec);
-        static pose3<T> euler_rotation(linalg::vec<T, 3> vec);
+        __attribute__((deprecated)) static pose3<T>
+        euler_rotation(linalg::vec<T, 3> vec);
+        static pose3<T> euler(linalg::vec<T, 3> vec);
+
+        static pose3<T> from_trent(const nos::trent &tr)
+        {
+            auto quat = linalg::vec<T, 4>{(T)tr["ang"][0].as_numer(),
+                                          (T)tr["ang"][1].as_numer(),
+                                          (T)tr["ang"][2].as_numer(),
+                                          (T)tr["ang"][3].as_numer()};
+            auto pos = linalg::vec<T, 3>{(T)tr["lin"][0].as_numer(),
+                                         (T)tr["lin"][1].as_numer(),
+                                         (T)tr["lin"][2].as_numer()};
+            return pose3<T>(quat, pos);
+        }
+
+        nos::trent to_trent() const
+        {
+            nos::trent tr;
+            tr["ang"].as_list();
+            tr["ang"].push_back(ang[0]);
+            tr["ang"].push_back(ang[1]);
+            tr["ang"].push_back(ang[2]);
+            tr["ang"].push_back(ang[3]);
+            tr["lin"].as_list();
+            tr["lin"].push_back(lin[0]);
+            tr["lin"].push_back(lin[1]);
+            tr["lin"].push_back(lin[2]);
+            return tr;
+        }
     };
 
     template <class T> pose3<T> rot3(linalg::vec<T, 3> vec, T angle);
@@ -234,6 +264,14 @@ pose3<T> ralgo::pose3<T>::euler_rotation(linalg::vec<T, 3> vec)
     return pose3<T>{linalg::rotation_quat<T>({0, 0, 1}, vec.z), {}} *
            pose3<T>{linalg::rotation_quat<T>({0, 1, 0}, vec.y), {}} *
            pose3<T>{linalg::rotation_quat<T>({1, 0, 0}, vec.x), {}};
+}
+
+template <class T> pose3<T> ralgo::pose3<T>::euler(linalg::vec<T, 3> vec)
+{
+    // yaw, pitch, roll
+    return pose3<T>{linalg::rotation_quat<T>({0, 0, 1}, vec.x), {}} *
+           pose3<T>{linalg::rotation_quat<T>({0, 1, 0}, vec.y), {}} *
+           pose3<T>{linalg::rotation_quat<T>({1, 0, 0}, vec.z), {}};
 }
 
 namespace ralgo

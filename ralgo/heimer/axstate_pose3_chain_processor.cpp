@@ -24,15 +24,18 @@ ralgo::screw3<position_t> axstate_chain3_processor::evaluate_position_error()
     return {};
 }
 
-static inline int info(axstate_chain3_processor *axctr, int, char **,
-                       char *output, int outmax)
+static inline int
+info(axstate_chain3_processor *axctr, int, char **, char *output, int outmax)
 {
     snprintf(output, outmax, "is_active: %d\r\n", axctr->is_active());
     return 0;
 }
 
-static inline int setconstant(axstate_chain3_processor *axctr, int argc,
-                              char **argv, char *output, int outmax)
+static inline int setconstant(axstate_chain3_processor *axctr,
+                              int argc,
+                              char **argv,
+                              char *output,
+                              int outmax)
 {
     if (argc != 7)
     {
@@ -40,15 +43,22 @@ static inline int setconstant(axstate_chain3_processor *axctr, int argc,
         return -1;
     }
 
-    axctr->set_constant(atoi(argv[0]), atof(argv[1]), atof(argv[2]),
-                        atof(argv[3]), atof(argv[4]), atof(argv[5]),
+    axctr->set_constant(atoi(argv[0]),
+                        atof(argv[1]),
+                        atof(argv[2]),
+                        atof(argv[3]),
+                        atof(argv[4]),
+                        atof(argv[5]),
                         atof(argv[6]));
 
     return 0;
 }
 
-static inline int setsensivity(axstate_chain3_processor *axctr, int argc,
-                               char **argv, char *output, int outmax)
+static inline int setsensivity(axstate_chain3_processor *axctr,
+                               int argc,
+                               char **argv,
+                               char *output,
+                               int outmax)
 {
     if (argc != 7)
     {
@@ -56,14 +66,20 @@ static inline int setsensivity(axstate_chain3_processor *axctr, int argc,
         return -1;
     }
 
-    axctr->set_sensivity(atoi(argv[0]), atof(argv[1]), atof(argv[2]),
-                         atof(argv[3]), atof(argv[4]), atof(argv[5]),
+    axctr->set_sensivity(atoi(argv[0]),
+                         atof(argv[1]),
+                         atof(argv[2]),
+                         atof(argv[3]),
+                         atof(argv[4]),
+                         atof(argv[5]),
                          atof(argv[6]));
 
     return 0;
 }
 
-int axstate_chain3_processor::command(int argc, char **argv, char *output,
+int axstate_chain3_processor::command(int argc,
+                                      char **argv,
+                                      char *output,
                                       int outmax)
 {
     int status = ENOENT;
@@ -157,8 +173,8 @@ axis_state *axstate_chain3_processor::leftax(int i)
     return settings[i].controlled;
 }
 
-void axstate_chain3_processor::set_constant(int i, double a, double b, double c,
-                                            double d, double e, double f)
+void axstate_chain3_processor::set_constant(
+    int i, double a, double b, double c, double d, double e, double f)
 {
     ralgo::pose3<double> *constant;
 
@@ -173,12 +189,11 @@ void axstate_chain3_processor::set_constant(int i, double a, double b, double c,
     }
 
     *constant = ralgo::pose3<double>::translation({a, b, c}) *
-                ralgo::pose3<double>::euler_rotation({d, e, f});
+                ralgo::pose3<double>::euler({d, e, f});
 }
 
-void axstate_chain3_processor::set_sensivity(int i, double a, double b,
-                                             double c, double d, double e,
-                                             double f)
+void axstate_chain3_processor::set_sensivity(
+    int i, double a, double b, double c, double d, double e, double f)
 {
     ralgo::screw3<double> *sensivity;
     sensivity = &settings[i].local_sensivity;
