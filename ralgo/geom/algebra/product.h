@@ -1,7 +1,9 @@
 #ifndef RALGO_GEOMALG_PRODUCT_H
 #define RALGO_GEOMALG_PRODUCT_H
 
-#include <ralgo/geomalg/complement.h>
+#include <ralgo/geom/algebra/base.h>
+#include <ralgo/geom/algebra/complement.h>
+#include <ralgo/geom/product.h>
 
 namespace ralgo
 {
@@ -50,14 +52,14 @@ namespace ralgo
             return trivector4d(x, y, z, w);
         }
 
-        template <class T> T dot(const vector2d<T> &a, const vector2d<T> &b)
+        template <class T>
+        trivector4d<T> wedge4d(const bivector4d<T> &l, const point3d<T> &p)
         {
-            return a.x() * b.x() + a.y() * b.y();
-        }
-
-        template <class T> T dot(const vector3d<T> &a, const vector3d<T> &b)
-        {
-            return a.x() * b.x() + a.y() * b.y() + a.z() * b.z();
+            double x = l.vy() * p.z() - l.vz() * p.y() + l.mx();
+            double y = l.vz() * p.x() - l.vx() * p.z() + l.my();
+            double z = l.vx() * p.y() - l.vy() * p.x() + l.mz();
+            double w = -(l.mx() * p.x() + l.my() * p.y() + l.mz() * p.z());
+            return trivector4d(x, y, z, w);
         }
 
         template <class T>

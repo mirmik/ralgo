@@ -5,7 +5,7 @@
 
 namespace ralgo
 {
-    namespace geomalg
+    namespace geom
     {
         template <class T> class vector3d
         {
@@ -33,7 +33,7 @@ namespace ralgo
                 return _data[2];
             }
 
-            const linalg::vec<T, 3> &xyz()
+            const linalg::vec<T, 3> &xyz() const
             {
                 return _data;
             }
@@ -77,6 +77,17 @@ namespace ralgo
             {
                 return _data != v;
             }
+
+            vector3d unitized() const
+            {
+                return vector3d(_data / norm());
+            }
+
+            vector3d &_unitize()
+            {
+                _data /= norm();
+                return *this;
+            }
         };
 
         template <class T> class point3d : public vector3d<T>
@@ -84,12 +95,48 @@ namespace ralgo
         public:
             point3d() = default;
             point3d(T x, T y, T z) : vector3d<T>(x, y, z) {}
+            point3d(const linalg::vec<T, 3> &v) : vector3d<T>(v) {}
 
             T weight() const
             {
                 return 1;
             }
         };
+
+        template <class T>
+        vector3d<T> operator+(const vector3d<T> &a, const vector3d<T> &b)
+        {
+            return vector3d<T>(a.xyz() + b.xyz());
+        }
+
+        template <class T>
+        vector3d<T> operator-(const vector3d<T> &a, const vector3d<T> &b)
+        {
+            return vector3d<T>(a.xyz() - b.xyz());
+        }
+
+        template <class T> vector3d<T> operator*(const vector3d<T> &a, T b)
+        {
+            return vector3d<T>(a.xyz() * b);
+        }
+
+        template <class T> vector3d<T> operator*(T a, const vector3d<T> &b)
+        {
+            return vector3d<T>(a * b.xyz());
+        }
+
+        template <class T>
+        vector3d<T> operator-(const point3d<T> &a, const point3d<T> &b)
+        {
+            return vector3d<T>(a.xyz() - b.xyz());
+        }
+
+        template <class T>
+        point3d<T> operator+(const point3d<T> &a, const vector3d<T> &b)
+        {
+            return point3d<T>(a.xyz() + b.xyz());
+        }
+
     }
 }
 

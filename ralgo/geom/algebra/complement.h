@@ -1,12 +1,12 @@
 #ifndef RALGO_GEOMALG_COMPLEMENT_H
 #define RALGO_GEOMALG_COMPLEMENT_H
 
-#include <ralgo/geomalg/bivector3d.h>
-#include <ralgo/geomalg/bivector4d.h>
-#include <ralgo/geomalg/trivector4d.h>
-#include <ralgo/geomalg/vector2d.h>
-#include <ralgo/geomalg/vector3d.h>
-#include <ralgo/geomalg/vector4d.h>
+#include <ralgo/geom/algebra/bivector3d.h>
+#include <ralgo/geom/algebra/bivector4d.h>
+#include <ralgo/geom/algebra/trivector4d.h>
+#include <ralgo/geom/algebra/vector4d.h>
+#include <ralgo/geom/vector2d.h>
+#include <ralgo/geom/vector3d.h>
 
 namespace ralgo
 {
