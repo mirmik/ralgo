@@ -3,7 +3,6 @@
 
 #include <ralgo/geomalg/line.h>
 #include <ralgo/geomalg/plane.h>
-#include <ralgo/geomalg/point.h>
 
 namespace ralgo
 {
@@ -12,22 +11,24 @@ namespace ralgo
 
         template <class T>
         ralgo::geomalg::line<T>
-        line_containing_points(const ralgo::geomalg::point<T> &p,
-                               const ralgo::geomalg::point<T> &q)
+        line_containing_points(const ralgo::geomalg::point3d<T> &p,
+                               const ralgo::geomalg::point3d<T> &q)
         {
-            linalg::vec<T, 3> v(p.w() * q.x() - p.x() * q.w(),
-                                p.w() * q.y() - p.y() * q.w(),
-                                p.w() * q.z() - p.z() * q.w());
-            linalg::vec<T, 3> m(p.y() * q.z() - p.z() * q.y(),
-                                p.z() * q.x() - p.x() * q.z(),
-                                p.x() * q.y() - p.y() * q.x());
-            return ralgo::geomalg::line(v, m);
+            return ralgo::geomalg::line<double>::from_points(p, q);
+        }
+
+        template <class T>
+        ralgo::geomalg::line<T>
+        line_containing_points(const ralgo::geomalg::vector4d<T> &p,
+                               const ralgo::geomalg::vector4d<T> &q)
+        {
+            return ralgo::geomalg::line<double>::from_points(p, q);
         }
 
         template <class T>
         ralgo::geomalg::plane<T>
         plane_containing_line_and_point(const ralgo::geomalg::line<T> &l,
-                                        const ralgo::geomalg::point<T> &p)
+                                        const ralgo::geomalg::vector4d<T> &p)
         {
             double x = l.vy() * p.z() - l.vz() * p.y() + l.mx() * p.w();
             double y = l.vz() * p.x() - l.vx() * p.z() + l.my() * p.w();

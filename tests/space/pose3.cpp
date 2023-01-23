@@ -10,12 +10,15 @@ TEST_CASE("pose3")
     CHECK_EQ(a * b, c);
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 TEST_CASE("euler")
 {
     ralgo::pose3<double> c{{0, 0, 0, 1}, {0, 0, 0}};
 
     CHECK_EQ(ralgo::pose3<double>::euler_rotation({0, 0, 0}), c);
 }
+#pragma GCC diagnostic pop
 
 TEST_CASE("translation")
 {
