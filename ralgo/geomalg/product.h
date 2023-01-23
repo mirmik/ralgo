@@ -59,6 +59,29 @@ namespace ralgo
         {
             return a.x() * b.x() + a.y() * b.y() + a.z() * b.z();
         }
+
+        template <class T>
+        bivector4d<T> antiwedge4d(const trivector4d<T> &g,
+                                  const trivector4d<T> &h)
+        {
+            linalg::vec<T, 3> v(g.z() * h.y() - g.y() * h.z(),
+                                g.x() * h.z() - g.z() * h.x(),
+                                g.y() * h.x() - g.x() * h.y());
+            linalg::vec<T, 3> m(g.x() * h.w() - g.w() * h.x(),
+                                g.y() * h.w() - g.w() * h.y(),
+                                g.z() * h.w() - g.w() * h.z());
+            return bivector4d(v, m);
+        }
+
+        template <class T>
+        point4d<T> antiwedge4d(const bivector4d<T> &l, const trivector4d<T> &g)
+        {
+            double x = l.my() * g.z() - l.mz() * g.y() + l.vx() * g.w();
+            double y = l.mz() * g.x() - l.mx() * g.z() + l.vy() * g.w();
+            double z = l.mx() * g.y() - l.my() * g.x() + l.vz() * g.w();
+            double w = -(l.vx() * g.x() + l.vy() * g.y() + l.vz() * g.z());
+            return {x, y, z, w};
+        }
     }
 }
 
