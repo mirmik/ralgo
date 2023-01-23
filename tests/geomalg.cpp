@@ -1,11 +1,11 @@
 #include <doctest/doctest.h>
-#include <ralgo/geomalg/types.h>
-#include <ralgo/geomalg/types_minimal.h>
-
+#include <ralgo/geomalg/distance.h>
 #include <ralgo/geomalg/join_meet.h>
 #include <ralgo/geomalg/line.h>
 #include <ralgo/geomalg/plane.h>
 #include <ralgo/geomalg/projection.h>
+#include <ralgo/geomalg/types.h>
+#include <ralgo/geomalg/types_minimal.h>
 
 TEST_CASE("geomalg::vector")
 {
@@ -155,4 +155,24 @@ TEST_CASE("projection_of_point_onto_line")
     CHECK_EQ(r.y(), 0);
     CHECK_EQ(r.z(), -2);
     CHECK_EQ(r.w(), 1);
+}
+
+TEST_CASE("distance_between_points")
+{
+    ralgo::geomalg::point<double> a(3, 0, -2);
+    ralgo::geomalg::point<double> b(0, 0, -2);
+    auto mag = ralgo::geomalg::distance_between_points(a, b);
+
+    CHECK_EQ(mag.s(), 3);
+    CHECK_EQ(mag.w(), 1);
+}
+
+TEST_CASE("distance_between_points_2")
+{
+    ralgo::geomalg::point<double> a(3, 0, -8);
+    ralgo::geomalg::point<double> b(0, 0, -2, 1.0 / 4);
+    auto mag = ralgo::geomalg::distance_between_points(a, b).unitized();
+
+    CHECK_EQ(mag.s(), 3);
+    CHECK_EQ(mag.w(), 1);
 }

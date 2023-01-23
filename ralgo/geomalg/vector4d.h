@@ -1,6 +1,7 @@
 #ifndef RALGO_GEOMALG_VECTOR4D_H
 #define RALGO_GEOMALG_VECTOR4D_H
 
+#include <ralgo/geomalg/vector3d.h>
 #include <ralgo/linalg/linalg.h>
 
 namespace ralgo
