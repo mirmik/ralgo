@@ -25,7 +25,7 @@ licant.cxx_static_and_shared("libs",
                                  "ralgo",
                                  "ralgo.rxsignal"
                              ],
-                             cxx_flags="-fPIC -g -pedantic -Werror=extra -Werror=all -Weffc++",
+                             cxx_flags="-fPIC -g -pedantic -Werror=extra -Werror=all -fmax-errors=1 ",
                              cc_flags="-fPIC -Werror=implicit-function-declaration -g -Werror=incompatible-pointer-types -pedantic -Werror=extra -Werror=all",
                              libs=["igris", "nos"]
                              )
@@ -64,7 +64,7 @@ licant.cxx_application("runtests",
                            "tests/rxsignal/*.cpp",
                        ],
                        objects=["libralgo.a"],
-                       cxx_flags="-fPIC -O0 -g -pedantic -Wno-vla -Werror=extra -Werror=all -Werror=reorder -Weffc++",
+                       cxx_flags="-fPIC -O0 -g -pedantic -Wno-vla -Werror=extra -Werror=all -Werror=reorder -fmax-errors=1",
                        cc_flags="-fPIC -O0 -g -Werror=incompatible-pointer-types -pedantic -Werror=extra -Werror=all",
                        ld_flags="-fPIC -O0 -L/usr/local/lib/",
                        cxxstd="c++20",

@@ -19,6 +19,10 @@ licant.module("ralgo.signal",
               sources=["ralgo/signal/fft.cpp"]
               )
 
+licant.module("ralgo.terathon",
+              sources=["ralgo/third/terathon/*.cpp"],
+              )
+
 licant.module("ralgo",
               sources=[
                   "ralgo/global_protection.cpp",
@@ -60,13 +64,13 @@ licant.module("ralgo",
                   "ralgo.log",
                   "ralgo.disctime",
                   "ralgo.signal",
-                  "ralgo.oldheimer",
+                  "ralgo.oldheimer"
               ],
               )
 
 licant.module("ralgo.rxsignal",
-  sources=["ralgo/rxsignal/rxpid.cpp"]
-)
+              sources=["ralgo/rxsignal/rxpid.cpp"]
+              )
 
 licant.module("ralgo.oldheimer",
               sources=["ralgo/oldheimer/*.cpp", ]

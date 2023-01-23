@@ -5,7 +5,6 @@
 #include <ralgo/geomalg/join_meet.h>
 #include <ralgo/geomalg/line.h>
 #include <ralgo/geomalg/plane.h>
-#include <ralgo/geomalg/point.h>
 #include <ralgo/geomalg/projection.h>
 
 TEST_CASE("geomalg::vector")
@@ -61,7 +60,7 @@ TEST_CASE("line_point.check_scalar is zero")
     ralgo::geomalg::point<double> p(53, 22, 12);
     ralgo::geomalg::point<double> q(1, 11, 1);
     auto l = ralgo::geomalg::line<double>::from_points(p, q);
-    CHECK_EQ(linalg::dot(l.direction(), l.momentum()), 0);
+    CHECK_EQ(dot(l.direction(), complement(l.momentum())), 0);
 }
 
 TEST_CASE("line_containing_points")
@@ -69,7 +68,7 @@ TEST_CASE("line_containing_points")
     ralgo::geomalg::point<double> p(53, 22, 12);
     ralgo::geomalg::point<double> q(1, 11, 1);
     auto l = ralgo::geomalg::line_containing_points(p, q);
-    CHECK_EQ(linalg::dot(l.direction(), l.momentum()), 0);
+    CHECK_EQ(dot(l.direction(), complement(l.momentum())), 0);
 }
 
 TEST_CASE("plane_containing_line_and_point")
@@ -84,6 +83,7 @@ TEST_CASE("plane_containing_line_and_point")
     CHECK_EQ(pl.z(), 1);
     CHECK_EQ(pl.w(), 0);
 }
+
 TEST_CASE("plane_containing_line_and_point_2")
 {
     ralgo::geomalg::point<double> a(0, 1, 1);

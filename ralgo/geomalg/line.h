@@ -1,80 +1,40 @@
 #ifndef RALGO_GEOMALG_LINE_H
 #define RALGO_GEOMALG_LINE_H
 
-#include <ralgo/geomalg/point.h>
+#include <ralgo/geomalg/bivector4d.h>
+#include <ralgo/geomalg/product.h>
+#include <ralgo/geomalg/vector3d.h>
+#include <ralgo/geomalg/vector4d.h>
 
 namespace ralgo
 {
     namespace geomalg
     {
-        template <class T> class line
+        template <class T> class line : public ralgo::geomalg::bivector4d<T>
         {
-        private:
-            linalg::vec<T, 3> _direction;
-            linalg::vec<T, 3> _momentum;
-
         public:
             line(const linalg::vec<T, 3> &direction,
                  const linalg::vec<T, 3> &momentum)
-                : _direction(direction), _momentum(momentum)
+                : bivector4d<T>(direction, momentum)
             {
             }
 
-            T vx() const
+            line(const bivector4d<T> &bivector) : bivector4d<T>(bivector) {}
+
+            static line<T> from_points(const vector4d<T> &p,
+                                       const vector4d<T> &q)
             {
-                return _direction[0];
+                return line<T>(wedge4d(p, q));
             }
 
-            T vy() const
+            static line<T> from_points(const point3d<T> &p, const point3d<T> &q)
             {
-                return _direction[1];
-            }
-
-            T vz() const
-            {
-                return _direction[2];
-            }
-
-            T mx() const
-            {
-                return _momentum[0];
-            }
-
-            T my() const
-            {
-                return _momentum[1];
-            }
-
-            T mz() const
-            {
-                return _momentum[2];
-            }
-
-            static line<T> from_points(const point<T> &p, const point<T> &q)
-            {
-                linalg::vec<T, 3> direction(p.w() * q.x() - p.x() * q.w(),
-                                            p.w() * q.y() - p.y() * q.w(),
-                                            p.w() * q.z() - p.z() * q.w());
-                linalg::vec<T, 3> momentum(p.y() * q.z() - p.z() * q.y(),
-                                           p.z() * q.x() - p.x() * q.z(),
-                                           p.x() * q.y() - p.y() * q.x());
-                return line<T>(direction, momentum);
-            }
-
-            const linalg::vec<T, 3> &direction() const
-            {
-                return _direction;
-            }
-
-            const linalg::vec<T, 3> &momentum() const
-            {
-                return _momentum;
+                return line<T>(wedge4d(p, q));
             }
 
             line unitized() const
             {
-                auto n = linalg::length(_direction);
-                return line(_direction / n, _momentum / n);
+                return line(bivector4d<T>::unitized());
             }
         };
     }
