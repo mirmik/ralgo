@@ -1,6 +1,7 @@
 #ifndef RALGO_GEOMALG_BIVECTOR3D_H
 #define RALGO_GEOMALG_BIVECTOR3D_H
 
+#include <ralgo/geom/algebra/base.h>
 #include <ralgo/linalg/linalg.h>
 
 namespace ralgo

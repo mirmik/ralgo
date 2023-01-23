@@ -70,6 +70,7 @@
     "variant": "cpp",
     "numbers": "cpp",
     "semaphore": "cpp",
-    "future": "cpp"
+    "future": "cpp",
+    "*.ipp": "cpp"
   }
 }

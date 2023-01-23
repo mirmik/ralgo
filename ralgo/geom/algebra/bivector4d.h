@@ -1,8 +1,8 @@
 #ifndef RALGO_GEOMALG_BIVECTOR4D_H
 #define RALGO_GEOMALG_BIVECTOR4D_H
 
-#include <ralgo/geomalg/bivector3d.h>
-#include <ralgo/geomalg/vector3d.h>
+#include <ralgo/geom/algebra/bivector3d.h>
+#include <ralgo/geom/vector3d.h>
 
 namespace ralgo
 {

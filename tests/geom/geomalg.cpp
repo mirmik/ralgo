@@ -1,11 +1,12 @@
 #include <doctest/doctest.h>
-#include <ralgo/geomalg/distance.h>
-#include <ralgo/geomalg/join_meet.h>
-#include <ralgo/geomalg/line.h>
-#include <ralgo/geomalg/plane.h>
-#include <ralgo/geomalg/projection.h>
-#include <ralgo/geomalg/types.h>
-#include <ralgo/geomalg/types_minimal.h>
+#include <ralgo/geom/algebra/complement.h>
+#include <ralgo/geom/algebra/distance.h>
+#include <ralgo/geom/algebra/join.h>
+#include <ralgo/geom/algebra/meet.h>
+#include <ralgo/geom/algebra/projection.h>
+#include <ralgo/geom/algebra/types.h>
+#include <ralgo/geom/algebra/types_minimal.h>
+#include <ralgo/geom/product.h>
 
 TEST_CASE("geomalg::vector")
 {
@@ -38,11 +39,11 @@ TEST_CASE("line_point")
     ralgo::geomalg::point<double> q2(1, 0, 2);
     ralgo::geomalg::point<double> q22(2, 0, 2);
     ralgo::geomalg::point<double> z(0, 0, 0);
-    auto l = ralgo::geomalg::line<double>::from_points(p, q);
-    auto l3 = ralgo::geomalg::line<double>::from_points(q, p);
-    auto l2 = ralgo::geomalg::line<double>::from_points(p2, q2);
-    auto l22 = ralgo::geomalg::line<double>::from_points(p2, q22);
-    auto m = ralgo::geomalg::line<double>::from_points(z, p);
+    auto l = join(p, q);
+    auto l3 = join(q, p);
+    auto l2 = join(p2, q2);
+    auto l22 = join(p2, q22);
+    auto m = join(z, p);
     CHECK_EQ(l.direction(), linalg::vec<double, 3>{1, 0, 0});
     CHECK_EQ(l.momentum(), linalg::vec<double, 3>{0, 1, 0});
     CHECK_EQ(l3.direction(), linalg::vec<double, 3>{-1, 0, 0});
@@ -59,7 +60,7 @@ TEST_CASE("line_point.check_scalar is zero")
 {
     ralgo::geomalg::point<double> p(53, 22, 12);
     ralgo::geomalg::point<double> q(1, 11, 1);
-    auto l = ralgo::geomalg::line<double>::from_points(p, q);
+    auto l = join(p, q);
     CHECK_EQ(dot(l.direction(), complement(l.momentum())), 0);
 }
 

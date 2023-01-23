@@ -1,16 +1,18 @@
 #ifndef RALGO_GEOMALG_VECTOR4D_H
 #define RALGO_GEOMALG_VECTOR4D_H
 
-#include <ralgo/geomalg/vector3d.h>
+#include <ralgo/geom/vector3d.h>
 #include <ralgo/linalg/linalg.h>
 
 namespace ralgo
 {
     namespace geomalg
     {
+        using ralgo::geom::vector3d;
+
         template <class T> class vector4d
         {
-            linalg::vec<T, 3> _xyz;
+            vector3d<T> _xyz;
             T _w;
 
         public:
@@ -21,17 +23,17 @@ namespace ralgo
 
             T x() const
             {
-                return _xyz.x;
+                return _xyz.x();
             }
 
             T y() const
             {
-                return _xyz.y;
+                return _xyz.y();
             }
 
             T z() const
             {
-                return _xyz.z;
+                return _xyz.z();
             }
 
             T w() const
@@ -47,6 +49,14 @@ namespace ralgo
             T weight() const
             {
                 return _w;
+            }
+
+            vector4d unitized()
+            {
+                return vector4d(this->x() / this->w(),
+                                this->y() / this->w(),
+                                this->z() / this->w(),
+                                1);
             }
         };
 

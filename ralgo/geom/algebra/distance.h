@@ -1,10 +1,9 @@
 #ifndef RALGO_GEOMALG_DISTANCE_H
 #define RALGO_GEOMALG_DISTANCE_H
 
-#include <ralgo/geomalg/line.h>
-#include <ralgo/geomalg/magnitude.h>
-#include <ralgo/geomalg/plane.h>
-#include <ralgo/geomalg/vector4d.h>
+#include <ralgo/geom/algebra/bivector4d.h>
+#include <ralgo/geom/algebra/magnitude.h>
+#include <ralgo/geom/algebra/vector4d.h>
 
 namespace ralgo
 {
@@ -24,7 +23,7 @@ namespace ralgo
 
         template <class T>
         magnitude<T> distance_between_point_and_line(const vector4d<T> &p,
-                                                     const line<T> &l)
+                                                     const bivector4d<T> &l)
         {
             auto x = l.vy() * p.z() - l.vz() * p.y() + l.mx() * p.w();
             auto y = l.vz() * p.x() - l.vx() * p.z() + l.my() * p.w();
