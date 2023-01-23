@@ -57,6 +57,16 @@ namespace ralgo
             {
                 return _data != v;
             }
+
+            T norm() const
+            {
+                return linalg::length(_data);
+            }
+
+            T norm2() const
+            {
+                return linalg::length2(_data);
+            }
         };
     }
 }

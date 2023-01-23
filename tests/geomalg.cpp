@@ -176,3 +176,19 @@ TEST_CASE("distance_between_points_2")
     CHECK_EQ(mag.s(), 3);
     CHECK_EQ(mag.w(), 1);
 }
+
+TEST_CASE("distance_between_point_and_line")
+{
+    ralgo::geomalg::point<double> a(1, 0, -2);
+    ralgo::geomalg::point<double> b(0, 0, -2);
+    ralgo::geomalg::point<double> d(0, 0, -8, 2);
+    auto l = ralgo::geomalg::line_containing_points(a, b);
+    auto mag = distance_between_point_and_line(d, l);
+
+    CHECK_EQ(mag.s(), 4);
+    CHECK_EQ(mag.w(), 2);
+
+    auto umag = mag.unitized();
+    CHECK_EQ(umag.s(), 2);
+    CHECK_EQ(umag.w(), 1);
+}

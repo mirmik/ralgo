@@ -38,6 +38,16 @@ namespace ralgo
                 return _data;
             }
 
+            T norm() const
+            {
+                return linalg::length(_data);
+            }
+
+            T norm2() const
+            {
+                return linalg::length2(_data);
+            }
+
             vector3d bulk() const
             {
                 return *this;
