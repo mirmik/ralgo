@@ -29,8 +29,8 @@ namespace heimer
         executor_class() = default;
         executor_class(const executor_class &) = delete;
         executor_class &operator=(const executor_class &) = delete;
-        void set_order_table(signal_processor **order_table, int capacity,
-                             int size);
+        void
+        set_order_table(signal_processor **order_table, int capacity, int size);
 
         void allocate_order_table(int size);
         void append_processor(signal_processor *proc);

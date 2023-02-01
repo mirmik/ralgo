@@ -35,8 +35,12 @@ namespace heimer
 
         int info(char *data, int) override
         {
-            nos::format_buffer(data, "(cpos:{}, cvel:{}, fpos:{}, fvel:{})\r\n",
-                               ctrpos, ctrvel, feedpos, feedvel);
+            nos::format_buffer(data,
+                               "(cpos:{}, cvel:{}, fpos:{}, fvel:{})\r\n",
+                               ctrpos,
+                               ctrvel,
+                               feedpos,
+                               feedvel);
             return 0;
         }
     };

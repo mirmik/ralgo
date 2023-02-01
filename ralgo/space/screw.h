@@ -25,17 +25,29 @@ namespace ralgo
         {
         }
 
-        screw operator*(double koeff) { return {ang * koeff, lin * koeff}; }
+        screw operator*(double koeff)
+        {
+            return {ang * koeff, lin * koeff};
+        }
 
-        T rotation() { return ang; }
-        linalg::vec<T, 3> translation() { return lin; }
+        T rotation()
+        {
+            return ang;
+        }
+        linalg::vec<T, 3> translation()
+        {
+            return lin;
+        }
 
         bool operator==(const screw &oth) const
         {
             return lin == oth.lin && ang == oth.ang;
         }
 
-        screw operator-() const { return {-ang, -lin}; }
+        screw operator-() const
+        {
+            return {-ang, -lin};
+        }
 
         screw rotate_by(const pose3<T> &tr)
         {
@@ -62,7 +74,10 @@ namespace ralgo
         screw(T ang, const linalg::vec<T, 2> &lin) : ang(ang), lin(lin) {}
         screw() : ang(0), lin(0, 0) {}
 
-        constexpr size_t size() const { return 3; }
+        constexpr size_t size() const
+        {
+            return 3;
+        }
 
         template <class U>
         screw(const screw2<U> &oth) : ang(oth.ang), lin(oth.lin.x, oth.lin.y)
@@ -77,10 +92,19 @@ namespace ralgo
             return *this;
         }
 
-        screw operator*(double koeff) { return {ang * koeff, lin * koeff}; }
+        screw operator*(double koeff)
+        {
+            return {ang * koeff, lin * koeff};
+        }
 
-        T rotation() { return ang; }
-        linalg::vec<T, 2> translation() { return lin; }
+        T rotation()
+        {
+            return ang;
+        }
+        linalg::vec<T, 2> translation()
+        {
+            return lin;
+        }
 
         T norm() const
         {
@@ -92,7 +116,10 @@ namespace ralgo
             return ang * o.ang + lin.x * o.lin.x + lin.y * o.lin.y;
         }
 
-        bool operator==(const screw &b) { return ang == b.ang && lin == b.lin; }
+        bool operator==(const screw &b)
+        {
+            return ang == b.ang && lin == b.lin;
+        }
 
         /*ssize_t print_to(nos::ostream& os) const
         { return nos::fprint_to(os, "({},{})", ang, lin); }*/

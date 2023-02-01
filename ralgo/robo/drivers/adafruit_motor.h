@@ -18,7 +18,10 @@ class Adafruit_MotorShield
     Adafruit_DCMotor M[4];
 
 public:
-    Adafruit_DCMotor *getMotor(int index) { return &M[index]; }
+    Adafruit_DCMotor *getMotor(int index)
+    {
+        return &M[index];
+    }
 };
 
 #define RELEASE 0
@@ -88,7 +91,10 @@ namespace robo
             }
         }
 
-        void stop() override { power(0); }
+        void stop() override
+        {
+            power(0);
+        }
     };
 }
 

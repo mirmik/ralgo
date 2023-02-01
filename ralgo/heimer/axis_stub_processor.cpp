@@ -1,13 +1,14 @@
 #include <ralgo/heimer/axis_stub_processor.h>
 #include <ralgo/heimer/sigtypes.h>
 
-heimer::axis_stub_processor::axis_stub_processor(const std::string& name)
+heimer::axis_stub_processor::axis_stub_processor(const std::string &name)
     : signal_processor(name, 0, 1)
-{}
+{
+}
 
-heimer::axis_stub_processor::axis_stub_processor(const std::string& name, 
-            const std::vector<axis_state*>& axstates) 
-        : signal_processor(name, 0, axstates.size()), axstates(axstates)
+heimer::axis_stub_processor::axis_stub_processor(
+    const std::string &name, const std::vector<axis_state *> &axstates)
+    : signal_processor(name, 0, axstates.size()), axstates(axstates)
 {
     for (auto axstate : axstates)
         bind(axstate);
@@ -15,7 +16,7 @@ heimer::axis_stub_processor::axis_stub_processor(const std::string& name,
 
 int heimer::axis_stub_processor::feedback(disctime_t time)
 {
-    for (auto _axstate : axstates) 
+    for (auto _axstate : axstates)
     {
         auto pos = _axstate->ctrpos;
         auto vel = _axstate->ctrvel;
@@ -39,8 +40,11 @@ int heimer::axis_stub_processor::serve(disctime_t)
     return 0;
 }
 
-static inline int bind(heimer::axis_stub_processor *axctr, int argc,
-                       char **argv, char *output, int outmax)
+static inline int bind(heimer::axis_stub_processor *axctr,
+                       int argc,
+                       char **argv,
+                       char *output,
+                       int outmax)
 {
     if (argc < 1)
     {
@@ -52,7 +56,8 @@ static inline int bind(heimer::axis_stub_processor *axctr, int argc,
 
     if (!sig)
     {
-        snprintf(output, outmax,
+        snprintf(output,
+                 outmax,
                  "Wrong signal name '%s' (type 'siglist' for display)",
                  argv[0]);
         return -1;
@@ -60,7 +65,8 @@ static inline int bind(heimer::axis_stub_processor *axctr, int argc,
 
     if (sig->type != SIGNAL_TYPE_AXIS_STATE)
     {
-        snprintf(output, outmax, "Wrong signal type. name:(%s)", sig->name.c_str());
+        snprintf(
+            output, outmax, "Wrong signal type. name:(%s)", sig->name.c_str());
         return -1;
     }
 
@@ -69,14 +75,16 @@ static inline int bind(heimer::axis_stub_processor *axctr, int argc,
     return 0;
 }
 
-static inline int info(heimer::axis_stub_processor *axctr, int, char **,
-                       char *output, int outmax)
+static inline int
+info(heimer::axis_stub_processor *axctr, int, char **, char *output, int outmax)
 {
     snprintf(output, outmax, "is_active: %d\r\n", axctr->is_active());
     return 0;
 }
 
-int heimer::axis_stub_processor::command(int argc, char **argv, char *output,
+int heimer::axis_stub_processor::command(int argc,
+                                         char **argv,
+                                         char *output,
                                          int outmax)
 {
     int status = ENOENT;

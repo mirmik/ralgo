@@ -2,7 +2,8 @@
 
 void ralgo::kinematic_chain_sensivities(ralgo::pose3<double> *constants,
                                         ralgo::screw3<double> *locsenses,
-                                        double *coords, int dim,
+                                        double *coords,
+                                        int dim,
                                         ralgo::screw3<double> *outsenses)
 {
     ralgo::pose3<double> temp;

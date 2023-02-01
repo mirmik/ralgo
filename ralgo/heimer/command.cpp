@@ -1,7 +1,7 @@
 #include <ralgo/heimer/command.h>
 
-#include <errno.h>
 #include <cstdlib>
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -31,14 +31,17 @@ using namespace heimer;
 
 static int help(int, char **, char *output, int maxsize)
 {
-    snprintf(output, maxsize,
+    snprintf(output,
+             maxsize,
              "Command list:\r\n"
              "signal - signal api utility\r\n");
 
     return 0;
 }
 
-int heimer::command_exec_safe(const char *str, char *output, int maxsize,
+int heimer::command_exec_safe(const char *str,
+                              char *output,
+                              int maxsize,
                               int *ret)
 {
     char copydata[96];
@@ -69,7 +72,9 @@ static int ctrnew(int argc, char **argv, char *output, int maxsize)
     {
         if (argc < 2)
         {
-            snprintf(output, maxsize, "usage: ctrnew axisctr NAME [NAME2] [NAME3] [...]\r\n");
+            snprintf(output,
+                     maxsize,
+                     "usage: ctrnew axisctr NAME [NAME2] [NAME3] [...]\r\n");
             return -1;
         }
 
@@ -181,7 +186,8 @@ static int ctrnew(int argc, char **argv, char *output, int maxsize)
         return 0;
     }
 
-    snprintf(output, maxsize,
+    snprintf(output,
+             maxsize,
              "Unresolved TYPE. Possible types: axisctr, axlinear, "
              "axsincos, axstub, chain3linctr, axmuxctr\r\n");
     return -1;
@@ -257,7 +263,8 @@ static int signew(int argc, char **argv, char *output, int maxsize)
         return 0;
     }
 
-    snprintf(output, maxsize,
+    snprintf(output,
+             maxsize,
              "Unresolved TYPE. Possible types: axstate, scalar, dof6state, "
              "axphase\r\n");
     return -1;
@@ -285,8 +292,11 @@ static int ctrlist(int, char **, char *output, int maxsize)
     dlist_for_each_entry(it, &signal_processor_list, list_lnk)
     {
         memset(buf, 0, 48);
-        snprintf(buf, 48, "%*s is_active:%d\r\n",
-                 SIGNAL_PROCESSOR_NAME_MAX_LENGTH, it->name().data(),
+        snprintf(buf,
+                 48,
+                 "%*s is_active:%d\r\n",
+                 SIGNAL_PROCESSOR_NAME_MAX_LENGTH,
+                 it->name().data(),
                  it->is_active());
         strncat(output, buf, maxsize);
     }
@@ -302,8 +312,11 @@ static int siglist(int, char **, char *output, int maxsize)
     dlist_for_each_entry(it, &signals_list, list_lnk)
     {
         memset(buf, 0, 48);
-        snprintf(buf, 48, "%*s controlled: %d\r\n",
-                 SIGNAL_PROCESSOR_NAME_MAX_LENGTH, it->name.c_str(),
+        snprintf(buf,
+                 48,
+                 "%*s controlled: %d\r\n",
+                 SIGNAL_PROCESSOR_NAME_MAX_LENGTH,
+                 it->name.c_str(),
                  it->current_controller != nullptr);
         strncat(output, buf, maxsize);
     }
@@ -369,9 +382,13 @@ struct rshell_command *heimer::commands_table = commands;
 
 int heimer::command(int argc, char **argv, char *output, int maxsize, int *ret)
 {
-    int sts = rshell_execute_v(argc, argv, commands, ret,
+    int sts = rshell_execute_v(argc,
+                               argv,
+                               commands,
+                               ret,
                                1, // drop submenu name
-                               output, maxsize);
+                               output,
+                               maxsize);
 
     return sts;
 }

@@ -308,7 +308,8 @@ namespace linalg
         };
         template <class T, class... U>
         struct scalars<T, U...> : std::conditional<std::is_arithmetic<T>::value,
-                                                   scalars<U...>, empty>::type
+                                                   scalars<U...>,
+                                                   empty>::type
         {
         };
         template <class... T> using scalars_t = typename scalars<T...>::type;
@@ -341,8 +342,8 @@ namespace linalg
                 size = M
             };
             template <int... I>
-            static constexpr type impl(seq<I...>, F f, const vec<A, M> &a,
-                                       const vec<B, M> &b)
+            static constexpr type
+            impl(seq<I...>, F f, const vec<A, M> &a, const vec<B, M> &b)
             {
                 return {f(getter<I>{}(a), getter<I>{}(b))...};
             }
@@ -384,8 +385,11 @@ namespace linalg
                 size = M
             };
             template <int... I>
-            static constexpr type impl(seq<I...>, F f, const vec<A, M> &a,
-                                       const vec<B, M> &b, const vec<C, M> &c)
+            static constexpr type impl(seq<I...>,
+                                       F f,
+                                       const vec<A, M> &a,
+                                       const vec<B, M> &b,
+                                       const vec<C, M> &c)
             {
                 return {f(getter<I>{}(a), getter<I>{}(b), getter<I>{}(c))...};
             }
@@ -399,8 +403,8 @@ namespace linalg
                 size = M
             };
             template <int... I>
-            static constexpr type impl(seq<I...>, F f, const vec<A, M> &a,
-                                       const vec<B, M> &b, C c)
+            static constexpr type
+            impl(seq<I...>, F f, const vec<A, M> &a, const vec<B, M> &b, C c)
             {
                 return {f(getter<I>{}(a), getter<I>{}(b), c)...};
             }
@@ -414,8 +418,8 @@ namespace linalg
                 size = M
             };
             template <int... I>
-            static constexpr type impl(seq<I...>, F f, const vec<A, M> &a, B b,
-                                       const vec<C, M> &c)
+            static constexpr type
+            impl(seq<I...>, F f, const vec<A, M> &a, B b, const vec<C, M> &c)
             {
                 return {f(getter<I>{}(a), b, getter<I>{}(c))...};
             }
@@ -429,8 +433,8 @@ namespace linalg
                 size = M
             };
             template <int... I>
-            static constexpr type impl(seq<I...>, F f, const vec<A, M> &a, B b,
-                                       C c)
+            static constexpr type
+            impl(seq<I...>, F f, const vec<A, M> &a, B b, C c)
             {
                 return {f(getter<I>{}(a), b, c)...};
             }
@@ -444,8 +448,8 @@ namespace linalg
                 size = M
             };
             template <int... I>
-            static constexpr type impl(seq<I...>, F f, A a, const vec<B, M> &b,
-                                       const vec<C, M> &c)
+            static constexpr type
+            impl(seq<I...>, F f, A a, const vec<B, M> &b, const vec<C, M> &c)
             {
                 return {f(a, getter<I>{}(b), getter<I>{}(c))...};
             }
@@ -459,8 +463,8 @@ namespace linalg
                 size = M
             };
             template <int... I>
-            static constexpr type impl(seq<I...>, F f, A a, const vec<B, M> &b,
-                                       C c)
+            static constexpr type
+            impl(seq<I...>, F f, A a, const vec<B, M> &b, C c)
             {
                 return {f(a, getter<I>{}(b), c)...};
             }
@@ -474,8 +478,8 @@ namespace linalg
                 size = M
             };
             template <int... I>
-            static constexpr type impl(seq<I...>, F f, A a, B b,
-                                       const vec<C, M> &c)
+            static constexpr type
+            impl(seq<I...>, F f, A a, B b, const vec<C, M> &c)
             {
                 return {f(a, b, getter<I>{}(c))...};
             }
@@ -491,8 +495,8 @@ namespace linalg
             template <int... J>
             static constexpr type impl(seq<J...>, F f, const mat<A, M, N> &a)
             {
-                return {apply<F, void, vec<A, M>>::impl(make_seq<0, M>{}, f,
-                                                        getter<J>{}(a))...};
+                return {apply<F, void, vec<A, M>>::impl(
+                    make_seq<0, M>{}, f, getter<J>{}(a))...};
             }
         };
         template <class F, int M, int N, class A, class B>
@@ -504,8 +508,8 @@ namespace linalg
                 size = N
             };
             template <int... J>
-            static constexpr type impl(seq<J...>, F f, const mat<A, M, N> &a,
-                                       const mat<B, M, N> &b)
+            static constexpr type
+            impl(seq<J...>, F f, const mat<A, M, N> &a, const mat<B, M, N> &b)
             {
                 return {apply<F, void, vec<A, M>, vec<B, M>>::impl(
                     make_seq<0, M>{}, f, getter<J>{}(a), getter<J>{}(b))...};
@@ -520,8 +524,8 @@ namespace linalg
                 size = N
             };
             template <int... J>
-            static constexpr type impl(seq<J...>, F f, const mat<A, M, N> &a,
-                                       B b)
+            static constexpr type
+            impl(seq<J...>, F f, const mat<A, M, N> &a, B b)
             {
                 return {apply<F, void, vec<A, M>, B>::impl(
                     make_seq<0, M>{}, f, getter<J>{}(a), b)...};
@@ -536,8 +540,8 @@ namespace linalg
                 size = N
             };
             template <int... J>
-            static constexpr type impl(seq<J...>, F f, A a,
-                                       const mat<B, M, N> &b)
+            static constexpr type
+            impl(seq<J...>, F f, A a, const mat<B, M, N> &b)
             {
                 return {apply<F, void, A, vec<B, M>>::impl(
                     make_seq<0, M>{}, f, a, getter<J>{}(b))...};
@@ -550,7 +554,10 @@ namespace linalg
             {
                 size = 0
             };
-            static constexpr type impl(seq<>, F f, A... a) { return f(a...); }
+            static constexpr type impl(seq<>, F f, A... a)
+            {
+                return f(a...);
+            }
         };
 
         // Function objects for selecting between alternatives
@@ -963,8 +970,14 @@ namespace linalg
         constexpr explicit vec(const vec<U, 1> &v) : vec(static_cast<T>(v.x))
         {
         }
-        constexpr const T &operator[](int) const { return x; }
-        LINALG_CONSTEXPR14 T &operator[](int) { return x; }
+        constexpr const T &operator[](int) const
+        {
+            return x;
+        }
+        LINALG_CONSTEXPR14 T &operator[](int)
+        {
+            return x;
+        }
 
         template <class U, class = detail::conv_t<vec, U>>
         constexpr vec(const U &u) : vec(converter<vec, U>{}(u))
@@ -988,8 +1001,14 @@ namespace linalg
             : vec(static_cast<T>(v.x), static_cast<T>(v.y))
         {
         }
-        constexpr const T &operator[](int i) const { return i == 0 ? x : y; }
-        LINALG_CONSTEXPR14 T &operator[](int i) { return i == 0 ? x : y; }
+        constexpr const T &operator[](int i) const
+        {
+            return i == 0 ? x : y;
+        }
+        LINALG_CONSTEXPR14 T &operator[](int i)
+        {
+            return i == 0 ? x : y;
+        }
 
         template <class U, class = detail::conv_t<vec, U>>
         constexpr vec(const U &u) : vec(converter<vec, U>{}(u))
@@ -1029,7 +1048,10 @@ namespace linalg
         {
             return *reinterpret_cast<const vec<T, 2> *>(this);
         }
-        vec<T, 2> &xy() { return *reinterpret_cast<vec<T, 2> *>(this); }
+        vec<T, 2> &xy()
+        {
+            return *reinterpret_cast<vec<T, 2> *>(this);
+        }
 
         template <class U, class = detail::conv_t<vec, U>>
         constexpr vec(const U &u) : vec(converter<vec, U>{}(u))
@@ -1061,7 +1083,9 @@ namespace linalg
         constexpr explicit vec(const T *p) : vec(p[0], p[1], p[2], p[3]) {}
         template <class U>
         constexpr explicit vec(const vec<U, 4> &v)
-            : vec(static_cast<T>(v.x), static_cast<T>(v.y), static_cast<T>(v.z),
+            : vec(static_cast<T>(v.x),
+                  static_cast<T>(v.y),
+                  static_cast<T>(v.z),
                   static_cast<T>(v.w))
         {
         }
@@ -1081,8 +1105,14 @@ namespace linalg
         {
             return *reinterpret_cast<const vec<T, 3> *>(this);
         }
-        vec<T, 2> &xy() { return *reinterpret_cast<vec<T, 2> *>(this); }
-        vec<T, 3> &xyz() { return *reinterpret_cast<vec<T, 3> *>(this); }
+        vec<T, 2> &xy()
+        {
+            return *reinterpret_cast<vec<T, 2> *>(this);
+        }
+        vec<T, 3> &xyz()
+        {
+            return *reinterpret_cast<vec<T, 3> *>(this);
+        }
 
         template <class U, class = detail::conv_t<vec, U>>
         constexpr vec(const U &u) : vec(converter<vec, U>{}(u))
@@ -1109,9 +1139,18 @@ namespace linalg
         constexpr explicit mat(const mat<U, M, 1> &m) : mat(V(m.x))
         {
         }
-        constexpr vec<T, 1> row(int i) const { return {x[i]}; }
-        constexpr const V &operator[](int) const { return x; }
-        LINALG_CONSTEXPR14 V &operator[](int) { return x; }
+        constexpr vec<T, 1> row(int i) const
+        {
+            return {x[i]};
+        }
+        constexpr const V &operator[](int) const
+        {
+            return x;
+        }
+        LINALG_CONSTEXPR14 V &operator[](int)
+        {
+            return x;
+        }
 
         template <class U, class = detail::conv_t<mat, U>>
         constexpr mat(const U &u) : mat(converter<mat, U>{}(u))
@@ -1135,9 +1174,18 @@ namespace linalg
         constexpr explicit mat(const mat<U, M, 2> &m) : mat(V(m.x), V(m.y))
         {
         }
-        constexpr vec<T, 2> row(int i) const { return {x[i], y[i]}; }
-        constexpr const V &operator[](int j) const { return j == 0 ? x : y; }
-        LINALG_CONSTEXPR14 V &operator[](int j) { return j == 0 ? x : y; }
+        constexpr vec<T, 2> row(int i) const
+        {
+            return {x[i], y[i]};
+        }
+        constexpr const V &operator[](int j) const
+        {
+            return j == 0 ? x : y;
+        }
+        LINALG_CONSTEXPR14 V &operator[](int j)
+        {
+            return j == 0 ? x : y;
+        }
 
         template <class U, class = detail::conv_t<mat, U>>
         constexpr mat(const U &u) : mat(converter<mat, U>{}(u))
@@ -1168,7 +1216,10 @@ namespace linalg
             : mat(V(m.x), V(m.y), V(m.z))
         {
         }
-        constexpr vec<T, 3> row(int i) const { return {x[i], y[i], z[i]}; }
+        constexpr vec<T, 3> row(int i) const
+        {
+            return {x[i], y[i], z[i]};
+        }
         constexpr const V &operator[](int j) const
         {
             return j == 0 ? x : j == 1 ? y : z;
@@ -1239,11 +1290,17 @@ namespace linalg
     };
     template <class T> struct converter<mat<T, 1, 1>, identity_t>
     {
-        mat<T, 1, 1> operator()(identity_t) const { return {vec<T, 1>{1}}; }
+        mat<T, 1, 1> operator()(identity_t) const
+        {
+            return {vec<T, 1>{1}};
+        }
     };
     template <class T> struct converter<mat<T, 2, 2>, identity_t>
     {
-        mat<T, 2, 2> operator()(identity_t) const { return {{1, 0}, {0, 1}}; }
+        mat<T, 2, 2> operator()(identity_t) const
+        {
+            return {{1, 0}, {0, 1}};
+        }
     };
     template <class T> struct converter<mat<T, 3, 3>, identity_t>
     {
@@ -1319,7 +1376,8 @@ namespace linalg
     constexpr apply_t<F, A...> apply(F func, const A &... args)
     {
         return detail::apply<F, void, A...>::impl(
-            detail::make_seq<0, detail::apply<F, void, A...>::size>{}, func,
+            detail::make_seq<0, detail::apply<F, void, A...>::size>{},
+            func,
             args...);
     }
 
@@ -1564,8 +1622,8 @@ namespace linalg
     template <int I0, int J0, int I1, int J1, class T, int M, int N>
     constexpr mat<T, I1 - I0, J1 - J0> submat(const mat<T, M, N> &a)
     {
-        return detail::swizzle(a, detail::make_seq<I0, I1>{},
-                               detail::make_seq<J0, J1>{});
+        return detail::swizzle(
+            a, detail::make_seq<I0, I1>{}, detail::make_seq<J0, J1>{});
     }
 
     // Component-wise standard library math functions
@@ -1703,20 +1761,20 @@ namespace linalg
         return apply(detail::max{}, a, b);
     }
     template <class X, class L, class H>
-    constexpr apply_t<detail::clamp, X, L, H> clamp(const X &x, const L &l,
-                                                    const H &h)
+    constexpr apply_t<detail::clamp, X, L, H>
+    clamp(const X &x, const L &l, const H &h)
     {
         return apply(detail::clamp{}, x, l, h);
     }
     template <class P, class A, class B>
-    constexpr apply_t<detail::select, P, A, B> select(const P &p, const A &a,
-                                                      const B &b)
+    constexpr apply_t<detail::select, P, A, B>
+    select(const P &p, const A &a, const B &b)
     {
         return apply(detail::select{}, p, a, b);
     }
     template <class A, class B, class T>
-    constexpr apply_t<detail::lerp, A, B, T> lerp(const A &a, const B &b,
-                                                  const T &t)
+    constexpr apply_t<detail::lerp, A, B, T>
+    lerp(const A &a, const B &b, const T &t)
     {
         return apply(detail::lerp{}, a, b, t);
     }
@@ -1737,7 +1795,8 @@ namespace linalg
     template <class T>
     constexpr vec<T, 3> cross(const vec<T, 3> &a, const vec<T, 3> &b)
     {
-        return {a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z,
+        return {a.y * b.z - a.z * b.y,
+                a.z * b.x - a.x * b.z,
                 a.x * b.y - a.y * b.x};
     }
     template <class T, int M>
@@ -1844,7 +1903,8 @@ namespace linalg
     template <class T> constexpr vec<T, 3> qxdir(const vec<T, 4> &q)
     {
         return {q.w * q.w + q.x * q.x - q.y * q.y - q.z * q.z,
-                (q.x * q.y + q.z * q.w) * 2, (q.z * q.x - q.y * q.w) * 2};
+                (q.x * q.y + q.z * q.w) * 2,
+                (q.z * q.x - q.y * q.w) * 2};
     }
     template <class T> constexpr vec<T, 3> qydir(const vec<T, 4> &q)
     {
@@ -1854,7 +1914,8 @@ namespace linalg
     }
     template <class T> constexpr vec<T, 3> qzdir(const vec<T, 4> &q)
     {
-        return {(q.z * q.x + q.y * q.w) * 2, (q.y * q.z - q.x * q.w) * 2,
+        return {(q.z * q.x + q.y * q.w) * 2,
+                (q.y * q.z - q.x * q.w) * 2,
                 q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z};
     }
     template <class T> constexpr mat<T, 3, 3> qmat(const vec<T, 4> &q)
@@ -1927,26 +1988,30 @@ namespace linalg
         return {mul(a, b.x), mul(a, b.y), mul(a, b.z), mul(a, b.w)};
     }
     template <class T, int M, int N, int P>
-    constexpr vec<T, M> mul(const mat<T, M, N> &a, const mat<T, N, P> &b,
-                            const vec<T, P> &c)
+    constexpr vec<T, M>
+    mul(const mat<T, M, N> &a, const mat<T, N, P> &b, const vec<T, P> &c)
     {
         return mul(mul(a, b), c);
     }
     template <class T, int M, int N, int P, int Q>
-    constexpr mat<T, M, Q> mul(const mat<T, M, N> &a, const mat<T, N, P> &b,
-                               const mat<T, P, Q> &c)
+    constexpr mat<T, M, Q>
+    mul(const mat<T, M, N> &a, const mat<T, N, P> &b, const mat<T, P, Q> &c)
     {
         return mul(mul(a, b), c);
     }
     template <class T, int M, int N, int P, int Q>
-    constexpr vec<T, M> mul(const mat<T, M, N> &a, const mat<T, N, P> &b,
-                            const mat<T, P, Q> &c, const vec<T, Q> &d)
+    constexpr vec<T, M> mul(const mat<T, M, N> &a,
+                            const mat<T, N, P> &b,
+                            const mat<T, P, Q> &c,
+                            const vec<T, Q> &d)
     {
         return mul(mul(a, b, c), d);
     }
     template <class T, int M, int N, int P, int Q, int R>
-    constexpr mat<T, M, R> mul(const mat<T, M, N> &a, const mat<T, N, P> &b,
-                               const mat<T, P, Q> &c, const mat<T, Q, R> &d)
+    constexpr mat<T, M, R> mul(const mat<T, M, N> &a,
+                               const mat<T, N, P> &b,
+                               const mat<T, P, Q> &c,
+                               const mat<T, Q, R> &d)
     {
         return mul(mul(a, b, c), d);
     }
@@ -2048,12 +2113,18 @@ namespace linalg
     }
 
     // Vectors and matrices can be used as ranges
-    template <class T, int M> T *begin(vec<T, M> &a) { return &a.x; }
+    template <class T, int M> T *begin(vec<T, M> &a)
+    {
+        return &a.x;
+    }
     template <class T, int M> const T *begin(const vec<T, M> &a)
     {
         return &a.x;
     }
-    template <class T, int M> T *end(vec<T, M> &a) { return begin(a) + M; }
+    template <class T, int M> T *end(vec<T, M> &a)
+    {
+        return begin(a) + M;
+    }
     template <class T, int M> const T *end(const vec<T, M> &a)
     {
         return begin(a) + M;
@@ -2119,10 +2190,19 @@ namespace linalg
         return {{qxdir(q), 0}, {qydir(q), 0}, {qzdir(q), 0}, {p, 1}};
     }
     template <class T>
-    mat<T, 4, 4> frustum_matrix(T x0, T x1, T y0, T y1, T n, T f,
-                                fwd_axis a = neg_z, z_range z = neg_one_to_one);
+    mat<T, 4, 4> frustum_matrix(T x0,
+                                T x1,
+                                T y0,
+                                T y1,
+                                T n,
+                                T f,
+                                fwd_axis a = neg_z,
+                                z_range z = neg_one_to_one);
     template <class T>
-    mat<T, 4, 4> perspective_matrix(T fovy, T aspect, T n, T f,
+    mat<T, 4, 4> perspective_matrix(T fovy,
+                                    T aspect,
+                                    T n,
+                                    T f,
                                     fwd_axis a = neg_z,
                                     z_range z = neg_one_to_one)
     {
@@ -2133,7 +2213,10 @@ namespace linalg
     // Provide implicit conversion between linalg::vec<T,M> and std::array<T,M>
     template <class T> struct converter<vec<T, 1>, std::array<T, 1>>
     {
-        vec<T, 1> operator()(const std::array<T, 1> &a) const { return {a[0]}; }
+        vec<T, 1> operator()(const std::array<T, 1> &a) const
+        {
+            return {a[0]};
+        }
     };
     template <class T> struct converter<vec<T, 2>, std::array<T, 2>>
     {
@@ -2159,7 +2242,10 @@ namespace linalg
 
     template <class T> struct converter<std::array<T, 1>, vec<T, 1>>
     {
-        std::array<T, 1> operator()(const vec<T, 1> &a) const { return {a[0]}; }
+        std::array<T, 1> operator()(const vec<T, 1> &a) const
+        {
+            return {a[0]};
+        }
     };
     template <class T> struct converter<std::array<T, 2>, vec<T, 2>>
     {
@@ -2447,11 +2533,14 @@ namespace std
 template <class T>
 constexpr linalg::mat<T, 3, 3> linalg::adjugate(const mat<T, 3, 3> &a)
 {
-    return {{a.y.y * a.z.z - a.z.y * a.y.z, a.z.y * a.x.z - a.x.y * a.z.z,
+    return {{a.y.y * a.z.z - a.z.y * a.y.z,
+             a.z.y * a.x.z - a.x.y * a.z.z,
              a.x.y * a.y.z - a.y.y * a.x.z},
-            {a.y.z * a.z.x - a.z.z * a.y.x, a.z.z * a.x.x - a.x.z * a.z.x,
+            {a.y.z * a.z.x - a.z.z * a.y.x,
+             a.z.z * a.x.x - a.x.z * a.z.x,
              a.x.z * a.y.x - a.y.z * a.x.x},
-            {a.y.x * a.z.y - a.z.x * a.y.y, a.z.x * a.x.y - a.x.x * a.z.y,
+            {a.y.x * a.z.y - a.z.x * a.y.y,
+             a.z.x * a.x.y - a.x.x * a.z.y,
              a.x.x * a.y.y - a.y.x * a.x.y}};
 }
 
@@ -2527,8 +2616,10 @@ template <class T> constexpr T linalg::determinant(const mat<T, 4, 4> &a)
 template <class T>
 linalg::vec<T, 4> linalg::rotation_quat(const mat<T, 3, 3> &m)
 {
-    const vec<T, 4> q{m.x.x - m.y.y - m.z.z, m.y.y - m.x.x - m.z.z,
-                      m.z.z - m.x.x - m.y.y, m.x.x + m.y.y + m.z.z},
+    const vec<T, 4> q{m.x.x - m.y.y - m.z.z,
+                      m.y.y - m.x.x - m.z.z,
+                      m.z.z - m.x.x - m.y.y,
+                      m.x.x + m.y.y + m.z.z},
         s[]{{1, m.x.y + m.y.x, m.z.x + m.x.z, m.y.z - m.z.y},
             {m.x.y + m.y.x, 1, m.y.z + m.z.y, m.z.x - m.x.z},
             {m.x.z + m.z.x, m.y.z + m.z.y, 1, m.x.y - m.y.x},
@@ -2537,14 +2628,16 @@ linalg::vec<T, 4> linalg::rotation_quat(const mat<T, 3, 3> &m)
 }
 
 template <class T>
-linalg::mat<T, 4, 4> linalg::frustum_matrix(T x0, T x1, T y0, T y1, T n, T f,
-                                            fwd_axis a, z_range z)
+linalg::mat<T, 4, 4>
+linalg::frustum_matrix(T x0, T x1, T y0, T y1, T n, T f, fwd_axis a, z_range z)
 {
     const T s = a == pos_z ? T(1) : T(-1), o = z == neg_one_to_one ? n : 0;
     return {{2 * n / (x1 - x0), 0, 0, 0},
             {0, 2 * n / (y1 - y0), 0, 0},
-            {-s * (x0 + x1) / (x1 - x0), -s * (y0 + y1) / (y1 - y0),
-             s * (f + o) / (f - n), s},
+            {-s * (x0 + x1) / (x1 - x0),
+             -s * (y0 + y1) / (y1 - y0),
+             s * (f + o) / (f - n),
+             s},
             {0, 0, -(n + o) * f / (f - n), 0}};
 }
 

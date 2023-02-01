@@ -6,12 +6,9 @@
 // Separate proprietary licenses are available from Terathon Software.
 //
 
-
 #include "TSBivector3D.h"
 
-
 using namespace Terathon;
-
 
 const ConstBivector3D Bivector3D::zero = {0.0F, 0.0F, 0.0F};
 

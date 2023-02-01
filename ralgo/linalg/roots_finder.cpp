@@ -34,8 +34,8 @@
 //
 //**********************************************************************
 
-#include <math.h>
 #include <float.h>
+#include <math.h>
 #include <ralgo/linalg/roots_finder.h>
 
 //======================================================================
@@ -74,17 +74,13 @@ namespace
 //  Constructor: PolynomialRootFinder::PolynomialRootFinder
 //======================================================================
 
-PolynomialRootFinder::PolynomialRootFinder()
-{
-}
+PolynomialRootFinder::PolynomialRootFinder() {}
 
 //======================================================================
 //  Destructor: PolynomialRootFinder::~PolynomialRootFinder
 //======================================================================
 
-PolynomialRootFinder::~PolynomialRootFinder()
-{
-}
+PolynomialRootFinder::~PolynomialRootFinder() {}
 
 //======================================================================
 //  Member Function: PolynomialRootFinder::FindRoots
@@ -143,12 +139,12 @@ PolynomialRootFinder::~PolynomialRootFinder()
 //
 //======================================================================
 
-PolynomialRootFinder::PolynomialRootStatus PolynomialRootFinder::FindRoots(
-                                       double * coefficient_vector_ptr,
-                                       int degree,
-                                       double * real_zero_vector_ptr,
-                                       double * imaginary_zero_vector_ptr,
-                                       int * number_of_roots_found_ptr)
+PolynomialRootFinder::PolynomialRootStatus
+PolynomialRootFinder::FindRoots(double *coefficient_vector_ptr,
+                                int degree,
+                                double *real_zero_vector_ptr,
+                                double *imaginary_zero_vector_ptr,
+                                int *number_of_roots_found_ptr)
 {
     //--------------------------------------------------------------
     //  The algorithm fails if the polynomial is not at least
@@ -189,8 +185,8 @@ PolynomialRootFinder::PolynomialRootStatus PolynomialRootFinder::FindRoots(
         m_k_vector_ptr = &m_k_vector[0];
         m_qk_vector_ptr = &m_qk_vector[0];
         m_svk_vector_ptr = &m_svk_vector[0];
-        double * temp_vector_ptr = &temp_vector[0];
-        PRF_Float_T * pt_vector_ptr = &pt_vector[0];
+        double *temp_vector_ptr = &temp_vector[0];
+        PRF_Float_T *pt_vector_ptr = &pt_vector[0];
 
         //--------------------------------------------------------------
         //  m_are and m_mre refer to the unit error in + and *
@@ -207,7 +203,7 @@ PolynomialRootFinder::PolynomialRootStatus PolynomialRootFinder::FindRoots(
         //--------------------------------------------------------------
 
         PRF_Float_T xx = f_XX_INITIAL_VALUE;
-        PRF_Float_T yy = - xx;
+        PRF_Float_T yy = -xx;
         PRF_Float_T cosr = f_COSR_INITIAL_VALUE;
         PRF_Float_T sinr = f_SINR_INITIAL_VALUE;
         m_n = m_degree;
@@ -275,7 +271,7 @@ PolynomialRootFinder::PolynomialRootStatus PolynomialRootFinder::FindRoots(
                     if (m_n == 1)
                     {
                         real_zero_vector_ptr[m_degree - 1] =
-                            - m_p_vector_ptr[1] / m_p_vector_ptr[0];
+                            -m_p_vector_ptr[1] / m_p_vector_ptr[0];
 
                         imaginary_zero_vector_ptr[m_degree - 1] = 0.0;
                     }
@@ -308,7 +304,8 @@ PolynomialRootFinder::PolynomialRootStatus PolynomialRootFinder::FindRoots(
 
                 for (ii = 0; ii < m_n_plus_one; ++ii)
                 {
-                    xvar = (PRF_Float_T)(::fabs((PRF_Float_T)(m_p_vector_ptr[ii])));
+                    xvar = (PRF_Float_T)(
+                        ::fabs((PRF_Float_T)(m_p_vector_ptr[ii])));
 
                     if (xvar > max)
                     {
@@ -341,7 +338,7 @@ PolynomialRootFinder::PolynomialRootStatus PolynomialRootFinder::FindRoots(
                 {
                     do_scaling_flag = max < 10.0;
 
-                    if (! do_scaling_flag)
+                    if (!do_scaling_flag)
                     {
                         if (sc == 0.0)
                         {
@@ -374,18 +371,19 @@ PolynomialRootFinder::PolynomialRootStatus PolynomialRootFinder::FindRoots(
 
                 for (ii = 0; ii < m_n_plus_one; ++ii)
                 {
-                     pt_vector_ptr[ii] = (PRF_Float_T)(::fabs((PRF_Float_T)(m_p_vector_ptr[ii])));
+                    pt_vector_ptr[ii] = (PRF_Float_T)(
+                        ::fabs((PRF_Float_T)(m_p_vector_ptr[ii])));
                 }
 
-                pt_vector_ptr[m_n] = - pt_vector_ptr[m_n];
+                pt_vector_ptr[m_n] = -pt_vector_ptr[m_n];
 
                 //------------------------------------------------------
                 //  Compute upper estimate of bound.
                 //------------------------------------------------------
 
-                xvar = (PRF_Float_T)
-                    (::exp((::log(- pt_vector_ptr[m_n]) - ::log(pt_vector_ptr[0]))
-                        / (PRF_Float_T)(m_n)));
+                xvar = (PRF_Float_T)(::exp(
+                    (::log(-pt_vector_ptr[m_n]) - ::log(pt_vector_ptr[0])) /
+                    (PRF_Float_T)(m_n)));
 
                 //------------------------------------------------------
                 //  If newton step at the origin is better, use it.
@@ -395,7 +393,7 @@ PolynomialRootFinder::PolynomialRootStatus PolynomialRootFinder::FindRoots(
 
                 if (pt_vector_ptr[m_n - 1] != 0.0)
                 {
-                    xm = - pt_vector_ptr[m_n] / pt_vector_ptr[m_n - 1];
+                    xm = -pt_vector_ptr[m_n] / pt_vector_ptr[m_n - 1];
 
                     if (xm < xvar)
                     {
@@ -466,8 +464,9 @@ PolynomialRootFinder::PolynomialRootStatus PolynomialRootFinder::FindRoots(
 
                 for (ii = 1; ii < m_n; ++ii)
                 {
-                    m_k_vector_ptr[ii] =
-                        (PRF_Float_T)(m_n - ii) * m_p_vector_ptr[ii] / (PRF_Float_T)(m_n);
+                    m_k_vector_ptr[ii] = (PRF_Float_T)(m_n - ii) *
+                                         m_p_vector_ptr[ii] /
+                                         (PRF_Float_T)(m_n);
                 }
 
                 m_k_vector_ptr[0] = m_p_vector_ptr[0];
@@ -502,17 +501,18 @@ PolynomialRootFinder::PolynomialRootStatus PolynomialRootFinder::FindRoots(
                         //  of m_k_vector_ptr at 0 is nonzero.
                         //----------------------------------------------
 
-                        double tvar = - aa / cc;
+                        double tvar = -aa / cc;
 
                         for (jvar = n_minus_one; jvar > 0; --jvar)
                         {
                             m_k_vector_ptr[jvar] =
-                                tvar * m_k_vector_ptr[jvar - 1] + m_p_vector_ptr[jvar];
+                                tvar * m_k_vector_ptr[jvar - 1] +
+                                m_p_vector_ptr[jvar];
                         }
 
                         m_k_vector_ptr[0] = m_p_vector_ptr[0];
-                        zerok_flag =
-                            ::fabs(m_k_vector_ptr[m_n - 1]) <= ::fabs(bb) * f_ETA_N;
+                        zerok_flag = ::fabs(m_k_vector_ptr[m_n - 1]) <=
+                                     ::fabs(bb) * f_ETA_N;
                     }
                 }
 
@@ -546,7 +546,7 @@ PolynomialRootFinder::PolynomialRootStatus PolynomialRootFinder::FindRoots(
                     xx = xxx;
                     m_real_s = bnd * xx;
                     m_imag_s = bnd * yy;
-                    m_u = - 2.0 * m_real_s;
+                    m_u = -2.0 * m_real_s;
                     m_v = bnd;
 
                     //--------------------------------------------------
@@ -580,7 +580,7 @@ PolynomialRootFinder::PolynomialRootStatus PolynomialRootFinder::FindRoots(
 
                         if (nz != 1)
                         {
-                            real_zero_vector_ptr[jvar + 1 ] = m_real_lz;
+                            real_zero_vector_ptr[jvar + 1] = m_real_lz;
                             imaginary_zero_vector_ptr[jvar + 1] = m_imag_lz;
                         }
 
@@ -634,13 +634,8 @@ int PolynomialRootFinder::Fxshfr(int l2var)
     //  Evaluate polynomial by synthetic division.
     //------------------------------------------------------------------
 
-    QuadraticSyntheticDivision(m_n_plus_one,
-                               m_u,
-                               m_v,
-                               m_p_vector_ptr,
-                               m_qp_vector_ptr,
-                               m_a,
-                               m_b);
+    QuadraticSyntheticDivision(
+        m_n_plus_one, m_u, m_v, m_p_vector_ptr, m_qp_vector_ptr, m_a, m_b);
 
     int itype = CalcSc();
 
@@ -676,7 +671,7 @@ int PolynomialRootFinder::Fxshfr(int l2var)
 
         if (m_k_vector_ptr[m_n - 1] != 0.0)
         {
-            ss = (double)(- m_p_vector_ptr[m_n] / m_k_vector_ptr[m_n - 1]);
+            ss = (double)(-m_p_vector_ptr[m_n] / m_k_vector_ptr[m_n - 1]);
         }
 
         double tv = 1.0;
@@ -753,11 +748,11 @@ int PolynomialRootFinder::Fxshfr(int l2var)
                 bool exit_outer_loop_flag = false;
 
                 bool start_with_real_iteration_flag =
-                    (spass_flag && ((! vpass_flag) || (tss < tvv)));
+                    (spass_flag && ((!vpass_flag) || (tss < tvv)));
 
                 do
                 {
-                    if (! start_with_real_iteration_flag)
+                    if (!start_with_real_iteration_flag)
                     {
                         nz = QuadraticIteration(ui, vi);
 
@@ -782,10 +777,10 @@ int PolynomialRootFinder::Fxshfr(int l2var)
                     //  tried and the svar sequence is converging.
                     //--------------------------------------------------
 
-                    if (((! stry_flag) && spass_flag)
-                        || start_with_real_iteration_flag)
+                    if (((!stry_flag) && spass_flag) ||
+                        start_with_real_iteration_flag)
                     {
-                        if (! start_with_real_iteration_flag)
+                        if (!start_with_real_iteration_flag)
                         {
                             for (ii = 0; ii < m_n; ++ii)
                             {
@@ -824,7 +819,7 @@ int PolynomialRootFinder::Fxshfr(int l2var)
                             //  iteration.
                             //------------------------------------------
 
-                            ui = - (svar + svar);
+                            ui = -(svar + svar);
                             vi = svar * svar;
 
                             continue;
@@ -847,8 +842,7 @@ int PolynomialRootFinder::Fxshfr(int l2var)
                     //  Try quadratic iteration if it has not been
                     //  tried and the m_v sequence is converging.
                     //----------------------------------------------
-                }
-                while (vpass_flag && (! vtry_flag));
+                } while (vpass_flag && (!vtry_flag));
 
                 if (exit_outer_loop_flag)
                 {
@@ -912,20 +906,16 @@ int PolynomialRootFinder::QuadraticIteration(double uu, double vv)
 
     while (true)
     {
-        SolveQuadraticEquation(1.0,
-                               m_u,
-                               m_v,
-                               m_real_sz,
-                               m_imag_sz,
-                               m_real_lz,
-                               m_imag_lz);
+        SolveQuadraticEquation(
+            1.0, m_u, m_v, m_real_sz, m_imag_sz, m_real_lz, m_imag_lz);
 
         //--------------------------------------------------------------
         //  Return if roots of the quadratic are real and not close
         //  to multiple or nearly equal and  of opposite sign.
         //--------------------------------------------------------------
 
-        if (::fabs(::fabs(m_real_sz) - ::fabs(m_real_lz)) > 0.01 * ::fabs(m_real_lz))
+        if (::fabs(::fabs(m_real_sz) - ::fabs(m_real_lz)) >
+            0.01 * ::fabs(m_real_lz))
         {
             break;
         }
@@ -934,15 +924,11 @@ int PolynomialRootFinder::QuadraticIteration(double uu, double vv)
         //  Evaluate polynomial by quadratic synthetic division.
         //------------------------------------------------------------------
 
-        QuadraticSyntheticDivision(m_n_plus_one,
-                                   m_u,
-                                   m_v,
-                                   m_p_vector_ptr,
-                                   m_qp_vector_ptr,
-                                   m_a,
-                                   m_b);
+        QuadraticSyntheticDivision(
+            m_n_plus_one, m_u, m_v, m_p_vector_ptr, m_qp_vector_ptr, m_a, m_b);
 
-        double mp = (double)(::fabs(m_a - m_real_sz * m_b) + ::fabs(m_imag_sz * m_b));
+        double mp =
+            (double)(::fabs(m_a - m_real_sz * m_b) + ::fabs(m_imag_sz * m_b));
 
         //--------------------------------------------------------------
         //  Compute a rigorous  bound on the rounding error in
@@ -950,8 +936,9 @@ int PolynomialRootFinder::QuadraticIteration(double uu, double vv)
         //--------------------------------------------------------------
 
         double zm = (double)(::sqrt((double)(::fabs((double)(m_v)))));
-        double ee = (double)(2.0 * (double)(::fabs((double)(m_qp_vector_ptr[0]))));
-        double tvar = (double)(- m_real_sz * m_b);
+        double ee =
+            (double)(2.0 * (double)(::fabs((double)(m_qp_vector_ptr[0]))));
+        double tvar = (double)(-m_real_sz * m_b);
         int ii = 0;
 
         for (ii = 1; ii < m_n; ++ii)
@@ -960,9 +947,11 @@ int PolynomialRootFinder::QuadraticIteration(double uu, double vv)
         }
 
         ee = ee * zm + (double)(::fabs((double)(m_a) + tvar));
-        ee = (double)((5.0 * m_mre + 4.0 * m_are) * ee
-            - (5.0 * m_mre + 2.0 * m_are) * ((double)(::fabs((double)(m_a) + tvar)) + (double)(::fabs((double)(m_b))) * zm)
-                + 2.0 * m_are * (double)(::fabs(tvar)));
+        ee = (double)((5.0 * m_mre + 4.0 * m_are) * ee -
+                      (5.0 * m_mre + 2.0 * m_are) *
+                          ((double)(::fabs((double)(m_a) + tvar)) +
+                           (double)(::fabs((double)(m_b))) * zm) +
+                      2.0 * m_are * (double)(::fabs(tvar)));
 
         //--------------------------------------------------------------
         //  Iteration has converged sufficiently if the polynomial
@@ -986,8 +975,7 @@ int PolynomialRootFinder::QuadraticIteration(double uu, double vv)
             break;
         }
 
-        if ((jvar >= 2) && ((relstp <= 0.01)
-            && (mp >= omp) && (! tried_flag)))
+        if ((jvar >= 2) && ((relstp <= 0.01) && (mp >= omp) && (!tried_flag)))
         {
             //----------------------------------------------------------
             //  A cluster appears to be stalling the convergence.
@@ -1061,7 +1049,7 @@ int PolynomialRootFinder::QuadraticIteration(double uu, double vv)
 //     Number of zero found.
 //======================================================================
 
-int PolynomialRootFinder::RealIteration(double & sss, int & flag)
+int PolynomialRootFinder::RealIteration(double &sss, int &flag)
 {
     //------------------------------------------------------------------
     //  Main loop
@@ -1098,7 +1086,9 @@ int PolynomialRootFinder::RealIteration(double & sss, int & flag)
         //--------------------------------------------------------------
 
         PRF_Float_T ms = (PRF_Float_T)(::fabs(svar));
-        PRF_Float_T ee = (m_mre / (m_are + m_mre)) * (PRF_Float_T)(::fabs((PRF_Float_T)(m_qp_vector_ptr[0])));
+        PRF_Float_T ee =
+            (m_mre / (m_are + m_mre)) *
+            (PRF_Float_T)(::fabs((PRF_Float_T)(m_qp_vector_ptr[0])));
 
         for (ii = 1; ii < m_n_plus_one; ++ii)
         {
@@ -1129,9 +1119,8 @@ int PolynomialRootFinder::RealIteration(double & sss, int & flag)
             break;
         }
 
-        if ((jvar >= 2)
-            && ((::fabs(tvar) <= 0.001 * ::fabs(svar - tvar))
-            && (mp > omp)))
+        if ((jvar >= 2) &&
+            ((::fabs(tvar) <= 0.001 * ::fabs(svar - tvar)) && (mp > omp)))
         {
             //----------------------------------------------------------
             //  A cluster of zeros near the real axis has been
@@ -1179,12 +1168,13 @@ int PolynomialRootFinder::RealIteration(double & sss, int & flag)
             //  value of m_k_vector_ptr at svar is non-zero.
             //----------------------------------------------------------
 
-            tvar = - pv / kv;
+            tvar = -pv / kv;
             m_k_vector_ptr[0] = m_qp_vector_ptr[0];
 
             for (ii = 1; ii < m_n; ++ii)
             {
-                m_k_vector_ptr[ii] = tvar * m_qk_vector_ptr[ii - 1] + m_qp_vector_ptr[ii];
+                m_k_vector_ptr[ii] =
+                    tvar * m_qk_vector_ptr[ii - 1] + m_qp_vector_ptr[ii];
             }
         }
 
@@ -1203,7 +1193,7 @@ int PolynomialRootFinder::RealIteration(double & sss, int & flag)
 
         if (::fabs(kv) > ::fabs(m_k_vector_ptr[m_n - 1]) * f_ETA_N)
         {
-            tvar = - pv / kv;
+            tvar = -pv / kv;
         }
 
         svar = svar + tvar;
@@ -1228,18 +1218,13 @@ int PolynomialRootFinder::CalcSc()
     //  Synthetic division of m_k_vector_ptr by the quadratic 1, m_u, m_v.
     //------------------------------------------------------------------
 
-    QuadraticSyntheticDivision(m_n,
-                               m_u,
-                               m_v,
-                               m_k_vector_ptr,
-                               m_qk_vector_ptr,
-                               m_c,
-                               m_d);
+    QuadraticSyntheticDivision(
+        m_n, m_u, m_v, m_k_vector_ptr, m_qk_vector_ptr, m_c, m_d);
 
     int itype = 0;
 
-    if ((::fabs(m_c) <= ::fabs(m_k_vector_ptr[m_n - 1]) * f_ETA_N_SQUARED)
-        && (::fabs(m_d) <= ::fabs(m_k_vector_ptr[m_n - 2]) * f_ETA_N_SQUARED))
+    if ((::fabs(m_c) <= ::fabs(m_k_vector_ptr[m_n - 1]) * f_ETA_N_SQUARED) &&
+        (::fabs(m_d) <= ::fabs(m_k_vector_ptr[m_n - 2]) * f_ETA_N_SQUARED))
     {
         //--------------------------------------------------------------
         //  itype == 3 Indicates the quadratic is almost a
@@ -1321,11 +1306,12 @@ void PolynomialRootFinder::NextK(int itype)
             //----------------------------------------------------------
 
             m_k_vector_ptr[0] = 0.0;
-            m_k_vector_ptr[1] = - m_a7 * m_qp_vector_ptr[0];
+            m_k_vector_ptr[1] = -m_a7 * m_qp_vector_ptr[0];
 
             for (ii = 2; ii < m_n; ++ii)
             {
-                m_k_vector_ptr[ii] = m_a3 * m_qk_vector_ptr[ii - 2] - m_a7 * m_qp_vector_ptr[ii - 1];
+                m_k_vector_ptr[ii] = m_a3 * m_qk_vector_ptr[ii - 2] -
+                                     m_a7 * m_qp_vector_ptr[ii - 1];
             }
         }
         else
@@ -1341,8 +1327,9 @@ void PolynomialRootFinder::NextK(int itype)
 
             for (ii = 2; ii < m_n; ++ii)
             {
-                m_k_vector_ptr[ii] =
-                    m_a3 * m_qk_vector_ptr[ii - 2] - m_a7 * m_qp_vector_ptr[ii - 1] + m_qp_vector_ptr[ii];
+                m_k_vector_ptr[ii] = m_a3 * m_qk_vector_ptr[ii - 2] -
+                                     m_a7 * m_qp_vector_ptr[ii - 1] +
+                                     m_qp_vector_ptr[ii];
             }
         }
     }
@@ -1355,7 +1342,7 @@ void PolynomialRootFinder::NextK(int itype)
 //  scalars computed in CalcSc.
 //======================================================================
 
-void PolynomialRootFinder::Newest(int itype, double & uu, double & vv)
+void PolynomialRootFinder::Newest(int itype, double &uu, double &vv)
 {
     //------------------------------------------------------------------
     //  Use formulas appropriate to setting of itype.
@@ -1390,8 +1377,9 @@ void PolynomialRootFinder::Newest(int itype, double & uu, double & vv)
         //  Evaluate new quadratic coefficients.
         //--------------------------------------------------------------
 
-        double b1 = - m_k_vector_ptr[m_n - 1] / m_p_vector_ptr[m_n];
-        double b2 = - (m_k_vector_ptr[m_n - 2] + b1 * m_p_vector_ptr[m_n - 1]) / m_p_vector_ptr[m_n];
+        double b1 = -m_k_vector_ptr[m_n - 1] / m_p_vector_ptr[m_n];
+        double b2 = -(m_k_vector_ptr[m_n - 2] + b1 * m_p_vector_ptr[m_n - 1]) /
+                    m_p_vector_ptr[m_n];
         double c1 = m_v * b2 * m_a1;
         double c2 = b1 * m_a7;
         double c3 = b1 * b1 * m_a3;
@@ -1416,10 +1404,10 @@ void PolynomialRootFinder::Newest(int itype, double & uu, double & vv)
 void PolynomialRootFinder::QuadraticSyntheticDivision(int n_plus_one,
                                                       double u,
                                                       double v,
-                                                      double * p_ptr,
-                                                      double * q_ptr,
-                                                      double & a,
-                                                      double & b)
+                                                      double *p_ptr,
+                                                      double *q_ptr,
+                                                      double &a,
+                                                      double &b)
 {
     b = p_ptr[0];
     q_ptr[0] = b;
@@ -1451,16 +1439,16 @@ void PolynomialRootFinder::QuadraticSyntheticDivision(int n_plus_one,
 void PolynomialRootFinder::SolveQuadraticEquation(double a,
                                                   double b,
                                                   double c,
-                                                  double & sr,
-                                                  double & si,
-                                                  double & lr,
-                                                  double & li)
+                                                  double &sr,
+                                                  double &si,
+                                                  double &lr,
+                                                  double &li)
 {
     if (a == 0.0)
     {
         if (b != 0.0)
         {
-            sr = - c / b;
+            sr = -c / b;
         }
         else
         {
@@ -1474,7 +1462,7 @@ void PolynomialRootFinder::SolveQuadraticEquation(double a,
     else if (c == 0.0)
     {
         sr = 0.0;
-        lr = - b / a;
+        lr = -b / a;
         si = 0.0;
         li = 0.0;
     }
@@ -1492,7 +1480,7 @@ void PolynomialRootFinder::SolveQuadraticEquation(double a,
         {
             if (c < 0.0)
             {
-                e = - a;
+                e = -a;
             }
             else
             {
@@ -1517,10 +1505,10 @@ void PolynomialRootFinder::SolveQuadraticEquation(double a,
 
             if (bvar >= 0.0)
             {
-                d = - d;
+                d = -d;
             }
 
-            lr = (- bvar + d) / a;
+            lr = (-bvar + d) / a;
             sr = 0.0;
 
             if (lr != 0.0)
@@ -1537,10 +1525,10 @@ void PolynomialRootFinder::SolveQuadraticEquation(double a,
             //  Complex conjugate zeros
             //----------------------------------------------------------
 
-            sr = - bvar / a;
+            sr = -bvar / a;
             lr = sr;
             si = ::fabs(d / a);
-            li = - si;
+            li = -si;
         }
     }
 

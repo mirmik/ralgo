@@ -13,7 +13,10 @@ namespace robo
         virtual void power(float pwr) = 0;
 
         /// Отключить подачу мощности.
-        virtual void stop() { power(0); }
+        virtual void stop()
+        {
+            power(0);
+        }
 
         virtual ~motor() = default;
     };

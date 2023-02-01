@@ -15,8 +15,8 @@ TEST_CASE("axstate_linear_processor")
     double matrix[] = {2, 0.5, 0, 1};
     double inverse_matrix[4];
 
-    axstate_linear_processor linproc("linproc", 2, left, right, matrix,
-                                     inverse_matrix);
+    axstate_linear_processor linproc(
+        "linproc", 2, left, right, matrix, inverse_matrix);
 
     CHECK_EQ(linproc.name(), "linproc");
     CHECK_EQ(heimer::signal_processors_count(), 1);

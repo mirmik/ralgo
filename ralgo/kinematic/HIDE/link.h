@@ -65,14 +65,20 @@ namespace ralgo
         {
             htrans<T> mat;
 
-            htrans<T> get() { return mat; }
+            htrans<T> get()
+            {
+                return mat;
+            }
 
             htrans<T> get(const malgo::vector<T> &coords, uint8_t pos) override
             {
                 return mat;
             }
 
-            uint8_t count_of_coords() override { return 0; }
+            uint8_t count_of_coords() override
+            {
+                return 0;
+            }
 
             constant_link(htrans<T> _mat) : mat(_mat){};
         };
@@ -89,9 +95,15 @@ namespace ralgo
                 return htrans<T>::rotation(axvec, coord);
             }
 
-            uint8_t count_of_coords() override { return 1; }
+            uint8_t count_of_coords() override
+            {
+                return 1;
+            }
 
-            bivec<T, 3> d1_bivec() override { return {axvec, ax_t()}; }
+            bivec<T, 3> d1_bivec() override
+            {
+                return {axvec, ax_t()};
+            }
         };
 
         template <typename T> struct translation_link : public onedof_link<T>
@@ -106,9 +118,15 @@ namespace ralgo
                 return htrans<T>::translation(axvec * coord);
             }
 
-            uint8_t count_of_coords() override { return 1; }
+            uint8_t count_of_coords() override
+            {
+                return 1;
+            }
 
-            bivec<T, 3> d1_bivec() override { return {ax_t(), axvec}; }
+            bivec<T, 3> d1_bivec() override
+            {
+                return {ax_t(), axvec};
+            }
         };
     }
 }

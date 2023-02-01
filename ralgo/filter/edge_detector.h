@@ -51,7 +51,10 @@ namespace ralgo
             prevent_halfspaces_area = en;
         }
 
-        const std::any &candidate_privdata() { return _candidate_privdata; }
+        const std::any &candidate_privdata()
+        {
+            return _candidate_privdata;
+        }
 
         EdgeDetectorStatus serve(double signal)
         {

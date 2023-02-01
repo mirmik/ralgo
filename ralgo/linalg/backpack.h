@@ -41,7 +41,7 @@ namespace ralgo
             }
 
             // predelta = delta;
-            //lastnorm = norm;
+            // lastnorm = norm;
 
             for (int i = 0; i < dim; ++i)
             {
@@ -51,7 +51,6 @@ namespace ralgo
                     coords[i] += koeff / vnorms[i];
                 }
             }
-
 
             lastcurrent = current;
             current = decltype(current)();
@@ -63,8 +62,8 @@ namespace ralgo
     }
 
     template <class T, class Alg>
-    void very_naive_backpack(T *coords, const Alg &target, Alg *vectors,
-                             int dim)
+    void
+    very_naive_backpack(T *coords, const Alg &target, Alg *vectors, int dim)
     {
         float vnorms[dim];
         Alg vnormalized[dim];
@@ -82,7 +81,9 @@ namespace ralgo
     }
 
     template <class T, class Alg>
-    void svd_backpack(T *coords, const Alg &target, Alg *vectors,
+    void svd_backpack(T *coords,
+                      const Alg &target,
+                      Alg *vectors,
                       int count_of_vectors)
     {
         // double result[count_of_vectors];

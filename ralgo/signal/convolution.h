@@ -35,7 +35,10 @@ namespace ralgo
         public:
             triangle_window(double strt, double fini) : window(strt, fini) {}
 
-            std::vector<double> values() { return {0, 1, 0}; }
+            std::vector<double> values()
+            {
+                return {0, 1, 0};
+            }
             std::vector<double> keypoints()
             {
                 return {strt, (strt + fini) / 2, fini};
@@ -45,8 +48,8 @@ namespace ralgo
             {
                 std::vector<double> r;
                 std::vector<double> kpoints = keypoints();
-                ralgo::vecops::merge_sorted(vec, kpoints, std::back_inserter(r),
-                                            strt, fini);
+                ralgo::vecops::merge_sorted(
+                    vec, kpoints, std::back_inserter(r), strt, fini);
                 return r;
             }
 
@@ -59,8 +62,8 @@ namespace ralgo
             }
         };
 
-        static inline double convolution(double t0, double t1, double f0,
-                                         double f1, double g0, double g1)
+        static inline double convolution(
+            double t0, double t1, double f0, double f1, double g0, double g1)
         {
             double f = f1 - f0;
             double g = g1 - g0;

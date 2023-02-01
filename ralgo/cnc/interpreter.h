@@ -55,7 +55,7 @@ namespace cnc
         igris::delegate<void> _external_final_shift_handle = {};
         planner_block lastblock = {};
         bool with_cleanup = true;
-	volatile bool stop_procedure_started = false;
+        volatile bool stop_procedure_started = false;
 
     public:
         interpreter(igris::ring<planner_block> *blocks,
@@ -136,7 +136,7 @@ namespace cnc
             if (blocks->avail() == 0)
             {
                 restore_finishes();
-		stop_procedure_started = false;
+                stop_procedure_started = false;
 
                 if (with_cleanup)
                 {
@@ -349,7 +349,7 @@ namespace cnc
         void command_incremental_move(const nos::argv &argv, nos::ostream &os)
         {
             if (stop_procedure_started)
-		return;
+                return;
 
             ralgo::info("command_incremental_move");
 
@@ -364,7 +364,7 @@ namespace cnc
         void command_absolute_move(const nos::argv &argv, nos::ostream &os)
         {
             if (stop_procedure_started)
-                 return;
+                return;
 
             ralgo::info("command_absolute_move");
 
@@ -421,9 +421,10 @@ namespace cnc
         {
             ralgo::info("smooth_stop");
             system_lock();
-            if (stop_procedure_started) {
-               system_unlock();
-               return;
+            if (stop_procedure_started)
+            {
+                system_unlock();
+                return;
             }
 
             auto curvels = revolver->current_velocity_no_lock();
@@ -444,8 +445,9 @@ namespace cnc
 
             bool is_valid = lastblock.set_stop_pattern(
                 total_axes, velocity, external_acceleration, direction);
-	    if (!is_valid) {
-                 system_unlock();
+            if (!is_valid)
+            {
+                system_unlock();
                 return;
             }
 

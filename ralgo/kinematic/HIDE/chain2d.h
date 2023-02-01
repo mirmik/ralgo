@@ -15,7 +15,10 @@ namespace ralgo
     public:
         kinematic_chain2d(){};
 
-        unit2d *out() { return chain[chain.size() - 1]; }
+        unit2d *out()
+        {
+            return chain[chain.size() - 1];
+        }
 
         kinematic_chain2d(igris::array_view<unit2d *> chain,
                           igris::array_view<kinematic_unit2d *> pairs)
@@ -55,7 +58,10 @@ namespace ralgo
             }
         }
 
-        void update_model_location() { update_location(); }
+        void update_model_location()
+        {
+            update_location();
+        }
 
         void sensivity(ralgo::screw2<float> *senses, unit2d *basis)
         {

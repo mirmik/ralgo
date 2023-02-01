@@ -60,12 +60,19 @@ namespace ralgo
 
         void set_koeffs(float sampleFreq, float beta);
 
-        void update_magnetic_reference_direction(float umx, float umy,
-                                                 float umz);
+        void
+        update_magnetic_reference_direction(float umx, float umy, float umz);
 
         /// Отмасштабировать и применить.
-        void update(float gx, float gy, float gz, float ax, float ay, float az,
-                    float mx, float my, float mz);
+        void update(float gx,
+                    float gy,
+                    float gz,
+                    float ax,
+                    float ay,
+                    float az,
+                    float mx,
+                    float my,
+                    float mz);
         void update(float gx, float gy, float gz, float ax, float ay, float az);
         void update(float gx, float gy, float gz);
 
@@ -77,8 +84,15 @@ namespace ralgo
         void update(const linalg::vec<float, 3> &g);
 
         /// Применить без масштабирования.
-        void apply(float gx, float gy, float gz, float ax, float ay, float az,
-                   float mx, float my, float mz);
+        void apply(float gx,
+                   float gy,
+                   float gz,
+                   float ax,
+                   float ay,
+                   float az,
+                   float mx,
+                   float my,
+                   float mz);
         void apply(float gx, float gy, float gz, float ax, float ay, float az);
         void apply(float gx, float gy, float gz);
 
@@ -101,8 +115,14 @@ namespace ralgo
 
         linalg::vec<float, 3> ZYX();
 
-        float magnetic_reference_x() { return hx; }
-        float magnetic_reference_y() { return hy; }
+        float magnetic_reference_x()
+        {
+            return hx;
+        }
+        float magnetic_reference_y()
+        {
+            return hy;
+        }
     };
 }
 

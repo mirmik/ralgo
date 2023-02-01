@@ -15,7 +15,10 @@ namespace heimer
     public:
         fast_cycle_device() {}
 
-        void bind() { dlist_move(&fast_cycle_list_lnk, &fast_cycle_list); }
+        void bind()
+        {
+            dlist_move(&fast_cycle_list_lnk, &fast_cycle_list);
+        }
 
         virtual int fast_cycle_serve() = 0;
         virtual ~fast_cycle_device() = default;

@@ -30,40 +30,51 @@ public:
     line_trajectory &operator=(const line_trajectory &) = default;
     virtual ~line_trajectory() = default;
 
-    line_trajectory(int dim, sf_position_t *sfpos_array,
+    line_trajectory(int dim,
+                    sf_position_t *sfpos_array,
                     int sfpos_stride = sizeof(sf_position_t))
     {
         init(dim, sfpos_array, sfpos_stride);
     }
 
-    void init(int dim, sf_position_t *sfpos_array,
+    void init(int dim,
+              sf_position_t *sfpos_array,
               int sfpos_stride = sizeof(sf_position_t));
 
     /// detail: Процедура не учитывает возможные начальную и оконечную скорости.
-    void init_nominal_speed(disctime_t stim, disctime_t ftim, position_t *spos,
+    void init_nominal_speed(disctime_t stim,
+                            disctime_t ftim,
+                            position_t *spos,
                             position_t *fpos,
 
-                            disctime_t acc_time, disctime_t dcc_time,
+                            disctime_t acc_time,
+                            disctime_t dcc_time,
 
                             int full_spattern = false);
 
-    void init_nominal_speed(disctime_t stim, disctime_t ftim, position_t spos,
-                            position_t fpos, disctime_t acc_time,
-                            disctime_t dcc_time, int full_spattern = false)
+    void init_nominal_speed(disctime_t stim,
+                            disctime_t ftim,
+                            position_t spos,
+                            position_t fpos,
+                            disctime_t acc_time,
+                            disctime_t dcc_time,
+                            int full_spattern = false)
     {
         position_t _spos[1] = {spos};
         position_t _fpos[1] = {fpos};
-        return init_nominal_speed(stim, ftim, _spos, _fpos, acc_time, dcc_time,
-                                  full_spattern);
+        return init_nominal_speed(
+            stim, ftim, _spos, _fpos, acc_time, dcc_time, full_spattern);
     }
 
-    int attime(disctime_t time, position_t *outpos,
-               velocity_t *outvel) override;
+    int
+    attime(disctime_t time, position_t *outpos, velocity_t *outvel) override;
 
     void set_point_hold(disctime_t time, position_t *pos);
 
-    void set_stop_pattern(position_t *curpos, velocity_t *curspd,
-                          disctime_t curtime, disctime_t stoptime);
+    void set_stop_pattern(position_t *curpos,
+                          velocity_t *curspd,
+                          disctime_t curtime,
+                          disctime_t stoptime);
 };
 
 template <int N> class lintraj : public line_trajectory

@@ -21,8 +21,13 @@ namespace ralgo
         */
 
         template <class VI, class SI, class KI, class RI>
-        static void lerp_values(VI vit, const VI vend, SI sit, const SI send,
-                                KI kit, const KI kend, RI rit)
+        static void lerp_values(VI vit,
+                                const VI vend,
+                                SI sit,
+                                const SI send,
+                                KI kit,
+                                const KI kend,
+                                RI rit)
         {
             SI sitnext = std::next(sit);
             VI vitnext = std::next(vit);
@@ -54,17 +59,18 @@ namespace ralgo
         }
 
         template <class R = void, class V, class S, class K>
-        static defvec_t<R, V> lerp_values(const V &vals, const S &stamp,
-                                          const K &keys)
+        static defvec_t<R, V>
+        lerp_values(const V &vals, const S &stamp, const K &keys)
         {
             defvec_t<R, V> r(keys.size());
 
-
-
-
-
-            lerp_values(vals.begin(), vals.end(), stamp.begin(), stamp.end(),
-                        keys.begin(), keys.end(), r.begin());
+            lerp_values(vals.begin(),
+                        vals.end(),
+                        stamp.begin(),
+                        stamp.end(),
+                        keys.begin(),
+                        keys.end(),
+                        r.begin());
 
             return r;
         }

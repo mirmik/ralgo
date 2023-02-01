@@ -53,7 +53,8 @@ namespace heimer
     public:
         stepctr(const char *name) : parent(name) {}
 
-        bool on_interrupt(control_node *slave, control_node *source,
+        bool on_interrupt(control_node *slave,
+                          control_node *source,
                           interrupt_args *data) override
         {
             return false; // пробросить выше
@@ -124,10 +125,16 @@ namespace heimer
             _deltatime = 1.0 / ticks_per_second;
         }
 
-        IntPos current_step() { return curstep; }
+        IntPos current_step()
+        {
+            return curstep;
+        }
         // void set_curstep(IntPos curstep) { this->curstep = curstep; }
 
-        int step_counter() { return steps_total; }
+        int step_counter()
+        {
+            return steps_total;
+        }
 
         // Position position () { return virtual_pos; }
         // Position current_position () { return virtual_pos; }
@@ -166,7 +173,10 @@ namespace heimer
             system_unlock();
         }
 
-        auto gear() { return pulsewidth; }
+        auto gear()
+        {
+            return pulsewidth;
+        }
 
         virtual void inc() = 0;
         virtual void dec() = 0;
@@ -227,9 +237,15 @@ namespace heimer
         {
         }
 
-        void inc() { parent::_feedback_position += parent::pulsewidth; }
+        void inc()
+        {
+            parent::_feedback_position += parent::pulsewidth;
+        }
 
-        void dec() { parent::_feedback_position -= parent::pulsewidth; }
+        void dec()
+        {
+            parent::_feedback_position -= parent::pulsewidth;
+        }
     };
 }
 

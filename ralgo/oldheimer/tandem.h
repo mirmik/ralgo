@@ -17,9 +17,12 @@ namespace heimer
 
         float koeff;
 
-        constexpr tandem(const char *mnemo, const char *master_mnemo,
-                         const char *slave_mnemo, axis_node<P, V> *_master,
-                         axis_node<P, V> *_slave, float koeff)
+        constexpr tandem(const char *mnemo,
+                         const char *master_mnemo,
+                         const char *slave_mnemo,
+                         axis_node<P, V> *_master,
+                         axis_node<P, V> *_slave,
+                         float koeff)
             : control_node(mnemo), master(master_mnemo, this),
               slave(slave_mnemo, this), master_controlled(_master),
               slave_controlled(_slave), koeff(koeff)
@@ -105,7 +108,8 @@ namespace heimer
         }
 
         virtual bool on_interrupt(control_node *slave_node,
-                                  control_node *source, interrupt_args *data)
+                                  control_node *source,
+                                  interrupt_args *data)
         {
             if (data->code() == HEIMER_INTERRUPT_TYPE_CONTROL_UPDATE)
             {

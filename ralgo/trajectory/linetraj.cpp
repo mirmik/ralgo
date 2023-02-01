@@ -34,7 +34,8 @@ int line_trajectory::attime(disctime_t time, position_t *pos, velocity_t *spd)
     return (tsdeform_is_finished(&tsd, time_unit) || stim == ftim) ? 1 : 0;
 }
 
-void line_trajectory::init(int dim, sf_position_t *sfpos_array,
+void line_trajectory::init(int dim,
+                           sf_position_t *sfpos_array,
                            int sfpos_stride)
 {
     trajectory::init(dim);
@@ -42,8 +43,10 @@ void line_trajectory::init(int dim, sf_position_t *sfpos_array,
 }
 
 /// detail: Процедура не учитывает возможные начальную и оконечную скорости.
-void line_trajectory::init_nominal_speed(disctime_t stim, disctime_t ftim,
-                                         position_t *spos, position_t *fpos,
+void line_trajectory::init_nominal_speed(disctime_t stim,
+                                         disctime_t ftim,
+                                         position_t *spos,
+                                         position_t *fpos,
 
                                          disctime_t acc_time,
                                          disctime_t dcc_time,
@@ -85,8 +88,10 @@ void line_trajectory::set_point_hold(disctime_t ftim, position_t *pos)
     tsdeform_set_stop_pattern(&tsd);
 }
 
-void line_trajectory::set_stop_pattern(position_t *curpos, velocity_t *curspd,
-                                       disctime_t curtime, disctime_t stoptime)
+void line_trajectory::set_stop_pattern(position_t *curpos,
+                                       velocity_t *curspd,
+                                       disctime_t curtime,
+                                       disctime_t stoptime)
 {
     // скоростной деформатор работает с точным выведением в позицию, и изменяет
     // время, поэтому подменяем время в два раза, чтобы соответствовать

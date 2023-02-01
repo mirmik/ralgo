@@ -47,8 +47,11 @@ int axstate_linear_processor::feedback(disctime_t)
     return 0;
 }
 
-static inline int matrix(axstate_linear_processor *axctr, int argc, char **argv,
-                         char *output, int outmax)
+static inline int matrix(axstate_linear_processor *axctr,
+                         int argc,
+                         char **argv,
+                         char *output,
+                         int outmax)
 {
     if (argc != axctr->dim() * axctr->dim())
     {
@@ -66,8 +69,11 @@ static inline int matrix(axstate_linear_processor *axctr, int argc, char **argv,
     return 0;
 }
 
-static inline int info(axstate_linear_processor *axctr, int argc, char **argv,
-                       char *output, int outmax)
+static inline int info(axstate_linear_processor *axctr,
+                       int argc,
+                       char **argv,
+                       char *output,
+                       int outmax)
 {
     (void)argc;
     (void)argv;
@@ -86,7 +92,8 @@ static inline int info(axstate_linear_processor *axctr, int argc, char **argv,
         strncat(output, buf, outmax);
     }
     memset(buf, 0, bufsize);
-    snprintf(buf, bufsize, "%s\r\n", axctr->leftax(axctr->dim() - 1)->name.c_str());
+    snprintf(
+        buf, bufsize, "%s\r\n", axctr->leftax(axctr->dim() - 1)->name.c_str());
     strncat(output, buf, outmax);
 
     memset(buf, 0, bufsize);
@@ -101,7 +108,8 @@ static inline int info(axstate_linear_processor *axctr, int argc, char **argv,
     }
 
     memset(buf, 0, bufsize);
-    snprintf(buf, bufsize, "%s\r\n", axctr->rightax(axctr->dim() - 1)->name.c_str());
+    snprintf(
+        buf, bufsize, "%s\r\n", axctr->rightax(axctr->dim() - 1)->name.c_str());
     strncat(output, buf, outmax);
 
     memset(buf, 0, bufsize);
@@ -137,7 +145,9 @@ static inline int info(axstate_linear_processor *axctr, int argc, char **argv,
     return 0;
 }
 
-int axstate_linear_processor::command(int argc, char **argv, char *output,
+int axstate_linear_processor::command(int argc,
+                                      char **argv,
+                                      char *output,
                                       int outmax)
 {
     int status = ENOENT;
@@ -173,8 +183,12 @@ void axstate_linear_processor::evaluate_invertion()
 }
 
 heimer::axstate_linear_processor::axstate_linear_processor(
-    const char *name, int _dim, axis_state **leftside, axis_state **rightside,
-    double *matrix, double *invert_matrix)
+    const char *name,
+    int _dim,
+    axis_state **leftside,
+    axis_state **rightside,
+    double *matrix,
+    double *invert_matrix)
     : axstate_signal_processor(name, _dim, _dim)
 {
     attach_leftside_table(leftside);
@@ -215,7 +229,8 @@ void heimer::axstate_linear_processor::on_activate(disctime_t)
 
 int heimer::axstate_linear_processor::help(char *output, int outmax)
 {
-    snprintf(output, outmax,
+    snprintf(output,
+             outmax,
              "bindleft\r\n"
              "bindright\r\n"
              "matrix\r\n"

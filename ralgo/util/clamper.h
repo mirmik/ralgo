@@ -12,11 +12,11 @@ namespace ralgo
         bool _inited = false;
 
     public:
-        clamper(bool en=true) : enabled(en) { }
+        clamper(bool en = true) : enabled(en) {}
 
-        bool inited() 
+        bool inited()
         {
-            return _inited; 
+            return _inited;
         }
 
         void set_limits(const T &lo, const T &hi)
@@ -26,7 +26,10 @@ namespace ralgo
             this->hi = hi;
         }
 
-        void enable(bool en) { enabled = en; }
+        void enable(bool en)
+        {
+            enabled = en;
+        }
 
         T operator()(const T &x)
         {

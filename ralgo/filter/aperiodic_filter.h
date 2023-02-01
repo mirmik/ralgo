@@ -38,9 +38,15 @@ namespace ralgo
             return state;
         }
 
-        T operator()(const T &in) override { return serve(in); }
+        T operator()(const T &in) override
+        {
+            return serve(in);
+        }
 
-        void reset(T val) { state = val; }
+        void reset(T val)
+        {
+            state = val;
+        }
 
         aperiodic_filter &set_koefficient(float delta, float time_constant)
         {

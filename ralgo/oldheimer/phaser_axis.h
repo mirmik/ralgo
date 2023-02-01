@@ -64,7 +64,8 @@ namespace heimer
                 controlled->set_speed(0);
 
                 char str[56];
-                sprintf(str, "position deviation error : mnemo:%s",
+                sprintf(str,
+                        "position deviation error : mnemo:%s",
                         parent::mnemo());
                 ralgo::warn(str);
 
@@ -79,9 +80,15 @@ namespace heimer
             controlled->set_speed(compspd);
         }
 
-        void set_compensate(float val) { compkoeff = val; }
+        void set_compensate(float val)
+        {
+            compkoeff = val;
+        }
 
-        V compensated_speed() { return compspd; }
+        V compensated_speed()
+        {
+            return compspd;
+        }
 
         P request_feedback_position() override
         {

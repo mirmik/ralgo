@@ -69,8 +69,8 @@ static inline int info(axstate_signal_processor *, int, char **, char *, int)
     return 0;
 }
 
-static inline int radius(axstate_sincos_processor *proc, int argc, char **argv,
-                         char *, int)
+static inline int
+radius(axstate_sincos_processor *proc, int argc, char **argv, char *, int)
 {
     if (argc < 1)
         return -1;
@@ -79,7 +79,9 @@ static inline int radius(axstate_sincos_processor *proc, int argc, char **argv,
     return 0;
 }
 
-int axstate_sincos_processor::command(int argc, char **argv, char *output,
+int axstate_sincos_processor::command(int argc,
+                                      char **argv,
+                                      char *output,
                                       int outmax)
 {
     int status = ENOENT;
@@ -112,8 +114,10 @@ void axstate_sincos_processor::set_alpha_scale(double ascale)
     alpha_to_radian_scale = ascale;
 }
 
-void axstate_sincos_processor::set_offset(position_t xoff, position_t yoff,
-                                          position_t aloff, position_t aroff)
+void axstate_sincos_processor::set_offset(position_t xoff,
+                                          position_t yoff,
+                                          position_t aloff,
+                                          position_t aroff)
 {
     x_offset = xoff;
     y_offset = yoff;
@@ -161,4 +165,7 @@ void heimer::axstate_sincos_processor::on_activate(disctime_t)
     }
 }
 
-void heimer::axstate_sincos_processor::set_radius(position_t p) { radius = p; }
+void heimer::axstate_sincos_processor::set_radius(position_t p)
+{
+    radius = p;
+}

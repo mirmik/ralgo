@@ -24,14 +24,32 @@ namespace heimer
         void attach_leftside_table(axis_state **table);
         void attach_rightside_table(axis_state **table);
 
-        axis_state *leftax(int i) { return _leftside[i]; }
-        axis_state *rightax(int i) { return _rightside[i]; }
+        axis_state *leftax(int i)
+        {
+            return _leftside[i];
+        }
+        axis_state *rightax(int i)
+        {
+            return _rightside[i];
+        }
 
-        int leftsigtype(int) { return SIGNAL_TYPE_AXIS_STATE; }
-        int rightsigtype(int) { return SIGNAL_TYPE_AXIS_STATE; }
+        int leftsigtype(int)
+        {
+            return SIGNAL_TYPE_AXIS_STATE;
+        }
+        int rightsigtype(int)
+        {
+            return SIGNAL_TYPE_AXIS_STATE;
+        }
 
-        signal_head *leftsig(int i) { return _leftside[i]; }
-        signal_head *rightsig(int i) { return _rightside[i]; }
+        signal_head *leftsig(int i)
+        {
+            return _leftside[i];
+        }
+        signal_head *rightsig(int i)
+        {
+            return _rightside[i];
+        }
 
         void set_leftsig(int i, signal_head *sig)
         {

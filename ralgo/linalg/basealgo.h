@@ -17,8 +17,7 @@ namespace ralgo
     }
 
     // Matrix multiply.
-    template <
-        class A, class B, class C, class AGetter, class BGetter, class CGetter, >
+    template <class A, class B, class C, class AGetter, class BGetter, class CGetter, >
     void matrix_multiply(const A *a, int m, int n, int l, const B *b, C *c)
     {
         // a - матрица m x n

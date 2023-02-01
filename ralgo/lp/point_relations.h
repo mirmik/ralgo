@@ -16,7 +16,8 @@ T line_over_point2_argument(const linalg::vec<T, 2> &a,
 }
 
 template <class T>
-T polyline_over_point2_argument(const linalg::vec<T, 2> *polyline, int size,
+T polyline_over_point2_argument(const linalg::vec<T, 2> *polyline,
+                                int size,
                                 const linalg::vec<T, 2> &pnt,
                                 bool closed = false)
 {
@@ -41,7 +42,8 @@ T polyline_over_point2_argument(const linalg::vec<T, 2> *polyline, int size,
 
 template <class T>
 bool point2_in_polygon(const linalg::vec<T, 2> &pnt,
-                       const linalg::vec<T, 2> *polyline, int size)
+                       const linalg::vec<T, 2> *polyline,
+                       int size)
 {
     auto angle = polyline_over_point2_argument(polyline, size, pnt, true);
 

@@ -34,7 +34,10 @@ namespace heimer
 
         virtual void current_point(Position *) = 0;
 
-        int set_accdcc(Speed acc) { return set_accdcc(acc, acc); }
+        int set_accdcc(Speed acc)
+        {
+            return set_accdcc(acc, acc);
+        }
 
         virtual Speed speed() = 0;
         virtual Speed acceleration() = 0;
@@ -75,8 +78,8 @@ namespace heimer
                         return -1;
                 }
 
-                return parted_absmove(std::data(axnums), std::data(fltargs),
-                                      argc - 1);
+                return parted_absmove(
+                    std::data(axnums), std::data(fltargs), argc - 1);
             }
 
             // absolute move

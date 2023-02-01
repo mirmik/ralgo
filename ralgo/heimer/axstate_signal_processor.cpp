@@ -3,7 +3,8 @@
 #include <ralgo/log.h>
 
 heimer::axstate_signal_processor::axstate_signal_processor(const char *name,
-                                                           int ldim, int rdim)
+                                                           int ldim,
+                                                           int rdim)
     : heimer::signal_processor(name, ldim, rdim)
 {
 }

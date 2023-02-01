@@ -2,7 +2,7 @@
 #define RALGO_OLDHEIMER_COORDINATE_CHECKER_H
 
 #include <igris/container/array_view.h>
-#include <ralgo/geom/zone_check.h>
+//#include <ralgo/geom/zone_check.h>
 #include <ralgo/linalg/linalg.h>
 
 namespace heimer
@@ -28,11 +28,17 @@ namespace heimer
             return false;
         }
 
-        virtual bool check_impl(control_node *dev, P *val, int dim,
-                                char *msgbuf) = 0;
-        virtual int command(int, char **) { return -1; }
+        virtual bool
+        check_impl(control_node *dev, P *val, int dim, char *msgbuf) = 0;
+        virtual int command(int, char **)
+        {
+            return -1;
+        }
 
-        void link_next(coordinate_checker *next) { this->next = next; }
+        void link_next(coordinate_checker *next)
+        {
+            this->next = next;
+        }
     };
 }
 

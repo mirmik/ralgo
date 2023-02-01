@@ -9,7 +9,8 @@
 #include <igris/dprint.h>
 
 void heimer::executor_class::set_order_table(signal_processor **order_table,
-                                             int capacity, int size)
+                                             int capacity,
+                                             int size)
 {
     this->order_table = order_table;
     this->order_table_capacity = capacity;
@@ -205,7 +206,9 @@ int heimer::executor_command(int, char **argv, char *output, int maxsize)
         for (int i = executor.order_table_size - 1; i >= 0; --i)
         {
             memset(buffer, 0, 28);
-            snprintf(buffer, 28, "%*s\r\n",
+            snprintf(buffer,
+                     28,
+                     "%*s\r\n",
                      (int)executor.order_table[i]->name().size(),
                      executor.order_table[i]->name().data());
             strncat(output, buffer, maxsize);
@@ -256,7 +259,10 @@ void heimer::executor_class::execute_if_allowed(disctime_t time)
         exec(time);
 }
 
-void heimer::executor_class::activate_process() { allowed_to_execution = true; }
+void heimer::executor_class::activate_process()
+{
+    allowed_to_execution = true;
+}
 
 void heimer::executor_class::deactivate_process()
 {

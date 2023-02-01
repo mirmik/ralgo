@@ -17,8 +17,10 @@ namespace ralgo
 
     public:
         mvec301() = default;
-        mvec301(const T &_s, const linalg::vec<T, 3> &_v,
-                const linalg::vec<T, 3> &_b, const T &_t)
+        mvec301(const T &_s,
+                const linalg::vec<T, 3> &_v,
+                const linalg::vec<T, 3> &_b,
+                const T &_t)
             : s(_s), v(_v), b(_b), t(_t)
         {
         }

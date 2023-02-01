@@ -130,8 +130,12 @@ void fixed_frequency_stepper_controller::info(char *buf, int)
                        "_control_pos: {}\r\n"
                        "_virtual_pos: {}\r\n"
                        "units_in_step_triggered: {}\r\n",
-                       speed_to_shift / 1000, freq, feedback_position(),
-                       current_shift, _control_pos, _virtual_pos,
+                       speed_to_shift / 1000,
+                       freq,
+                       feedback_position(),
+                       current_shift,
+                       _control_pos,
+                       _virtual_pos,
                        units_in_step_triggered);
 
     // strcat(buf, sbuf);

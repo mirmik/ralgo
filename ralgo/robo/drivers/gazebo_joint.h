@@ -17,13 +17,25 @@ namespace robo
 
     public:
         gazebo_joint() = default;
-        gazebo_joint(gazebo::physics::JointPtr joint) { bind(joint); }
+        gazebo_joint(gazebo::physics::JointPtr joint)
+        {
+            bind(joint);
+        }
 
-        double feedback_position() override { return _joint->Position(0); }
+        double feedback_position() override
+        {
+            return _joint->Position(0);
+        }
 
-        double feedback_velocity() override { return _joint->GetVelocity(0); }
+        double feedback_velocity() override
+        {
+            return _joint->GetVelocity(0);
+        }
 
-        void set_torque(double val) override { _joint->SetForce(0, val); }
+        void set_torque(double val) override
+        {
+            _joint->SetForce(0, val);
+        }
 
         void bind(gazebo::physics::JointPtr joint)
         {

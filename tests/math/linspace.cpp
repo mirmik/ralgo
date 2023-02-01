@@ -2,8 +2,8 @@
 #include <ralgo/linspace.h>
 
 #include <nos/print.h>
-#include <vector>
 #include <ralgo/linalg/vector.h>
+#include <vector>
 
 TEST_CASE("linspace")
 {
@@ -37,9 +37,10 @@ TEST_CASE("bilinear")
 
 TEST_CASE("vector linspace")
 {
-    auto ls = ralgo::linspace(ralgo::vector{1.,1.5}, ralgo::vector{4.,4.5}, 4);
-    CHECK_EQ(ls[0], ralgo::vector{1.,1.5});
-    CHECK_EQ(ls[1], ralgo::vector{2.,2.5});
-    CHECK_EQ(ls[2], ralgo::vector{3.,3.5});
-    CHECK_EQ(ls[3], ralgo::vector{4.,4.5});
+    auto ls =
+        ralgo::linspace(ralgo::vector{1., 1.5}, ralgo::vector{4., 4.5}, 4);
+    CHECK_EQ(ls[0], ralgo::vector{1., 1.5});
+    CHECK_EQ(ls[1], ralgo::vector{2., 2.5});
+    CHECK_EQ(ls[2], ralgo::vector{3., 3.5});
+    CHECK_EQ(ls[3], ralgo::vector{4., 4.5});
 }

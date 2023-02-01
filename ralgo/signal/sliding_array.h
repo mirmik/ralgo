@@ -37,9 +37,15 @@ namespace ralgo
         sliding_array(const sliding_array &) = delete;
         sliding_array &operator=(const sliding_array &) = delete;
 
-        void invalidate() { delete[] dataarr; }
+        void invalidate()
+        {
+            delete[] dataarr;
+        }
 
-        ~sliding_array() { invalidate(); }
+        ~sliding_array()
+        {
+            invalidate();
+        }
 
         void resize(size_t halfsize)
         {
@@ -74,7 +80,10 @@ namespace ralgo
             cursor_fixup();
         }
 
-        size_t right_room() { return halfsize - cursor; }
+        size_t right_room()
+        {
+            return halfsize - cursor;
+        }
 
         void push(T *dt, size_t sz)
         {

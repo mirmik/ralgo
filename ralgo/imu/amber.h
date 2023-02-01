@@ -19,13 +19,25 @@ namespace ralgo
         float poskoeff = 0.1;
 
     public:
-        void set_pos(T _pos) { pos = _pos; }
+        void set_pos(T _pos)
+        {
+            pos = _pos;
+        }
 
-        void set_vel(T _vel) { vel = _vel; }
+        void set_vel(T _vel)
+        {
+            vel = _vel;
+        }
 
-        void step_acc(T acc, float delta) { vel += acc * delta; }
+        void step_acc(T acc, float delta)
+        {
+            vel += acc * delta;
+        }
 
-        void step_vel(float delta) { pos += vel * delta; }
+        void step_vel(float delta)
+        {
+            pos += vel * delta;
+        }
 
         /// @brief            Корректирует скорость по информации внешнего
         /// источника.

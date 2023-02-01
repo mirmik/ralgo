@@ -19,8 +19,8 @@ namespace heimer
             this->arrsize = 0;
         }
 
-        bool check_impl(control_node *dev, P *val, int dim,
-                        char *msgbuf) override
+        bool
+        check_impl(control_node *dev, P *val, int dim, char *msgbuf) override
         {
             assert(dim == 2);
 
@@ -121,8 +121,8 @@ namespace heimer
             assert(positive != negative);
         }
 
-        bool check_impl(control_node *dev, P *val, int dim,
-                        char *msgbuf) override
+        bool
+        check_impl(control_node *dev, P *val, int dim, char *msgbuf) override
         {
             assert(positive == dev || negative == dev);
             assert(dim == 2);
@@ -156,8 +156,8 @@ namespace heimer
 
             // auto pnt = pos_point - neg_point;
 
-            bool in_polygon = ralgo::point2_in_polygon(t, parent::arr,
-                                                       (size_t)parent::arrsize);
+            bool in_polygon = ralgo::point2_in_polygon(
+                t, parent::arr, (size_t)parent::arrsize);
 
             if (in_polygon)
             {

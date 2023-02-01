@@ -6,8 +6,8 @@
 */
 
 #include <functional>
-#include <type_traits>
 #include <ralgo/util/helpers.h>
+#include <type_traits>
 
 namespace ralgo
 {
@@ -101,8 +101,8 @@ namespace ralgo
         // Применить функцию f ко всем элементам массивов a и b. Допускается
         // передача дополнительных аргументов.
         template <class R = void, class F, class A, class B, class... Args>
-        defsame_t<R, A> elementwise2(const F &f, const A &a, const B &b,
-                                     Args &&... args)
+        defsame_t<R, A>
+        elementwise2(const F &f, const A &a, const B &b, Args &&... args)
         {
             assert(a.size() == b.size());
             defsame_t<R, A> c(a.size());
@@ -130,8 +130,8 @@ namespace ralgo
         }
 
         template <class C, class F, class A, class B, class... Args>
-        void elementwise2_to(C &c, const F &f, const A &a, const B &b,
-                             Args &&... args)
+        void elementwise2_to(
+            C &c, const F &f, const A &a, const B &b, Args &&... args)
         {
             auto ait = a.begin(), aend = a.end();
             auto bit = b.begin();

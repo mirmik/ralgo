@@ -26,7 +26,10 @@ namespace ralgo
         {
             K k;
             koeff(K _k) : k(_k) {}
-            V operator()(V g) override { return k * g; }
+            V operator()(V g) override
+            {
+                return k * g;
+            }
         };
 
         // W(s)=1/(T+s); a=t/(T+t); t=delta;
@@ -74,8 +77,14 @@ namespace ralgo
         {
             V integral;
             integrator(V init = V()) : integral(init) {}
-            V operator()(V g) override { return integral += g; }
-            V output() { return integral; }
+            V operator()(V g) override
+            {
+                return integral += g;
+            }
+            V output()
+            {
+                return integral;
+            }
         };
 
         // a - Постоянная времени процесса в секундах.
@@ -86,7 +95,10 @@ namespace ralgo
             V p;
             V _a;
             K pp, pg;
-            V a() { return _a; }
+            V a()
+            {
+                return _a;
+            }
 
             aperiodic(K a, K delta, V pi = V()) : p(pi), _a(a)
             {
@@ -95,11 +107,20 @@ namespace ralgo
                 pg = delta / q;
             }
 
-            V operator()(V g) override { return p = pp * p + pg * g; }
+            V operator()(V g) override
+            {
+                return p = pp * p + pg * g;
+            }
 
-            V output() { return p; }
+            V output()
+            {
+                return p;
+            }
 
-            void set_value(V value) { p = value; }
+            void set_value(V value)
+            {
+                p = value;
+            }
 
             void print_internal() override {}
         };
@@ -159,9 +180,18 @@ namespace ralgo
 
             T integral = 0;
 
-            T kp() const { return _kp; }
-            T ki() const { return ki_discr / delta; }
-            T kip() const { return kip() / _kp; }
+            T kp() const
+            {
+                return _kp;
+            }
+            T ki() const
+            {
+                return ki_discr / delta;
+            }
+            T kip() const
+            {
+                return kip() / _kp;
+            }
 
             pi(K kp, K ki, K delta)
                 : _kp(kp), ki_discr(ki * delta), delta(delta)
@@ -176,12 +206,7 @@ namespace ralgo
                 return _kp * error + ki_discr * integral;
             }
 
-            void print_internal() override
-            {
-
-
-
-            }
+            void print_internal() override {}
         };
 
         template <class T, class K = float> struct pid : public inout<T>
@@ -214,12 +239,7 @@ namespace ralgo
                 return ret;
             }
 
-            void print_internal() override
-            {
-
-
-
-            }
+            void print_internal() override {}
         };
     } // namespace lintrans
 } // namespace ralgo

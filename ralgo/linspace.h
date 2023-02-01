@@ -7,8 +7,12 @@
 namespace ralgo
 {
     template <class V, class C>
-    V bilinear_interpolation(const C &rkoeff, const C &ckoeff, const V &lb,
-                             const V &rb, const V &lt, const V &rt)
+    V bilinear_interpolation(const C &rkoeff,
+                             const C &ckoeff,
+                             const V &lb,
+                             const V &rb,
+                             const V &lt,
+                             const V &rt)
     {
         return (1 - rkoeff) * (1 - ckoeff) * lb + (rkoeff) * (1 - ckoeff) * rb +
                (1 - rkoeff) * (ckoeff)*lt + (rkoeff) * (ckoeff)*rt;
@@ -28,15 +32,18 @@ namespace ralgo
     template <class T> class linspace
     {
         class linspace_iterator
-            : public std::iterator<std::bidirectional_iterator_tag, T, T, T *,
-                                   T &>
+            : public std::
+                  iterator<std::bidirectional_iterator_tag, T, T, T *, T &>
         {
             linspace *ls;
             int p;
 
         public:
             linspace_iterator(linspace *ls, int p) : ls(ls), p(p) {}
-            T operator*() { return ls->operator[](p); }
+            T operator*()
+            {
+                return ls->operator[](p);
+            }
             linspace_iterator &operator++()
             {
                 ++p;
@@ -67,7 +74,10 @@ namespace ralgo
             }
         }
 
-        T step() { return (b - a) / (points - 1); }
+        T step()
+        {
+            return (b - a) / (points - 1);
+        }
 
         T operator[](int p)
         {
@@ -75,10 +85,19 @@ namespace ralgo
             return lerp(a, b, koeff);
         }
 
-        int size() const { return points; }
+        int size() const
+        {
+            return points;
+        }
 
-        linspace_iterator begin() { return linspace_iterator(this, 0); }
-        linspace_iterator end() { return linspace_iterator(this, points); }
+        linspace_iterator begin()
+        {
+            return linspace_iterator(this, 0);
+        }
+        linspace_iterator end()
+        {
+            return linspace_iterator(this, points);
+        }
 
         std::vector<T> to_vector()
         {

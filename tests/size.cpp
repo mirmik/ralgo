@@ -3,5 +3,5 @@
 
 TEST_CASE("size")
 {
-    CHECK_EQ(std::size(linalg::vec<double,3>()), 3);
+    CHECK_EQ(std::size(linalg::vec<double, 3>()), 3);
 }

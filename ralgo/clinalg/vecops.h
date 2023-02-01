@@ -7,8 +7,8 @@
 
 __BEGIN_DECLS
 
-static inline double vecops_distance_d(const double *a, const double *b,
-                                       int dim)
+static inline double
+vecops_distance_d(const double *a, const double *b, int dim)
 {
     double acc = 0;
 
@@ -21,8 +21,8 @@ static inline double vecops_distance_d(const double *a, const double *b,
     return sqrt(acc);
 }
 
-static inline void vecops_sub_d(const double *a, const double *b, int dim,
-                                double *c)
+static inline void
+vecops_sub_d(const double *a, const double *b, int dim, double *c)
 {
     for (int i = 0; i < dim; ++i)
     {
@@ -30,8 +30,8 @@ static inline void vecops_sub_d(const double *a, const double *b, int dim,
     }
 }
 
-static inline void vecops_add_d(const double *a, const double *b, int dim,
-                                double *c)
+static inline void
+vecops_add_d(const double *a, const double *b, int dim, double *c)
 {
     for (int i = 0; i < dim; ++i)
     {

@@ -217,7 +217,6 @@ namespace ralgo
                 {
                     auto curtrans = get(reference);
 
-
                     auto rrr = get_speed_transes(reference);
                     auto iv6 = curtrans.vector6_to(target);
 
@@ -243,14 +242,6 @@ namespace ralgo
                     // abs(f); koeffs_length /= koeffs.size();
 
                     nos::println();
-
-
-
-
-
-
-
-
 
                     // nos::readline();*/
 

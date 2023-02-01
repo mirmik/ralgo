@@ -19,7 +19,8 @@ namespace heimer
         axis_state *state = nullptr;
 
     public:
-        position_applier(const char *name, robo::i_position_driver *driver,
+        position_applier(const char *name,
+                         robo::i_position_driver *driver,
                          axis_state *state)
             : signal_processor(name, 0, 1)
         {
@@ -49,7 +50,10 @@ namespace heimer
             return 0;
         }
 
-        signal_head *iterate_left(signal_head *) { return NULL; }
+        signal_head *iterate_left(signal_head *)
+        {
+            return NULL;
+        }
 
         signal_head *iterate_right(signal_head *iter)
         {

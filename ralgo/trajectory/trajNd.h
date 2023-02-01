@@ -15,10 +15,14 @@ namespace ralgo
         int64_t ftim;
 
     public:
-        virtual int attime(int64_t time, igris::array_view<P> pos,
+        virtual int attime(int64_t time,
+                           igris::array_view<P> pos,
                            igris::array_view<V> spd) = 0;
 
-        bool is_finished(int64_t time) { return time > ftim; }
+        bool is_finished(int64_t time)
+        {
+            return time > ftim;
+        }
     };
 
     template <size_t Dim, class P, class V>
@@ -36,9 +40,15 @@ namespace ralgo
     public:
         struct trajectory_speed_deformer spddeform;
 
-        void set_start_position(int i, P pos) { spos[i] = pos; }
+        void set_start_position(int i, P pos)
+        {
+            spos[i] = pos;
+        }
 
-        void set_finish_position_inc(int i, P inc) { fpos[i] = spos[i] + inc; }
+        void set_finish_position_inc(int i, P inc)
+        {
+            fpos[i] = spos[i] + inc;
+        }
 
         // Инициализировать траекторию, когда spos и fpos уже установлены.
         int reset(int64_t stim, int64_t ftim)
@@ -62,8 +72,10 @@ namespace ralgo
             return 0;
         }
 
-        int reset(igris::array_view<P> &spos, int64_t stim,
-                  igris::array_view<P> &fpos, int64_t ftim)
+        int reset(igris::array_view<P> &spos,
+                  int64_t stim,
+                  igris::array_view<P> &fpos,
+                  int64_t ftim)
         {
             std::copy(std::begin(spos), std::end(spos), std::begin(this->spos));
             std::copy(std::begin(fpos), std::end(fpos), std::begin(this->fpos));
@@ -72,7 +84,8 @@ namespace ralgo
             return 0;
         }
 
-        int attime(int64_t time, igris::array_view<P> pos,
+        int attime(int64_t time,
+                   igris::array_view<P> pos,
                    igris::array_view<V> spd) override
         {
             // Умножение на коэффициент времени перерасщитывает скорость
@@ -100,7 +113,9 @@ namespace ralgo
                        : 0;
         }
 
-        void set_speed_pattern(double acc, double dcc, double speed,
+        void set_speed_pattern(double acc,
+                               double dcc,
+                               double speed,
                                bool full_spattern = false)
         {
             // Чтобы расчитать интервал времени разгона, необходимо
@@ -119,12 +134,13 @@ namespace ralgo
 
             // ralgo::speed_deformer::acc_dcc_balance(acc_part, dcc_part);
 
-            tsdeform_set_speed_pattern(&spddeform, acc_part, dcc_part, 0, 0,
-                                       full_spattern);
+            tsdeform_set_speed_pattern(
+                &spddeform, acc_part, dcc_part, 0, 0, full_spattern);
         }
 
         void set_stop_trajectory(igris::array_view<P> curpos,
-                                 igris::array_view<V> curspd, V dccval)
+                                 igris::array_view<V> curspd,
+                                 V dccval)
         {
             // скоростной деформатор работает с точным выведением в позицию, и
             // изменяет время, поэтому подменяем время в два раза, чтобы
@@ -134,8 +150,8 @@ namespace ralgo
             double realdiff = ralgo::vecops::length(curspd) / dccval;
             ftim = stim + realdiff / 2 * ralgo::discrete_time_frequency();
 
-            std::copy(std::begin(curpos), std::end(curpos),
-                      std::begin(this->spos));
+            std::copy(
+                std::begin(curpos), std::end(curpos), std::begin(this->spos));
             if (ftim > stim)
             {
                 for (unsigned int i = 0; i < Dim; ++i)
@@ -162,10 +178,10 @@ namespace ralgo
             ftim = ralgo::discrete_time();
             stim = ftim - 1;
 
-            std::copy(std::begin(curpos), std::end(curpos),
-                      std::begin(this->spos));
-            std::copy(std::begin(curpos), std::end(curpos),
-                      std::begin(this->fpos));
+            std::copy(
+                std::begin(curpos), std::end(curpos), std::begin(this->spos));
+            std::copy(
+                std::begin(curpos), std::end(curpos), std::begin(this->fpos));
 
             ralgo::vecops::fill(setted_speed, 0);
 

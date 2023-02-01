@@ -44,7 +44,7 @@ namespace heimer
         } u = {};
 
     public:
-        virtual ~signal_processor() 
+        virtual ~signal_processor()
         {
             dlist_del(&list_lnk);
         }
@@ -52,8 +52,11 @@ namespace heimer
         signal_processor(int ldim, int rdim);
         signal_processor(const std::string &name, int ldim, int rdim);
         void rebind();
-        void set_name(const std::string& name);
-        bool is_axisctr() { return u.f.is_axisctr; }
+        void set_name(const std::string &name);
+        bool is_axisctr()
+        {
+            return u.f.is_axisctr;
+        }
 
         void set_dims(int ldim, int rdim);
         uint8_t leftdim();
@@ -108,7 +111,10 @@ namespace heimer
         /// Обработка поступившего прерывания.
         /// Стандартное поведение при получении прерывания - не делать ничего
         /// @resval Если true - запретить прокидывать прерывание выше.
-        virtual bool on_interrupt(disctime_t) { return false; }
+        virtual bool on_interrupt(disctime_t)
+        {
+            return false;
+        }
 
         void set_dynamic_resources_flag(bool en);
         bool is_dynamic_resources();
@@ -118,8 +124,8 @@ namespace heimer
 
     int signal_processors_count();
     void signal_processors_list_reinit();
-    int command_signal_processors(int argc, char **argv, char *output,
-                                  int maxsize);
+    int
+    command_signal_processors(int argc, char **argv, char *output, int maxsize);
 
     signal_processor *signal_processor_get_by_name(const char *name);
 }

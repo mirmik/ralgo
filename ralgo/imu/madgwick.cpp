@@ -62,8 +62,15 @@ namespace ralgo
     //---------------------------------------------------------------------------------------------------
     // AHRS algorithm update
 
-    void madgwick::update(float gx, float gy, float gz, float ax, float ay,
-                          float az, float mx, float my, float mz)
+    void madgwick::update(float gx,
+                          float gy,
+                          float gz,
+                          float ax,
+                          float ay,
+                          float az,
+                          float mx,
+                          float my,
+                          float mz)
     {
         float recipNorm;
 
@@ -82,8 +89,15 @@ namespace ralgo
         apply(gx, gy, gz, ax, ay, az, mx, my, mz);
     }
 
-    void madgwick::apply(float gx, float gy, float gz, float ax, float ay,
-                         float az, float mx, float my, float mz)
+    void madgwick::apply(float gx,
+                         float gy,
+                         float gz,
+                         float ax,
+                         float ay,
+                         float az,
+                         float mx,
+                         float my,
+                         float mz)
     {
         float module;
         float recipNorm;
@@ -132,7 +146,7 @@ namespace ralgo
 
         _2bx = sqrtf(hx * hx + hy * hy);
         //_2bz = -_2q0mx * q2 + _2q0my * q1 + mz * q0q0 + _2q1mx * q3 - mz *
-        //q1q1 + _2q2 * my * q3 - mz * q2q2 + mz * q3q3;
+        // q1q1 + _2q2 * my * q3 - mz * q2q2 + mz * q3q3;
         _2bz = 2.0f * (mx * (q1q3 - q0q2) + my * (q2q3 + q0q1) +
                        mz * (0.5f - q1q1 - q2q2));
         _4bx = 2.0f * _2bx;
@@ -207,8 +221,8 @@ namespace ralgo
     //---------------------------------------------------------------------------------------------------
     // IMU algorithm update
 
-    void madgwick::update(float gx, float gy, float gz, float ax, float ay,
-                          float az)
+    void
+    madgwick::update(float gx, float gy, float gz, float ax, float ay, float az)
     {
         float recipNorm;
 
@@ -221,8 +235,8 @@ namespace ralgo
         apply(gx, gy, gz, ax, ay, az);
     }
 
-    void madgwick::apply(float gx, float gy, float gz, float ax, float ay,
-                         float az)
+    void
+    madgwick::apply(float gx, float gy, float gz, float ax, float ay, float az)
     {
         float module;
         float recipNorm;
@@ -341,11 +355,20 @@ namespace ralgo
                           1.0f - 2.0f * (q2 * q2 + q1 * q1));
     }
 
-    float madgwick::getYawDeg() { return getYawRad() * RAD_TO_DEG; }
+    float madgwick::getYawDeg()
+    {
+        return getYawRad() * RAD_TO_DEG;
+    }
 
-    float madgwick::getPitchDeg() { return getPitchRad() * RAD_TO_DEG; }
+    float madgwick::getPitchDeg()
+    {
+        return getPitchRad() * RAD_TO_DEG;
+    }
 
-    float madgwick::getRollDeg() { return getRollRad() * RAD_TO_DEG; }
+    float madgwick::getRollDeg()
+    {
+        return getRollRad() * RAD_TO_DEG;
+    }
 
     void madgwick::ZYX(float &z, float &y, float &x)
     {

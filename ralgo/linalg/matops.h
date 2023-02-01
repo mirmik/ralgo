@@ -151,7 +151,9 @@ namespace ralgo
                 }
         }
 
-        template <class A, class B, class C,
+        template <class A,
+                  class B,
+                  class C,
                   std::enable_if_t<is_matrix_compatible<B>(), int> = 0>
         void multiply(const A &a, const B &b, C &c)
         {
@@ -175,7 +177,9 @@ namespace ralgo
             }
         }
 
-        template <class A, class B, class C,
+        template <class A,
+                  class B,
+                  class C,
                   std::enable_if_t<is_vector_compatible<B>(), int> = 0>
         void multiply(const A &a, const B &b, C &c)
         {
@@ -195,7 +199,9 @@ namespace ralgo
             }
         }
 
-        template <class C = void, class A, class B,
+        template <class C = void,
+                  class A,
+                  class B,
                   std::enable_if_t<is_matrix_compatible<B>(), int> = 0>
         auto multiply(const A &a, const B &b)
             -> defsame_t<C,
@@ -207,7 +213,9 @@ namespace ralgo
             return res;
         }
 
-        template <class C = void, class A, class B,
+        template <class C = void,
+                  class A,
+                  class B,
                   std::enable_if_t<is_vector_compatible<B>(), int> = 0>
         auto multiply(const A &a, const B &b)
             -> defsame_t<C,

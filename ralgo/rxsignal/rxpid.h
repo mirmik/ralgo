@@ -10,8 +10,8 @@ namespace ralgo
     template <class T>
     auto rxintegral(const rxcpp::observable<T> &source, double delta)
     {
-        return source.scan(T{}, [delta](T acc, T value)
-                           { return acc + value * delta; });
+        return source.scan(
+            T{}, [delta](T acc, T value) { return acc + value * delta; });
     }
 
     template <class T>
@@ -20,8 +20,7 @@ namespace ralgo
         double last = 0;
         double inverse_delta = 1.0 / delta;
         return source | rxcpp::operators::transform(
-                            [inverse_delta, last](T value) mutable
-                            {
+                            [inverse_delta, last](T value) mutable {
                                 auto diff = value - last;
                                 last = value;
                                 return diff * inverse_delta;
@@ -30,17 +29,18 @@ namespace ralgo
 
     template <class T> auto rxlist(std::vector<T> values)
     {
-        return rxcpp::observable<>::create<T>(
-            [values](auto subscriber)
-            {
-                for (auto value : values)
-                    subscriber.on_next(value);
-                subscriber.on_completed();
-            });
+        return rxcpp::observable<>::create<T>([values](auto subscriber) {
+            for (auto value : values)
+                subscriber.on_next(value);
+            subscriber.on_completed();
+        });
     }
 
     template <class T>
-    auto rxpid(double kp, double ki, double kd, double delta,
+    auto rxpid(double kp,
+               double ki,
+               double kd,
+               double delta,
                const rxcpp::observable<T> &error)
     {
         auto integral = rxintegral<T>(error, delta);
@@ -56,12 +56,10 @@ namespace ralgo
         auto zip = error | rxcpp::operators::zip(integral, derivative);
 
         return zip |
-               rxcpp::operators::transform(
-                   [kp, ki, kd](const auto &args)
-                   {
-                       auto [error, integral, derivative] = args;
-                       return kp * error + ki * integral + kd * derivative;
-                   });
+               rxcpp::operators::transform([kp, ki, kd](const auto &args) {
+                   auto [error, integral, derivative] = args;
+                   return kp * error + ki * integral + kd * derivative;
+               });
     }
 }
 

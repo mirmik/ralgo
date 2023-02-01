@@ -170,8 +170,8 @@ int tsdeform_is_finished(tsdeform_t *tsd, double t);
 /// @param t23 - доля времени, которую займёт торможение до доли скорости v3
 /// @param v0  - доля скорости, существующая на момент начала движения.
 /// @param v3  - доля скорости, планируемая на момент окончания движения.
-void tsdeform_set_timestamp_pattern(tsdeform_t *tsd, double t01, double t23,
-                                    double v0, double v3);
+void tsdeform_set_timestamp_pattern(
+    tsdeform_t *tsd, double t01, double t23, double v0, double v3);
 
 /// Второй вариант инициализации, когда вместо увеличения максимальной скорости
 /// расширяется время довода изделия. Номинальная скорость
@@ -182,8 +182,12 @@ void tsdeform_set_timestamp_pattern(tsdeform_t *tsd, double t01, double t23,
 /// @param v0  - доля скорости, существующая на момент начала движения.
 /// @param v3  - доля скорости, планируемая на момент окончания движения.
 /// @full_spattern - включение стратегии плавного изменения ускорения.
-void tsdeform_set_speed_pattern(tsdeform_t *tsd, double t01, double t23,
-                                double v0, double v3, int full_spattern);
+void tsdeform_set_speed_pattern(tsdeform_t *tsd,
+                                double t01,
+                                double t23,
+                                double v0,
+                                double v3,
+                                int full_spattern);
 
 /// Интеграл коэффициента деформации
 double tsdeform_posmod(tsdeform_t *tsd, double t);

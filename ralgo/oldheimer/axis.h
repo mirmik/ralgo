@@ -29,11 +29,23 @@ namespace heimer
             nos::println("feedspd:", feedspd);
         }
 
-        P feedback_position() { return feedpos; }
-        P feedback_speed() { return feedspd; }
+        P feedback_position()
+        {
+            return feedpos;
+        }
+        P feedback_speed()
+        {
+            return feedspd;
+        }
 
-        P target_position() { return ctrpos; }
-        P target_speed() { return ctrspd; }
+        P target_position()
+        {
+            return ctrpos;
+        }
+        P target_speed()
+        {
+            return ctrspd;
+        }
 
         void restore_control(P pos, V spd)
         {
@@ -63,11 +75,15 @@ namespace heimer
             ctrspd = 0;
         }
 
-        P position_error() { return ctrpos - feedpos; }
+        P position_error()
+        {
+            return ctrpos - feedpos;
+        }
 
         virtual P request_feedback_position() = 0;
 
-        bool on_interrupt(control_node *slave, control_node *source,
+        bool on_interrupt(control_node *slave,
+                          control_node *source,
                           interrupt_args *data) override
         {
             (void)slave;
