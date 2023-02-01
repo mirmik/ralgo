@@ -6,4 +6,7 @@ heimer::dof6_signal::dof6_signal(const char *name)
 {
 }
 
-int heimer::dof6_signal::info(char *, int) { return 0; }
+int heimer::dof6_signal::info(char *, int)
+{
+    return 0;
+}

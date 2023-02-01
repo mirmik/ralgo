@@ -17,7 +17,10 @@ namespace ralgo
             ring_counter_init(&counter, N);
         }
 
-        int size() { return N; }
+        int size()
+        {
+            return N;
+        }
 
         T push(T val)
         {
@@ -30,7 +33,10 @@ namespace ralgo
         /// Получить элемент z*i, где z - дискретный оператор.
         /// 0 - последний, 1 - предпоследний
         // и так далее
-        T operator[](int i) { return data[ring_counter_prev(&counter, i)]; }
+        T operator[](int i)
+        {
+            return data[ring_counter_prev(&counter, i)];
+        }
     };
 }
 

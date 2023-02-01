@@ -17,5 +17,5 @@ TEST_CASE("axis_stub_processor")
     axstub.serve(0);
     axstub.feedback(0);
 
-    //CHECK_EQ(axstate.feedpos, 100);
+    // CHECK_EQ(axstate.feedpos, 100);
 }

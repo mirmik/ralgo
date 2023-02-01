@@ -1,5 +1,5 @@
-#include <ralgo/oldheimer/command_center.h>
 #include <ralgo/global_protection.h>
+#include <ralgo/oldheimer/command_center.h>
 
 heimer::command_center_cls<float, float> heimer::command_center;
 

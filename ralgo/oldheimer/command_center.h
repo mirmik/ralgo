@@ -138,8 +138,8 @@ namespace heimer
         control_node *find_node_by_name(const char *name)
         {
             control_node *node;
-            dlist_for_each_entry(node, &control_node_list,
-                                 control_node_list_lnk)
+            dlist_for_each_entry(
+                node, &control_node_list, control_node_list_lnk)
             {
                 if (strcmp(node->mnemo(), name) == 0)
                 {
@@ -163,10 +163,11 @@ namespace heimer
             if (strcmp(argv[1], "list") == 0)
             {
                 control_node *node;
-                dlist_for_each_entry(node, &control_node_list,
-                                     control_node_list_lnk)
+                dlist_for_each_entry(
+                    node, &control_node_list, control_node_list_lnk)
                 {
-                    nos::fprintln("{:10}  sts:{:3}  ctr:{:10}", node->mnemo(),
+                    nos::fprintln("{:10}  sts:{:3}  ctr:{:10}",
+                                  node->mnemo(),
                                   node->is_active() ? "on" : "off",
                                   node->last_controller()
                                       ? node->last_controller()->mnemo()

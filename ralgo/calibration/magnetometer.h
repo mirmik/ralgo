@@ -19,13 +19,15 @@ namespace ralgo
             {}; // (size : yaw_total + pitch_total + 2)
 
     public:
-        spherical_cloud_collector(int _yaw_total, int _pitch_total,
+        spherical_cloud_collector(int _yaw_total,
+                                  int _pitch_total,
                                   linalg::vec<float, 3> *_points_array)
         {
             init(_yaw_total, _pitch_total, _points_array);
         }
 
-        void init(int _yaw_total, int _pitch_total,
+        void init(int _yaw_total,
+                  int _pitch_total,
                   linalg::vec<float, 3> *_points_array)
         {
             yaw_total = _yaw_total;
@@ -45,9 +47,15 @@ namespace ralgo
             return (-M_PI / 2) * (1.f - k) + (M_PI / 2) * k;
         }
 
-        float pitch_koeff(float p) { return (p + M_PI / 2) / (M_PI); }
+        float pitch_koeff(float p)
+        {
+            return (p + M_PI / 2) / (M_PI);
+        }
 
-        float yaw_koeff(float y) { return (y) / (2 * M_PI); }
+        float yaw_koeff(float y)
+        {
+            return (y) / (2 * M_PI);
+        }
 
         linalg::vec<float, 2> angles_by_index(int idx)
         {

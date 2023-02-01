@@ -10,9 +10,15 @@ namespace heimer
     class interrupt_args
     {
     public:
-        virtual const char *what() { return "interrupt"; }
+        virtual const char *what()
+        {
+            return "interrupt";
+        }
 
-        virtual uint8_t code() { return HEIMER_INTERRUPT_TYPE_USER; }
+        virtual uint8_t code()
+        {
+            return HEIMER_INTERRUPT_TYPE_USER;
+        }
         virtual ~interrupt_args() = default;
     };
 
@@ -26,7 +32,10 @@ namespace heimer
         interrupt_args_message &
         operator=(const interrupt_args_message &) = delete;
 
-        const char *what() override { return msg; }
+        const char *what() override
+        {
+            return msg;
+        }
     };
 
     class force_stop_interrupt_args : public interrupt_args
@@ -39,14 +48,23 @@ namespace heimer
         force_stop_interrupt_args &
         operator=(const force_stop_interrupt_args &) = delete;
 
-        const char *what() override { return msg; }
+        const char *what() override
+        {
+            return msg;
+        }
 
-        uint8_t code() override { return HEIMER_INTERRUPT_TYPE_FORCE_STOP; }
+        uint8_t code() override
+        {
+            return HEIMER_INTERRUPT_TYPE_FORCE_STOP;
+        }
     };
 
     class control_update_interrupt_args : public interrupt_args
     {
-        uint8_t code() override { return HEIMER_INTERRUPT_TYPE_CONTROL_UPDATE; }
+        uint8_t code() override
+        {
+            return HEIMER_INTERRUPT_TYPE_CONTROL_UPDATE;
+        }
     };
 }
 

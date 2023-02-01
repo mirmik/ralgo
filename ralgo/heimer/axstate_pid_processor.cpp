@@ -32,7 +32,10 @@ heimer::axstate_pid_processor::iterate_right(heimer::signal_head *iter)
     return iter == nullptr ? target : nullptr;
 }
 
-int heimer::axstate_pid_processor::feedback(disctime_t) { return 0; }
+int heimer::axstate_pid_processor::feedback(disctime_t)
+{
+    return 0;
+}
 
 int heimer::axstate_pid_processor::serve(disctime_t time)
 {
@@ -50,7 +53,10 @@ int heimer::axstate_pid_processor::command(int, char **, char *, int)
     return -1;
 }
 
-void heimer::axstate_pid_processor::deinit() { return; }
+void heimer::axstate_pid_processor::deinit()
+{
+    return;
+}
 
 void heimer::axstate_pid_processor::on_activate(disctime_t time)
 {

@@ -99,7 +99,9 @@ namespace heimer
         void on_activate(disctime_t) override;
 
         void set_alpha_scale(double ascale);
-        void set_offset(position_t xoff, position_t yoff, position_t aloff,
+        void set_offset(position_t xoff,
+                        position_t yoff,
+                        position_t aloff,
                         position_t aroff);
         void set_x_offset(position_t xoff);
         void set_y_offset(position_t yoff);

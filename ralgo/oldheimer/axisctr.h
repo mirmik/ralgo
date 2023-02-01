@@ -59,10 +59,19 @@ namespace heimer
         axisctr(const axisctr &) = delete;
         axisctr &operator=(const axisctr &) = delete;
 
-        auto *current_trajectory() { return curtraj; }
-        auto *linear_trajectory() { return &lintraj; }
+        auto *current_trajectory()
+        {
+            return curtraj;
+        }
+        auto *linear_trajectory()
+        {
+            return &lintraj;
+        }
 
-        bool in_operate() { return !operation_finished_flag; }
+        bool in_operate()
+        {
+            return !operation_finished_flag;
+        }
 
         constexpr axisctr(const char *mnemo,
                           heimer::axis_node<P, V> *controlled)
@@ -101,24 +110,63 @@ namespace heimer
         int stop();
         void hardstop();
 
-        void set_gain(V gain) { this->gain = gain; };
+        void set_gain(V gain)
+        {
+            this->gain = gain;
+        };
 
-        P feedback_position() { return controlled->feedpos / gain; }
-        V feedback_speed() { return controlled->feedspd / fabs(gain); }
+        P feedback_position()
+        {
+            return controlled->feedpos / gain;
+        }
+        V feedback_speed()
+        {
+            return controlled->feedspd / fabs(gain);
+        }
 
-        P telemetry_position() { return feedback_position(); }
+        P telemetry_position()
+        {
+            return feedback_position();
+        }
 
-        P target_position() { return controlled->ctrpos / gain; }
-        V target_speed() { return controlled->ctrspd / fabs(gain); }
+        P target_position()
+        {
+            return controlled->ctrpos / gain;
+        }
+        V target_speed()
+        {
+            return controlled->ctrspd / fabs(gain);
+        }
 
-        V setted_speed() { return spd / fabs(gain); }
-        V setted_acceleration() { return acc / fabs(gain); }
-        V setted_deceleration() { return dcc / fabs(gain); }
+        V setted_speed()
+        {
+            return spd / fabs(gain);
+        }
+        V setted_acceleration()
+        {
+            return acc / fabs(gain);
+        }
+        V setted_deceleration()
+        {
+            return dcc / fabs(gain);
+        }
 
-        void set_speed(V spd) { this->spd = spd * fabs(gain); }
-        void set_acceleration(V acc) { this->acc = acc * fabs(gain); }
-        void set_deceleration(V dcc) { this->dcc = dcc * fabs(gain); }
-        void set_offset(P offset) { this->offset = offset; }
+        void set_speed(V spd)
+        {
+            this->spd = spd * fabs(gain);
+        }
+        void set_acceleration(V acc)
+        {
+            this->acc = acc * fabs(gain);
+        }
+        void set_deceleration(V dcc)
+        {
+            this->dcc = dcc * fabs(gain);
+        }
+        void set_offset(P offset)
+        {
+            this->offset = offset;
+        }
 
         void set_accdcc(V acc, V dcc)
         {
@@ -170,7 +218,8 @@ namespace heimer
             nos::println("maxdcc: ", maxdcc);
         }
 
-        bool on_interrupt(control_node *slave, control_node *source,
+        bool on_interrupt(control_node *slave,
+                          control_node *source,
                           interrupt_args *args) override
         {
             (void)slave;
@@ -329,8 +378,8 @@ namespace heimer
             return 0;
         }
 
-        lintraj.set_stop_trajectory(controlled->feedpos, controlled->feedspd,
-                                    dcc);
+        lintraj.set_stop_trajectory(
+            controlled->feedpos, controlled->feedspd, dcc);
 
         operation_finished_flag = false;
         curtraj = &lintraj;

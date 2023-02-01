@@ -5,10 +5,14 @@
 
 typedef unsigned long disctime_t;
 
-static inline
-unsigned long discrete_time() { return millis(); }
+static inline unsigned long discrete_time()
+{
+    return millis();
+}
 
-static inline
-float discrete_time_frequency() { return 1000.f; }
+static inline float discrete_time_frequency()
+{
+    return 1000.f;
+}
 
 #endif

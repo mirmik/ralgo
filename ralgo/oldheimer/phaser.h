@@ -31,11 +31,23 @@ namespace heimer
 
         virtual void invoke_update() = 0;
 
-        ExtPos int2ext_pos(IntPos intpos) { return intpos / _gain; }
-        IntPos ext2int_pos(ExtPos extpos) { return extpos * _gain; }
+        ExtPos int2ext_pos(IntPos intpos)
+        {
+            return intpos / _gain;
+        }
+        IntPos ext2int_pos(ExtPos extpos)
+        {
+            return extpos * _gain;
+        }
 
-        Speed int2ext_spd(Speed intspd) { return intspd / _gain; }
-        Speed ext2int_spd(Speed extspd) { return extspd * _gain; }
+        Speed int2ext_spd(Speed intspd)
+        {
+            return intspd / _gain;
+        }
+        Speed ext2int_spd(Speed extspd)
+        {
+            return extspd * _gain;
+        }
 
         virtual void set_speed_internal_impl(Speed spd) = 0;
         void set_speed_internal(Speed spd)
@@ -43,11 +55,23 @@ namespace heimer
             _setted_speed = spd;
             set_speed_internal_impl(spd);
         }
-        Speed setted_speed_internal() { return _setted_speed; }
+        Speed setted_speed_internal()
+        {
+            return _setted_speed;
+        }
 
-        void set_speed(Speed spd) { set_speed_internal(ext2int_spd(spd)); }
-        Speed setted_speed() { return int2ext_spd(setted_speed_internal()); }
-        Speed feedback_speed() { return setted_speed(); }
+        void set_speed(Speed spd)
+        {
+            set_speed_internal(ext2int_spd(spd));
+        }
+        Speed setted_speed()
+        {
+            return int2ext_spd(setted_speed_internal());
+        }
+        Speed feedback_speed()
+        {
+            return setted_speed();
+        }
 
         void print_info() override
         {
@@ -85,7 +109,10 @@ namespace heimer
             _gain = gain;
             system_unlock();
         }
-        auto gain() { return _gain; }
+        auto gain()
+        {
+            return _gain;
+        }
     };
 
     template <class ExtPos, class Speed>
@@ -97,7 +124,10 @@ namespace heimer
         int64_t lasttime;
 
     public:
-        phaser_emulator<ExtPos, Speed>() { lasttime = ralgo::discrete_time(); }
+        phaser_emulator<ExtPos, Speed>()
+        {
+            lasttime = ralgo::discrete_time();
+        }
 
         void serve_impl() override
         {

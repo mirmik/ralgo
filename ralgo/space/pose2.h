@@ -25,7 +25,10 @@ namespace ralgo
             return *this;
         }
 
-        pose2 inverse() { return {-ang, linalg::rot<T>(-ang, -lin)}; }
+        pose2 inverse()
+        {
+            return {-ang, linalg::rot<T>(-ang, -lin)};
+        }
 
         pose2 operator*(const pose2 &oth)
         {
@@ -59,7 +62,7 @@ namespace ralgo
             return linalg::rot(-ang, vec - lin);
         }
 
-        ralgo::screw<T, 2> rotate(ralgo::screw<T, 2> scr) const 
+        ralgo::screw<T, 2> rotate(ralgo::screw<T, 2> scr) const
         {
             return {scr.ang, rotate(scr.lin)};
         }
@@ -74,7 +77,10 @@ namespace ralgo
             return linalg::rot(ang, vec);
         }
 
-        linalg::vec<T, 2> translation() { return lin; }
+        linalg::vec<T, 2> translation()
+        {
+            return lin;
+        }
     };
 
     template <class T> T vector_angle(linalg::vec<T, 2> vec)

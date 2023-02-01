@@ -23,12 +23,15 @@ namespace ralgo
             _ki = ki;
         }
 
-        double integral() 
+        double integral()
         {
             return _integral;
         }
 
-        void reset_integral(double val = 0) { _integral = val; }
+        void reset_integral(double val = 0)
+        {
+            _integral = val;
+        }
 
         void set_integral_limits(double lo, double hi)
         {

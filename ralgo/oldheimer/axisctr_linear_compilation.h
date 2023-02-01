@@ -18,7 +18,8 @@ namespace heimer
     public:
         axisctr_linear_compilation(const char *name) : axisctr<P, V>(name) {}
 
-        axisctr_linear_compilation(const char *name, linintctr<P, V, 2> *_ctr1,
+        axisctr_linear_compilation(const char *name,
+                                   linintctr<P, V, 2> *_ctr1,
                                    linintctr<P, V, 2> *_ctr2)
             : axisctr_linear_compilation(name)
         {

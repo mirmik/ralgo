@@ -10,7 +10,8 @@
 
 namespace ralgo
 {
-    template <class T, class O = ralgo::row_order<T>,
+    template <class T,
+              class O = ralgo::row_order<T>,
               class Alloc = std::allocator<T>>
     class matrix : public matrix_view<T, O>
     {
@@ -60,7 +61,10 @@ namespace ralgo
             parent::resize(r, c);
         }
 
-        ~matrix() { invalidate(); }
+        ~matrix()
+        {
+            invalidate();
+        }
 
         void invalidate()
         {

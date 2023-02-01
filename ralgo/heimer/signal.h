@@ -45,7 +45,7 @@ namespace heimer
         signal_head(signal_head &&) = delete;
         signal_head &operator=(signal_head &&) = delete;
 
-        virtual ~signal_head() 
+        virtual ~signal_head()
         {
             dlist_del(&list_lnk);
         }
@@ -54,12 +54,12 @@ namespace heimer
             : name(name), type(type)
         {
         }
-        void set_name(const std::string & name);
+        void set_name(const std::string &name);
 
         virtual int info(char *buffer, int maxsize) = 0;
         int ctrinfo(char *buffer, int maxsize);
 
-        void init(const std::string & name, uint8_t type);
+        void init(const std::string &name, uint8_t type);
         void rebind();
         void deinit();
 

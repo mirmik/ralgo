@@ -34,15 +34,15 @@ namespace ralgo
             (void)rows;
             return {data + i * cols, cols, 1};
         }
-        static vector_view<T> row(T *data, int i, int rows, int cols,
-                                  int stride)
+        static vector_view<T>
+        row(T *data, int i, int rows, int cols, int stride)
         {
             (void)rows;
             (void)stride;
             return {data + i * cols, cols, 1};
         }
-        static vector_view<T> col(T *data, int i, int rows, int cols,
-                                  int stride)
+        static vector_view<T>
+        col(T *data, int i, int rows, int cols, int stride)
         {
             (void)cols;
             return {data + i, rows, stride};
@@ -66,15 +66,15 @@ namespace ralgo
             (void)cols;
             return {data + i * rows, rows, 1};
         }
-        static vector_view<T> row(T *data, int i, int rows, int cols,
-                                  int stride)
+        static vector_view<T>
+        row(T *data, int i, int rows, int cols, int stride)
         {
             (void)cols;
             (void)stride;
             return {data + i * rows, rows, 1};
         }
-        static vector_view<T> col(T *data, int i, int rows, int cols,
-                                  int stride)
+        static vector_view<T>
+        col(T *data, int i, int rows, int cols, int stride)
         {
             (void)rows;
             return {data + i, cols, stride};
@@ -117,15 +117,36 @@ namespace ralgo
         {
         }
 
-        int rows() const { return _rows; }
-        int cols() const { return _cols; }
-        int size() const { return _rows * _cols; }
+        int rows() const
+        {
+            return _rows;
+        }
+        int cols() const
+        {
+            return _cols;
+        }
+        int size() const
+        {
+            return _rows * _cols;
+        }
 
-        size_t size1() const { return _rows; }
-        size_t size2() const { return _cols; }
+        size_t size1() const
+        {
+            return _rows;
+        }
+        size_t size2() const
+        {
+            return _cols;
+        }
 
-        T *data() { return _data; }
-        const T *data() const { return _data; }
+        T *data()
+        {
+            return _data;
+        }
+        const T *data() const
+        {
+            return _data;
+        }
 
         void resize(int rows, int cols, int stride = 0)
         {
@@ -137,14 +158,23 @@ namespace ralgo
                 _stride = stride;
         }
 
-        T &at(int i, int j) { return accessor.at(_data, i, j, _stride); }
+        T &at(int i, int j)
+        {
+            return accessor.at(_data, i, j, _stride);
+        }
         const T &at(int i, int j) const
         {
             return accessor.at(_data, i, j, _stride);
         }
 
-        T &operator()(int i, int j) { return at(i, j); }
-        const T &operator()(int i, int j) const { return at(i, j); }
+        T &operator()(int i, int j)
+        {
+            return at(i, j);
+        }
+        const T &operator()(int i, int j) const
+        {
+            return at(i, j);
+        }
 
         ralgo::vector_view<T> operator[](int i)
         {
@@ -173,10 +203,22 @@ namespace ralgo
         }
 
         // vecops compatible. Убрать, если потребуются смещения.
-        T *begin() { return _data; }
-        T *end() { return _data + _cols * _rows; } // Stride ?
-        const T *begin() const { return _data; }
-        const T *end() const { return _data + _rows * _cols; } // Stride ?
+        T *begin()
+        {
+            return _data;
+        }
+        T *end()
+        {
+            return _data + _cols * _rows;
+        } // Stride ?
+        const T *begin() const
+        {
+            return _data;
+        }
+        const T *end() const
+        {
+            return _data + _rows * _cols;
+        } // Stride ?
 
         void release()
         {

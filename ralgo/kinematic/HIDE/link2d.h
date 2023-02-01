@@ -30,7 +30,10 @@ namespace ralgo
             local_location = trans;
         }
 
-        virtual bool iscynem() { return false; }
+        virtual bool iscynem()
+        {
+            return false;
+        }
     };
 
     class kinematic_unit2d : public unit2d
@@ -40,13 +43,22 @@ namespace ralgo
         double coord = 0;
 
     public:
-        kinematic_unit2d() { output.parent = this; }
+        kinematic_unit2d()
+        {
+            output.parent = this;
+        }
 
-        void link(unit2d *oth) { oth->parent = &output; }
+        void link(unit2d *oth)
+        {
+            oth->parent = &output;
+        }
 
         virtual ralgo::screw2<float> sensivity() = 0;
 
-        bool iscynem() override { return true; }
+        bool iscynem() override
+        {
+            return true;
+        }
     };
 
     class unit2d_1dof : public kinematic_unit2d
@@ -69,7 +81,10 @@ namespace ralgo
             output.local_location = ralgo::htrans2<float>(angle * mul, {0, 0});
         }
 
-        ralgo::screw2<float> sensivity() override { return {mul, {0, 0}}; }
+        ralgo::screw2<float> sensivity() override
+        {
+            return {mul, {0, 0}};
+        }
     };
 
     class actuator2 : public unit2d_1dof
@@ -86,7 +101,10 @@ namespace ralgo
             output.local_location = ralgo::htrans2<float>(0, ax * mul * c);
         }
 
-        ralgo::screw2<float> sensivity() override { return {0, mul * ax}; }
+        ralgo::screw2<float> sensivity() override
+        {
+            return {0, mul * ax};
+        }
     };
 }
 

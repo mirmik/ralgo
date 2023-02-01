@@ -40,7 +40,10 @@ namespace heimer
         igris::array_view<heimer::axis_node<Position, Speed> *> _axes;
 
     public:
-        bool in_operate() { return _in_operation; }
+        bool in_operate()
+        {
+            return _in_operation;
+        }
 
         linintctr(const char *name,
                   igris::array_view<heimer::axis_node<Position, Speed> *> axes)
@@ -63,9 +66,15 @@ namespace heimer
             ralgo::vecops::fill(_reverse, 0);
         }
 
-        constexpr int dim() { return Dim; }
+        constexpr int dim()
+        {
+            return Dim;
+        }
 
-        axis_node<float, float> *get_axis(int index) { return _axes[index]; }
+        axis_node<float, float> *get_axis(int index)
+        {
+            return _axes[index];
+        }
 
         int _move(igris::array_view<Position> curpos,
                   igris::array_view<Position> tgtpos,
@@ -87,8 +96,8 @@ namespace heimer
             if (parent::coord_checker && !without_checker)
             {
                 char msg[64];
-                if (parent::coord_checker->check(this, tgtpos.data(),
-                                                 tgtpos.size(), msg))
+                if (parent::coord_checker->check(
+                        this, tgtpos.data(), tgtpos.size(), msg))
                 {
                     ralgo::warn(parent::mnemo(), ": ", msg);
                     return -1;
@@ -113,7 +122,8 @@ namespace heimer
             }
 
             lintraj.reset(curpos, curtime, tgtpos, tgttim);
-            lintraj.set_speed_pattern(gained_acc_val, gained_dcc_val,
+            lintraj.set_speed_pattern(gained_acc_val,
+                                      gained_dcc_val,
                                       gained_speed,
                                       parent::enable_full_spattern);
 
@@ -193,9 +203,15 @@ namespace heimer
             return _move(curpos, tgtpos, without_checker);
         }
 
-        int incmove(Position *mov) { return incmove({mov, Dim}); }
+        int incmove(Position *mov)
+        {
+            return incmove({mov, Dim});
+        }
 
-        int absmove(Position *pos) { return absmove({pos, Dim}); }
+        int absmove(Position *pos)
+        {
+            return absmove({pos, Dim});
+        }
 
         int parted_absmove(int *axno, Position *pos, int len)
         {
@@ -256,7 +272,10 @@ namespace heimer
             }
         }
 
-        float *gains() override { return _gains; }
+        float *gains() override
+        {
+            return _gains;
+        }
 
         void set_gains(igris::array_view<float> arr) override
         {
@@ -286,11 +305,23 @@ namespace heimer
             }
         }
 
-        void print_info() override { nos::println("TODO"); }
+        void print_info() override
+        {
+            nos::println("TODO");
+        }
 
-        Speed speed() { return _speed; }
-        Speed acceleration() { return _acc_val; }
-        Speed deceleration() { return _dcc_val; }
+        Speed speed()
+        {
+            return _speed;
+        }
+        Speed acceleration()
+        {
+            return _acc_val;
+        }
+        Speed deceleration()
+        {
+            return _dcc_val;
+        }
 
         control_node *iterate(control_node *slt) override
         {
@@ -364,8 +395,8 @@ namespace heimer
 
             float speed_multiplier =
                 evaluate_speed_multiplier_by_curspd(feedspd);
-            lintraj.set_stop_trajectory(feedpos, feedspd,
-                                        _dcc_val * speed_multiplier);
+            lintraj.set_stop_trajectory(
+                feedpos, feedspd, _dcc_val * speed_multiplier);
 
             operation_finished_flag = false;
             curtraj = &lintraj;
@@ -373,11 +404,12 @@ namespace heimer
             return 0;
         }
 
-        bool on_interrupt(control_node *slave, control_node *source,
+        bool on_interrupt(control_node *slave,
+                          control_node *source,
                           interrupt_args *data) override
         {
-            (void) slave;
-            (void) source;
+            (void)slave;
+            (void)source;
             if (data->code() == HEIMER_INTERRUPT_TYPE_CONTROL_UPDATE)
             {
                 // update_from_controlled();

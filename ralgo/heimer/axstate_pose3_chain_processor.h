@@ -101,9 +101,15 @@ namespace heimer
             return 1;
         }
 
-        int leftsigtype(int) override { return SIGNAL_TYPE_AXIS_STATE; }
+        int leftsigtype(int) override
+        {
+            return SIGNAL_TYPE_AXIS_STATE;
+        }
 
-        signal_head *leftsig(int i) override { return settings[i].controlled; }
+        signal_head *leftsig(int i) override
+        {
+            return settings[i].controlled;
+        }
 
         void set_leftsig(int i, signal_head *sig) override
         {
@@ -143,7 +149,10 @@ namespace heimer
         {
             return 1. / discrete_time_frequency() / T;
         }
-        void set_compkoeff(double ck) { this->compkoeff = ck; }
+        void set_compkoeff(double ck)
+        {
+            this->compkoeff = ck;
+        }
         void set_compkoeff_timeconst(double T)
         {
             this->compkoeff = compkoeff_timeconst(T);
@@ -166,8 +175,14 @@ namespace heimer
             rightside->feedvel = feedback_velocity.lin;
         }
 
-        signal_head *rightsig(int) override { return rightside; }
-        int rightsigtype(int) override { return SIGNAL_TYPE_PHASE3; }
+        signal_head *rightsig(int) override
+        {
+            return rightside;
+        }
+        int rightsigtype(int) override
+        {
+            return SIGNAL_TYPE_PHASE3;
+        }
         void set_rightsig(int, signal_head *sig) override
         {
             rightside = static_cast<phase_signal<3> *>(sig);
@@ -200,12 +215,15 @@ namespace heimer
             TEMPORARY_STORAGE(double, 3 * leftdim(), Udata);
             TEMPORARY_STORAGE(double, leftdim() * leftdim(), Vdata);
 
-            ralgo::matrix_view<double> A(std::data(Adata), 3,
+            ralgo::matrix_view<double> A(std::data(Adata),
+                                         3,
                                          leftdim()); // Матрица чуствительности
-            ralgo::matrix_view<double> U(std::data(Udata), 3,
+            ralgo::matrix_view<double> U(std::data(Udata),
+                                         3,
                                          leftdim()); // Левая матрица разложения
             ralgo::matrix_view<double> V(
-                std::data(Vdata), leftdim(),
+                std::data(Vdata),
+                leftdim(),
                 leftdim()); // Правая матрица разложения
             ralgo::vector_view<double> W(std::data(Wdata),
                                          leftdim()); // Центральная матрица.

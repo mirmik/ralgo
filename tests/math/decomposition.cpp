@@ -11,8 +11,9 @@ TEST_CASE("svd")
     double arr[12];
     ralgo::matrix_view<double> mat(arr, 4, 3);
     ralgo::matops::copy_from_cols(
-        mat, std::vector<std::vector<double>>{
-                 {1, 0, 0, 1}, {0, 1, 0, -1}, {0, 0, 1, 0}});
+        mat,
+        std::vector<std::vector<double>>{
+            {1, 0, 0, 1}, {0, 1, 0, -1}, {0, 0, 1, 0}});
 
     auto svd = ralgo::svd(mat);
 

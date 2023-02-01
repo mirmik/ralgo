@@ -17,8 +17,8 @@ TEST_CASE("kinchain.1")
     double coords[2] = {0, 0};
     ralgo::screw3<double> outsenses[2];
 
-    ralgo::kinematic_chain_sensivities(constants, locsenses, coords, 2,
-                                       outsenses);
+    ralgo::kinematic_chain_sensivities(
+        constants, locsenses, coords, 2, outsenses);
 
     CHECK_EQ(outsenses[0].lin, linalg::vec<double, 3>{0, 0, 1});
     CHECK_EQ(outsenses[0].ang, linalg::vec<double, 3>{0, 0, 0});
@@ -35,8 +35,8 @@ TEST_CASE("kinchain.2")
     double coords[2] = {0, 0};
     ralgo::screw3<double> outsenses[2];
 
-    ralgo::kinematic_chain_sensivities(constants, locsenses, coords, 2,
-                                       outsenses);
+    ralgo::kinematic_chain_sensivities(
+        constants, locsenses, coords, 2, outsenses);
 
     CHECK_EQ(outsenses[0].lin, linalg::vec<double, 3>{0, 0, 1});
     CHECK_EQ(outsenses[0].ang, linalg::vec<double, 3>{0, 0, 0});
@@ -52,8 +52,8 @@ TEST_CASE("kinchain.3")
     double coords[1] = {0};
     ralgo::screw3<double> outsenses[1];
 
-    ralgo::kinematic_chain_sensivities(constants, locsenses, coords, 1,
-                                       outsenses);
+    ralgo::kinematic_chain_sensivities(
+        constants, locsenses, coords, 1, outsenses);
 
     CHECK_EQ(outsenses[0].lin, linalg::vec<double, 3>{0, 1, 0});
     CHECK_EQ(outsenses[0].ang, linalg::vec<double, 3>{0, 0, 1});
@@ -67,8 +67,8 @@ TEST_CASE("kinchain.4")
     double coords[1] = {M_PI / 2};
     ralgo::screw3<double> outsenses[1];
 
-    ralgo::kinematic_chain_sensivities(constants, locsenses, coords, 1,
-                                       outsenses);
+    ralgo::kinematic_chain_sensivities(
+        constants, locsenses, coords, 1, outsenses);
 
     CHECK_EQ(outsenses[0].lin[0], doctest::Approx(-1));
     CHECK_EQ(outsenses[0].lin[1], doctest::Approx(0));
@@ -85,8 +85,8 @@ TEST_CASE("kinchain.5")
     double coords[1] = {M_PI / 2};
     ralgo::screw3<double> outsenses[1];
 
-    ralgo::kinematic_chain_sensivities(constants, locsenses, coords, 1,
-                                       outsenses);
+    ralgo::kinematic_chain_sensivities(
+        constants, locsenses, coords, 1, outsenses);
 
     CHECK_EQ(outsenses[0].lin[0], doctest::Approx(0));
     CHECK_EQ(outsenses[0].lin[1], doctest::Approx(-1));
@@ -106,8 +106,8 @@ TEST_CASE("kinchain.6")
     double coords[2] = {M_PI / 4, M_PI / 4};
     ralgo::screw3<double> outsenses[2];
 
-    ralgo::kinematic_chain_sensivities(constants, locsenses, coords, 2,
-                                       outsenses);
+    ralgo::kinematic_chain_sensivities(
+        constants, locsenses, coords, 2, outsenses);
 
     CHECK_EQ(outsenses[0].lin[0], doctest::Approx(-(1 + 1 / sqrt(2))));
     CHECK_EQ(outsenses[0].lin[1], doctest::Approx(1 / sqrt(2)));

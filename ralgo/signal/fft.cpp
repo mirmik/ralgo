@@ -132,8 +132,8 @@ void ralgo::signal::spectre(double *src, double *dst, int srclen, int dstlen)
     delete[] Tmvl;
 }
 
-std::vector<double> ralgo::signal::spectre(double *src, size_t srclen,
-                                           size_t dstlen)
+std::vector<double>
+ralgo::signal::spectre(double *src, size_t srclen, size_t dstlen)
 {
     std::vector<double> v(dstlen);
     ralgo::signal::spectre(src, v.data(), srclen, dstlen);

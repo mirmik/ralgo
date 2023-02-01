@@ -3,7 +3,10 @@
 #include <ralgo/imu/madgwick.h>
 #include <ralgo/linalg/linalg.h>
 
-double deg(double x) { return x / 180. * M_PI; }
+double deg(double x)
+{
+    return x / 180. * M_PI;
+}
 
 using linalg::ostream_overloads::operator<<;
 

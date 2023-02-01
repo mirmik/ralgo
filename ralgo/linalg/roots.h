@@ -8,7 +8,10 @@
 
 namespace ralgo
 {
-    template <class T> ralgo::vector<T> roots(T b, T a) { return {-b / a}; }
+    template <class T> ralgo::vector<T> roots(T b, T a)
+    {
+        return {-b / a};
+    }
 
     template <class T> ralgo::vector<T> roots(T c, T b, T a)
     {
@@ -43,8 +46,8 @@ namespace ralgo
         int ret[2];
         ralgo::vector<double> real_roots(degree);
         ralgo::vector<double> imag_roots(degree);
-        finder.FindRoots(coeffs.data(), degree, real_roots.data(),
-                         imag_roots.data(), ret);
+        finder.FindRoots(
+            coeffs.data(), degree, real_roots.data(), imag_roots.data(), ret);
         return real_roots;
     }
 }

@@ -99,7 +99,8 @@ public:
 
     virtual ~PolynomialRootFinder();
 
-    PolynomialRootStatus FindRoots(double *coefficient_ptr, int degree,
+    PolynomialRootStatus FindRoots(double *coefficient_ptr,
+                                   int degree,
                                    double *real_zero_vector_ptr,
                                    double *imaginary_zero_vector_ptr,
                                    int *number_of_roots_found_ptr = 0);
@@ -117,12 +118,21 @@ private:
 
     void Newest(int itype, double &uu, double &vv);
 
-    void QuadraticSyntheticDivision(int n_plus_one, double u, double v,
-                                    double *p_ptr, double *q_ptr, double &a,
+    void QuadraticSyntheticDivision(int n_plus_one,
+                                    double u,
+                                    double v,
+                                    double *p_ptr,
+                                    double *q_ptr,
+                                    double &a,
                                     double &b);
 
-    void SolveQuadraticEquation(double a, double b, double c, double &sr,
-                                double &si, double &lr, double &li);
+    void SolveQuadraticEquation(double a,
+                                double b,
+                                double c,
+                                double &sr,
+                                double &si,
+                                double &lr,
+                                double &li);
 
     //==================================================================
     //  Declare the copy constructor and operator equals to be private

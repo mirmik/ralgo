@@ -1,5 +1,5 @@
-#include <igris/math.h>
 #include <cstdlib>
+#include <igris/math.h>
 #include <ralgo/heimer/executor.h>
 #include <ralgo/heimer/velocity_applier.h>
 #include <ralgo/log.h>
@@ -9,7 +9,8 @@ using namespace heimer;
 velocity_applier::velocity_applier() : signal_processor(0, 1) {}
 
 velocity_applier::velocity_applier(
-    const char *name, robo::fixed_frequency_stepper_controller *stepctr,
+    const char *name,
+    robo::fixed_frequency_stepper_controller *stepctr,
     axis_state *state)
     : signal_processor(0, 1)
 {
@@ -108,7 +109,8 @@ int velocity_applier::info(char *ans, int)
                        "listen: {} \r\n"
                        "feedpos: {} \r\n"
                        "stepctr_info: \r\n{}",
-                       state->name, controlled_posget->feedback_position(),
+                       state->name,
+                       controlled_posget->feedback_position(),
                        stepctr_info);
 
     return 0;
@@ -118,8 +120,11 @@ int velocity_applier::bind(int argc, char **argv, char *output, int outmax)
 {
     if (argc != 1)
     {
-        snprintf(output, outmax, "Can't bind %d symbols for %d _dim velctr",
-                 argc, 1);
+        snprintf(output,
+                 outmax,
+                 "Can't bind %d symbols for %d _dim velctr",
+                 argc,
+                 1);
         return -1;
     }
 
@@ -127,7 +132,8 @@ int velocity_applier::bind(int argc, char **argv, char *output, int outmax)
 
     if (!sig)
     {
-        snprintf(output, outmax,
+        snprintf(output,
+                 outmax,
                  "Wrong signal name '%s' (type 'siglist' for display)",
                  argv[0]);
         return -1;
@@ -135,7 +141,8 @@ int velocity_applier::bind(int argc, char **argv, char *output, int outmax)
 
     if (sig->type != SIGNAL_TYPE_AXIS_STATE)
     {
-        snprintf(output, outmax, "Wrong signal type. name:(%s)", sig->name.c_str());
+        snprintf(
+            output, outmax, "Wrong signal type. name:(%s)", sig->name.c_str());
         return -1;
     }
 
@@ -145,7 +152,10 @@ int velocity_applier::bind(int argc, char **argv, char *output, int outmax)
     return 0;
 }
 
-void velocity_applier::set_gear(double gear) { this->gear = gear; }
+void velocity_applier::set_gear(double gear)
+{
+    this->gear = gear;
+}
 
 int velocity_applier::set_current_position_protected(double pos)
 {
@@ -188,7 +198,8 @@ int velocity_applier::command(int argc, char **argv, char *output, int outmax)
         if (sts)
         {
             snprintf(
-                output, outmax,
+                output,
+                outmax,
                 "position cannot be setted because device in protected state");
         }
         status = 0;
@@ -201,7 +212,8 @@ int velocity_applier::command(int argc, char **argv, char *output, int outmax)
         if (sts)
         {
             snprintf(
-                output, outmax,
+                output,
+                outmax,
                 "position cannot be setted because device in protected state");
         }
         status = 0;
@@ -215,7 +227,10 @@ int velocity_applier::command(int argc, char **argv, char *output, int outmax)
     return status;
 }
 
-signal_head *velocity_applier::iterate_left(signal_head *) { return NULL; }
+signal_head *velocity_applier::iterate_left(signal_head *)
+{
+    return NULL;
+}
 
 signal_head *velocity_applier::iterate_right(signal_head *iter)
 {

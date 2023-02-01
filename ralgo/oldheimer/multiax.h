@@ -18,7 +18,10 @@ namespace heimer
         {
         }
 
-        int on_activate() override { return HEIM_ERR_IS_PARTED; }
+        int on_activate() override
+        {
+            return HEIM_ERR_IS_PARTED;
+        }
 
         P request_feedback_position() override
         {
@@ -26,7 +29,8 @@ namespace heimer
             return heimer::axis_node<P, V>::feedpos;
         }
 
-        virtual bool on_interrupt(control_node *slave, control_node *source,
+        virtual bool on_interrupt(control_node *slave,
+                                  control_node *source,
                                   interrupt_args *data)
         {
             if (data->code() == HEIMER_INTERRUPT_TYPE_CONTROL_UPDATE)

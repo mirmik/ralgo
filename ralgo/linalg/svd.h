@@ -487,8 +487,8 @@ namespace ralgo
     }
 
     template <class MA, class MU, class MV, class V>
-    SVD<typename MA::value_type, MU, MV, V> make_SVD(const MA &a, MU &u, MV &v,
-                                                     V &w)
+    SVD<typename MA::value_type, MU, MV, V>
+    make_SVD(const MA &a, MU &u, MV &v, V &w)
     {
         return SVD<typename MA::value_type, MU, MV, V>(a, u, v, w);
     }

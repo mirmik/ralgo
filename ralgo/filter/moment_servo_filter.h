@@ -45,8 +45,8 @@ namespace ralgo
             return compensate_torq;
         }
 
-        double position_control(double error_pos, double error_vel,
-                                double delta)
+        double
+        position_control(double error_pos, double error_vel, double delta)
         {
             double compensate_vel = pos_pi.serve(error_pos, delta);
             double control_vel = error_vel + compensate_vel;

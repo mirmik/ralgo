@@ -49,7 +49,10 @@ namespace heimer
         control_node *controller = nullptr;
 
     public:
-        const control_node *last_controller() { return controller; }
+        const control_node *last_controller()
+        {
+            return controller;
+        }
 
         virtual ~control_node() = default;
         constexpr control_node(const char *mnemo) : _mnemo(mnemo)
@@ -66,7 +69,10 @@ namespace heimer
         }
 
         // итератор подчинённых устройств
-        virtual control_node *iterate(control_node *) { return nullptr; }
+        virtual control_node *iterate(control_node *)
+        {
+            return nullptr;
+        }
 
         // Итератор контроллирующих устройств
         virtual control_node *controllers_iterate(control_node *it)
@@ -86,23 +92,50 @@ namespace heimer
         void serve();
         virtual void serve_impl() = 0;
 
-        bool is_active() { return flags & HEIM_IS_ACTIVE; }
+        bool is_active()
+        {
+            return flags & HEIM_IS_ACTIVE;
+        }
 
-        bool is_controlled() { return flags & HEIM_IS_CONTROLLED; }
+        bool is_controlled()
+        {
+            return flags & HEIM_IS_CONTROLLED;
+        }
 
-        bool is_multicontrolled() { return flags & HEIM_IS_MULTICONTROLLED; }
+        bool is_multicontrolled()
+        {
+            return flags & HEIM_IS_MULTICONTROLLED;
+        }
 
-        bool is_alarmed() { return flags & HEIM_IS_ALARM; }
+        bool is_alarmed()
+        {
+            return flags & HEIM_IS_ALARM;
+        }
 
-        void set_multicontrolled_mode() { flags |= HEIM_IS_MULTICONTROLLED; }
+        void set_multicontrolled_mode()
+        {
+            flags |= HEIM_IS_MULTICONTROLLED;
+        }
 
-        const char *mnemo() const { return _mnemo; }
+        const char *mnemo() const
+        {
+            return _mnemo;
+        }
 
-        void set_mnemo(const char *str) { _mnemo = str; }
+        void set_mnemo(const char *str)
+        {
+            _mnemo = str;
+        }
 
-        virtual void print_info() { nos::println("info"); }
+        virtual void print_info()
+        {
+            nos::println("info");
+        }
 
-        virtual int internal_command(int, char **) { return -1; }
+        virtual int internal_command(int, char **)
+        {
+            return -1;
+        }
 
         void
         rethrow_interrupt(control_node *slave, // источник, переславший сигнал
@@ -114,13 +147,25 @@ namespace heimer
 
     protected:
         // вызывается при взятии внешнего управления нодом
-        virtual int on_external_take(control_node *) { return 0; }
+        virtual int on_external_take(control_node *)
+        {
+            return 0;
+        }
 
         // вызывается при отпускании внешнего управления
-        virtual int on_external_release(control_node *) { return 0; }
+        virtual int on_external_release(control_node *)
+        {
+            return 0;
+        }
 
-        virtual int on_activate() { return 0; }
-        virtual int on_deactivate() { return 0; }
+        virtual int on_activate()
+        {
+            return 0;
+        }
+        virtual int on_deactivate()
+        {
+            return 0;
+        }
 
         // обратное уведомления о событиях
         // если возвращает истину, распространение сообщения

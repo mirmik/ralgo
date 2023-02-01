@@ -29,7 +29,8 @@ namespace heimer
         // кинематические в другой.
         void setup(igris::array_view<ralgo::unit2d *> a,
                    igris::array_view<ralgo::kinematic_unit2d *> b,
-                   ralgo::unit2d *finallink, ralgo::unit2d *startlink = nullptr)
+                   ralgo::unit2d *finallink,
+                   ralgo::unit2d *startlink = nullptr)
         {
             chain.setup(a, b);
             chain.collect_chain(finallink, startlink);
@@ -46,7 +47,10 @@ namespace heimer
         // контрлирующих элементов по реальному положению системы.
         virtual void restore_control_model() = 0;
 
-        void update_model_location() { chain.update_model_location(); }
+        void update_model_location()
+        {
+            chain.update_model_location();
+        }
 
         void evaluate_links_speeds(ralgo::htrans2<float> pos,
                                    ralgo::screw2<float> spd)
@@ -81,11 +85,15 @@ namespace heimer
             // Результат возвращается через spdarr.
         }
 
-        void set_compensate(double k) { compensation_koefficient = k; }
+        void set_compensate(double k)
+        {
+            compensation_koefficient = k;
+        }
 
         // Расчитать модельный объект из
         // конфигурации управляющих осей.
-        virtual void get_control_phase(int64_t time, ralgo::htrans2<float> &pos,
+        virtual void get_control_phase(int64_t time,
+                                       ralgo::htrans2<float> &pos,
                                        ralgo::screw2<float> &spd) = 0;
 
         virtual double *ctrspd_array() = 0;

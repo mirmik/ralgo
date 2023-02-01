@@ -1,8 +1,8 @@
 #include <ralgo/heimer/executor.h>
 #include <ralgo/heimer/signal.h>
 #include <ralgo/heimer/signal_processor.h>
-#include <ralgo/util/helpers.h>
 #include <ralgo/log.h>
+#include <ralgo/util/helpers.h>
 
 #include <igris/math.h>
 #include <igris/shell/rshell.h>
@@ -24,7 +24,7 @@ void signal_processor::set_dims(int ldim, int rdim)
     _rightdim = rdim;
 }
 
-signal_processor::signal_processor(const std::string& name, int ldim, int rdim)
+signal_processor::signal_processor(const std::string &name, int ldim, int rdim)
 {
     set_dims(ldim, rdim);
     set_name(name);
@@ -47,7 +47,10 @@ void signal_processor::set_name(const std::string &name)
     _name = name;
 }
 
-void signal_processor::deinit() { dlist_del(&list_lnk); }
+void signal_processor::deinit()
+{
+    dlist_del(&list_lnk);
+}
 
 int heimer::signal_processors_count()
 {
@@ -171,11 +174,17 @@ igris::buffer signal_processor::name()
     return {_name.data(), _name.size()};
 }
 
-bool signal_processor::is_active() { return u.f.active; }
+bool signal_processor::is_active()
+{
+    return u.f.active;
+}
 
 void signal_processor::on_activate(disctime_t) {}
 
-bool signal_processor::is_dynamic_resources() { return u.f.dynamic_resources; }
+bool signal_processor::is_dynamic_resources()
+{
+    return u.f.dynamic_resources;
+}
 
 void signal_processor::set_dynamic_resources_flag(bool en)
 {
@@ -199,18 +208,21 @@ void signal_processor::release_signals()
     }
 }
 
-static int bindleft(signal_processor *axctr, int argc, char **argv,
-                    char *output, int outmax)
+static int bindleft(
+    signal_processor *axctr, int argc, char **argv, char *output, int outmax)
 {
     if (argc != axctr->leftdim())
     {
-        snprintf(output, outmax, "Can't bind %d symbols for %d _dim axisctr",
-                 argc, axctr->leftdim());
+        snprintf(output,
+                 outmax,
+                 "Can't bind %d symbols for %d _dim axisctr",
+                 argc,
+                 axctr->leftdim());
         return -1;
     }
 
     {
-        TEMPORARY_STORAGE(signal_head*, argc, arr);
+        TEMPORARY_STORAGE(signal_head *, argc, arr);
 
         for (int i = 0; i < argc; ++i)
         {
@@ -218,7 +230,8 @@ static int bindleft(signal_processor *axctr, int argc, char **argv,
 
             if (!sig)
             {
-                snprintf(output, outmax,
+                snprintf(output,
+                         outmax,
                          "Wrong signal name '%s ' (type 'siglist' for display)",
                          argv[i]);
                 return -1;
@@ -226,7 +239,9 @@ static int bindleft(signal_processor *axctr, int argc, char **argv,
 
             if (sig->type != axctr->leftsigtype(i))
             {
-                snprintf(output, outmax, "Wrong signal type. name:(%s)",
+                snprintf(output,
+                         outmax,
+                         "Wrong signal type. name:(%s)",
                          sig->name.c_str());
                 return -1;
             }
@@ -240,18 +255,21 @@ static int bindleft(signal_processor *axctr, int argc, char **argv,
     return 0;
 }
 
-static int bindright(signal_processor *axctr, int argc, char **argv,
-                     char *output, int outmax)
+static int bindright(
+    signal_processor *axctr, int argc, char **argv, char *output, int outmax)
 {
     if (argc != axctr->rightdim())
     {
-        snprintf(output, outmax, "Can't bind %d symbols for %d _dim axisctr",
-                 argc, axctr->rightdim());
+        snprintf(output,
+                 outmax,
+                 "Can't bind %d symbols for %d _dim axisctr",
+                 argc,
+                 axctr->rightdim());
         return -1;
     }
 
     {
-        TEMPORARY_STORAGE(signal_head*, argc, arr);
+        TEMPORARY_STORAGE(signal_head *, argc, arr);
 
         for (int i = 0; i < argc; ++i)
         {
@@ -259,7 +277,8 @@ static int bindright(signal_processor *axctr, int argc, char **argv,
 
             if (!sig)
             {
-                snprintf(output, outmax,
+                snprintf(output,
+                         outmax,
                          "Wrong signal name '%s' (type 'siglist' for display)",
                          argv[i]);
                 return -1;
@@ -267,7 +286,9 @@ static int bindright(signal_processor *axctr, int argc, char **argv,
 
             if (sig->type != axctr->rightsigtype(i))
             {
-                snprintf(output, outmax, "Wrong signal type. name:(%s)",
+                snprintf(output,
+                         outmax,
+                         "Wrong signal type. name:(%s)",
                          sig->name.c_str());
                 return -1;
             }
@@ -325,9 +346,15 @@ signal_head *signal_processor::rightsig(int)
     return _;
 }
 
-uint8_t signal_processor::leftdim() { return _leftdim; }
+uint8_t signal_processor::leftdim()
+{
+    return _leftdim;
+}
 
-uint8_t signal_processor::rightdim() { return _rightdim; }
+uint8_t signal_processor::rightdim()
+{
+    return _rightdim;
+}
 
 int leftsigtype(int)
 {
@@ -371,9 +398,15 @@ int signal_processor::rightsigtype(int)
     return 0;
 }
 
-void signal_processor::set_leftsig(int, signal_head *) { BUG(); }
+void signal_processor::set_leftsig(int, signal_head *)
+{
+    BUG();
+}
 
-void signal_processor::set_rightsig(int, signal_head *) { BUG(); }
+void signal_processor::set_rightsig(int, signal_head *)
+{
+    BUG();
+}
 
 signal_head *signal_processor::iterate_left(signal_head *iter)
 {

@@ -6,7 +6,8 @@
 #include <ralgo/heimer/convex_zone_approval.h>
 #include <ralgo/lp/point_in_hexagon.h>
 
-int heimer::convex_zone_approval::check(int dim, position_t *strt,
+int heimer::convex_zone_approval::check(int dim,
+                                        position_t *strt,
                                         position_t *fini)
 {
     (void)strt;
@@ -28,7 +29,8 @@ int heimer::convex_zone_approval::room()
     return points_capacity - points_total;
 }
 
-void heimer::convex_zone_approval::bind_table(position_t *table, int cap,
+void heimer::convex_zone_approval::bind_table(position_t *table,
+                                              int cap,
                                               int size)
 {
     this->table = table;

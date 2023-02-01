@@ -23,9 +23,15 @@ namespace robo
             return data;
         }
 
-        void set_compare_value(int32_t cmp) { *compare_reg = cmp; }
+        void set_compare_value(int32_t cmp)
+        {
+            *compare_reg = cmp;
+        }
 
-        int32_t get_compare_value() { return *compare_reg; }
+        int32_t get_compare_value()
+        {
+            return *compare_reg;
+        }
     };
 }
 

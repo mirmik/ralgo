@@ -87,8 +87,10 @@ namespace heimer
         P axposes[3];
 
     public:
-        xyalpha_chain2d_controller(const char *name, const char *xname,
-                                   const char *yname, const char *aname,
+        xyalpha_chain2d_controller(const char *name,
+                                   const char *xname,
+                                   const char *yname,
+                                   const char *aname,
                                    axis_node<P, V> *x_controlled,
                                    axis_node<P, V> *y_controlled,
                                    axis_node<P, V> *a_controlled)
@@ -109,8 +111,10 @@ namespace heimer
             this->a_controlled = a_controlled;
         }
 
-        void relocate(ralgo::htrans2<float> x, ralgo::htrans2<float> y,
-                      ralgo::htrans2<float> a, ralgo::htrans2<float> out)
+        void relocate(ralgo::htrans2<float> x,
+                      ralgo::htrans2<float> y,
+                      ralgo::htrans2<float> a,
+                      ralgo::htrans2<float> out)
         {
             x_link.relocate(x);
             y_link.relocate(y);
@@ -120,7 +124,8 @@ namespace heimer
 
         // Расчитывает положение и винт скорости
         // для текущей управляющей конфигурации.
-        void get_control_phase(int64_t time, ralgo::htrans2<float> &pos,
+        void get_control_phase(int64_t time,
+                               ralgo::htrans2<float> &pos,
                                ralgo::screw2<float> &spd)
         {
             P xpos, ypos, apos;
@@ -188,7 +193,10 @@ namespace heimer
             a_axis.feedspd = a_axis.ctrspd;
         }
 
-        double *ctrspd_array() override { return ctrspd; }
+        double *ctrspd_array() override
+        {
+            return ctrspd;
+        }
 
         void apply_control()
         {
@@ -200,7 +208,10 @@ namespace heimer
             a_controlled->control(a_controlled->feedback_position(), ctrspd[2]);
         }
 
-        void print_info() override { nos::println("not implemented"); }
+        void print_info() override
+        {
+            nos::println("not implemented");
+        }
 
         control_node *iterate(control_node *slt) override
         {
@@ -235,7 +246,8 @@ namespace heimer
             return 0;
         }
 
-        virtual bool on_interrupt(control_node *slave, control_node *source,
+        virtual bool on_interrupt(control_node *slave,
+                                  control_node *source,
                                   interrupt_args *data)
         {
             if (data->code() == HEIMER_INTERRUPT_TYPE_CONTROL_UPDATE)

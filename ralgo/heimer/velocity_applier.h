@@ -69,7 +69,10 @@ namespace heimer
         {
             return 1. / discrete_time_frequency() / T;
         }
-        void set_compkoeff(double ck) { this->compkoeff = ck; }
+        void set_compkoeff(double ck)
+        {
+            this->compkoeff = ck;
+        }
         void set_compkoeff_timeconst(double T)
         {
             this->compkoeff = compkoeff_timeconst(T);

@@ -19,4 +19,7 @@ int64_t discrete_time()
         .count();
 }
 
-float discrete_time_frequency() { return 1000; }
+float discrete_time_frequency()
+{
+    return 1000;
+}

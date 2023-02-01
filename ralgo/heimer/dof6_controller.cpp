@@ -13,25 +13,43 @@ signal_head *dof6_controller::iterate_left(signal_head *iter)
     return iter == nullptr ? controlled : nullptr;
 }
 
-signal_head *dof6_controller::iterate_right(signal_head *) { return nullptr; }
+signal_head *dof6_controller::iterate_right(signal_head *)
+{
+    return nullptr;
+}
 
 void dof6_controller::set_controlled(dof6_signal *controlled)
 {
     this->controlled = controlled;
 }
 
-void dof6_controller::set_velocity(double v) { vel = v; }
+void dof6_controller::set_velocity(double v)
+{
+    vel = v;
+}
 
-void dof6_controller::set_acceleration(double v) { acc = v; }
+void dof6_controller::set_acceleration(double v)
+{
+    acc = v;
+}
 
-void dof6_controller::set_decceleration(double v) { dcc = v; }
+void dof6_controller::set_decceleration(double v)
+{
+    dcc = v;
+}
 
-int dof6_controller::feedback(disctime_t) { return 0; }
+int dof6_controller::feedback(disctime_t)
+{
+    return 0;
+}
 
-int dof6_controller::serve(disctime_t) { return 0; }
+int dof6_controller::serve(disctime_t)
+{
+    return 0;
+}
 
-static inline int setvel(dof6_controller *axctr, int argc, char **argv,
-                         char *output, int outmax)
+static inline int
+setvel(dof6_controller *axctr, int argc, char **argv, char *output, int outmax)
 {
     if (argc < 1)
     {
@@ -43,8 +61,8 @@ static inline int setvel(dof6_controller *axctr, int argc, char **argv,
     return 0;
 }
 
-static inline int setacc(dof6_controller *axctr, int argc, char **argv,
-                         char *output, int outmax)
+static inline int
+setacc(dof6_controller *axctr, int argc, char **argv, char *output, int outmax)
 {
     if (argc < 1)
     {
@@ -59,8 +77,8 @@ static inline int setacc(dof6_controller *axctr, int argc, char **argv,
     return 0;
 }
 
-static inline int setdcc(dof6_controller *axctr, int argc, char **argv,
-                         char *output, int outmax)
+static inline int
+setdcc(dof6_controller *axctr, int argc, char **argv, char *output, int outmax)
 {
     if (argc < 1)
     {
@@ -127,8 +145,14 @@ int dof6_controller::command(int argc, char **argv, char *output, int outmax)
 
 void dof6_controller::deinit() {}
 
-int dof6_controller::leftsigtype(int) { return SIGNAL_TYPE_DOF6; }
-signal_head *dof6_controller::leftsig(int) { return controlled; }
+int dof6_controller::leftsigtype(int)
+{
+    return SIGNAL_TYPE_DOF6;
+}
+signal_head *dof6_controller::leftsig(int)
+{
+    return controlled;
+}
 void dof6_controller::set_leftsig(int, signal_head *sig)
 {
     controlled = static_cast<dof6_signal *>(sig);

@@ -51,7 +51,10 @@ namespace ralgo
     public:
         virtual ~traj1d() = default;
         virtual int attime(int64_t time, P &pos, V &spd) = 0;
-        bool is_finished(int64_t time) { return time > ftim; }
+        bool is_finished(int64_t time)
+        {
+            return time > ftim;
+        }
     };
 
     template <class P, class V> class traj1d_line : public traj1d<P, V>
@@ -92,8 +95,8 @@ namespace ralgo
                 dcc_part = 0.5;
             }
 
-            tsdeform_set_timestamp_pattern(&spddeform, acc_part, dcc_part, 0,
-                                           0);
+            tsdeform_set_timestamp_pattern(
+                &spddeform, acc_part, dcc_part, 0, 0);
         }
 
         void
@@ -123,8 +126,8 @@ namespace ralgo
 
             // Учёт возможного треугольного паттерна осуществляется
             // здесь:
-            tsdeform_set_speed_pattern(&spddeform, acc_part, dcc_part, 0, 0,
-                                       args->full_spattern);
+            tsdeform_set_speed_pattern(
+                &spddeform, acc_part, dcc_part, 0, 0, args->full_spattern);
         }
 
         int attime(int64_t time, P &pos, V &spd) override

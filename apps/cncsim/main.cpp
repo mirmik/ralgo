@@ -46,8 +46,7 @@ crow::publish_logger logger("ralgo", &publisher_log);
 crow::service_node control_service(
     crowker,
     "cncsim" RALGO_CNC_CLI_SERVICE,
-    +[](char *cmd, int len, crow::service_node &srv)
-    {
+    +[](char *cmd, int len, crow::service_node &srv) {
         std::lock_guard<std::mutex> lock(mtx);
         cmd[len] = 0;
         nos::println("input: ", std::string(cmd, len), "END");

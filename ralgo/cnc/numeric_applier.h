@@ -32,7 +32,10 @@ class control_block
             return interrupt_counter < deaceleration_after_ic;
     }
 
-    bool is_postactive() { return interrupt_counter < block_finish_ic; }
+    bool is_postactive()
+    {
+        return interrupt_counter < block_finish_ic;
+    }
 
     float current_acceleration(int64_t interrupt_counter)
     {
@@ -73,9 +76,15 @@ class planned_blocks_ring
 
     control_block planned[PLANNED_BLOCKS_RING];
 
-    int change_active_block() { ring_move_head_one(&ring); }
+    int change_active_block()
+    {
+        ring_move_head_one(&ring);
+    }
 
-    int block_index(control_block *it) { return it - planned; }
+    int block_index(control_block *it)
+    {
+        return it - planned;
+    }
 
     void fixup_postactive_blocks()
     {

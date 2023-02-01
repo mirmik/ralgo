@@ -80,7 +80,10 @@ namespace heimer
             void (*operation_finish_handler)(void *priv, axis_controller *ax));
 
         void set_gain(double *gain);
-        void set_gain(double gain) { set_gain(&gain); }
+        void set_gain(double gain)
+        {
+            set_gain(&gain);
+        }
         void set_gain(const std::initializer_list<double> &gain);
 
         void set_limits_external(double *back, double *forw);
@@ -120,7 +123,9 @@ namespace heimer
         velocity_t restore_internal_velocity_from_axstates();
 
     private:
-        int _absmove(disctime_t curtim, position_t *curpos, position_t *tgtpos,
+        int _absmove(disctime_t curtim,
+                     position_t *curpos,
+                     position_t *tgtpos,
                      double extdist);
 
         void finish_trajectory(disctime_t time, position_t *ctrpos);

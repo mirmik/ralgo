@@ -73,8 +73,14 @@ namespace robo
 
         virtual void evaluate() {}
 
-        int64_t control_pos() { return _control_pos; }
-        int64_t virtual_pos() { return _virtual_pos; }
+        int64_t control_pos()
+        {
+            return _control_pos;
+        }
+        int64_t virtual_pos()
+        {
+            return _virtual_pos;
+        }
 
         double real_feedback_position()
         {
@@ -146,9 +152,15 @@ namespace robo
 
         void info(char *buf, int len) override;
 
-        double frequency() { return freq; }
+        double frequency()
+        {
+            return freq;
+        }
 
-        int fast_cycle_serve() override { return constant_frequency_serve(); }
+        int fast_cycle_serve() override
+        {
+            return constant_frequency_serve();
+        }
 
     private:
         void evaluate() override;
