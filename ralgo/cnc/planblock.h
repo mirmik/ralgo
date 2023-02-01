@@ -298,7 +298,7 @@ namespace cnc
         bool set_stop_pattern(int axes,
                               double velocity,
                               double acceleration,
-                              ralgo::vector_view<double> _direction)
+                              const ralgo::vector_view<double> &_direction)
         {
             start_velocity = velocity;
             final_velocity = 0;
