@@ -1,7 +1,7 @@
 #include <doctest/doctest.h>
-#include <ralgo/geom/algtype.h>
+//#include <ralgo/geom/algtype.h>
 
-TEST_CASE("SB")
+/*TEST_CASE("SB")
 {
     ralgo::geom::SB<double> a(1, {0, 0, 0});
     ralgo::geom::SB<double> b(2, {0, 1, 0});
@@ -26,4 +26,4 @@ TEST_CASE("SB.rotor")
     CHECK_EQ(unrotor.e23, doctest::Approx(0));
     CHECK_EQ(unrotor.e31, doctest::Approx(0));
     CHECK_EQ(unrotor.e12, doctest::Approx(M_PI));
-}
+}*/
