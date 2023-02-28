@@ -118,7 +118,7 @@ static inline int info(axstate_linear_processor *axctr,
     for (int i = 0; i < axctr->dim() * axctr->dim(); ++i)
     {
         memset(buf, 0, bufsize);
-        f32toa(axctr->matrix[i], buf, 5);
+        igris_f32toa(axctr->matrix[i], buf, 5);
         // snprintf(buf, bufsize, "%f ", axctr->matrix[i]);
         strncat(output, buf, outmax);
         strncat(output, " ", outmax);
@@ -133,7 +133,7 @@ static inline int info(axstate_linear_processor *axctr,
     for (int i = 0; i < axctr->dim() * axctr->dim(); ++i)
     {
         memset(buf, 0, bufsize);
-        f32toa(axctr->matrix[i], buf, 5);
+        igris_f32toa(axctr->matrix[i], buf, 5);
         // snprintf(buf, bufsize, "%f ", axctr->matrix[i]);
         strncat(output, buf, outmax);
         strncat(output, " ", outmax);
