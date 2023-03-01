@@ -1,6 +1,7 @@
 #ifndef RALGO_VECTOR_VIEW_H
 #define RALGO_VECTOR_VIEW_H
 
+#include <cstddef>
 #include <iostream>
 #include <memory>
 
@@ -21,7 +22,7 @@ namespace ralgo
         vector_view_iterator(T *dat) : dat(dat), stride(1) {}
         vector_view_iterator(T *dat, int stride) : dat(dat), stride(stride) {}
 
-        ptrdiff_t operator-(const vector_view_iterator &oth)
+        std::ptrdiff_t operator-(const vector_view_iterator &oth)
         {
             return (dat - oth.dat) / stride;
         }
