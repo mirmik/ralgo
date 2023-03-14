@@ -10,13 +10,13 @@ TEST_CASE("gpssolver")
         linalg::vec<double, 4>{ 0.0+1,  0.0+16, -1.0, T},
         linalg::vec<double, 4>{ 0.0+1,  0.0+16,  1.0, T},
         linalg::vec<double, 4>{ 0.0+1,  1.0+16,  0.0, T},
-        linalg::vec<double, 4>{ 1.0+1,  0.0+16,  0.0, T},
+        linalg::vec<double, 4>{ 1./sqrt(2)+1,  1./sqrt(2)+16,  0.0, T},
     };
     
-    auto x = ralgo::gps_solver(points, 2);
+    auto x = ralgo::gps_solver(points, 4);
 
     CHECK_LT(std::abs(x[0] - 1), 1e-6);
     CHECK_LT(std::abs(x[1] - 16), 1e-6);
     CHECK_LT(std::abs(x[2] - 0), 1e-6);
-    CHECK_LT(std::abs(x[3] - 15.5), 1e-6);
+    CHECK_LT(std::abs(x[3] - 15.25), 1e-6);
 }
