@@ -33,6 +33,7 @@ namespace ralgo
         MU u = {};
         MV v = {};
         V w = {};
+        std::vector<double> mean_of_columns = {};
         T eps = {};
         T tsh = {};
 
@@ -44,10 +45,21 @@ namespace ralgo
             u.resize(_a.rows(), _a.cols());
             v.resize(_a.cols(), _a.cols());
             w.resize(_a.cols());
+            mean_of_columns.resize(_a.cols());
 
             ralgo::matops::copy(u, _a); // Копируем данные.
             ralgo::vecops::inplace::clean(v);
             ralgo::vecops::inplace::clean(w);
+            ralgo::vecops::fill(mean_of_columns, 0);
+
+            for (int i = 0; i < n; ++i)
+            {
+                T sum = 0;
+                for (int j = 0; j < m; ++j) {
+                    sum += u(j, i);
+                }
+                mean_of_columns[i] = (double)sum / (double)m;
+            }
 
             eps = std::numeric_limits<T>::epsilon();
 
@@ -58,8 +70,8 @@ namespace ralgo
 
         template <class MA> SVD(const MA &a) : SVD(a, MU{}, MV{}, V{}) {}
 
-        template <class A, class B>
-        void solve(const A &b, B &x, T thresh = -1.);
+        template <class B, class X>
+        void solve(const B &b, X &x, T thresh = -1.);
 
         template <class R> void pinv(R &result)
         {
@@ -108,7 +120,7 @@ namespace ralgo
     {
         int i, j, jj;
         T s;
-        if (std::size(b) != (unsigned)m || x.size() != (unsigned)n)
+        if (std::size(b) != (unsigned)m || ralgo::size(x) != (unsigned)n)
             ralgo::fault("SVD::solve bad sizes");
 
         TEMPORARY_STORAGE(T, n, tmp);
@@ -121,14 +133,18 @@ namespace ralgo
                 for (i = 0; i < m; i++)
                     s += u[i][j] * b[i];
                 s /= w[j];
+                tmp[j] = s;
             }
-            tmp[j] = s;
+            else  {
+                tmp[j] = 0;
+            }           
         }
         for (j = 0; j < n; j++)
         {
             s = 0.0;
-            for (jj = 0; jj < n; jj++)
+            for (jj = 0; jj < n; jj++) {
                 s += v[j][jj] * tmp[jj];
+            }
             x[j] = s;
         }
     }
