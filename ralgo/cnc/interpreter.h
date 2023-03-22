@@ -526,26 +526,26 @@ namespace cnc
         int command_help(nos::ostream &os)
         {
             nos::println_to(os,
-                            "setprotect - disable protection\n"
-                            "stop - stop all motors\n"
-                            "axmaxspd - set max speed for axis\n"
-                            "axmaxacc - set max acceleration for axis\n"
-                            "maxspd - set max speed for all axes\n"
-                            "maxacc - set max acceleration for all axes\n"
-                            "relmove - move relative to current position\n"
-                            "absmove - move absolute\n"
-                            "steps - print current steps\n"
-                            "finishes - print current finishes\n"
-                            "gains - print current gains\n"
-                            "setgear - set gear for axis\n"
-                            "gears - print current gears\n"
-                            "setpos - set position for axis\n"
-                            "velmaxs - set max velocities for all axes\n"
-                            "accmaxs - set max accelerations for all axes\n"
-                            "lastblock - print last block\n"
-                            "state - print interpreter state\n"
-                            "simulator - enable simulator mode\n"
-                            "help - print this help\n");
+                            "setprotect - disable protection\r\n"
+                            "stop - stop all motors\r\n"
+                            "axmaxspd - set max speed for axis\r\n"
+                            "axmaxacc - set max acceleration for axis\r\n"
+                            "maxspd - set max speed for all axes\r\n"
+                            "maxacc - set max acceleration for all axes\r\n"
+                            "relmove - move relative to current position\r\n"
+                            "absmove - move absolute\r\n"
+                            "steps - print current steps\r\n"
+                            "finishes - print current finishes\r\n"
+                            "gains - print current gains\r\n"
+                            "setgear - set gear for axis\r\n"
+                            "gears - print current gears\r\n"
+                            "setpos - set position for axis\r\n"
+                            "velmaxs - set max velocities for all axes\r\n"
+                            "accmaxs - set max accelerations for all axes\r\n"
+                            "lastblock - print last block\r\n"
+                            "state - print interpreter state\r\n"
+                            "simulator - enable simulator mode\r\n"
+                            "help - print this help\r\n");
             return 0;
         }
 

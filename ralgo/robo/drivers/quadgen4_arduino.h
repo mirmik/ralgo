@@ -34,9 +34,9 @@ namespace robo
             bpin1 = d;
         }
 
-        void set_state(uint8_t state) override
+        void apply_state() override
         {
-            uint8_t setcode = graycode8(state);
+            uint8_t setcode = graycode8(current_state());
 
             int a = (setcode & 0b01);
             int b = (setcode & 0b10);

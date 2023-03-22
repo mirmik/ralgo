@@ -18,18 +18,29 @@ namespace robo
         void inc() override
         {
             ++counter;
-            state = state == 3 ? 0 : state + 1;
-            set_state(state);
+            auto newstate = state == 3 ? 0 : state + 1;
+            set_state(newstate);
         }
 
         void dec() override
         {
             --counter;
-            state = state == 0 ? 3 : state - 1;
-            set_state(state);
+            auto newstate = state == 0 ? 3 : state - 1;
+            set_state(newstate);
         }
 
-        virtual void set_state(uint8_t state) = 0;
+        virtual void apply_state() = 0;
+
+        void set_state(uint8_t newstate)
+        {
+            state = newstate;
+            apply_state();
+        }
+
+        uint8_t current_state()
+        {
+            return state;
+        }
     };
 }
 
