@@ -428,7 +428,7 @@ namespace cnc
                 return;
             }
 
-            auto curvels = revolver->current_velocity_no_lock();
+            auto curvels = planner->current_velocity();
             auto cursteps = revolver->current_steps_no_lock();
 
             auto direction =

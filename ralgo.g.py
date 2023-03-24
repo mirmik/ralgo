@@ -25,6 +25,7 @@ licant.module("ralgo.terathon",
 
 licant.module("ralgo",
               sources=[
+                    "ralgo/cnc/*.cpp",
                   "ralgo/global_protection.cpp",
                   "ralgo/imu/madgwick.cpp",
                   "ralgo/log/log.cpp",
