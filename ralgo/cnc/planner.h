@@ -58,12 +58,15 @@ namespace cnc
         igris::ring<cnc::planner_block> *blocks = {};
         igris::ring<cnc::control_shift> *shifts = {};
         bool need_to_reevaluate = false;
+        bool in_operation = false;
         uint8_t state = 0;
         // int count_of_reevaluation = 0;
         igris::delegate<void> _start_operation_handle = {};
         int waited = 0;
 
         bool dda_counter_overflow_error_detected = false;
+
+        igris::delegate<void> final_shift_pushed = {};
 
     public:
         planner(const planner &) = delete;
@@ -221,8 +224,16 @@ namespace cnc
             int final;
 
             system_lock();
+            bool shifts_empty = shifts->empty();
+            bool blocks_empty = blocks->empty() && active_block == nullptr;
+            if (shifts_empty && blocks_empty && in_operation)
+            {
+                in_operation = false;
+                final_shift_pushed();
+                system_unlock();
+                return 0;
+            }
             int room = shifts->room();
-            // bool empty = blocks->empty();
             system_unlock();
 
             while (room--)
@@ -230,6 +241,7 @@ namespace cnc
                 // Планируем поведение револьвера на несколько циклов вперёд
                 // попутно инкрементируя модельное время.
                 final = iteration();
+                in_operation = true;
 
                 if (final)
                     return final;
@@ -365,7 +377,7 @@ namespace cnc
             total_axes = total;
             gears.resize(total);
             gears_high_trigger.resize(total);
-            ralgo::vecops::fill(gears, 100000);
+            ralgo::vecops::fill(gears, 1000);
             update_triggers();
         }
 

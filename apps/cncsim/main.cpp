@@ -21,7 +21,7 @@
 igris::ring<cnc::planner_block> blocks{40};
 igris::ring<cnc::control_shift> shifts{400};
 cnc::planner planner(&blocks, &shifts);
-cnc::revolver revolver(&shifts, &blocks, &planner);
+cnc::revolver revolver(&shifts);
 cnc::interpreter interpreter(&blocks, &planner, &revolver, &shifts);
 robo::stepper steppers[3];
 robo::stepper *steppers_ptrs[] = {&steppers[0], &steppers[1], &steppers[2]};
@@ -46,7 +46,8 @@ crow::publish_logger logger("ralgo", &publisher_log);
 crow::service_node control_service(
     crowker,
     "cncsim" RALGO_CNC_CLI_SERVICE,
-    +[](char *cmd, int len, crow::service_node &srv) {
+    +[](char *cmd, int len, crow::service_node &srv)
+    {
         std::lock_guard<std::mutex> lock(mtx);
         cmd[len] = 0;
         nos::println("input: ", std::string(cmd, len), "END");

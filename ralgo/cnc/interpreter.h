@@ -120,7 +120,8 @@ namespace cnc
             ralgo::vecops::fill(_final_position, 0);
             ralgo::vecops::fill(max_axes_accelerations, 0);
             ralgo::vecops::fill(max_axes_velocities, 0);
-            revolver->final_shift_pushed =
+
+            planner->final_shift_pushed =
                 igris::make_delegate(&interpreter::final_shift_handle, this);
         }
 
@@ -739,8 +740,8 @@ namespace cnc
             PRINTTO(os, revolver_frequency);
             PRINTTO(os, saved_acc);
             PRINTTO(os, saved_feed);
-            PRINTTO(os, revolver->shifts_ring->head_index());
-            PRINTTO(os, revolver->shifts_ring->tail_index());
+            PRINTTO(os, shifts->head_index());
+            PRINTTO(os, shifts->tail_index());
             nos::print_to(os, "vel: ");
             nos::print_list_to(os, planner->velocities);
             nos::println_to(os);

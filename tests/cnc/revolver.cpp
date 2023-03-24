@@ -10,7 +10,7 @@ TEST_CASE("revolver")
     robo::stepper *steppers[2] = {&_steppers[0], &_steppers[1]};
 
     auto shift_ring = igris::ring<cnc::control_shift>(10);
-    auto revolver = cnc::revolver(&shift_ring, nullptr, nullptr);
+    auto revolver = cnc::revolver(&shift_ring);
 
     revolver.set_steppers(steppers, 2);
 
