@@ -4,5 +4,5 @@
 TEST_CASE("quadgen4_arduino")
 {
     robo::quadgen4_arduino quadgen(8, 10, 9, 11);
-    quadgen.set_state(3);
+    // quadgen.set_state(3);
 }

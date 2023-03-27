@@ -40,6 +40,7 @@ namespace cnc
     private:
         robo::stepper **steppers = nullptr;
         igris::ring<cnc::control_shift> *shifts_ring = {};
+        control_shift zero_step = {};
 
     public:
         revolver(igris::ring<cnc::control_shift> *ring);

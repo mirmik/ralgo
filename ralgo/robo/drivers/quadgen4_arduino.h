@@ -21,7 +21,7 @@ static inline void digitalWrite(uint8_t pin, uint8_t val)
 
 namespace robo
 {
-    class quadgen4_arduino : public robo::quadgen
+    class quadgen4_arduino : robo::quadgen
     {
         uint8_t apin0 = 0, apin1 = 0, bpin0 = 0, bpin1 = 0;
 
@@ -34,13 +34,8 @@ namespace robo
             bpin1 = d;
         }
 
-        void apply_state() override
+        void apply_state(bool a, bool b) override
         {
-            uint8_t setcode = graycode8(current_state());
-
-            int a = (setcode & 0b01);
-            int b = (setcode & 0b10);
-
             digitalWrite(apin0, a);
             digitalWrite(apin1, !a);
             digitalWrite(bpin0, b);

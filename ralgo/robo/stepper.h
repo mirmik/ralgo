@@ -20,6 +20,9 @@ namespace robo
             --counter;
         }
 
+        // The control immitation without any action
+        virtual void no_action() {}
+
         int64_t steps_count()
         {
             return counter;

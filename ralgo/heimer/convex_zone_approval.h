@@ -1,6 +1,7 @@
 #ifndef RALGO_HEIMER_CONVEX_ZONE_APPROVAL_H
 #define RALGO_HEIMER_CONVEX_ZONE_APPROVAL_H
 
+#include <new>
 #include <ralgo/heimer/axisctr_approval.h>
 
 namespace heimer

@@ -31,6 +31,32 @@ namespace cnc
         }
         return -1;
     }
+
+    static inline char index_to_symbol(int i)
+    {
+        switch (i)
+        {
+        case 0:
+            return 'x';
+        case 1:
+            return 'y';
+        case 2:
+            return 'z';
+        case 3:
+            return 'a';
+        case 4:
+            return 'b';
+        case 5:
+            return 'c';
+        case 6:
+            return 'i';
+        case 7:
+            return 'j';
+        case 8:
+            return 'k';
+        }
+        return '?';
+    }
 }
 
 #endif

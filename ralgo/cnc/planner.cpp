@@ -1,5 +1,7 @@
 #include <ralgo/cnc/planner.h>
 
+#pragma GCC optimize("O3")
+
 void cnc::planner::cleanup()
 {
     blocks->clear();
@@ -320,7 +322,7 @@ void cnc::planner::set_axes_count(int total)
     update_triggers();
 }
 
-void cnc::planner::set_gears(igris::array_view<double> arr)
+void cnc::planner::set_gears(const igris::array_view<double> &arr)
 {
     ralgo::vecops::copy(arr, gears);
     update_triggers();
@@ -348,8 +350,8 @@ void cnc::planner::clear()
 {
     blocks->clear();
     std::fill(dda_counters.begin(), dda_counters.end(), 0);
-    std::fill(velocities.begin(), velocities.end(), 0);
     std::fill(accelerations.begin(), accelerations.end(), 0);
+    std::fill(velocities.begin(), velocities.end(), 0);
     active_block = nullptr;
     active = blocks->head_index();
     need_to_reevaluate = true;

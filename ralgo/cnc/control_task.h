@@ -2,8 +2,11 @@
 #define CONTROL_TASK_H
 
 #include <algorithm>
+#include <igris/container/static_vector.h>
+#include <igris/util/numconvert.h>
 #include <nos/shell/argv.h>
 #include <ralgo/cnc/defs.h>
+#include <ralgo/cnc/util.h>
 #include <ralgo/linalg/vector_view.h>
 
 namespace cnc
@@ -12,24 +15,40 @@ namespace cnc
     {
     public:
         bool isok = false;
-        std::array<double, NMAX_AXES> _poses = {};
+        igris::static_vector<double, NMAX_AXES> _poses = {};
         double feed = 0;
         double acc = 0;
 
-        control_task() = default;
-
-        ralgo::vector_view<double> poses(size_t total_axes)
+        control_task(size_t total_axes)
         {
-            ralgo::vector_view<double> ret(_poses.data(), total_axes);
-            std::copy(std::begin(_poses), std::end(_poses), ret.begin());
-            return ret;
+            _poses.resize(total_axes);
         }
 
-        const ralgo::vector_view<double> poses(size_t total_axes) const
+        control_task(const control_task &other)
         {
-            ralgo::vector_view<double> ret((double *)_poses.data(), total_axes);
-            std::copy(std::begin(_poses), std::end(_poses), ret.begin());
-            return ret;
+            isok = other.isok;
+            feed = other.feed;
+            acc = other.acc;
+            _poses = other._poses;
+        }
+
+        control_task &operator=(const control_task &other)
+        {
+            isok = other.isok;
+            feed = other.feed;
+            acc = other.acc;
+            _poses = other._poses;
+            return *this;
+        }
+
+        igris::static_vector<double, NMAX_AXES> &poses()
+        {
+            return _poses;
+        }
+
+        const igris::static_vector<double, NMAX_AXES> &poses() const
+        {
+            return _poses;
         }
 
         void set_poses(const igris::array_view<double> &arr)
@@ -107,6 +126,58 @@ namespace cnc
             return ret;
         }
     };
+
+    struct idxpos
+    {
+        int idx;
+        double pos;
+    };
+
+    static inline std::vector<idxpos>
+    get_task_poses_from_argv(const nos::argv &argv)
+    {
+        std::vector<idxpos> ret;
+        for (unsigned int i = 0; i < argv.size(); ++i)
+        {
+            char symb = tolower(argv[i].data()[0]);
+            int idx = symbol_to_index(symb);
+            if (idx >= 0)
+            {
+                double val = igris_atof64(&argv[i].data()[1], nullptr);
+                ret.push_back({idx, val});
+            }
+        }
+        return ret;
+    }
+
+    static inline double get_task_feed_from_argv(const nos::argv &argv)
+    {
+        for (unsigned int i = 0; i < argv.size(); ++i)
+        {
+            char symb = tolower(argv[i].data()[0]);
+            if (symb == 'f')
+            {
+                double val = igris_atof64(&argv[i].data()[1], nullptr);
+                return val;
+            }
+        }
+        return 0;
+    }
+
+    static inline double get_task_acc_from_argv(const nos::argv &argv)
+    {
+        for (unsigned int i = 0; i < argv.size(); ++i)
+        {
+            char symb = tolower(argv[i].data()[0]);
+            if (symb == 'm')
+            {
+                double val = igris_atof64(&argv[i].data()[1], nullptr);
+                return val;
+            }
+        }
+        return 0;
+    }
+
 }
 
 #endif

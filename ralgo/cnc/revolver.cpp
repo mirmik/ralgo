@@ -101,11 +101,19 @@ void cnc::revolver::serve()
             continue;
 
         bool dir = shift.direction & mask;
+        auto &stepper = *steppers[i];
 
-        if (dir)
-            steppers[i]->inc();
+        if (step)
+        {
+            if (dir)
+                stepper.inc();
+            else
+                stepper.dec();
+        }
         else
-            steppers[i]->dec();
+        {
+            stepper.no_action();
+        }
     }
 
     shifts_ring->move_tail_one();

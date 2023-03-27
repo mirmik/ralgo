@@ -25,6 +25,7 @@
 #include <string.h>
 #include <string>
 
+#pragma GCC optimize("O3")
 namespace cnc
 {
     class interpreter
@@ -179,9 +180,43 @@ namespace cnc
             return 0;
         }
 
-        control_task g1_parse_task(const nos::argv &argv)
+        control_task create_task_for_relative_move(
+            const std::vector<idxpos> poses, double feed, double acc)
         {
-            control_task task;
+            control_task task(total_axes);
+            task.feed = feed == 0 ? saved_feed : feed;
+            task.acc = acc == 0 ? saved_acc : acc;
+            for (auto &i : poses)
+            {
+                task.poses()[i.idx] = i.pos;
+            }
+            task.isok = true;
+            return task;
+        }
+
+        control_task create_task_for_absolute_move(
+            const std::vector<idxpos> poses, double feed, double acc)
+        {
+            control_task task(total_axes);
+            task.feed = feed == 0 ? saved_feed : feed;
+            task.acc = acc == 0 ? saved_acc : acc;
+            auto finalpos = _final_position;
+            task.set_poses({finalpos.data(), finalpos.size()});
+            for (auto &i : poses)
+            {
+                task.poses()[i.idx] = i.pos;
+            }
+            for (int i = 0; i < total_axes; ++i)
+            {
+                task.poses()[i] -= finalpos[i];
+            }
+            task.isok = true;
+            return task;
+        }
+
+        /*control_task g1_parse_task(const nos::argv &argv)
+        {
+            control_task task(total_axes);
 
             task.feed = saved_feed;
             task.acc = saved_acc;
@@ -197,12 +232,12 @@ namespace cnc
             saved_acc = task.acc;
             task.isok = true;
             return task;
-        }
+        }*/
 
-        control_task g1_parse_task(const nos::argv &argv,
+        /*control_task g1_parse_task(const nos::argv &argv,
                                    const igris::array_view<double> &fposes)
         {
-            control_task task;
+            control_task task(total_axes);
             task.set_poses(igris::array_view<double>((double *)fposes.data(),
                                                      fposes.size()));
 
@@ -220,7 +255,7 @@ namespace cnc
             saved_acc = task.acc;
             task.isok = true;
             return task;
-        }
+        }*/
 
         /// Расщитывает ускорение или скорость для блока на основании
         /// запрошенных скоростей или ускорений для отдельных осей и
@@ -256,16 +291,18 @@ namespace cnc
                                        nos::ostream &)
         {
             ralgo::infof("evaluate_task: {}", task.to_string());
+            saved_acc = task.acc;
+            saved_feed = task.feed;
 
-            double tasknorm = ralgo::vecops::norm(task.poses(total_axes));
+            double tasknorm = ralgo::vecops::norm(task.poses());
             if (tasknorm == 0)
                 return true;
 
             // Это записано для инкрементального режима:
             auto intdists = ralgo::vecops::mul_vv<ralgo::vector<double>>(
-                task.poses(total_axes), gains);
-            auto direction = ralgo::vecops::normalize<ralgo::vector<double>>(
-                task.poses(total_axes));
+                task.poses(), gains);
+            auto direction =
+                ralgo::vecops::normalize<ralgo::vector<double>>(task.poses());
             auto dirgain =
                 ralgo::vecops::norm(ralgo::vecops::mul_vv(direction, gains));
 
@@ -356,7 +393,10 @@ namespace cnc
 
             if (check_correctness(os))
                 return;
-            auto task = g1_parse_task(argv);
+            auto poses = get_task_poses_from_argv(argv);
+            double feed = get_task_feed_from_argv(argv);
+            double acc = get_task_acc_from_argv(argv);
+            auto task = create_task_for_relative_move(poses, feed, acc);
             if (!task.isok)
                 return;
             evaluate_task(task, os);
@@ -372,18 +412,43 @@ namespace cnc
             if (check_correctness(os))
                 return;
             auto finalpos = final_gained_position();
-            auto task = g1_parse_task(argv, {finalpos.data(), finalpos.size()});
+            auto poses = get_task_poses_from_argv(argv);
+            double feed = get_task_feed_from_argv(argv);
+            double acc = get_task_acc_from_argv(argv);
+            auto task = create_task_for_absolute_move(poses, feed, acc);
+
             if (!task.isok)
             {
                 ralgo::info("command_absolute_move: task is not ok");
                 return;
             }
-            for (int i = 0; i < total_axes; ++i)
+            /*for (int i = 0; i < total_axes; ++i)
             {
-                task.poses(total_axes)[i] =
-                    task.poses(total_axes)[i] - finalpos[i];
-            }
+                task.poses()[i] -= finalpos[i];
+            }*/
             evaluate_task(task, os);
+        }
+
+        void command_absolute_pulses(const nos::argv &argv, nos::ostream &os)
+        {
+            if (stop_procedure_started)
+                return;
+
+            ralgo::info("command_absolute_move");
+
+            if (check_correctness(os))
+                return;
+
+            auto poses = get_task_poses_from_argv(argv);
+            double feed = get_task_feed_from_argv(argv);
+            double acc = get_task_acc_from_argv(argv);
+            (void)poses;
+            (void)feed;
+            (void)acc;
+
+            // TODO: implement
+
+            return;
         }
 
         void inspect_args(const nos::argv &argv, nos::ostream &os)
@@ -609,6 +674,12 @@ namespace cnc
                 return 0;
             }
 
+            else if (argv[0] == "abspulses")
+            {
+                command_absolute_pulses(argv.without(1), os);
+                return 0;
+            }
+
             else if (argv[0] == "steps")
             {
                 return nos::println_to(os, current_steps());
@@ -800,5 +871,6 @@ namespace cnc
         }
     };
 }
+#pragma GCC reset_options
 
 #endif

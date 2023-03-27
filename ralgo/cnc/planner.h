@@ -94,7 +94,7 @@ namespace cnc
         void iteration_planning_phase();
         int iteration();
         void set_axes_count(int total);
-        void set_gears(igris::array_view<double> arr);
+        void set_gears(const igris::array_view<double> &);
         igris::array_view<double> get_gears();
         size_t get_total_axes();
         void set_gear(int index, double val);
