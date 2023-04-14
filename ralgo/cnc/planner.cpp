@@ -221,6 +221,10 @@ void cnc::planner::iteration_planning_phase()
         dda_counters[i] += velocities[i] +         //* delta +
                            accelerations[i] * 0.5; //* delta_sqr_div_2;
 
+        // check frequency correctness
+        int gears_per_counter = dda_counters[i] / gears[i];
+        assert(gears_per_counter >= -1 && gears_per_counter <= 1);
+
         if (dda_counters[i] > gears_high_trigger[i])
         {
             dda_counters[i] -= gears[i];
