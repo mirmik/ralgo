@@ -63,10 +63,9 @@ namespace cnc
         // int count_of_reevaluation = 0;
         igris::delegate<void> _start_operation_handle = {};
         int waited = 0;
-
         bool dda_counter_overflow_error_detected = false;
-
         igris::delegate<void> final_shift_pushed = {};
+        bool _frequency_protection = true;
 
     public:
         planner(const planner &) = delete;
@@ -74,6 +73,7 @@ namespace cnc
         planner &operator=(const planner &) = delete;
         planner &operator=(planner &&) = delete;
 
+        void disable_frequency_protection();
         void cleanup();
         bool is_dda_overflow_detected();
         void set_start_operation_handle(igris::delegate<void> dlg);

@@ -24,6 +24,11 @@ bool cnc::planner::is_dda_overflow_detected()
     return dda_counter_overflow_error_detected;
 }
 
+void cnc::planner::disable_frequency_protection()
+{
+    _frequency_protection = false;
+}
+
 void cnc::planner::set_start_operation_handle(igris::delegate<void> dlg)
 {
     _start_operation_handle = dlg;
@@ -222,8 +227,11 @@ void cnc::planner::iteration_planning_phase()
                            accelerations[i] * 0.5; //* delta_sqr_div_2;
 
         // check frequency correctness
-        int gears_per_counter = dda_counters[i] / gears[i];
-        assert(gears_per_counter >= -1 && gears_per_counter <= 1);
+        if (_frequency_protection)
+        {
+            int gears_per_counter = dda_counters[i] / gears[i];
+            assert(gears_per_counter >= -1 && gears_per_counter <= 1);
+        }
 
         if (dda_counters[i] > gears_high_trigger[i])
         {

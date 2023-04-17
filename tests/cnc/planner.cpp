@@ -7,6 +7,7 @@ TEST_CASE("planner.0")
     igris::ring<cnc::control_shift> shifts(10);
 
     cnc::planner planner(&blocks, &shifts);
+    planner.disable_frequency_protection();
     planner.set_dim(1);
 
     auto &block = blocks.head_place();

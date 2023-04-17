@@ -7,7 +7,6 @@ import licant
 import licant.install
 
 licant.include("ralgo", "ralgo.g.py")
-
 licant.execute("apps/sigtrans/make.py")
 licant.execute("apps/cncsim/make.py")
 
@@ -65,10 +64,10 @@ licant.cxx_application("runtests",
                            "tests/geom/*.cpp",
                            "tests/rxsignal/*.cpp",
                        ],
-                       objects=["libralgo.a"],
-                       cxx_flags="-flto -fPIC -O0 -g -pedantic -Wno-vla -Werror=extra -Werror=all -Werror=reorder",
-                       cc_flags="-flto -fPIC -O0 -g -Werror=incompatible-pointer-types -pedantic -Werror=extra -Werror=all",
-                       ld_flags="-flto -fPIC -O0 -L/usr/local/lib/",
+                       mdepends=["ralgo"],
+                       cxx_flags="-fPIC -O0 -g -pedantic -Wno-vla -Werror=extra -Werror=all -Werror=reorder",
+                       cc_flags="-fPIC -O0 -g -Werror=incompatible-pointer-types -pedantic -Werror=extra -Werror=all",
+                       ld_flags="-fPIC -O0 -L/usr/local/lib/",
                        cxxstd="c++20",
                        include_paths=[".", "tests"],
                        libs=["igris", "nos", "pthread"],
