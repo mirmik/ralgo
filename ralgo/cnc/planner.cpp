@@ -1,7 +1,5 @@
 #include <ralgo/cnc/planner.h>
 
-#pragma GCC optimize("O3")
-
 void cnc::planner::cleanup()
 {
     blocks->clear();

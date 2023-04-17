@@ -25,7 +25,6 @@
 #include <string.h>
 #include <string>
 
-#pragma GCC optimize("O3")
 namespace cnc
 {
     class interpreter
@@ -871,6 +870,5 @@ namespace cnc
         }
     };
 }
-#pragma GCC reset_options
 
 #endif

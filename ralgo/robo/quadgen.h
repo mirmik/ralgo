@@ -4,8 +4,6 @@
 #include <igris/util/graycode.h>
 #include <ralgo/robo/stepper.h>
 
-#pragma GCC optimize("O3")
-
 namespace robo
 {
     class quadgen : public robo::stepper
@@ -82,7 +80,5 @@ namespace robo
         virtual void apply_state(bool a, bool b) = 0;
     };
 }
-
-#pragma GCC reset_options
 
 #endif
