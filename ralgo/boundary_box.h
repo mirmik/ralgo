@@ -47,24 +47,6 @@ namespace ralgo
             ralgo::vector<T> coeffs(pnt.size());
             for (size_t i = 0; i < pnt.size(); i++)
             {
-                if (std::isinf(mins()[i]))
-                {
-                    coeffs[i] = 1;
-                    continue;
-                }
-
-                if (std::isinf(maxs()[i]))
-                {
-                    coeffs[i] = 0;
-                    continue;
-                }
-
-                if (mins()[i] == maxs()[i])
-                {
-                    coeffs[i] = 0;
-                    continue;
-                }
-
                 coeffs[i] = ralgo::lerpcoeff(mins()[i], maxs()[i], pnt[i]);
             }
             return coeffs;

@@ -1,6 +1,7 @@
 #ifndef RALGO_INTERPOLATE_H
 #define RALGO_INTERPOLATE_H
 
+#include <cmath>
 #include <iterator>
 #include <vector>
 
@@ -25,7 +26,23 @@ namespace ralgo
 
     template <class A, class B, class U>
     auto lerpcoeff(A left, B right, U target)
+        -> decltype((target - left) / (right - left))
     {
+        if (std::isinf(left))
+        {
+            return 1;
+        }
+
+        if (std::isinf(right))
+        {
+            return 0;
+        }
+
+        if (left == right)
+        {
+            return 0;
+        }
+
         return (target - left) / (right - left);
     }
 
