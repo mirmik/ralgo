@@ -2,42 +2,35 @@
 #define RALGO_CARTESIAN_GRID_H
 
 #include <ralgo/linalg/vector.h>
-#include <ralgo/number_line.h>
+#include <vector>
 
 namespace ralgo
 {
-    template <class T> class cartesian_grid
+
+    // for bounds = {a, b, c}
+    //                0       a        1      b        2     c        3
+    //         <--------------|---------------|--------------|------------>
+    template <class T>
+    size_t number_of_cartesian_grid_interval_for_point(std::vector<T> bounds,
+                                                       T coord)
     {
-        std::vector<std::vector<T>> coords;
+        auto it = std::lower_bound(bounds.begin(), bounds.end(), coord);
+        return std::distance(bounds.begin(), it);
+    }
 
-    public:
-        cartesian_grid(std::vector<std::vector<T>> coords) : coords(coords) {}
-        cartesian_grid(const cartesian_grid &oth) : coords(oth.coords) {}
-        cartesian_grid(cartesian_grid &&oth) : coords(std::move(oth.coords)) {}
-        cartesian_grid &operator=(const cartesian_grid &oth)
+    template <class T>
+    std::vector<size_t> number_of_cartesian_grid_interval_for_point(
+        std::vector<std::vector<T>> bounds, std::vector<T> coord)
+    {
+        std::vector<size_t> result(bounds.size());
+        for (size_t i = 0; i < coord.size(); i++)
         {
-            coords = oth.coords;
-            return *this;
+            result[i] = number_of_cartesian_grid_interval_for_point(bounds[i],
+                                                                    coord[i]);
         }
-        cartesian_grid &operator=(cartesian_grid &&oth)
-        {
-            coords = std::move(oth.coords);
-            return *this;
-        }
+        return result;
+    }
 
-        std::vector<T> cell_for_point(const ralgo::vector<T> &pnt)
-        {
-            std::vector<T> ret(pnt.size());
-            for (size_t i = 0; i < pnt.size(); ++i)
-            {
-                auto &dimension_coords = coords[i];
-                auto pnt_dimension_project = pnt[i];
-                ret[i] = ralgo::number_line_interval_for_point(
-                    dimension_coords, pnt_dimension_project);
-            }
-            return ret;
-        }
-    };
 }
 
 #endif
