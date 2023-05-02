@@ -51,6 +51,11 @@ namespace ralgo
             return coeffs;
         }
 
+        size_t dim() const
+        {
+            return _data.size() / 2;
+        }
+
         ralgo::vector<T> maxs_as_vector() const
         {
             return {(T *)maxs(), _data.size() / 2};
