@@ -19,11 +19,14 @@ namespace ralgo
         return std::distance(bounds.begin(), it);
     }
 
-    template <class T, class Coords = std::vector<T>>
-    std::vector<size_t> number_of_cartesian_grid_interval_for_ndim_point(
-        const std::vector<std::vector<T>> &bounds, const Coords &coord)
+    template <class R = std::vector<size_t>,
+              class T = double,
+              class Bounds = std::vector<std::vector<T>>,
+              class Coords = std::vector<T>>
+    auto number_of_cartesian_grid_interval_for_ndim_point(const Bounds &bounds,
+                                                          const Coords &coord)
     {
-        std::vector<size_t> result(bounds.size());
+        R result(bounds.size());
         for (size_t i = 0; i < coord.size(); i++)
         {
             result[i] = number_of_cartesian_grid_interval_for_line_point(
