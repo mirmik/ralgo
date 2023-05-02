@@ -162,6 +162,12 @@ namespace std
     template <class T>
     std::ostream &operator<<(std::ostream &os, const ralgo::vector<T> &vec)
     {
+        if (vec.size() == 0)
+        {
+            os << "{}";
+            return os;
+        }
+
         os << '{';
         for (unsigned int i = 0; i < vec.size() - 1; ++i)
         {
