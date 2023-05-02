@@ -17,5 +17,8 @@ TEST_CASE("cartesian_grid")
 
         CHECK_EQ(grid.cell_for_point(ralgo::vector<double>({15, 16})),
                  ralgo::vector<double>({3, 3}));
+
+        CHECK_EQ(grid.cell_for_point(ralgo::vector<double>({2, 5})),
+                 ralgo::vector<double>({1, 1}));
     }
 }
