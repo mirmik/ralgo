@@ -11,38 +11,27 @@ namespace ralgo
     //                0       a        1      b        2     c        3
     //         <--------------|---------------|--------------|------------>
     template <class T>
-    size_t number_of_cartesian_grid_interval_for_point(std::vector<T> bounds,
-                                                       T coord)
+    size_t
+    number_of_cartesian_grid_interval_for_line_point(std::vector<T> bounds,
+                                                     T coord)
     {
         auto it = std::lower_bound(bounds.begin(), bounds.end(), coord);
         return std::distance(bounds.begin(), it);
     }
 
-    template <class T>
-    std::vector<size_t> number_of_cartesian_grid_interval_for_point(
-        std::vector<std::vector<T>> bounds, std::vector<T> coord)
+    template <class T, class Coords = std::vector<T>>
+    std::vector<size_t> number_of_cartesian_grid_interval_for_ndim_point(
+        const std::vector<std::vector<T>> &bounds, const Coords &coord)
     {
         std::vector<size_t> result(bounds.size());
         for (size_t i = 0; i < coord.size(); i++)
         {
-            result[i] = number_of_cartesian_grid_interval_for_point(bounds[i],
-                                                                    coord[i]);
+            result[i] = number_of_cartesian_grid_interval_for_line_point(
+                bounds[i], coord[i]);
         }
         return result;
     }
 
-    template <class T>
-    ralgo::vector<size_t> number_of_cartesian_grid_interval_for_point(
-        ralgo::vector<ralgo::vector<T>> bounds, ralgo::vector<T> coord)
-    {
-        ralgo::vector<size_t> result(bounds.size());
-        for (size_t i = 0; i < coord.size(); i++)
-        {
-            result[i] = number_of_cartesian_grid_interval_for_point(bounds[i],
-                                                                    coord[i]);
-        }
-        return result;
-    }
 }
 
 #endif
