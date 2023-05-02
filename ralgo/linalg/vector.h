@@ -18,7 +18,7 @@ namespace ralgo
 
         vector() = default;
         explicit vector(size_t n) : vec(n) {}
-        vector(T *ptr, size_t n) : vec(ptr, n) {}
+        vector(T *ptr, size_t n) : vec(ptr, ptr + n) {}
         vector(const std::initializer_list<T> &list) : vec(list) {}
         vector(const vector &oth) = default;
         vector(vector &&oth) = default;

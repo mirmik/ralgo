@@ -82,6 +82,11 @@ namespace ralgo
         {
         }
 
+        template <class U>
+        vector_view(const U &vec) : dat(vec), n(vec.size()), stride(1)
+        {
+        }
+
         T &operator[](int i)
         {
             return *(dat + i * stride);

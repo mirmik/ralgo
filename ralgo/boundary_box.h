@@ -37,8 +37,8 @@ namespace ralgo
         boundary_box(const ralgo::vector<T> &mins, const ralgo::vector<T> &maxs)
         {
             _data.resize(mins.size() * 2);
-            std::copy(mins.begin(), mins.end(), this->mins());
-            std::copy(maxs.begin(), maxs.end(), this->maxs());
+            std::copy(std::begin(mins), std::end(mins), this->mins());
+            std::copy(std::begin(maxs), std::end(maxs), this->maxs());
         }
 
         ralgo::vector<T> lerpcoeffs(const ralgo::vector<T> &pnt)
@@ -53,12 +53,12 @@ namespace ralgo
 
         ralgo::vector<T> maxs_as_vector() const
         {
-            return ralgo::vector<T>((T *)maxs(), _data.size() / 2);
+            return {(T *)maxs(), _data.size() / 2};
         }
 
         ralgo::vector<T> mins_as_vector() const
         {
-            return ralgo::vector<T>((T *)mins(), _data.size() / 2);
+            return {(T *)mins(), _data.size() / 2};
         }
     };
 }

@@ -12,4 +12,7 @@ TEST_CASE("boundary_box")
     CHECK_EQ(coeffs[0], 0.5);
     CHECK_EQ(coeffs[1], 0.5);
     CHECK_EQ(coeffs[2], 0.5);
+
+    CHECK_EQ(box.mins_as_vector(), ralgo::vector<double>({1, 2, 3}));
+    CHECK_EQ(box.maxs_as_vector(), ralgo::vector<double>({3, 4, 5}));
 }

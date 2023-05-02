@@ -48,8 +48,8 @@ namespace ralgo
         {
             R accum = initval;
 
-            auto ait = a.begin();
-            auto aeit = a.end();
+            auto ait = std::begin(a);
+            auto aeit = std::end(a);
 
             for (; ait != aeit; ++ait)
             {
@@ -62,9 +62,9 @@ namespace ralgo
         template <class F, class A, class B, class... Args>
         bool boolean_all(F &&func, const A &a, const B &b, Args &&... args)
         {
-            auto ait = a.begin();
-            auto bit = b.begin();
-            auto aeit = a.end();
+            auto ait = std::begin(a);
+            auto bit = std::begin(b);
+            auto aeit = std::end(a);
             for (; ait != aeit; ++ait, ++bit)
                 if (func(*ait, *bit, std::forward<Args>(args)...) == false)
                     return false;
@@ -73,9 +73,9 @@ namespace ralgo
         template <class F, class A, class B, class... Args>
         bool boolean_any(F &&func, const A &a, const B &b, Args &&... args)
         {
-            auto ait = a.begin();
-            auto bit = b.begin();
-            auto aeit = a.end();
+            auto ait = std::begin(a);
+            auto bit = std::begin(b);
+            auto aeit = std::end(a);
             for (; ait != aeit; ++ait, ++bit)
                 if (func(*ait, *bit, std::forward<Args>(args)...) == true)
                     return true;
@@ -89,8 +89,8 @@ namespace ralgo
         {
             defsame_t<R, A> ret(a.size());
 
-            auto ait = a.begin(), aend = a.end();
-            auto cit = ret.begin();
+            auto ait = std::begin(a), aend = std::end(a);
+            auto cit = std::begin(ret);
 
             for (; ait != aend; ++ait, ++cit)
                 *cit = f(*ait, std::forward<Args>(args)...);
@@ -107,9 +107,9 @@ namespace ralgo
             assert(a.size() == b.size());
             defsame_t<R, A> c(a.size());
 
-            auto ait = a.begin(), aend = a.end();
-            auto bit = b.begin();
-            auto cit = c.begin();
+            auto ait = std::begin(a), aend = std::end(a);
+            auto bit = std::begin(b);
+            auto cit = std::begin(c);
 
             for (; ait != aend; ++ait, ++bit, ++cit)
                 *cit = f(*ait, *bit, std::forward<Args>(args)...);
@@ -122,8 +122,8 @@ namespace ralgo
         {
             c.resize(a.size());
 
-            auto ait = a.begin(), aend = a.end();
-            auto cit = c.begin();
+            auto ait = std::begin(a), aend = std::end(a);
+            auto cit = std::begin(c);
 
             for (; ait != aend; ++ait, ++cit)
                 *cit = f(*ait, std::forward<Args>(args)...);
@@ -133,9 +133,9 @@ namespace ralgo
         void elementwise2_to(
             C &c, const F &f, const A &a, const B &b, Args &&... args)
         {
-            auto ait = a.begin(), aend = a.end();
-            auto bit = b.begin();
-            auto cit = c.begin();
+            auto ait = std::begin(a), aend = std::end(a);
+            auto bit = std::begin(b);
+            auto cit = std::begin(c);
 
             for (; ait != aend; ++ait, ++bit, ++cit)
                 *cit = f(*ait, *bit, std::forward<Args>(args)...);
