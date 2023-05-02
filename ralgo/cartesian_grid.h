@@ -31,6 +31,18 @@ namespace ralgo
         return result;
     }
 
+    template <class T>
+    ralgo::vector<size_t> number_of_cartesian_grid_interval_for_point(
+        ralgo::vector<ralgo::vector<T>> bounds, ralgo::vector<T> coord)
+    {
+        ralgo::vector<size_t> result(bounds.size());
+        for (size_t i = 0; i < coord.size(); i++)
+        {
+            result[i] = number_of_cartesian_grid_interval_for_point(bounds[i],
+                                                                    coord[i]);
+        }
+        return result;
+    }
 }
 
 #endif
