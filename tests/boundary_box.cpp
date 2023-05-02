@@ -16,3 +16,27 @@ TEST_CASE("boundary_box")
     CHECK_EQ(box.mins_as_vector(), ralgo::vector<double>({1, 2, 3}));
     CHECK_EQ(box.maxs_as_vector(), ralgo::vector<double>({3, 4, 5}));
 }
+
+TEST_CASE("boundary_box max equal min")
+{
+    ralgo::boundary_box<double> box({1, 2, 3}, {1, 2, 3});
+
+    {
+        ralgo::vector<double> pnt({1, 2, 3});
+        auto coeffs = box.lerpcoeffs(pnt);
+        CHECK_EQ(coeffs[0], 0);
+        CHECK_EQ(coeffs[1], 0);
+        CHECK_EQ(coeffs[2], 0);
+    }
+
+    {
+        ralgo::vector<double> pnt({-1, 22, 33});
+        auto coeffs = box.lerpcoeffs(pnt);
+        CHECK_EQ(coeffs[0], 0);
+        CHECK_EQ(coeffs[1], 0);
+        CHECK_EQ(coeffs[2], 0);
+    }
+
+    CHECK_EQ(box.mins_as_vector(), ralgo::vector<double>({1, 2, 3}));
+    CHECK_EQ(box.maxs_as_vector(), ralgo::vector<double>({1, 2, 3}));
+}
