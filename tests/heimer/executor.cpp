@@ -9,7 +9,7 @@
 /*
 using namespace heimer;
 
-std::string str(igris::buffer buf)
+std::string str(nos::buffer buf)
 {
     return std::string(buf.data(), buf.size());
 }

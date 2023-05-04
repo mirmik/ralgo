@@ -5,7 +5,7 @@
 
 #include <igris/buffer.h>
 #include <igris/datastruct/dlist.h>
-
+#include <nos/buffer.h>
 #include <ralgo/disctime.h>
 #include <ralgo/heimer/signal.h>
 
@@ -92,7 +92,7 @@ namespace heimer
 
         bool is_active();
 
-        igris::buffer name();
+        nos::buffer name();
         void release_signals();
 
         virtual signal_head *leftsig(int i);

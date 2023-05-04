@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <igris/math.h>
+#include <nos/buffer.h>
 #include <ralgo/heimer/executor.h>
 #include <ralgo/heimer/velocity_applier.h>
 #include <ralgo/log.h>

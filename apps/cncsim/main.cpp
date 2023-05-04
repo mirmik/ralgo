@@ -46,8 +46,7 @@ crow::publish_logger logger("ralgo", &publisher_log);
 crow::service_node control_service(
     crowker,
     "cncsim" RALGO_CNC_CLI_SERVICE,
-    +[](char *cmd, int len, crow::service_node &srv)
-    {
+    +[](char *cmd, int len, crow::service_node &srv) {
         std::lock_guard<std::mutex> lock(mtx);
         cmd[len] = 0;
         nos::println("input: ", std::string(cmd, len), "END");
@@ -84,14 +83,13 @@ void telemetry_thread_function()
         std::this_thread::sleep_until(awake);
         for (size_t i = 0; i < interpreter.get_axes_count(); ++i)
             poses[i] = int64_t(steppers[i].steps_count());
-        publisher.publish(igris::buffer(
-            poses, sizeof(int64_t) * interpreter.get_axes_count()));
+        publisher.publish(
+            nos::buffer(poses, sizeof(int64_t) * interpreter.get_axes_count()));
 
         std::string poses_str = "";
         for (size_t i = 0; i < interpreter.get_axes_count(); ++i)
             poses_str += std::to_string(poses[i]) + " ";
-        publisher_txt.publish(
-            igris::buffer(poses_str.data(), poses_str.size()));
+        publisher_txt.publish(nos::buffer(poses_str.data(), poses_str.size()));
     }
 }
 
@@ -190,7 +188,7 @@ int main(int argc, char **argv)
     while (1)
     {
         auto exp_str = nos::readline(1024, true);
-        if (exp_str)
+        if (exp_str.is_ok())
         {
             mtx.lock();
             auto ans = interpreter.newline(*exp_str);

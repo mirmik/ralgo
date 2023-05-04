@@ -2437,21 +2437,24 @@ namespace nos
 {
     template <typename T> struct print_implementation<linalg::vec<T, 2>>
     {
-        static ssize_t print_to(nos::ostream &os, const linalg::vec<T, 2> &v)
+        static nos::expected<size_t, nos::output_error>
+        print_to(nos::ostream &os, const linalg::vec<T, 2> &v)
         {
             return nos::fprint_to(os, "({},{})", v[0], v[1]);
         }
     };
     template <typename T> struct print_implementation<linalg::vec<T, 3>>
     {
-        static ssize_t print_to(nos::ostream &os, const linalg::vec<T, 3> &v)
+        static nos::expected<size_t, nos::output_error>
+        print_to(nos::ostream &os, const linalg::vec<T, 3> &v)
         {
             return nos::fprint_to(os, "({},{},{})", v[0], v[1], v[2]);
         }
     };
     template <typename T> struct print_implementation<linalg::vec<T, 4>>
     {
-        static ssize_t print_to(nos::ostream &os, const linalg::vec<T, 4> &v)
+        static nos::expected<size_t, nos::output_error>
+        print_to(nos::ostream &os, const linalg::vec<T, 4> &v)
         {
             return nos::fprint_to(os, "({},{},{},{})", v[0], v[1], v[2], v[3]);
         }

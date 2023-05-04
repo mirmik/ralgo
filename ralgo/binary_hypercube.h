@@ -30,8 +30,6 @@ namespace ralgo
         return vect;
     }
 
-    // Вернуть коэфициенты точек, из которых нужно извлекать
-    // значения для коррекции в правильном порядке.
     static inline auto
     cell_indices_hypercube_with_collapsed_bounds(ralgo::vector<size_t> indices,
                                                  std::vector<size_t> maxidx)

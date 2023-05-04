@@ -681,26 +681,30 @@ namespace cnc
 
             else if (argv[0] == "steps")
             {
-                return nos::println_to(os, current_steps());
+                nos::println_to(os, current_steps());
+                return 0;
             }
 
             else if (argv[0] == "finishes")
             {
                 nos::print_list_to(os, _final_position);
-                return nos::println_to(os);
+                nos::println_to(os);
+                return 0;
             }
 
             else if (argv[0] == "gains")
             {
                 nos::print_list_to(os, gains);
-                return nos::println_to(os);
+                nos::println_to(os);
+                return 0;
             }
 
             else if (argv[0] == "gears")
             {
                 auto gears = planner->get_gears();
                 nos::print_list_to(os, gears);
-                return nos::println_to(os);
+                nos::println_to(os);
+                return 0;
             }
 
             else if (argv[0] == "setgear")
@@ -726,7 +730,8 @@ namespace cnc
             {
                 if (argv.size() == 0)
                 {
-                    return nos::println_to(os, nos::ilist(max_axes_velocities));
+                    nos::println_to(os, nos::ilist(max_axes_velocities));
+                    return 0;
                 }
 
                 auto axes = argv.size() - 1;
@@ -752,7 +757,8 @@ namespace cnc
                     {
                         accs.push_back(max_axes_accelerations[i]);
                     }
-                    return nos::println_to(os, accs);
+                    nos::println_to(os, accs);
+                    return 0;
                 }
                 auto axes = argv.size() - 1;
                 if (axes != (size_t)total_axes)

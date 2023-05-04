@@ -169,7 +169,7 @@ signal_processor *heimer::signal_processor_get_by_name(const char *name)
     return NULL;
 }
 
-igris::buffer signal_processor::name()
+nos::buffer signal_processor::name()
 {
     return {_name.data(), _name.size()};
 }

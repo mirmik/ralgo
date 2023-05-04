@@ -202,7 +202,7 @@ int main(int argc, char **argv)
             exit(0);
         }
 
-        while ((str = nos::readline_from(fl, 1024, false)).size())
+        while ((str = *nos::readline_from(fl, 1024, false)).size())
         {
             str = igris::trim(str);
 
