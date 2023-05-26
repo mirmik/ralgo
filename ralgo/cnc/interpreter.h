@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 #include <igris/container/array_view.h>
+#include <igris/container/flat_map.h>
 #include <igris/container/ring.h>
 #include <igris/container/static_vector.h>
 #include <igris/datastruct/argvc.h>
@@ -13,6 +14,7 @@
 #include <nos/log/logger.h>
 #include <nos/print/stdtype.h>
 #include <nos/shell/executor.h>
+#include <nos/util/string.h>
 #include <ralgo/cnc/control_task.h>
 #include <ralgo/cnc/planblock.h>
 #include <ralgo/cnc/planner.h>
@@ -324,11 +326,19 @@ namespace cnc
 
             double feed = evalfeed * dirgain;
             double acc = evalacc * dirgain;
+            ralgo::infof("feed: {} acc: {}", feed, acc);
 
             // scale feed and acc by revolver freqs settings.
             double reduced_feed = feed / revolver_frequency;
             double reduced_acc =
                 acc / (revolver_frequency * revolver_frequency);
+
+            ralgo::infof(
+                "reduced_feed: {} reduced_acc: {}", reduced_feed, reduced_acc);
+
+            auto gears = planner->get_gears();
+            ralgo::infof(
+                "gears: {} gains: {}", nos::ilist(gears), nos::ilist(gains));
 
             // output
             block.set_state(intdists, total_axes, reduced_feed, reduced_acc);
@@ -367,6 +377,7 @@ namespace cnc
             bool fastfinish = evaluate_interpreter_task(task, lastblock, os);
             if (fastfinish)
             {
+                ralgo::info("fastfinish");
                 print_interpreter_state(os);
                 return;
             }
@@ -410,7 +421,6 @@ namespace cnc
 
             if (check_correctness(os))
                 return;
-            auto finalpos = final_gained_position();
             auto poses = get_task_poses_from_argv(argv);
             double feed = get_task_feed_from_argv(argv);
             double acc = get_task_acc_from_argv(argv);
@@ -421,10 +431,6 @@ namespace cnc
                 ralgo::info("command_absolute_move: task is not ok");
                 return;
             }
-            /*for (int i = 0; i < total_axes; ++i)
-            {
-                task.poses()[i] -= finalpos[i];
-            }*/
             evaluate_task(task, os);
         }
 
@@ -614,6 +620,37 @@ namespace cnc
             return 0;
         }
 
+        igris::flat_map<int, double>
+        args_to_index_value_map(const nos::argv &args)
+        {
+            igris::flat_map<int, double> ret;
+            int cursor = 0;
+            for (unsigned int i = 0; i < args.size(); ++i)
+            {
+                auto splitlst = nos::split(args[i], ":");
+
+                if (splitlst.size() == 1)
+                {
+                    auto index = cursor;
+                    auto value = std::stod(splitlst[0]);
+                    ret.emplace(index, value);
+                    cursor++;
+                }
+                else if (splitlst.size() == 2)
+                {
+                    auto index = std::stoi(splitlst[0]);
+                    auto value = std::stod(splitlst[1]);
+                    ret.emplace(index, value);
+                    cursor = index + 1;
+                }
+                else
+                {
+                    ralgo::warnf("Invalid argument: {}", args[i]);
+                }
+            }
+            return ret;
+        }
+
         int command(const nos::argv &argv, nos::ostream &os)
         {
             ralgo::infof("cnc-command: {}", argv.to_string());
@@ -634,30 +671,6 @@ namespace cnc
             if (argv[0] == "lastblock")
             {
                 last_block().print_to_stream(os);
-                return 0;
-            }
-
-            else if (argv[0] == "axmaxspd")
-            {
-                nos::println_to(os, "TODO");
-                return 0;
-            }
-
-            else if (argv[0] == "axmaxacc")
-            {
-                nos::println_to(os, "TODO");
-                return 0;
-            }
-
-            else if (argv[0] == "maxspd")
-            {
-                nos::println_to(os, "TODO");
-                return 0;
-            }
-
-            else if (argv[0] == "maxacc")
-            {
-                nos::println_to(os, "TODO");
                 return 0;
             }
 
@@ -728,49 +741,17 @@ namespace cnc
 
             else if (argv[0] == "velmaxs")
             {
-                if (argv.size() == 0)
-                {
-                    nos::println_to(os, nos::ilist(max_axes_velocities));
-                    return 0;
-                }
-
-                auto axes = argv.size() - 1;
-                if (axes != (size_t)total_axes)
-                {
-                    nos::println_to(os, "wrong axes count");
-                    return 0;
-                }
-                for (size_t i = 0; i < axes; ++i)
-                {
-                    max_axes_velocities[i] =
-                        igris_atof64(argv[i + 1].data(), NULL);
-                }
+                auto fmap = args_to_index_value_map(argv.without(1));
+                for (auto &[key, val] : fmap)
+                    max_axes_velocities[key] = val;
                 return 0;
             }
 
             else if (argv[0] == "accmaxs")
             {
-                if (argv.size() == 0)
-                {
-                    std::vector<double> accs;
-                    for (int i = 0; i < total_axes; ++i)
-                    {
-                        accs.push_back(max_axes_accelerations[i]);
-                    }
-                    nos::println_to(os, accs);
-                    return 0;
-                }
-                auto axes = argv.size() - 1;
-                if (axes != (size_t)total_axes)
-                {
-                    nos::println_to(os, "wrong axes count");
-                    return 0;
-                }
-                for (size_t i = 0; i < axes; ++i)
-                {
-                    max_axes_accelerations[i] =
-                        igris_atof64(argv[i + 1].data(), NULL);
-                }
+                auto fmap = args_to_index_value_map(argv.without(1));
+                for (auto &[key, val] : fmap)
+                    max_axes_accelerations[key] = val;
                 return 0;
             }
 
