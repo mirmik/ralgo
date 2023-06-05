@@ -494,6 +494,7 @@ namespace cnc
             system_lock();
             if (stop_procedure_started)
             {
+                ralgo::info("prevented because stop procedure is started");
                 system_unlock();
                 return;
             }
@@ -510,14 +511,17 @@ namespace cnc
             auto velocity = ralgo::vecops::norm(curvels);
             if (velocity == 0)
             {
+                ralgo::info("prevented because velocity is not valid");
                 system_unlock();
                 return;
             }
 
             bool is_valid = lastblock.set_stop_pattern(
                 total_axes, velocity, external_acceleration, direction);
+
             if (!is_valid)
             {
+                nos::log::info("prevented because stop pattern is not valid");
                 system_unlock();
                 return;
             }
@@ -526,6 +530,7 @@ namespace cnc
             for (int i = 0; i < total_axes; ++i)
                 _final_position[i] += lastblock.axdist[i];
 
+            ralgo::info("clear queue and start stop block");
             shifts->clear();
             planner->clear_queue();
             planner->force_skip_all_blocks();

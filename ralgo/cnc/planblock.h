@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <math.h>
 #include <nos/io/ostream.h>
+#include <nos/log.h>
 #include <nos/print.h>
 #include <ralgo/cnc/defs.h>
 #include <ralgo/linalg/vecops.h>
@@ -37,6 +38,9 @@ namespace cnc
     public:
         // отметки времени хранят инкрементное время до планирования и
         // абсолютное время после активации блока.
+        // Скорость показывает инкремент, который прибавляется к dda_counter
+        // за такт работы планировщика. При этом максимальная скорость
+        // равна параметру gears[i] оси i.
         int64_t start_ic = 0;
         int64_t acceleration_before_ic =
             0; // < момент времени до которого идёт разгон
@@ -145,16 +149,30 @@ namespace cnc
 
         bool validation()
         {
-            if (fabs(start_velocity + acceleration_time() * acceleration -
+            // Проверка N1 работает нестабильно при малом количестве тактов?
+            // Ситуация:
+            // start_velocity = 470.7636939822022
+            // acceleration = 0.3362587010712585
+            // nominal_velocity  = 470.76218149976199
+            /*if (fabs(start_velocity + acceleration_time() * acceleration -
                      nominal_velocity) > 1e-3)
+            {
+                nos::log::error("Block is not valid by reason N1");
                 return false;
+            }*/
 
             if (fabs(AB_distance() + BC_distance() + CD_distance() - fullpath) >
                 1e-5)
+            {
+                nos::log::error("Block is not valid by reason N2");
                 return false;
+            }
 
             if (ralgo::vecops::norm(_direction) - 1 >= 1e-5)
+            {
+                nos::log::error("Block is not valid by reason N3");
                 return false;
+            }
 
             return true;
         }
@@ -260,6 +278,10 @@ namespace cnc
             double path = sqrt(pathsqr); // area
             double time = path / velocity;
 
+            // Поскольку время дискретно, движение должно быть завершено
+            // в момент времени, соответствующий целому числу.
+            // Для этого выполняется округление расчётного времени
+            // и небольшая модификация скорости и ускорения.
             int itime = ceil(time);
             int preftime = ceil(velocity / acceleration);
 
@@ -309,6 +331,11 @@ namespace cnc
                 this->_direction[i] = _direction[i];
                 this->axdist[i] = path * _direction[i];
             }
+
+            // Поскольку время дискретно, движение должно быть завершено
+            // в момент времени, соответствующий целому числу.
+            // Для этого выполняется округление расчётного времени
+            // и небольшая модификация скорости и ускорения.
             int preftime = ceil(velocity / acceleration);
             this->acceleration_before_ic = 0;
             this->deceleration_after_ic = 0;

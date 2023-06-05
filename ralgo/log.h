@@ -19,6 +19,8 @@ namespace ralgo
     {
         switch (lvl)
         {
+        // case RALGO_TRACE:
+        //    return nos::log::level::Trace;
         case RALGO_DEBUG:
             return nos::log::level::Debug;
         case RALGO_INFO:
@@ -28,6 +30,7 @@ namespace ralgo
         case RALGO_FAULT:
             return nos::log::level::Error;
         }
+        return nos::log::level::Debug;
     }
 
     void log(LogLevel lvl, const char *, const char *, const char *);
