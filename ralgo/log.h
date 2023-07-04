@@ -5,7 +5,7 @@
 
 namespace ralgo
 {
-    extern nos::log::logger *logger;
+    extern nos::log::ilogger *logger;
 
     enum LogLevel
     {
@@ -86,7 +86,7 @@ namespace ralgo
             logger->error(fmt, std::forward<Args>(args)...);
     }
 
-    void set_logger(nos::log::logger *logger);
+    void set_logger(nos::log::ilogger *logger);
 }
 
 #endif

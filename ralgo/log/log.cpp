@@ -1,7 +1,7 @@
 #include <igris/dprint.h>
 #include <ralgo/log.h>
 
-nos::log::logger *ralgo::logger;
+nos::log::ilogger *ralgo::logger;
 
 void ralgo::log(ralgo::LogLevel lvl, const char *str, const char *a)
 {
@@ -73,7 +73,7 @@ void ralgo::fault(const char *str)
     ralgo::log(RALGO_FAULT, str);
 }
 
-void ralgo::set_logger(nos::log::logger *logger)
+void ralgo::set_logger(nos::log::ilogger *logger)
 {
     ralgo::logger = logger;
 }
