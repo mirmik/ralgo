@@ -384,6 +384,5 @@ void cnc::planner::alarm_stop()
     system_lock();
     clear();
     shifts->clear();
-    ralgo::warn("alarm stop");
     system_unlock();
 }

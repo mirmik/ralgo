@@ -15,6 +15,9 @@ namespace cnc
         igris::delegate<void, igris::span<int64_t>>
             _set_feedback_position_callback;
 
+        igris::delegate<void, size_t, int64_t>
+            _set_feedback_position_by_axis_callback;
+
         igris::static_vector<double, NMAX_AXES> feedback_to_drive = {};
         igris::static_vector<double, NMAX_AXES> control_to_drive =
             {}; //< этот массив равен gears
@@ -30,7 +33,17 @@ namespace cnc
         {
             double max_drop = 1000;
             for (size_t i = 0; i < NMAX_AXES; ++i)
+            {
                 maximum_drop_pulses[i] = max_drop;
+                feedback_to_drive[i] = 1;
+                control_to_drive[i] = 1;
+            }
+        }
+
+        void set_set_feedback_position_by_axis_callback(
+            igris::delegate<void, size_t, int64_t> dlg)
+        {
+            _set_feedback_position_by_axis_callback = dlg;
         }
 
         void set_feedback_to_drive_multiplier(igris::span<double> mult)
@@ -67,6 +80,12 @@ namespace cnc
             _set_feedback_position_callback(igris::span(fpos));
         }
 
+        void set_feedback_position(size_t axno, int64_t val)
+        {
+            int64_t fpos = static_cast<int64_t>(val / feedback_to_drive[axno]);
+            _set_feedback_position_by_axis_callback(axno, fpos);
+        }
+
         void verify_position_and_alarm_if_needed(
             igris::span<int64_t> feedback_position,
             igris::span<int64_t> control_position)
@@ -83,6 +102,21 @@ namespace cnc
                     return;
                 }
             }
+        }
+
+        bool verify_position(igris::span<int64_t> feedback_position,
+                             igris::span<int64_t> control_position)
+        {
+            for (size_t i = 0; i < planner->total_axes(); ++i)
+            {
+                int64_t drop_pulses =
+                    feedback_position[i] * feedback_to_drive[i] -
+                    control_position[i] * control_to_drive[i];
+
+                if (std::abs(drop_pulses) > maximum_drop_pulses[i])
+                    return false;
+            }
+            return true;
         }
     };
 }

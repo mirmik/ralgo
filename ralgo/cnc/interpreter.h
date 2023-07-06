@@ -761,6 +761,8 @@ namespace cnc
                 system_lock();
                 _final_position[axno] = val * planner->gears[axno];
                 revolver->get_steppers()[axno]->set_counter_value(val);
+                feedback_guard->set_feedback_position(axno,
+                                                      _final_position[axno]);
                 system_unlock();
                 return 0;
             }
