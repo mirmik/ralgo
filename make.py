@@ -24,9 +24,10 @@ licant.cxx_static_and_shared("libs",
                                  "ralgo",
                                  "ralgo.rxsignal"
                              ],
+                             cxxstd="c++20",
                              cxx_flags="-flto -fPIC -g -pedantic -Werror=extra -Werror=all",
                              cc_flags="-flto -fPIC -Werror=implicit-function-declaration -g -Werror=incompatible-pointer-types -pedantic -Werror=extra -Werror=all",
-                            ld_flags="-flto -fPIC ",
+                             ld_flags="-flto -fPIC ",
                              libs=["igris", "nos"]
                              )
 

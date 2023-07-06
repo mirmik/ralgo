@@ -18,7 +18,8 @@ TEST_CASE("cnc.runtest")
     igris::ring<cnc::control_shift> shifts{400};
     cnc::planner planner(&blocks, &shifts);
     cnc::revolver revolver(&shifts);
-    cnc::interpreter interpreter(&blocks, &planner, &revolver, &shifts);
+    cnc::interpreter interpreter(
+        &blocks, &planner, &revolver, nullptr, &shifts);
     robo::stepper steppers[3];
     robo::stepper *steppers_ptrs[] = {&steppers[0], &steppers[1], &steppers[2]};
 
@@ -108,7 +109,8 @@ TEST_CASE("cnc.runtest with gears assigned one")
     igris::ring<cnc::control_shift> shifts{400};
     cnc::planner planner(&blocks, &shifts);
     cnc::revolver revolver(&shifts);
-    cnc::interpreter interpreter(&blocks, &planner, &revolver, &shifts);
+    cnc::interpreter interpreter(
+        &blocks, &planner, &revolver, nullptr, &shifts);
     robo::stepper steppers[3];
     robo::stepper *steppers_ptrs[] = {&steppers[0], &steppers[1], &steppers[2]};
     double freq = 10000;
@@ -170,7 +172,8 @@ TEST_CASE("cnc.runtest with gears assigned ten")
     igris::ring<cnc::control_shift> shifts{400};
     cnc::planner planner(&blocks, &shifts);
     cnc::revolver revolver(&shifts);
-    cnc::interpreter interpreter(&blocks, &planner, &revolver, &shifts);
+    cnc::interpreter interpreter(
+        &blocks, &planner, &revolver, nullptr, &shifts);
     robo::stepper steppers[3];
     robo::stepper *steppers_ptrs[] = {&steppers[0], &steppers[1], &steppers[2]};
 
@@ -230,7 +233,8 @@ TEST_CASE("cnc.runtest move and stop")
     igris::ring<cnc::control_shift> shifts{400};
     cnc::planner planner(&blocks, &shifts);
     cnc::revolver revolver(&shifts);
-    cnc::interpreter interpreter(&blocks, &planner, &revolver, &shifts);
+    cnc::interpreter interpreter(
+        &blocks, &planner, &revolver, nullptr, &shifts);
     robo::stepper steppers[3];
     robo::stepper *steppers_ptrs[] = {&steppers[0], &steppers[1], &steppers[2]};
 
@@ -324,7 +328,8 @@ TEST_CASE("cnc.runtest with gears assigned ten")
     igris::ring<cnc::control_shift> shifts{400};
     cnc::planner planner(&blocks, &shifts);
     cnc::revolver revolver(&shifts);
-    cnc::interpreter interpreter(&blocks, &planner, &revolver, &shifts);
+    cnc::interpreter interpreter(
+        &blocks, &planner, &revolver, nullptr, &shifts);
     robo::stepper steppers[3];
     robo::stepper *steppers_ptrs[] = {&steppers[0], &steppers[1], &steppers[2]};
 
@@ -386,7 +391,8 @@ TEST_CASE("cnc.runtest stop and move")
     igris::ring<cnc::control_shift> shifts{400};
     cnc::planner planner(&blocks, &shifts);
     cnc::revolver revolver(&shifts);
-    cnc::interpreter interpreter(&blocks, &planner, &revolver, &shifts);
+    cnc::interpreter interpreter(
+        &blocks, &planner, &revolver, nullptr, &shifts);
     robo::stepper steppers[3];
     robo::stepper *steppers_ptrs[] = {&steppers[0], &steppers[1], &steppers[2]};
 
@@ -479,7 +485,8 @@ TEST_CASE("cnc.runtest move and stop and move")
     igris::ring<cnc::control_shift> shifts{400};
     cnc::planner planner(&blocks, &shifts);
     cnc::revolver revolver(&shifts);
-    cnc::interpreter interpreter(&blocks, &planner, &revolver, &shifts);
+    cnc::interpreter interpreter(
+        &blocks, &planner, &revolver, nullptr, &shifts);
     robo::stepper steppers[3];
     robo::stepper *steppers_ptrs[] = {&steppers[0], &steppers[1], &steppers[2]};
 

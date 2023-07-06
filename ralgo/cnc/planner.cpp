@@ -45,7 +45,7 @@ void cnc::planner::force_skip_all_blocks()
 
 void cnc::planner::set_current_velocity(const std::vector<double> &vel)
 {
-    for (int i = 0; i < total_axes; ++i)
+    for (int i = 0; i < _total_axes; ++i)
     {
         velocities[i] = vel[i];
     }
@@ -67,7 +67,7 @@ void cnc::planner::update_triggers()
 
 void cnc::planner::set_dim(int axes)
 {
-    total_axes = axes;
+    _total_axes = axes;
 }
 
 void cnc::planner::reset_iteration_counter()
@@ -198,17 +198,17 @@ void cnc::planner::evaluate_accelerations()
 {
     if (active_block)
         active_block->assign_accelerations(
-            accelerations.data(), total_axes, iteration_counter);
+            accelerations.data(), _total_axes, iteration_counter);
     else
     {
-        for (int i = 0; i < total_axes; ++i)
+        for (int i = 0; i < _total_axes; ++i)
             accelerations[i] = 0;
     }
 
     for (int i = blocks->tail_index(); i != active;
          i = blocks->fixup_index(i + 1))
         blocks->get(i).append_accelerations(
-            accelerations.data(), total_axes, iteration_counter);
+            accelerations.data(), _total_axes, iteration_counter);
 }
 
 /// В этой фазе расчитывается программе револьвера
@@ -217,7 +217,7 @@ void cnc::planner::iteration_planning_phase()
 {
     revolver_t mask, step = 0, dir = 0;
 
-    for (int i = 0; i < total_axes; ++i)
+    for (int i = 0; i < _total_axes; ++i)
     {
         mask = (1 << i);
 
@@ -325,7 +325,7 @@ int cnc::planner::iteration()
 
 void cnc::planner::set_axes_count(int total)
 {
-    total_axes = total;
+    _total_axes = total;
     gears.resize(total);
     gears_high_trigger.resize(total);
     ralgo::vecops::fill(gears, 1000);
@@ -345,7 +345,12 @@ igris::array_view<double> cnc::planner::get_gears()
 
 size_t cnc::planner::get_total_axes()
 {
-    return total_axes;
+    return _total_axes;
+}
+
+size_t cnc::planner::total_axes()
+{
+    return _total_axes;
 }
 
 void cnc::planner::set_gear(int index, double val)

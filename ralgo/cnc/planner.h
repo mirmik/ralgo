@@ -43,7 +43,7 @@ namespace cnc
     class planner
     {
     private:
-        int total_axes = 0;
+        int _total_axes = 0;
 
     public:
         bool info_mode = true;
@@ -97,11 +97,14 @@ namespace cnc
         void set_gears(const igris::array_view<double> &);
         igris::array_view<double> get_gears();
         size_t get_total_axes();
+        size_t total_axes();
         void set_gear(int index, double val);
         void clear();
         void clear_queue();
         int block_index(planner_block *it);
         void fixup_postactive_blocks();
+
+        void alarm_stop();
     };
 }
 

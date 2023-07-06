@@ -16,6 +16,7 @@
 #include <nos/shell/executor.h>
 #include <nos/util/string.h>
 #include <ralgo/cnc/control_task.h>
+#include <ralgo/cnc/feedback_guard.h>
 #include <ralgo/cnc/planblock.h>
 #include <ralgo/cnc/planner.h>
 #include <ralgo/cnc/revolver.h>
@@ -34,6 +35,7 @@ namespace cnc
     public:
         cnc::planner *planner = nullptr;
         cnc::revolver *revolver = nullptr;
+        cnc::feedback_guard *feedback_guard = nullptr;
 
     private:
         igris::ring<planner_block> *blocks = nullptr;
@@ -63,9 +65,10 @@ namespace cnc
         interpreter(igris::ring<planner_block> *blocks,
                     cnc::planner *planner,
                     cnc::revolver *revolver,
+                    cnc::feedback_guard *feedback_guard,
                     igris::ring<cnc::control_shift> *shifts)
-            : planner(planner), revolver(revolver), blocks(blocks),
-              shifts(shifts)
+            : planner(planner), revolver(revolver),
+              feedback_guard(feedback_guard), blocks(blocks), shifts(shifts)
         {
         }
 

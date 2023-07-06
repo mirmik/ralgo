@@ -11,6 +11,7 @@
 #include <nos/input.h>
 #include <nos/io/string_writer.h>
 #include <nos/shell/argv.h>
+#include <ralgo/cnc/feedback_guard.h>
 #include <ralgo/cnc/interpreter.h>
 #include <ralgo/cnc/planner.h>
 #include <ralgo/cnc/revolver.h>
@@ -22,7 +23,9 @@ igris::ring<cnc::planner_block> blocks{40};
 igris::ring<cnc::control_shift> shifts{400};
 cnc::planner planner(&blocks, &shifts);
 cnc::revolver revolver(&shifts);
-cnc::interpreter interpreter(&blocks, &planner, &revolver, &shifts);
+cnc::feedback_guard feedback_guard(&planner);
+cnc::interpreter
+    interpreter(&blocks, &planner, &revolver, &feedback_guard, &shifts);
 robo::stepper steppers[3];
 robo::stepper *steppers_ptrs[] = {&steppers[0], &steppers[1], &steppers[2]};
 std::mutex mtx;
