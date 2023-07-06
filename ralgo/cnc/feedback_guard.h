@@ -26,7 +26,12 @@ namespace cnc
         cnc::planner *planner = nullptr;
 
     public:
-        feedback_guard(cnc::planner *planner) : planner(planner) {}
+        feedback_guard(cnc::planner *planner) : planner(planner)
+        {
+            double max_drop = 1000;
+            for (size_t i = 0; i < NMAX_AXES; ++i)
+                maximum_drop_pulses[i] = max_drop;
+        }
 
         void set_feedback_to_drive_multiplier(igris::span<double> mult)
         {
@@ -36,6 +41,22 @@ namespace cnc
         void set_control_to_drive_multiplier(igris::span<double> mult)
         {
             std::copy(mult.begin(), mult.end(), control_to_drive.begin());
+        }
+
+        void set_feedback_to_drive_multiplier(int axno, double mult)
+        {
+            feedback_to_drive[axno] = mult;
+        }
+
+        void set_control_to_drive_multiplier(int axno, double mult)
+        {
+            control_to_drive[axno] = mult;
+        }
+
+        void set_maximum_drop_pulses(igris::span<double> max_drop)
+        {
+            std::copy(
+                max_drop.begin(), max_drop.end(), maximum_drop_pulses.begin());
         }
 
         void set_feedback_position(igris::span<int64_t> pos)

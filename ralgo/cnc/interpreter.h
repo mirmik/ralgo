@@ -733,6 +733,24 @@ namespace cnc
                 auto axno = symbol_to_index(argv[1][0]);
                 double val = igris_atof64(argv[2].data(), NULL);
                 planner->set_gear(axno, val);
+                feedback_guard->set_control_to_drive_multiplier(axno, val);
+                return 0;
+            }
+
+            else if (argv[0] == "set_control_gear")
+            {
+                auto axno = symbol_to_index(argv[1][0]);
+                double val = igris_atof64(argv[2].data(), NULL);
+                planner->set_gear(axno, val);
+                feedback_guard->set_control_to_drive_multiplier(axno, val);
+                return 0;
+            }
+
+            else if (argv[0] == "set_feedback_gear")
+            {
+                auto axno = symbol_to_index(argv[1][0]);
+                double val = igris_atof64(argv[2].data(), NULL);
+                feedback_guard->set_feedback_to_drive_multiplier(axno, val);
                 return 0;
             }
 
