@@ -378,3 +378,12 @@ void cnc::planner::clear_queue()
 {
     blocks->set_last_index(active);
 }
+
+void cnc::planner::alarm_stop()
+{
+    system_lock();
+    clear();
+    shifts->clear();
+    ralgo::warn("alarm stop");
+    system_unlock();
+}
