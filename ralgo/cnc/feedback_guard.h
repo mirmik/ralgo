@@ -31,7 +31,7 @@ namespace cnc
     public:
         feedback_guard(cnc::planner *planner) : planner(planner)
         {
-            double max_drop = 1000;
+            double max_drop = 400000;
             for (size_t i = 0; i < NMAX_AXES; ++i)
             {
                 maximum_drop_pulses[i] = max_drop;
