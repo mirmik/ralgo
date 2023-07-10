@@ -86,24 +86,6 @@ namespace cnc
             _set_feedback_position_by_axis_callback(axno, fpos);
         }
 
-        void verify_position_and_alarm_if_needed(
-            igris::span<int64_t> feedback_position,
-            igris::span<int64_t> control_position)
-        {
-            for (size_t i = 0; i < planner->total_axes(); ++i)
-            {
-                int64_t drop_pulses =
-                    feedback_position[i] * feedback_to_drive[i] -
-                    control_position[i] * control_to_drive[i];
-
-                if (std::abs(drop_pulses) > maximum_drop_pulses[i])
-                {
-                    planner->alarm_stop();
-                    return;
-                }
-            }
-        }
-
         bool verify_position(igris::span<int64_t> feedback_position,
                              igris::span<int64_t> control_position)
         {
@@ -114,7 +96,20 @@ namespace cnc
                     control_position[i] * control_to_drive[i];
 
                 if (std::abs(drop_pulses) > maximum_drop_pulses[i])
+                {
+                    std::string f = nos::format(
+                        "{}", feedback_position[i] * feedback_to_drive[i]);
+                    std::string c = nos::format(
+                        "{}", control_position[i] * control_to_drive[i]);
+                    ralgo::warn("feedback_guard: drop_pulses overflow");
+                    ralgo::warn("feedback_guard: feedback_position:",
+                                f.c_str());
+                    ralgo::warn("feedback_guard: control_position:", c.c_str());
+                    ralgo::warn("feedback_guard: drop_pulses:",
+                                std::to_string(drop_pulses).c_str());
+
                     return false;
+                }
             }
             return true;
         }
