@@ -31,7 +31,7 @@ namespace cnc
     public:
         feedback_guard(cnc::planner *planner) : planner(planner)
         {
-            double max_drop = 400000;
+            double max_drop = 6000000;
             for (size_t i = 0; i < NMAX_AXES; ++i)
             {
                 maximum_drop_pulses[i] = max_drop;
@@ -97,16 +97,13 @@ namespace cnc
 
                 if (std::abs(drop_pulses) > maximum_drop_pulses[i])
                 {
-                    std::string f = nos::format(
-                        "{}", feedback_position[i] * feedback_to_drive[i]);
-                    std::string c = nos::format(
-                        "{}", control_position[i] * control_to_drive[i]);
-                    ralgo::warn("feedback_guard: drop_pulses overflow");
-                    ralgo::warn("feedback_guard: feedback_position:",
-                                f.c_str());
-                    ralgo::warn("feedback_guard: control_position:", c.c_str());
-                    ralgo::warn("feedback_guard: drop_pulses:",
-                                std::to_string(drop_pulses).c_str());
+                    // std::string f = nos::format("{}", feedback_to_drive[i]);
+                    // std::string c = nos::format("{}", control_to_drive[i]);
+                    // ralgo::warn("feedback_guard: drop_pulses overflow");
+                    // ralgo::warn("feedback_guard: feedback_to_drive:",
+                    //            f.c_str());
+                    // ralgo::warn("feedback_guard: control_to_drive:",
+                    // c.c_str());
 
                     return false;
                 }
