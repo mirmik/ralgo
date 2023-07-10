@@ -386,3 +386,10 @@ void cnc::planner::alarm_stop()
     shifts->clear();
     system_unlock();
 }
+
+bool cnc::planner::is_not_halt()
+{
+    igris::syslock_guard lock;
+    return !shifts->empty() || active_block != nullptr ||
+           has_postactive_blocks() || !blocks->empty();
+}

@@ -105,6 +105,8 @@ namespace cnc
         void fixup_postactive_blocks();
 
         void alarm_stop();
+
+        bool is_not_halt();
     };
 }
 
