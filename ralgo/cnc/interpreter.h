@@ -659,6 +659,17 @@ namespace cnc
             return ret;
         }
 
+        std::vector<size_t> args_to_index_vector(const nos::argv &args)
+        {
+            std::vector<size_t> ret;
+            for (unsigned int i = 0; i < args.size(); ++i)
+            {
+                auto index = std::stoi(args[i]);
+                ret.push_back(index);
+            }
+            return ret;
+        }
+
         int command(const nos::argv &argv, nos::ostream &os)
         {
             ralgo::infof("cnc-command: {}", argv.to_string());
@@ -765,6 +776,18 @@ namespace cnc
                                                       _final_position[axno]);
                 system_unlock();
                 return 0;
+            }
+
+            else if (argv[0] == "enable_tandem_protection")
+            {
+                auto fmap = args_to_index_vector(argv.without(1));
+                feedback_guard->add_tandem(fmap);
+            }
+
+            else if (argv[0] == "disable_tandem_protection")
+            {
+                auto idx = std::stoi(argv[1]);
+                feedback_guard->remove_tandem(idx);
             }
 
             else if (argv[0] == "velmaxs")

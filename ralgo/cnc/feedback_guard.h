@@ -18,6 +18,8 @@ namespace cnc
         igris::delegate<void, size_t, int64_t>
             _set_feedback_position_by_axis_callback;
 
+        std::vector<std::vector<size_t>> tandem_nums = {};
+
         igris::static_vector<double, NMAX_AXES> feedback_to_drive = {};
         igris::static_vector<double, NMAX_AXES> control_to_drive =
             {}; //< этот массив равен gears
@@ -25,6 +27,7 @@ namespace cnc
         // максимальное значение drop_pulses, после которого вызывается
         // planner->alarm_stop()
         igris::static_vector<double, NMAX_AXES> maximum_drop_pulses = {};
+        double maximum_tandem_mistake = 4000;
 
         cnc::planner *planner = nullptr;
 
@@ -97,18 +100,46 @@ namespace cnc
 
                 if (std::abs(drop_pulses) > maximum_drop_pulses[i])
                 {
-                    // std::string f = nos::format("{}", feedback_to_drive[i]);
-                    // std::string c = nos::format("{}", control_to_drive[i]);
-                    // ralgo::warn("feedback_guard: drop_pulses overflow");
-                    // ralgo::warn("feedback_guard: feedback_to_drive:",
-                    //            f.c_str());
-                    // ralgo::warn("feedback_guard: control_to_drive:",
-                    // c.c_str());
-
                     return false;
                 }
             }
             return true;
+        }
+
+        bool verify_tandems(igris::span<int64_t> feedback_position)
+        {
+            for (auto &tandem : tandem_nums)
+            {
+                size_t reference_index = tandem[0];
+                double reference = feedback_position[reference_index] *
+                                   feedback_to_drive[reference_index];
+                for (size_t i = 1; i < tandem.size(); ++i)
+                {
+                    size_t index = tandem[i];
+                    double pos =
+                        feedback_position[index] * feedback_to_drive[index];
+                    double diff = pos - reference;
+                    if (std::abs(diff) > maximum_tandem_mistake)
+                        return false;
+                }
+            }
+            return true;
+        }
+
+        void add_tandem(const std::vector<size_t> &tandem)
+        {
+            tandem_nums.push_back(tandem);
+        }
+
+        void remove_tandem(size_t idx)
+        {
+            tandem_nums.erase(
+                std::remove_if(tandem_nums.begin(),
+                               tandem_nums.end(),
+                               [idx](const std::vector<size_t> &v) {
+                                   return std::count(v.begin(), v.end(), idx);
+                               }),
+                tandem_nums.end());
         }
     };
 }
