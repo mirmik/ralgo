@@ -670,6 +670,17 @@ namespace cnc
             return ret;
         }
 
+        std::vector<size_t> args_symbols_to_index_vector(const nos::argv &args)
+        {
+            std::vector<size_t> ret;
+            for (unsigned int i = 0; i < args.size(); ++i)
+            {
+                auto index = symbol_to_index(args[i][0]);
+                ret.push_back(index);
+            }
+            return ret;
+        }
+
         int command(const nos::argv &argv, nos::ostream &os)
         {
             ralgo::infof("cnc-command: {}", argv.to_string());
@@ -780,14 +791,55 @@ namespace cnc
 
             else if (argv[0] == "enable_tandem_protection")
             {
-                auto fmap = args_to_index_vector(argv.without(1));
-                feedback_guard->add_tandem(fmap);
+                if (isdigit(argv[0][0]))
+                {
+                    auto fmap = args_to_index_vector(argv.without(1));
+                    feedback_guard->add_tandem(fmap);
+                }
+                else
+                {
+                    auto fmap = args_symbols_to_index_vector(argv.without(1));
+                    feedback_guard->add_tandem(fmap);
+                }
+                return 0;
             }
 
             else if (argv[0] == "disable_tandem_protection")
             {
                 auto idx = std::stoi(argv[1]);
                 feedback_guard->remove_tandem(idx);
+                return 0;
+            }
+
+            else if (argv[0] == "tandem_info")
+            {
+                const auto &tandems = feedback_guard->tandems();
+                if (tandems.size() == 0)
+                {
+                    nos::println_to(os, "Tandem list is empty");
+                }
+                for (auto &tandem : tandems)
+                {
+                    nos::println_to(os, tandem.info());
+                }
+                return 0;
+            }
+
+            else if (argv[0] == "drop_pulses_allowed")
+            {
+                size_t no = std::stoi(argv[1]);
+
+                if (argv.size() > 2)
+                {
+                    int64_t pulses = std::stoi(argv[1]);
+                    feedback_guard->set_drop_pulses_allowed(no, pulses);
+                }
+                else
+                {
+                    nos::println_to(os,
+                                    feedback_guard->drop_pulses_allowed(no));
+                }
+                return 0;
             }
 
             else if (argv[0] == "velmaxs")
