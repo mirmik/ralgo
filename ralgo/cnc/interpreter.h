@@ -7,6 +7,7 @@
 #include <igris/container/ring.h>
 #include <igris/container/static_vector.h>
 #include <igris/datastruct/argvc.h>
+#include <igris/shell/callable_collection.h>
 #include <igris/sync/syslock.h>
 #include <igris/util/numconvert.h>
 #include <nos/ilist.h>
@@ -685,192 +686,217 @@ namespace cnc
         {
             ralgo::infof("cnc-command: {}", argv.to_string());
 
-            if (argv[0] == "setprotect")
+            auto *fptr = clicommands.find(argv[0]);
+            if (fptr)
             {
-                ralgo::global_protection = false;
-                ralgo::info("Protection disabled");
-                return 0;
-            }
-
-            if (argv[0] == "stop")
-            {
-                smooth_stop();
-                return 0;
-            }
-
-            if (argv[0] == "lastblock")
-            {
-                last_block().print_to_stream(os);
-                return 0;
-            }
-
-            else if (argv[0] == "relmove")
-            {
-                command_incremental_move(argv.without(1), os);
-                return 0;
-            }
-
-            else if (argv[0] == "absmove")
-            {
-                command_absolute_move(argv.without(1), os);
-                return 0;
-            }
-
-            else if (argv[0] == "abspulses")
-            {
-                command_absolute_pulses(argv.without(1), os);
-                return 0;
-            }
-
-            else if (argv[0] == "steps")
-            {
-                nos::println_to(os, current_steps());
-                return 0;
-            }
-
-            else if (argv[0] == "finishes")
-            {
-                nos::print_list_to(os, _final_position);
-                nos::println_to(os);
-                return 0;
-            }
-
-            else if (argv[0] == "gains")
-            {
-                nos::print_list_to(os, gains);
-                nos::println_to(os);
-                return 0;
-            }
-
-            else if (argv[0] == "gears")
-            {
-                auto gears = planner->get_gears();
-                nos::print_list_to(os, gears);
-                nos::println_to(os);
-                return 0;
-            }
-
-            else if (argv[0] == "setgear")
-            {
-                auto axno = symbol_to_index(argv[1][0]);
-                double val = igris_atof64(argv[2].data(), NULL);
-                planner->set_gear(axno, val);
-                feedback_guard->set_control_to_drive_multiplier(axno, val);
-                return 0;
-            }
-
-            else if (argv[0] == "set_control_gear")
-            {
-                auto axno = symbol_to_index(argv[1][0]);
-                double val = igris_atof64(argv[2].data(), NULL);
-                planner->set_gear(axno, val);
-                feedback_guard->set_control_to_drive_multiplier(axno, val);
-                return 0;
-            }
-
-            else if (argv[0] == "set_feedback_gear")
-            {
-                auto axno = symbol_to_index(argv[1][0]);
-                double val = igris_atof64(argv[2].data(), NULL);
-                feedback_guard->set_feedback_to_drive_multiplier(axno, val);
-                return 0;
-            }
-
-            else if (argv[0] == "setpos")
-            {
-                auto axno = symbol_to_index(argv[1][0]);
-                double val = igris_atof64(argv[2].data(), NULL);
-                system_lock();
-                _final_position[axno] = val * planner->gears[axno];
-                revolver->get_steppers()[axno]->set_counter_value(val);
-                feedback_guard->set_feedback_position(axno,
-                                                      _final_position[axno]);
-                system_unlock();
-                return 0;
-            }
-
-            else if (argv[0] == "enable_tandem_protection")
-            {
-                if (isdigit(argv[0][0]))
-                {
-                    auto fmap = args_to_index_vector(argv.without(1));
-                    feedback_guard->add_tandem(fmap);
-                }
-                else
-                {
-                    auto fmap = args_symbols_to_index_vector(argv.without(1));
-                    feedback_guard->add_tandem(fmap);
-                }
-                return 0;
-            }
-
-            else if (argv[0] == "disable_tandem_protection")
-            {
-                auto idx = std::stoi(argv[1]);
-                feedback_guard->remove_tandem(idx);
-                return 0;
-            }
-
-            else if (argv[0] == "tandem_info")
-            {
-                const auto &tandems = feedback_guard->tandems();
-                if (tandems.size() == 0)
-                {
-                    nos::println_to(os, "Tandem list is empty");
-                }
-                for (auto &tandem : tandems)
-                {
-                    nos::println_to(os, tandem.info());
-                }
-                return 0;
-            }
-
-            else if (argv[0] == "drop_pulses_allowed")
-            {
-                size_t no = std::stoi(argv[1]);
-
-                if (argv.size() > 2)
-                {
-                    int64_t pulses = std::stoi(argv[1]);
-                    feedback_guard->set_drop_pulses_allowed(no, pulses);
-                }
-                else
-                {
-                    nos::println_to(os,
-                                    feedback_guard->drop_pulses_allowed(no));
-                }
-                return 0;
-            }
-
-            else if (argv[0] == "velmaxs")
-            {
-                auto fmap = args_to_index_value_map(argv.without(1));
-                for (auto &[key, val] : fmap)
-                    max_axes_velocities[key] = val;
-                return 0;
-            }
-
-            else if (argv[0] == "accmaxs")
-            {
-                auto fmap = args_to_index_value_map(argv.without(1));
-                for (auto &[key, val] : fmap)
-                    max_axes_accelerations[key] = val;
-                return 0;
-            }
-
-            else if (argv[0] == "state")
-            {
-                return print_interpreter_state(os);
-            }
-
-            else if (argv[0] == "help")
-            {
-                return command_help(os);
+                return (*fptr)(argv, os);
             }
 
             nos::println_to(os, "Unresolved command");
             return 0;
         }
+
+        igris::callable_collection<int(const nos::argv &, nos::ostream &)>
+            clicommands{
+                {"setprotect",
+                 "setprotect",
+                 [this](const nos::argv &, nos::ostream &) {
+                     ralgo::global_protection = false;
+                     ralgo::info("Protection disabled");
+                     return 0;
+                 }},
+                {"stop",
+                 "stop",
+                 [this](const nos::argv &, nos::ostream &) {
+                     smooth_stop();
+                     return 0;
+                 }},
+
+                {"lastblock",
+                 "lastblock",
+                 [this](const nos::argv &, nos::ostream &os) {
+                     last_block().print_to_stream(os);
+                     return 0;
+                 }},
+
+                {"relmove",
+                 "relmove",
+                 [this](const nos::argv &argv, nos::ostream &os) {
+                     command_incremental_move(argv.without(1), os);
+                     return 0;
+                 }},
+
+                {"absmove",
+                 "absmove",
+                 [this](const nos::argv &argv, nos::ostream &os) {
+                     command_absolute_move(argv.without(1), os);
+                     return 0;
+                 }},
+
+                {"abspulses",
+                 "abspulses",
+                 [this](const nos::argv &argv, nos::ostream &os) {
+                     command_absolute_pulses(argv.without(1), os);
+                     return 0;
+                 }},
+
+                {"steps",
+                 "steps",
+                 [this](const nos::argv &, nos::ostream &os) {
+                     nos::println_to(os, current_steps());
+                     return 0;
+                 }},
+
+                {"finishes",
+                 "finishes",
+                 [this](const nos::argv &, nos::ostream &os) {
+                     nos::print_list_to(os, _final_position);
+                     nos::println_to(os);
+                     return 0;
+                 }},
+
+                {"gains",
+                 "gains",
+                 [this](const nos::argv &, nos::ostream &os) {
+                     nos::print_list_to(os, gains);
+                     nos::println_to(os);
+                     return 0;
+                 }},
+
+                {"gears",
+                 "gears",
+                 [this](const nos::argv &, nos::ostream &os) {
+                     auto gears = planner->get_gears();
+                     nos::print_list_to(os, gears);
+                     nos::println_to(os);
+                     return 0;
+                 }},
+
+                {"setgear",
+                 "setgear",
+                 [this](const nos::argv &argv, nos::ostream &) {
+                     auto axno = symbol_to_index(argv[1][0]);
+                     double val = igris_atof64(argv[2].data(), NULL);
+                     planner->set_gear(axno, val);
+                     feedback_guard->set_control_to_drive_multiplier(axno, val);
+                     return 0;
+                 }},
+
+                {"set_control_gear",
+                 "set_control_gear",
+                 [this](const nos::argv &argv, nos::ostream &) {
+                     auto axno = symbol_to_index(argv[1][0]);
+                     double val = igris_atof64(argv[2].data(), NULL);
+                     planner->set_gear(axno, val);
+                     feedback_guard->set_control_to_drive_multiplier(axno, val);
+                     return 0;
+                 }},
+
+                {"set_feedback_gear",
+                 "set_feedback_gear",
+                 [this](const nos::argv &argv, nos::ostream &) {
+                     auto axno = symbol_to_index(argv[1][0]);
+                     double val = igris_atof64(argv[2].data(), NULL);
+                     feedback_guard->set_feedback_to_drive_multiplier(axno,
+                                                                      val);
+                     return 0;
+                 }},
+
+                {"setpos",
+                 "setpos",
+                 [this](const nos::argv &argv, nos::ostream &) {
+                     auto axno = symbol_to_index(argv[1][0]);
+                     double val = igris_atof64(argv[2].data(), NULL);
+                     system_lock();
+                     _final_position[axno] = val * planner->gears[axno];
+                     revolver->get_steppers()[axno]->set_counter_value(val);
+                     feedback_guard->set_feedback_position(
+                         axno, _final_position[axno]);
+                     system_unlock();
+                     return 0;
+                 }},
+                {"enable_tandem_protection",
+                 "enable_tandem_protection",
+                 [this](const nos::argv &argv, nos::ostream &) {
+                     auto idx = std::stoi(argv[1]);
+                     feedback_guard->remove_tandem(idx);
+                     return 0;
+                 }},
+                {"disable_tandem_protection",
+                 "disable_tandem_protection",
+                 [this](const nos::argv &argv, nos::ostream &) {
+                     if (isdigit(argv[0][0]))
+                     {
+                         auto fmap = args_to_index_vector(argv.without(1));
+                         feedback_guard->add_tandem(fmap);
+                     }
+                     else
+                     {
+                         auto fmap =
+                             args_symbols_to_index_vector(argv.without(1));
+                         feedback_guard->add_tandem(fmap);
+                     }
+                     return 0;
+                 }},
+                {"tandem_info",
+                 "tandem_info",
+                 [this](const nos::argv &, nos::ostream &os) {
+                     const auto &tandems = feedback_guard->tandems();
+                     if (tandems.size() == 0)
+                     {
+                         nos::println_to(os, "Tandem list is empty");
+                     }
+                     for (auto &tandem : tandems)
+                     {
+                         nos::println_to(os, tandem.info());
+                     }
+                     return 0;
+                 }},
+                {"drop_pulses_allowed",
+                 "drop_pulses_allowed",
+                 [this](const nos::argv &argv, nos::ostream &os) {
+                     size_t no = std::stoi(argv[1]);
+
+                     if (argv.size() > 2)
+                     {
+                         int64_t pulses = std::stoi(argv[1]);
+                         feedback_guard->set_drop_pulses_allowed(no, pulses);
+                     }
+                     else
+                     {
+                         nos::println_to(
+                             os, feedback_guard->drop_pulses_allowed(no));
+                     }
+                     return 0;
+                 }},
+                {"velmaxs",
+                 "Set maximum velocity for axes",
+                 [this](const nos::argv &argv, nos::ostream &) {
+                     auto fmap = args_to_index_value_map(argv.without(1));
+                     for (auto &[key, val] : fmap)
+                         max_axes_velocities[key] = val;
+                     return 0;
+                 }},
+                {"accmaxs",
+                 "Set maximum accelerations for axes",
+                 [this](const nos::argv &argv, nos::ostream &) {
+                     auto fmap = args_to_index_value_map(argv.without(1));
+                     for (auto &[key, val] : fmap)
+                         max_axes_accelerations[key] = val;
+                     return 0;
+                 }},
+                {"help",
+                 "print this help",
+                 [this](const nos::argv &, nos::ostream &os) {
+                     return command_help(os);
+                 }},
+                {"state",
+                 "print interpreter state",
+                 [this](const nos::argv &, nos::ostream &os) {
+                     return print_interpreter_state(os);
+                 }}
+
+            };
 
         int gcode_drop_first(const nos::argv &argv, nos::ostream &os)
         {
