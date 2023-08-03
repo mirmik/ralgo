@@ -686,7 +686,7 @@ namespace cnc
         {
             ralgo::infof("cnc-command: {}", argv.to_string());
 
-            auto *fptr = clicommands.find(argv[0]);
+            auto *fptr = clicommands.find(argv[0].data());
             if (fptr)
             {
                 return (*fptr)(argv, os);
@@ -696,7 +696,9 @@ namespace cnc
             return 0;
         }
 
-        igris::callable_collection<int(const nos::argv &, nos::ostream &)>
+        igris::static_callable_collection<int(const nos::argv &,
+                                              nos::ostream &),
+                                          50>
             clicommands{
                 {"setprotect",
                  "setprotect",
