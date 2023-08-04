@@ -10,19 +10,19 @@
 #include <ralgo/cnc/planner.h>
 #include <ralgo/cnc/util.h>
 
-const constexpr size_t MAXIMUM_TANDEM_MISTAKE = 4000;
+const constexpr size_t MAXIMUM_TANDEM_MISTAKE = 64000;
 
 namespace cnc
 {
     class feedback_guard_tandem
     {
         std::vector<size_t> _nums;
-        std::vector<double> _multipliers;
+        std::vector<int64_t> _multipliers;
         double _maximum_tandem_mistake;
 
     public:
         feedback_guard_tandem(std::vector<size_t> nums,
-                              std::vector<double> muls,
+                              std::vector<int64_t> muls,
                               double mistake)
             : _nums(nums), _multipliers(muls), _maximum_tandem_mistake(mistake)
         {
@@ -38,7 +38,7 @@ namespace cnc
             return _nums;
         }
 
-        const std::vector<double> &muls() const
+        const std::vector<int64_t> &muls() const
         {
             return _multipliers;
         }
@@ -174,29 +174,30 @@ namespace cnc
 
         bool verify_tandems(igris::span<int64_t> feedback_position)
         {
-            if (_tandems.size() == 0)
-                return true;
-
             for (auto &tandem : _tandems)
             {
                 size_t reference_index = tandem.nums()[0];
                 double reference = feedback_position[reference_index] *
+                                   tandem.muls()[reference_index] *
                                    feedback_to_drive[reference_index];
-                for (size_t i = 1; i < _tandems.size(); ++i)
+                for (size_t i = 1; i < tandem.nums().size(); ++i)
                 {
                     size_t index = tandem.nums()[i];
-                    double pos =
-                        feedback_position[index] * feedback_to_drive[index];
+                    double pos = feedback_position[index] *
+                                 tandem.muls()[index] *
+                                 feedback_to_drive[index];
                     double diff = pos - reference;
-                    if (std::abs(diff) > tandems()[i].maximum_tandem_mistake())
+                    if (std::abs(diff) > tandem.maximum_tandem_mistake())
+                    {
                         return false;
+                    }
                 }
             }
             return true;
         }
 
         void add_tandem(const std::vector<size_t> &tandem,
-                        const std::vector<double> &muls,
+                        const std::vector<int64_t> &muls,
                         double max_mistake)
         {
             _tandems.emplace_back(tandem, muls, max_mistake);
@@ -223,7 +224,7 @@ namespace cnc
         {
             double mistake = MAXIMUM_TANDEM_MISTAKE;
             std::vector<size_t> nums;
-            std::vector<double> muls;
+            std::vector<int64_t> muls;
 
             for (auto &arg : argv)
             {
