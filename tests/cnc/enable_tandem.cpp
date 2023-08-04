@@ -37,4 +37,15 @@ TEST_CASE("tandem")
     CHECK_EQ(guard.tandems()[2].muls()[0], 1);
     CHECK_EQ(guard.tandems()[2].muls()[1], 1);
     CHECK_EQ(guard.tandems()[2].maximum_tandem_mistake(), 4000);
+
+    auto args4 = nos::tokens("B:-2 C");
+    guard.add_tandem_command(args4, ss);
+    CHECK_EQ(guard.tandems().size(), 4);
+    CHECK_EQ(guard.tandems()[3].nums().size(), 2);
+    CHECK_EQ(guard.tandems()[3].nums()[0], 4);
+    CHECK_EQ(guard.tandems()[3].nums()[1], 5);
+    CHECK_EQ(guard.tandems()[3].muls().size(), 2);
+    CHECK_EQ(guard.tandems()[3].muls()[0], -2);
+    CHECK_EQ(guard.tandems()[3].muls()[1], 1);
+    CHECK_EQ(guard.tandems()[3].maximum_tandem_mistake(), 4000);
 }

@@ -827,7 +827,7 @@ namespace cnc
                 {"enable_tandem_protection",
                  "enable_tandem_protection",
                  [this](const nos::argv &argv, nos::ostream &os) {
-                     feedback_guard->add_tandem_command(argv, os);
+                     feedback_guard->add_tandem_command(argv.without(1), os);
                      return 0;
                  }},
                 {"tandem_info",

@@ -272,6 +272,8 @@ namespace cnc
                 }
             }
 
+            for (auto n : nums)
+                remove_tandem(n);
             add_tandem(nums, muls, mistake);
         }
     };
