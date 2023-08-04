@@ -5,20 +5,27 @@
 #include <igris/container/span.h>
 #include <igris/container/static_vector.h>
 #include <igris/event/delegate.h>
+#include <nos/shell/executor.h>
+#include <nos/util/string.h>
 #include <ralgo/cnc/planner.h>
+#include <ralgo/cnc/util.h>
+
+const constexpr size_t MAXIMUM_TANDEM_MISTAKE = 4000;
 
 namespace cnc
 {
     class feedback_guard_tandem
     {
         std::vector<size_t> _nums;
-        double _maximum_tandem_mistake = 4000;
+        std::vector<double> _multipliers;
+        double _maximum_tandem_mistake;
 
     public:
-        feedback_guard_tandem(std::vector<size_t> nums) : _nums(nums) {}
-        void set_maximum_tandem_mistake(double mistake)
+        feedback_guard_tandem(std::vector<size_t> nums,
+                              std::vector<double> muls,
+                              double mistake)
+            : _nums(nums), _multipliers(muls), _maximum_tandem_mistake(mistake)
         {
-            _maximum_tandem_mistake = mistake;
         }
 
         double maximum_tandem_mistake() const
@@ -31,10 +38,17 @@ namespace cnc
             return _nums;
         }
 
+        const std::vector<double> &muls() const
+        {
+            return _multipliers;
+        }
+
         std::string info() const
         {
-            return nos::format(
-                "{}: max_mistake:{}", _nums, _maximum_tandem_mistake);
+            return nos::format("{}: muls:{} max_mistake:{}",
+                               _nums,
+                               _multipliers,
+                               _maximum_tandem_mistake);
         }
     };
 
@@ -181,7 +195,14 @@ namespace cnc
             return true;
         }
 
-        void add_tandem(const std::vector<size_t> &tandem)
+        void add_tandem(const std::vector<size_t> &tandem,
+                        const std::vector<double> &muls,
+                        double max_mistake)
+        {
+            _tandems.emplace_back(tandem, muls, max_mistake);
+        }
+
+        void add_tandem(const feedback_guard_tandem &tandem)
         {
             _tandems.push_back(tandem);
         }
@@ -196,6 +217,62 @@ namespace cnc
                                        v.nums().begin(), v.nums().end(), idx);
                                }),
                 _tandems.end());
+        }
+
+        void add_tandem_command(const nos::argv &argv, nos::ostream &os)
+        {
+            double mistake = MAXIMUM_TANDEM_MISTAKE;
+            std::vector<size_t> nums;
+            std::vector<double> muls;
+
+            for (auto &arg : argv)
+            {
+                auto lst = nos::split(arg, ':');
+
+                std::string name_or_index_or_command = lst[0];
+                std::string multiplier = lst.size() > 1 ? lst[1] : "1";
+
+                if (name_or_index_or_command == "maxmistake")
+                {
+                    if (lst.size() != 2)
+                    {
+                        nos::println_to(os, "'maxmistake' argument required");
+                        return;
+                    }
+
+                    mistake = std::stoi(multiplier);
+                    continue;
+                }
+
+                else
+                {
+                    if (isdigit(name_or_index_or_command[0]))
+                    {
+                        nums.push_back(std::stoi(name_or_index_or_command));
+                    }
+                    else
+                    {
+                        nums.push_back(
+                            symbol_to_index(name_or_index_or_command[0]));
+                    }
+
+                    if (lst.size() == 1)
+                    {
+                        muls.push_back(1);
+                    }
+                    else if (lst.size() == 2)
+                    {
+                        muls.push_back(std::stoi(multiplier));
+                    }
+                    else
+                    {
+                        nos::println_to(os, "too many arguments");
+                        return;
+                    }
+                }
+            }
+
+            add_tandem(nums, muls, mistake);
         }
     };
 }

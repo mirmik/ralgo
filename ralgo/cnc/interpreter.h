@@ -817,27 +817,17 @@ namespace cnc
                      system_unlock();
                      return 0;
                  }},
-                {"enable_tandem_protection",
-                 "enable_tandem_protection",
+                {"disable_tandem_protection",
+                 "disable_tandem_protection",
                  [this](const nos::argv &argv, nos::ostream &) {
                      auto idx = std::stoi(argv[1]);
                      feedback_guard->remove_tandem(idx);
                      return 0;
                  }},
-                {"disable_tandem_protection",
-                 "disable_tandem_protection",
-                 [this](const nos::argv &argv, nos::ostream &) {
-                     if (isdigit(argv[0][0]))
-                     {
-                         auto fmap = args_to_index_vector(argv.without(1));
-                         feedback_guard->add_tandem(fmap);
-                     }
-                     else
-                     {
-                         auto fmap =
-                             args_symbols_to_index_vector(argv.without(1));
-                         feedback_guard->add_tandem(fmap);
-                     }
+                {"enable_tandem_protection",
+                 "enable_tandem_protection",
+                 [this](const nos::argv &argv, nos::ostream &os) {
+                     feedback_guard->add_tandem_command(argv, os);
                      return 0;
                  }},
                 {"tandem_info",
@@ -890,7 +880,11 @@ namespace cnc
                 {"help",
                  "print this help",
                  [this](const nos::argv &, nos::ostream &os) {
-                     return command_help(os);
+                     for (auto &rec : clicommands)
+                     {
+                         nos::fprintln_to(os, "{} - {}", rec.key, rec.help);
+                     }
+                     return 0;
                  }},
                 {"state",
                  "print interpreter state",
