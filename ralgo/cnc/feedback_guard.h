@@ -10,7 +10,7 @@
 #include <ralgo/cnc/planner.h>
 #include <ralgo/cnc/util.h>
 
-const constexpr size_t MAXIMUM_TANDEM_MISTAKE = 64000;
+const constexpr size_t MAXIMUM_TANDEM_MISTAKE = 256000;
 
 namespace cnc
 {
