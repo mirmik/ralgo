@@ -702,56 +702,64 @@ namespace cnc
             clicommands{
                 {"setprotect",
                  "setprotect",
-                 [this](const nos::argv &, nos::ostream &) {
+                 [](const nos::argv &, nos::ostream &)
+                 {
                      ralgo::global_protection = false;
                      ralgo::info("Protection disabled");
                      return 0;
                  }},
                 {"stop",
                  "stop",
-                 [this](const nos::argv &, nos::ostream &) {
+                 [this](const nos::argv &, nos::ostream &)
+                 {
                      smooth_stop();
                      return 0;
                  }},
 
                 {"lastblock",
                  "lastblock",
-                 [this](const nos::argv &, nos::ostream &os) {
+                 [this](const nos::argv &, nos::ostream &os)
+                 {
                      last_block().print_to_stream(os);
                      return 0;
                  }},
 
                 {"relmove",
                  "relmove",
-                 [this](const nos::argv &argv, nos::ostream &os) {
+                 [this](const nos::argv &argv, nos::ostream &os)
+                 {
                      command_incremental_move(argv.without(1), os);
                      return 0;
                  }},
 
                 {"absmove",
                  "absmove",
-                 [this](const nos::argv &argv, nos::ostream &os) {
+                 [this](const nos::argv &argv, nos::ostream &os)
+                 {
                      command_absolute_move(argv.without(1), os);
                      return 0;
                  }},
 
                 {"abspulses",
                  "abspulses",
-                 [this](const nos::argv &argv, nos::ostream &os) {
+                 [this](const nos::argv &argv, nos::ostream &os)
+                 {
                      command_absolute_pulses(argv.without(1), os);
                      return 0;
                  }},
 
                 {"steps",
                  "steps",
-                 [this](const nos::argv &, nos::ostream &os) {
+                 [this](const nos::argv &, nos::ostream &os)
+                 {
                      nos::println_to(os, current_steps());
                      return 0;
                  }},
 
                 {"finishes",
                  "finishes",
-                 [this](const nos::argv &, nos::ostream &os) {
+                 [this](const nos::argv &, nos::ostream &os)
+                 {
                      nos::print_list_to(os, _final_position);
                      nos::println_to(os);
                      return 0;
@@ -759,7 +767,8 @@ namespace cnc
 
                 {"gains",
                  "gains",
-                 [this](const nos::argv &, nos::ostream &os) {
+                 [this](const nos::argv &, nos::ostream &os)
+                 {
                      nos::print_list_to(os, gains);
                      nos::println_to(os);
                      return 0;
@@ -767,7 +776,8 @@ namespace cnc
 
                 {"gears",
                  "gears",
-                 [this](const nos::argv &, nos::ostream &os) {
+                 [this](const nos::argv &, nos::ostream &os)
+                 {
                      auto gears = planner->get_gears();
                      nos::print_list_to(os, gears);
                      nos::println_to(os);
@@ -776,7 +786,8 @@ namespace cnc
 
                 {"setgear",
                  "setgear",
-                 [this](const nos::argv &argv, nos::ostream &) {
+                 [this](const nos::argv &argv, nos::ostream &)
+                 {
                      auto axno = symbol_to_index(argv[1][0]);
                      double val = igris_atof64(argv[2].data(), NULL);
                      planner->set_gear(axno, val);
@@ -786,7 +797,8 @@ namespace cnc
 
                 {"set_control_gear",
                  "set_control_gear",
-                 [this](const nos::argv &argv, nos::ostream &) {
+                 [this](const nos::argv &argv, nos::ostream &)
+                 {
                      auto axno = symbol_to_index(argv[1][0]);
                      double val = igris_atof64(argv[2].data(), NULL);
                      planner->set_gear(axno, val);
@@ -796,7 +808,8 @@ namespace cnc
 
                 {"set_feedback_gear",
                  "set_feedback_gear",
-                 [this](const nos::argv &argv, nos::ostream &) {
+                 [this](const nos::argv &argv, nos::ostream &)
+                 {
                      auto axno = symbol_to_index(argv[1][0]);
                      double val = igris_atof64(argv[2].data(), NULL);
                      feedback_guard->set_feedback_to_drive_multiplier(axno,
@@ -806,7 +819,8 @@ namespace cnc
 
                 {"setpos",
                  "setpos",
-                 [this](const nos::argv &argv, nos::ostream &) {
+                 [this](const nos::argv &argv, nos::ostream &)
+                 {
                      auto axno = symbol_to_index(argv[1][0]);
                      double val = igris_atof64(argv[2].data(), NULL);
                      system_lock();
@@ -819,20 +833,23 @@ namespace cnc
                  }},
                 {"disable_tandem_protection",
                  "disable_tandem_protection",
-                 [this](const nos::argv &argv, nos::ostream &) {
+                 [this](const nos::argv &argv, nos::ostream &)
+                 {
                      auto idx = std::stoi(argv[1]);
                      feedback_guard->remove_tandem(idx);
                      return 0;
                  }},
                 {"enable_tandem_protection",
                  "enable_tandem_protection",
-                 [this](const nos::argv &argv, nos::ostream &os) {
+                 [this](const nos::argv &argv, nos::ostream &os)
+                 {
                      feedback_guard->add_tandem_command(argv.without(1), os);
                      return 0;
                  }},
                 {"tandem_info",
                  "tandem_info",
-                 [this](const nos::argv &, nos::ostream &os) {
+                 [this](const nos::argv &, nos::ostream &os)
+                 {
                      const auto &tandems = feedback_guard->tandems();
                      if (tandems.size() == 0)
                      {
@@ -846,7 +863,8 @@ namespace cnc
                  }},
                 {"drop_pulses_allowed",
                  "drop_pulses_allowed",
-                 [this](const nos::argv &argv, nos::ostream &os) {
+                 [this](const nos::argv &argv, nos::ostream &os)
+                 {
                      size_t no = std::stoi(argv[1]);
 
                      if (argv.size() > 2)
@@ -863,7 +881,8 @@ namespace cnc
                  }},
                 {"velmaxs",
                  "Set maximum velocity for axes",
-                 [this](const nos::argv &argv, nos::ostream &) {
+                 [this](const nos::argv &argv, nos::ostream &)
+                 {
                      auto fmap = args_to_index_value_map(argv.without(1));
                      for (auto &[key, val] : fmap)
                          max_axes_velocities[key] = val;
@@ -871,7 +890,8 @@ namespace cnc
                  }},
                 {"accmaxs",
                  "Set maximum accelerations for axes",
-                 [this](const nos::argv &argv, nos::ostream &) {
+                 [this](const nos::argv &argv, nos::ostream &)
+                 {
                      auto fmap = args_to_index_value_map(argv.without(1));
                      for (auto &[key, val] : fmap)
                          max_axes_accelerations[key] = val;
@@ -879,7 +899,8 @@ namespace cnc
                  }},
                 {"help",
                  "print this help",
-                 [this](const nos::argv &, nos::ostream &os) {
+                 [this](const nos::argv &, nos::ostream &os)
+                 {
                      for (auto &rec : clicommands)
                      {
                          nos::fprintln_to(os, "{} - {}", rec.key, rec.help);
@@ -888,9 +909,8 @@ namespace cnc
                  }},
                 {"state",
                  "print interpreter state",
-                 [this](const nos::argv &, nos::ostream &os) {
-                     return print_interpreter_state(os);
-                 }}
+                 [this](const nos::argv &, nos::ostream &os)
+                 { return print_interpreter_state(os); }}
 
             };
 
