@@ -11,12 +11,19 @@
 
 namespace ralgo
 {
-    template <class T>
-    class vector_view_iterator
-        : public std::iterator<std::random_access_iterator_tag, T>
+    template <class T> class vector_view_iterator
     {
-        T *dat;
-        int stride;
+    public:
+        using iterator_category = std::random_access_iterator_tag;
+        using value_type = T;
+        using difference_type = std::ptrdiff_t;
+        using pointer = T *;
+        using reference = T &;
+        using stride_type = int;
+
+    private:
+        pointer dat;
+        stride_type stride;
 
     public:
         vector_view_iterator(T *dat) : dat(dat), stride(1) {}
