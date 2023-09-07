@@ -1,6 +1,17 @@
 #include <doctest/doctest.h>
 #include <ralgo/boundary_box.h>
 
+TEST_CASE("boundary_box 1 dim")
+{
+    ralgo::boundary_box<double> box(
+        {-std::numeric_limits<double>::infinity(), 2, 3}, {3, 4, 5});
+
+    CHECK_EQ(box.mins_as_vector(),
+             ralgo::vector<double>(
+                 {-std::numeric_limits<double>::infinity(), 2, 3}));
+    CHECK_EQ(box.maxs_as_vector(), ralgo::vector<double>({3, 4, 5}));
+}
+
 TEST_CASE("boundary_box")
 {
     ralgo::boundary_box<double> box({1, 2, 3}, {3, 4, 5});

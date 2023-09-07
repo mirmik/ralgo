@@ -60,12 +60,11 @@ namespace cnc
         bool need_to_reevaluate = false;
         bool in_operation = false;
         uint8_t state = 0;
-        // int count_of_reevaluation = 0;
         igris::delegate<void> _start_operation_handle = {};
         int waited = 0;
         bool dda_counter_overflow_error_detected = false;
         igris::delegate<void> final_shift_pushed = {};
-        bool _frequency_protection = true;
+        bool _frequency_protection = false;
 
     public:
         planner(const planner &) = delete;
