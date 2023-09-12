@@ -64,7 +64,7 @@ namespace cnc
         int waited = 0;
         bool dda_counter_overflow_error_detected = false;
         igris::delegate<void> final_shift_pushed = {};
-        bool _frequency_protection = false;
+        bool _frequency_protection = true;
 
     public:
         planner(const planner &) = delete;
@@ -106,6 +106,7 @@ namespace cnc
         void alarm_stop();
 
         bool is_not_halt();
+        bool is_halt();
     };
 }
 

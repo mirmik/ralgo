@@ -393,3 +393,8 @@ bool cnc::planner::is_not_halt()
     return !shifts->empty() || active_block != nullptr ||
            has_postactive_blocks() || !blocks->empty();
 }
+
+bool cnc::planner::is_halt()
+{
+    return !is_not_halt();
+}

@@ -11,6 +11,12 @@
 
 namespace cnc
 {
+    struct idxpos
+    {
+        int idx;
+        double pos;
+    };
+
     class control_task
     {
     public:
@@ -18,6 +24,7 @@ namespace cnc
         igris::static_vector<double, NMAX_AXES> _poses = {};
         double feed = 0;
         double acc = 0;
+        std::vector<size_t> active_axes;
 
         control_task(size_t total_axes)
         {
@@ -30,6 +37,20 @@ namespace cnc
             feed = other.feed;
             acc = other.acc;
             _poses = other._poses;
+        }
+
+        void set_active_axes(const std::vector<size_t> &axes)
+        {
+            active_axes = axes;
+        }
+
+        void set_active_axes(const std::vector<idxpos> &axes)
+        {
+            active_axes.clear();
+            for (auto &pair : axes)
+            {
+                active_axes.push_back(pair.idx);
+            }
         }
 
         control_task &operator=(const control_task &other)
@@ -125,12 +146,6 @@ namespace cnc
             ret += "])";
             return ret;
         }
-    };
-
-    struct idxpos
-    {
-        int idx;
-        double pos;
     };
 
     static inline std::vector<idxpos>

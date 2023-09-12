@@ -21,11 +21,15 @@ namespace cnc
         double _maximum_tandem_mistake;
 
     public:
+        bool in_operation = false;
+
+    public:
         feedback_guard_tandem(std::vector<size_t> nums,
                               std::vector<int64_t> muls,
                               double mistake)
             : _nums(nums), _multipliers(muls), _maximum_tandem_mistake(mistake)
         {
+            assert(_nums.size() == _multipliers.size());
         }
 
         double maximum_tandem_mistake() const
@@ -63,13 +67,13 @@ namespace cnc
 
         std::vector<feedback_guard_tandem> _tandems = {};
 
-        igris::static_vector<double, NMAX_AXES> feedback_to_drive = {};
-        igris::static_vector<double, NMAX_AXES> control_to_drive =
+        std::array<double, NMAX_AXES> feedback_to_drive = {};
+        std::array<double, NMAX_AXES> control_to_drive =
             {}; //< этот массив равен gears
 
         // максимальное значение drop_pulses, после которого вызывается
         // planner->alarm_stop()
-        igris::static_vector<double, NMAX_AXES> maximum_drop_pulses = {};
+        std::array<double, NMAX_AXES> maximum_drop_pulses = {};
         cnc::planner *planner = nullptr;
 
     public:
@@ -82,6 +86,19 @@ namespace cnc
                 feedback_to_drive[i] = 1;
                 control_to_drive[i] = 1;
             }
+        }
+
+        std::string guard_info()
+        {
+            return nos::format("feed_to_drive: {}\r\nctrl_to_drive: {}\r\n",
+                               nos::ilist(feedback_to_drive),
+                               nos::ilist(control_to_drive));
+        }
+
+        int guard_info(nos::ostream &os)
+        {
+            nos::println_to(os, guard_info());
+            return 0;
         }
 
         const auto &tandems() const
@@ -172,21 +189,89 @@ namespace cnc
             return true;
         }
 
+        std::vector<int64_t>
+        feedback_position_as_drive(igris::span<int64_t> feedback_position)
+        {
+            std::vector<int64_t> vec;
+            vec.resize(planner->total_axes());
+            for (size_t i = 0; i < planner->total_axes(); ++i)
+            {
+                vec[i] = feedback_position[i] * feedback_to_drive[i];
+            }
+            return vec;
+        }
+
+        std::vector<int64_t>
+        control_position_as_drive(igris::span<int64_t> control_position)
+        {
+            std::vector<int64_t> vec;
+            vec.resize(planner->total_axes());
+            for (size_t i = 0; i < planner->total_axes(); ++i)
+            {
+                vec[i] = control_position[i] * control_to_drive[i];
+            }
+            return vec;
+        }
+
+        bool verify_position_in_drives(
+            igris::span<int64_t> feedback_position_as_drive,
+            igris::span<int64_t> control_position_as_drive)
+        {
+            for (size_t i = 0; i < planner->total_axes(); ++i)
+            {
+                int64_t drop_pulses = feedback_position_as_drive[i] -
+                                      control_position_as_drive[i];
+
+                if (std::abs(drop_pulses) > maximum_drop_pulses[i])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        void enable_tandem_protection_for_axis(size_t axno)
+        {
+            for (auto &tandem : _tandems)
+            {
+                for (auto num : tandem.nums())
+                {
+                    if (num == axno)
+                        tandem.in_operation = true;
+                }
+            }
+        }
+
+        void finish_operations()
+        {
+            for (auto &tandem : _tandems)
+            {
+                tandem.in_operation = false;
+            }
+        }
+
         bool verify_tandems(igris::span<int64_t> feedback_position)
         {
             for (auto &tandem : _tandems)
             {
+                if (tandem.in_operation == false)
+                    continue;
+
                 size_t reference_index = tandem.nums()[0];
-                double reference = feedback_position[reference_index] *
-                                   tandem.muls()[reference_index] *
-                                   feedback_to_drive[reference_index];
+                auto reference_mul = tandem.muls()[0];
+                auto reference_pos = feedback_position[reference_index];
+                auto reference_to = feedback_to_drive[reference_index];
+                double reference_drive =
+                    reference_pos * reference_mul * reference_to;
                 for (size_t i = 1; i < tandem.nums().size(); ++i)
                 {
-                    size_t index = tandem.nums()[i];
-                    double pos = feedback_position[index] *
-                                 tandem.muls()[index] *
-                                 feedback_to_drive[index];
-                    double diff = pos - reference;
+                    size_t it_index = tandem.nums()[i];
+                    auto it_mul = tandem.muls()[i];
+                    auto it_pos = feedback_position[it_index];
+                    auto it_to = feedback_to_drive[it_index];
+
+                    double it_drive = it_pos * it_mul * it_to;
+                    double diff = it_drive - reference_drive;
                     if (std::abs(diff) > tandem.maximum_tandem_mistake())
                     {
                         return false;
@@ -247,15 +332,18 @@ namespace cnc
 
                 else
                 {
+                    size_t index;
                     if (isdigit(name_or_index_or_command[0]))
                     {
-                        nums.push_back(std::stoi(name_or_index_or_command));
+                        index = std::stoi(name_or_index_or_command);
                     }
                     else
                     {
-                        nums.push_back(
-                            symbol_to_index(name_or_index_or_command[0]));
+                        index = symbol_to_index(name_or_index_or_command[0]);
                     }
+                    // assert(index == 0 || index == 1 || index == 2 ||
+                    //       index == 4);
+                    nums.push_back(index);
 
                     if (lst.size() == 1)
                     {
