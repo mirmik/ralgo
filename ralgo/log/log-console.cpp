@@ -13,32 +13,32 @@ void ralgo::log(ralgo::LogLevel lvl,
         return;
     }
 
-    std::string str;
-    str += a;
+    std::string str = "";
+    str += std::string(a);
     if (b)
     {
         str += " ";
-        str += b;
+        str += std::string(b);
     }
     if (c)
     {
         str += " ";
-        str += c;
+        str += std::string(c);
     }
 
     switch (lvl)
     {
     case RALGO_DEBUG:
-        ralgo::logger->debug(str.c_str());
+        ralgo::logger->debug(str);
         break;
     case RALGO_INFO:
-        ralgo::logger->info(str.c_str());
+        ralgo::logger->info(str);
         break;
     case RALGO_WARN:
-        ralgo::logger->warn(str.c_str());
+        ralgo::logger->warn(str);
         break;
     case RALGO_FAULT:
-        ralgo::logger->error(str.c_str());
+        ralgo::logger->error(str);
         break;
     }
 }

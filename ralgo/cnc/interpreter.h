@@ -334,6 +334,8 @@ namespace cnc
 
             double feed = evalfeed * dirgain;
             double acc = evalacc * dirgain;
+
+            ralgo::infof("evalfeed: {} dirgain: {}", evalfeed, dirgain);
             ralgo::infof("feed: {} acc: {}", feed, acc);
 
             assert(feed != 0);
