@@ -336,10 +336,26 @@ namespace cnc
             double acc = evalacc * dirgain;
             ralgo::infof("feed: {} acc: {}", feed, acc);
 
+            assert(feed != 0);
+            assert(!isnan(feed));
+            assert(!isinf(feed));
+
+            assert(acc != 0);
+            assert(!isnan(acc));
+            assert(!isinf(acc));
+
             // scale feed and acc by revolver freqs settings.
             double reduced_feed = feed / revolver_frequency;
             double reduced_acc =
                 acc / (revolver_frequency * revolver_frequency);
+
+            assert(reduced_feed != 0);
+            assert(!isnan(reduced_feed));
+            assert(!isinf(reduced_feed));
+
+            assert(reduced_acc != 0);
+            assert(!isnan(reduced_acc));
+            assert(!isinf(reduced_acc));
 
             ralgo::infof(
                 "reduced_feed: {} reduced_acc: {}", reduced_feed, reduced_acc);

@@ -84,6 +84,9 @@ namespace ralgo
         linspace(T _a, T _b, int _points, bool endpoint = true)
             : a(_a), b(_b), points(_points)
         {
+            if (points < 2)
+                points = 2;
+
             if (!endpoint)
             {
                 double k = (double)(points - 1) / (double)(points);
