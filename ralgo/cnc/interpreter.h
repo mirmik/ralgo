@@ -300,7 +300,6 @@ namespace cnc
                                        planner_block &block,
                                        nos::ostream &)
         {
-            ralgo::infof("evaluate_task: {}", task.to_string());
             saved_acc = task.acc;
             saved_feed = task.feed;
 
@@ -312,12 +311,9 @@ namespace cnc
             auto intdists = ralgo::vecops::mul_vv<ralgo::vector<double>>(
                 task.poses(), gains);
 
-            // ralgo::infof("intdist: {}", intdists[0]);
-            // ralgo::infof("intdist: {}", intdists[1]);
             auto direction =
                 ralgo::vecops::normalize<ralgo::vector<double>>(task.poses());
-            // ralgo::infof("direction: {}", direction[0]);
-            // ralgo::infof("direction: {}", direction[1]);
+
             auto dirgain =
                 ralgo::vecops::norm(ralgo::vecops::mul_vv(direction, gains));
 
@@ -341,9 +337,6 @@ namespace cnc
             double feed = evalfeed * dirgain;
             double acc = evalacc * dirgain;
 
-            // ralgo::infof("evalfeed: {} dirgain: {}", evalfeed, dirgain);
-            // ralgo::infof("feed: {} acc: {}", feed, acc);
-
             assert(feed != 0);
             assert(!isnan(feed));
             assert(!isinf(feed));
@@ -364,14 +357,6 @@ namespace cnc
             assert(reduced_acc != 0);
             assert(!isnan(reduced_acc));
             assert(!isinf(reduced_acc));
-
-            // ralgo::infof(
-            //    "reduced_feed: {} reduced_acc: {}", reduced_feed,
-            //    reduced_acc);
-
-            // auto gears = planner->get_gears();
-            // ralgo::infof(
-            //    "gears: {} gains: {}", nos::ilist(gears), nos::ilist(gains));
 
             if (feedback_guard)
                 for (auto idx : task.active_axes)
@@ -662,8 +647,6 @@ namespace cnc
 
         int command(const nos::argv &argv, nos::ostream &os)
         {
-            ralgo::infof("cnc-command: {}", argv.to_string());
-
             auto *fptr = clicommands.find(argv[0].data());
             if (fptr)
             {
@@ -851,12 +834,9 @@ namespace cnc
                 {"velmaxs",
                  "Set maximum velocity for axes",
                  [this](const nos::argv &argv, nos::ostream &) {
-                     ralgo::infof("size:: {}", argv.size());
                      auto fmap = args_to_index_value_map(argv.without(1));
                      for (auto &[key, val] : fmap)
                      {
-                         assert(val != 0);
-                         ralgo::infof("key:val:: {}:{}", key, val);
                          max_axes_velocities[key] = val;
                      }
                      return 0;
