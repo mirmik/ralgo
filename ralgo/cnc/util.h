@@ -2,6 +2,8 @@
 #define RALGO_CNC_UTIL_H
 
 #include <ctype.h>
+#include <igris/container/flat_map.h>
+#include <nos/shell/argv.h>
 #include <string.h>
 
 namespace cnc
@@ -58,5 +60,7 @@ namespace cnc
         return '?';
     }
 }
+
+igris::flat_map<int, double> args_to_index_value_map(const nos::argv &args);
 
 #endif

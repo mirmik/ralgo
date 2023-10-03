@@ -292,6 +292,7 @@ namespace cnc
                         minmul = lmul;
                 }
 
+            assert(minmul != std::numeric_limits<double>::max());
             return minmul;
         }
 
@@ -310,8 +311,13 @@ namespace cnc
             // Это записано для инкрементального режима:
             auto intdists = ralgo::vecops::mul_vv<ralgo::vector<double>>(
                 task.poses(), gains);
+
+            // ralgo::infof("intdist: {}", intdists[0]);
+            // ralgo::infof("intdist: {}", intdists[1]);
             auto direction =
                 ralgo::vecops::normalize<ralgo::vector<double>>(task.poses());
+            // ralgo::infof("direction: {}", direction[0]);
+            // ralgo::infof("direction: {}", direction[1]);
             auto dirgain =
                 ralgo::vecops::norm(ralgo::vecops::mul_vv(direction, gains));
 
@@ -335,8 +341,8 @@ namespace cnc
             double feed = evalfeed * dirgain;
             double acc = evalacc * dirgain;
 
-            ralgo::infof("evalfeed: {} dirgain: {}", evalfeed, dirgain);
-            ralgo::infof("feed: {} acc: {}", feed, acc);
+            // ralgo::infof("evalfeed: {} dirgain: {}", evalfeed, dirgain);
+            // ralgo::infof("feed: {} acc: {}", feed, acc);
 
             assert(feed != 0);
             assert(!isnan(feed));
@@ -359,12 +365,13 @@ namespace cnc
             assert(!isnan(reduced_acc));
             assert(!isinf(reduced_acc));
 
-            ralgo::infof(
-                "reduced_feed: {} reduced_acc: {}", reduced_feed, reduced_acc);
+            // ralgo::infof(
+            //    "reduced_feed: {} reduced_acc: {}", reduced_feed,
+            //    reduced_acc);
 
-            auto gears = planner->get_gears();
-            ralgo::infof(
-                "gears: {} gains: {}", nos::ilist(gears), nos::ilist(gains));
+            // auto gears = planner->get_gears();
+            // ralgo::infof(
+            //    "gears: {} gains: {}", nos::ilist(gears), nos::ilist(gains));
 
             if (feedback_guard)
                 for (auto idx : task.active_axes)
@@ -631,37 +638,6 @@ namespace cnc
             return 0;
         }
 
-        igris::flat_map<int, double>
-        args_to_index_value_map(const nos::argv &args)
-        {
-            igris::flat_map<int, double> ret;
-            int cursor = 0;
-            for (unsigned int i = 0; i < args.size(); ++i)
-            {
-                auto splitlst = nos::split(args[i], ":");
-
-                if (splitlst.size() == 1)
-                {
-                    auto index = cursor;
-                    auto value = std::stod(splitlst[0]);
-                    ret.emplace(index, value);
-                    cursor++;
-                }
-                else if (splitlst.size() == 2)
-                {
-                    auto index = std::stoi(splitlst[0]);
-                    auto value = std::stod(splitlst[1]);
-                    ret.emplace(index, value);
-                    cursor = index + 1;
-                }
-                else
-                {
-                    ralgo::warnf("Invalid argument: {}", args[i]);
-                }
-            }
-            return ret;
-        }
-
         std::vector<size_t> args_to_index_vector(const nos::argv &args)
         {
             std::vector<size_t> ret;
@@ -875,9 +851,14 @@ namespace cnc
                 {"velmaxs",
                  "Set maximum velocity for axes",
                  [this](const nos::argv &argv, nos::ostream &) {
+                     ralgo::infof("size:: {}", argv.size());
                      auto fmap = args_to_index_value_map(argv.without(1));
                      for (auto &[key, val] : fmap)
+                     {
+                         assert(val != 0);
+                         ralgo::infof("key:val:: {}:{}", key, val);
                          max_axes_velocities[key] = val;
+                     }
                      return 0;
                  }},
                 {"accmaxs",
