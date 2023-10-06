@@ -371,12 +371,14 @@ void cnc::planner::clear()
     active = blocks->head_index();
     need_to_reevaluate = true;
     state = 0;
+    waited = 0;
     change_active_block();
 }
 
 void cnc::planner::clear_queue()
 {
     blocks->set_last_index(active);
+    clear();
 }
 
 void cnc::planner::alarm_stop()

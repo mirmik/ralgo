@@ -292,7 +292,8 @@ namespace cnc
                         minmul = lmul;
                 }
 
-            assert(minmul != std::numeric_limits<double>::max());
+            if (minmul == std::numeric_limits<double>::max())
+                return 1000;
             return minmul;
         }
 
@@ -514,7 +515,8 @@ namespace cnc
 
         void smooth_stop()
         {
-            ralgo::info("smooth_stop");
+            ralgo::info("SMOOTH_STOP");
+
             system_lock();
             if (stop_procedure_started)
             {
@@ -554,13 +556,12 @@ namespace cnc
             for (int i = 0; i < total_axes; ++i)
                 _final_position[i] += lastblock.axdist[i];
 
-            ralgo::info("clear queue and start stop block");
             shifts->clear();
             planner->clear_queue();
             planner->force_skip_all_blocks();
             planner->set_current_velocity(curvels);
             auto &placeblock = blocks->head_place();
-            lastblock.blockno = blockno++;
+            lastblock.blockno = 0;
             placeblock = lastblock;
             blocks->move_head_one();
             stop_procedure_started = true;
