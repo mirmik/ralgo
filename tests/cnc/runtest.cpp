@@ -280,7 +280,7 @@ TEST_CASE("cnc.runtest move and stop")
     CHECK_EQ(responce_1, "");
 
     auto last_block = interpreter.last_block();
-    CHECK_EQ(last_block.blockno, 1);
+    CHECK_EQ(last_block.blockno, 0);
     CHECK(fabs(last_block.axdist[0] - 5000) < 1e-5);
     CHECK_EQ(last_block.direction()[0], 1);
     CHECK_EQ(last_block.direction()[1], 0);
@@ -537,7 +537,7 @@ TEST_CASE("cnc.runtest move and stop and move")
     CHECK_EQ(responce_1, "");
 
     auto last_block = interpreter.last_block();
-    CHECK_EQ(last_block.blockno, 1);
+    CHECK_EQ(last_block.blockno, 0);
     CHECK(fabs(last_block.axdist[0] - 5000) < 1e-5);
     CHECK_EQ(last_block.direction()[0], 1);
     CHECK_EQ(last_block.direction()[1], 0);
