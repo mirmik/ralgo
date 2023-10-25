@@ -269,7 +269,7 @@ namespace cnc
         /// Расщитывает ускорение или скорость для блока на основании
         /// запрошенных скоростей или ускорений для отдельных осей и
         /// скоростей или ускорений для точки в евклидовом пространстве.
-        double
+        static double
         evaluate_external_accfeed(const ralgo::vector<double> &direction,
                                   double absolute_maximum,
                                   const igris::static_vector<double, NMAX_AXES>
