@@ -269,28 +269,12 @@ namespace cnc
         /// Расщитывает ускорение или скорость для блока на основании
         /// запрошенных скоростей или ускорений для отдельных осей и
         /// скоростей или ускорений для точки в евклидовом пространстве.
-        static double
-        evaluate_external_accfeed(const ralgo::vector<double> &direction,
-                                  double absolute_maximum,
-                                  const igris::static_vector<double, NMAX_AXES>
-                                      &element_maximums) const
+        static double evaluate_external_accfeed(
+            const ralgo::vector<double> &direction,
+            double absolute_maximum,
+            const igris::static_vector<double, NMAX_AXES> &element_maximums)
         {
-            // if (absolute_maximum == 0)
-            // {
-            //     auto bounded =
-            //     ralgo::vecops::ray_to_box<ralgo::vector<double>>(
-            //         direction, element_maximums);
-            //     return ralgo::vecops::norm(bounded);
-            // }
-            // else
-            // {
-            //     auto vec = ralgo::vecops::mul_vs(direction,
-            //     absolute_maximum); auto bounded =
-            //     ralgo::vecops::ray_to_box<ralgo::vector<double>>(
-            //         vec, element_maximums);
-            //     return absolute_maximum / ralgo::vecops::norm(bounded);
-            // }
-
+            int total_axes = (int)direction.size();
             double minmul = std::numeric_limits<double>::max();
 
             if (absolute_maximum == 0 &&
@@ -311,6 +295,26 @@ namespace cnc
             if (minmul == std::numeric_limits<double>::max())
                 return 1000;
             return minmul;
+        }
+
+        static double evaluate_external_accfeed_2(
+            const ralgo::vector<double> &direction,
+            double absolute_maximum,
+            const igris::static_vector<double, NMAX_AXES> &element_maximums)
+        {
+            if (absolute_maximum == 0)
+            {
+                auto bounded = ralgo::vecops::ray_to_box<ralgo::vector<double>>(
+                    direction, element_maximums);
+                return ralgo::vecops::norm(bounded);
+            }
+            else
+            {
+                auto vec = ralgo::vecops::mul_vs(direction, absolute_maximum);
+                auto bounded = ralgo::vecops::ray_to_box<ralgo::vector<double>>(
+                    vec, element_maximums);
+                return absolute_maximum / ralgo::vecops::norm(bounded);
+            }
         }
 
         bool evaluate_interpreter_task(const control_task &task,
