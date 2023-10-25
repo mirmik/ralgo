@@ -17,7 +17,11 @@ namespace ralgo
         using value_type = typename Parent::value_type;
 
         vector() = default;
-        explicit vector(size_t n) : vec(n) {}
+        explicit vector(size_t n, T init = T()) : vec(n)
+        {
+            for (size_t i = 0; i < n; ++i)
+                vec[i] = init;
+        }
         vector(T *ptr, size_t n) : vec(ptr, ptr + n) {}
         vector(const std::initializer_list<T> &list) : vec(list) {}
         vector(const vector &oth) = default;

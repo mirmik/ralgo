@@ -275,10 +275,26 @@ namespace cnc
                                   const igris::static_vector<double, NMAX_AXES>
                                       &element_maximums) const
         {
-            double minmul = std::numeric_limits<double>::max();
-            auto vecnorm = ralgo::vecops::norm(element_maximums);
+            // if (absolute_maximum == 0)
+            // {
+            //     auto bounded =
+            //     ralgo::vecops::ray_to_box<ralgo::vector<double>>(
+            //         direction, element_maximums);
+            //     return ralgo::vecops::norm(bounded);
+            // }
+            // else
+            // {
+            //     auto vec = ralgo::vecops::mul_vs(direction,
+            //     absolute_maximum); auto bounded =
+            //     ralgo::vecops::ray_to_box<ralgo::vector<double>>(
+            //         vec, element_maximums);
+            //     return absolute_maximum / ralgo::vecops::norm(bounded);
+            // }
 
-            if (absolute_maximum == 0 && vecnorm == 0)
+            double minmul = std::numeric_limits<double>::max();
+
+            if (absolute_maximum == 0 &&
+                ralgo::vecops::norm(element_maximums) == 0)
                 return 0;
 
             if (absolute_maximum != 0)
@@ -338,26 +354,10 @@ namespace cnc
             double feed = evalfeed * dirgain;
             double acc = evalacc * dirgain;
 
-            assert(feed != 0);
-            assert(!isnan(feed));
-            assert(!isinf(feed));
-
-            assert(acc != 0);
-            assert(!isnan(acc));
-            assert(!isinf(acc));
-
             // scale feed and acc by revolver freqs settings.
             double reduced_feed = feed / revolver_frequency;
             double reduced_acc =
                 acc / (revolver_frequency * revolver_frequency);
-
-            assert(reduced_feed != 0);
-            assert(!isnan(reduced_feed));
-            assert(!isinf(reduced_feed));
-
-            assert(reduced_acc != 0);
-            assert(!isnan(reduced_acc));
-            assert(!isinf(reduced_acc));
 
             if (feedback_guard)
                 for (auto idx : task.active_axes)

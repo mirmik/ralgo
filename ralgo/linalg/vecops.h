@@ -324,6 +324,7 @@ namespace ralgo
         {
             return elementwise<R>(ralgo::op_mul(), a, b);
         }
+
         template <class R = void, class A, class B>
         defsame_t<R, A> div_vs(const A &a, B b)
         {
@@ -412,6 +413,39 @@ namespace ralgo
             }
 
             return ret;
+        }
+
+        template <class R = void, class Direction, class Box>
+        defsame_t<R, Direction> ray_to_box(const Direction &u, Box &&box)
+        {
+            double result = std::numeric_limits<double>::max();
+            size_t sz = std::min(u.size(), box.size());
+            for (size_t i = 0; i < sz; ++i)
+            {
+                auto proj = std::abs(u[i]);
+                auto bound = box[i];
+                if (bound == 0)
+                {
+                    if (proj == 0)
+                        continue;
+                    else
+                        return defsame_t<R, Direction>(u.size(), 0);
+                }
+                auto quotient = bound / proj;
+                if (quotient < result)
+                    result = quotient;
+            }
+            return vecops::mul_vs(u, result);
+        }
+
+        template <class R = void, class Vector, class Box>
+        defsame_t<R, Vector> bound_to_box(const Vector &u, Box &&box)
+        {
+            double norm_of_d = ralgo::vecops::norm(u);
+            auto d = ralgo::vecops::div_vs(u, norm_of_d);
+            auto r = ray_to_box(d, box);
+            auto norm_of_r = ralgo::vecops::norm(r);
+            return norm_of_r < norm_of_d ? r : u;
         }
 
         namespace inplace
