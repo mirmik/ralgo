@@ -90,7 +90,7 @@ namespace cnc
             double maximum_acceleration = _smooth_stop_acceleration != 0
                                               ? _smooth_stop_acceleration
                                               : saved_acc;
-            return evaluate_external_accfeed(
+            return evaluate_external_accfeed_2(
                 direction, maximum_acceleration, max_axes_accelerations);
         }
 
@@ -302,6 +302,11 @@ namespace cnc
             double absolute_maximum,
             const igris::static_vector<double, NMAX_AXES> &element_maximums)
         {
+            if (ralgo::vecops::norm(element_maximums) == 0)
+            {
+                return absolute_maximum;
+            }
+
             if (absolute_maximum == 0)
             {
                 auto bounded = ralgo::vecops::ray_to_box<ralgo::vector<double>>(
@@ -311,9 +316,10 @@ namespace cnc
             else
             {
                 auto vec = ralgo::vecops::mul_vs(direction, absolute_maximum);
-                auto bounded = ralgo::vecops::ray_to_box<ralgo::vector<double>>(
-                    vec, element_maximums);
-                return absolute_maximum / ralgo::vecops::norm(bounded);
+                auto bounded =
+                    ralgo::vecops::bound_to_box<ralgo::vector<double>>(
+                        vec, element_maximums);
+                return ralgo::vecops::norm(bounded);
             }
         }
 
@@ -338,9 +344,9 @@ namespace cnc
             auto dirgain =
                 ralgo::vecops::norm(ralgo::vecops::mul_vv(direction, gains));
 
-            auto evalfeed = evaluate_external_accfeed(
+            auto evalfeed = evaluate_external_accfeed_2(
                 direction, task.feed, max_axes_velocities);
-            auto evalacc = evaluate_external_accfeed(
+            auto evalacc = evaluate_external_accfeed_2(
                 direction, task.acc, max_axes_accelerations);
 
             if (evalacc == 0)
@@ -531,6 +537,13 @@ namespace cnc
 
             auto curvels = planner->current_velocity();
             auto cursteps = revolver->current_steps_no_lock();
+
+            if (ralgo::vecops::norm(curvels) < 1e-5)
+            {
+                ralgo::info("prevented because not moving");
+                system_unlock();
+                return;
+            }
 
             auto direction =
                 ralgo::vecops::normalize<ralgo::vector<double>>(curvels);
