@@ -40,23 +40,25 @@ namespace cnc
 
     private:
         igris::ring<planner_block> *blocks = nullptr;
-        igris::ring<cnc::control_shift> *shifts = nullptr;
+        // igris::ring<cnc::control_shift> *shifts = nullptr;
         int total_axes = 0;
-        double revolver_frequency = 0;
+        cnc_float_type revolver_frequency = 0;
 
         // Мультипликатор на входе интерпретатора.
         // Применяется к позициям, скоростям и ускорениям во входном потоке
         // комманд. Есть подозрение, что механика gains переусложнена и его надо
         // заменить на единый множитель для всех осей.
-        igris::static_vector<double, NMAX_AXES> gains = {};
+        igris::static_vector<cnc_float_type, NMAX_AXES> gains = {};
 
-        igris::static_vector<double, NMAX_AXES> _final_position = {};
-        igris::static_vector<double, NMAX_AXES> max_axes_velocities = {};
-        igris::static_vector<double, NMAX_AXES> max_axes_accelerations = {};
+        igris::static_vector<cnc_float_type, NMAX_AXES> _final_position = {};
+        igris::static_vector<cnc_float_type, NMAX_AXES> max_axes_velocities =
+            {};
+        igris::static_vector<cnc_float_type, NMAX_AXES> max_axes_accelerations =
+            {};
         int blockno = 0;
-        double saved_acc = 0;
-        double saved_feed = 0;
-        double _smooth_stop_acceleration = 0;
+        cnc_float_type saved_acc = 0;
+        cnc_float_type saved_feed = 0;
+        cnc_float_type _smooth_stop_acceleration = 0;
         igris::delegate<void> _external_final_shift_handle = {};
         planner_block lastblock = {};
         bool with_cleanup = true;
@@ -66,10 +68,9 @@ namespace cnc
         interpreter(igris::ring<planner_block> *blocks,
                     cnc::planner *planner,
                     cnc::revolver *revolver,
-                    cnc::feedback_guard *feedback_guard,
-                    igris::ring<cnc::control_shift> *shifts)
+                    cnc::feedback_guard *feedback_guard)
             : planner(planner), revolver(revolver),
-              feedback_guard(feedback_guard), blocks(blocks), shifts(shifts)
+              feedback_guard(feedback_guard), blocks(blocks)
         {
         }
 
@@ -84,17 +85,17 @@ namespace cnc
             lastblock = {};
         }
 
-        double
-        smooth_stop_acceleration(const ralgo::vector<double> &direction) const
+        cnc_float_type smooth_stop_acceleration(
+            const ralgo::vector<cnc_float_type> &direction) const
         {
-            double maximum_acceleration = _smooth_stop_acceleration != 0
-                                              ? _smooth_stop_acceleration
-                                              : saved_acc;
+            cnc_float_type maximum_acceleration =
+                _smooth_stop_acceleration != 0 ? _smooth_stop_acceleration
+                                               : saved_acc;
             return evaluate_external_accfeed_2(
                 direction, maximum_acceleration, max_axes_accelerations);
         }
 
-        const igris::static_vector<double, NMAX_AXES> &final_position()
+        const igris::static_vector<cnc_float_type, NMAX_AXES> &final_position()
         {
             return _final_position;
         }
@@ -187,8 +188,10 @@ namespace cnc
             return 0;
         }
 
-        control_task create_task_for_relative_move(
-            const std::vector<idxpos> poses, double feed, double acc)
+        control_task
+        create_task_for_relative_move(const std::vector<idxpos> poses,
+                                      cnc_float_type feed,
+                                      cnc_float_type acc)
         {
             control_task task(total_axes);
             task.feed = feed == 0 ? saved_feed : feed;
@@ -202,8 +205,10 @@ namespace cnc
             return task;
         }
 
-        control_task create_task_for_absolute_move(
-            const std::vector<idxpos> poses, double feed, double acc)
+        control_task
+        create_task_for_absolute_move(const std::vector<idxpos> poses,
+                                      cnc_float_type feed,
+                                      cnc_float_type acc)
         {
             control_task task(total_axes);
             task.feed = feed == 0 ? saved_feed : feed;
@@ -244,11 +249,12 @@ namespace cnc
         }*/
 
         /*control_task g1_parse_task(const nos::argv &argv,
-                                   const igris::array_view<double> &fposes)
+                                   const igris::array_view<cnc_float_type>
+        &fposes)
         {
             control_task task(total_axes);
-            task.set_poses(igris::array_view<double>((double *)fposes.data(),
-                                                     fposes.size()));
+            task.set_poses(igris::array_view<cnc_float_type>((cnc_float_type
+        *)fposes.data(), fposes.size()));
 
             task.feed = saved_feed;
             task.acc = saved_acc;
@@ -269,13 +275,14 @@ namespace cnc
         /// Расщитывает ускорение или скорость для блока на основании
         /// запрошенных скоростей или ускорений для отдельных осей и
         /// скоростей или ускорений для точки в евклидовом пространстве.
-        static double evaluate_external_accfeed(
-            const ralgo::vector<double> &direction,
-            double absolute_maximum,
-            const igris::static_vector<double, NMAX_AXES> &element_maximums)
+        static cnc_float_type evaluate_external_accfeed(
+            const ralgo::vector<cnc_float_type> &direction,
+            cnc_float_type absolute_maximum,
+            const igris::static_vector<cnc_float_type, NMAX_AXES>
+                &element_maximums)
         {
             int total_axes = (int)direction.size();
-            double minmul = std::numeric_limits<double>::max();
+            cnc_float_type minmul = std::numeric_limits<cnc_float_type>::max();
 
             if (absolute_maximum == 0 &&
                 ralgo::vecops::norm(element_maximums) == 0)
@@ -287,20 +294,22 @@ namespace cnc
             for (int i = 0; i < total_axes; i++)
                 if (element_maximums[i] != 0)
                 {
-                    double lmul = element_maximums[i] / fabs(direction[i]);
+                    cnc_float_type lmul =
+                        element_maximums[i] / fabs(direction[i]);
                     if (minmul > lmul)
                         minmul = lmul;
                 }
 
-            if (minmul == std::numeric_limits<double>::max())
+            if (minmul == std::numeric_limits<cnc_float_type>::max())
                 return 1000;
             return minmul;
         }
 
-        static double evaluate_external_accfeed_2(
-            const ralgo::vector<double> &direction,
-            double absolute_maximum,
-            const igris::static_vector<double, NMAX_AXES> &element_maximums)
+        static cnc_float_type evaluate_external_accfeed_2(
+            const ralgo::vector<cnc_float_type> &direction,
+            cnc_float_type absolute_maximum,
+            const igris::static_vector<cnc_float_type, NMAX_AXES>
+                &element_maximums)
         {
             if (ralgo::vecops::norm(element_maximums) == 0)
             {
@@ -309,15 +318,16 @@ namespace cnc
 
             if (absolute_maximum == 0)
             {
-                auto bounded = ralgo::vecops::ray_to_box<ralgo::vector<double>>(
-                    direction, element_maximums);
+                auto bounded =
+                    ralgo::vecops::ray_to_box<ralgo::vector<cnc_float_type>>(
+                        direction, element_maximums);
                 return ralgo::vecops::norm(bounded);
             }
             else
             {
                 auto vec = ralgo::vecops::mul_vs(direction, absolute_maximum);
                 auto bounded =
-                    ralgo::vecops::bound_to_box<ralgo::vector<double>>(
+                    ralgo::vecops::bound_to_box<ralgo::vector<cnc_float_type>>(
                         vec, element_maximums);
                 return ralgo::vecops::norm(bounded);
             }
@@ -330,16 +340,18 @@ namespace cnc
             saved_acc = task.acc;
             saved_feed = task.feed;
 
-            double tasknorm = ralgo::vecops::norm(task.poses());
+            cnc_float_type tasknorm = ralgo::vecops::norm(task.poses());
             if (tasknorm == 0)
                 return true;
 
             // Это записано для инкрементального режима:
-            auto intdists = ralgo::vecops::mul_vv<ralgo::vector<double>>(
-                task.poses(), gains);
+            auto intdists =
+                ralgo::vecops::mul_vv<ralgo::vector<cnc_float_type>>(
+                    task.poses(), gains);
 
             auto direction =
-                ralgo::vecops::normalize<ralgo::vector<double>>(task.poses());
+                ralgo::vecops::normalize<ralgo::vector<cnc_float_type>>(
+                    task.poses());
 
             auto dirgain =
                 ralgo::vecops::norm(ralgo::vecops::mul_vv(direction, gains));
@@ -361,12 +373,12 @@ namespace cnc
                 return true;
             }
 
-            double feed = evalfeed * dirgain;
-            double acc = evalacc * dirgain;
+            cnc_float_type feed = evalfeed * dirgain;
+            cnc_float_type acc = evalacc * dirgain;
 
             // scale feed and acc by revolver freqs settings.
-            double reduced_feed = feed / revolver_frequency;
-            double reduced_acc =
+            cnc_float_type reduced_feed = feed / revolver_frequency;
+            cnc_float_type reduced_acc =
                 acc / (revolver_frequency * revolver_frequency);
 
             if (feedback_guard)
@@ -380,15 +392,15 @@ namespace cnc
             return false;
         }
 
-        std::vector<double> final_gained_position()
+        std::vector<cnc_float_type> final_gained_position()
         {
-            std::vector<double> ret(total_axes);
+            std::vector<cnc_float_type> ret(total_axes);
             for (int i = 0; i < total_axes; ++i)
                 ret[i] = _final_position[i] / gains[i];
             return ret;
         }
 
-        void set_scale(const ralgo::vector_view<double> &vec)
+        void set_scale(const ralgo::vector_view<cnc_float_type> &vec)
         {
             if (vec.size() != static_cast<size_t>(total_axes))
             {
@@ -397,12 +409,12 @@ namespace cnc
             std::copy(vec.begin(), vec.end(), gains.begin());
         }
 
-        void set_saved_acc(double acc)
+        void set_saved_acc(cnc_float_type acc)
         {
             saved_acc = acc;
         }
 
-        void set_saved_feed(double feed)
+        void set_saved_feed(cnc_float_type feed)
         {
             saved_feed = feed;
         }
@@ -439,8 +451,8 @@ namespace cnc
             if (check_correctness(os))
                 return;
             auto poses = get_task_poses_from_argv(argv);
-            double feed = get_task_feed_from_argv(argv);
-            double acc = get_task_acc_from_argv(argv);
+            cnc_float_type feed = get_task_feed_from_argv(argv);
+            cnc_float_type acc = get_task_acc_from_argv(argv);
             auto task = create_task_for_relative_move(poses, feed, acc);
             if (!task.isok)
                 return;
@@ -457,8 +469,8 @@ namespace cnc
             if (check_correctness(os))
                 return;
             auto poses = get_task_poses_from_argv(argv);
-            double feed = get_task_feed_from_argv(argv);
-            double acc = get_task_acc_from_argv(argv);
+            cnc_float_type feed = get_task_feed_from_argv(argv);
+            cnc_float_type acc = get_task_acc_from_argv(argv);
             auto task = create_task_for_absolute_move(poses, feed, acc);
 
             if (!task.isok)
@@ -480,8 +492,8 @@ namespace cnc
                 return;
 
             auto poses = get_task_poses_from_argv(argv);
-            double feed = get_task_feed_from_argv(argv);
-            double acc = get_task_acc_from_argv(argv);
+            cnc_float_type feed = get_task_feed_from_argv(argv);
+            cnc_float_type acc = get_task_acc_from_argv(argv);
             (void)poses;
             (void)feed;
             (void)acc;
@@ -535,7 +547,7 @@ namespace cnc
                 return;
             }
 
-            auto curvels = planner->current_velocity();
+            auto curvels = revolver->current_velocities();
             auto cursteps = revolver->current_steps_no_lock();
 
             if (ralgo::vecops::norm(curvels) < 1e-5)
@@ -546,7 +558,8 @@ namespace cnc
             }
 
             auto direction =
-                ralgo::vecops::normalize<ralgo::vector<double>>(curvels);
+                ralgo::vecops::normalize<ralgo::vector<cnc_float_type>>(
+                    curvels);
             auto external_acceleration = smooth_stop_acceleration(direction) /
                                          revolver_frequency /
                                          revolver_frequency;
@@ -573,10 +586,11 @@ namespace cnc
             for (int i = 0; i < total_axes; ++i)
                 _final_position[i] += lastblock.axdist[i];
 
-            shifts->clear();
-            planner->clear_queue();
+            // shifts->clear();
+            // revolver->clear();
+            planner->clear_for_stop();
             planner->force_skip_all_blocks();
-            planner->set_current_velocity(curvels);
+            // planner->set_current_velocity(curvels);
             auto &placeblock = blocks->head_place();
             lastblock.blockno = 0;
             placeblock = lastblock;
@@ -766,7 +780,7 @@ namespace cnc
                  "setgear",
                  [this](const nos::argv &argv, nos::ostream &) {
                      auto axno = symbol_to_index(argv[1][0]);
-                     double val = igris_atof64(argv[2].data(), NULL);
+                     cnc_float_type val = igris_atof64(argv[2].data(), NULL);
                      planner->set_gear(axno, val);
                      feedback_guard->set_control_to_drive_multiplier(axno, val);
                      return 0;
@@ -776,7 +790,7 @@ namespace cnc
                  "set_control_gear",
                  [this](const nos::argv &argv, nos::ostream &) {
                      auto axno = symbol_to_index(argv[1][0]);
-                     double val = igris_atof64(argv[2].data(), NULL);
+                     cnc_float_type val = igris_atof64(argv[2].data(), NULL);
                      planner->set_gear(axno, val);
                      feedback_guard->set_control_to_drive_multiplier(axno, val);
                      return 0;
@@ -786,7 +800,7 @@ namespace cnc
                  "set_feedback_gear",
                  [this](const nos::argv &argv, nos::ostream &) {
                      auto axno = symbol_to_index(argv[1][0]);
-                     double val = igris_atof64(argv[2].data(), NULL);
+                     cnc_float_type val = igris_atof64(argv[2].data(), NULL);
                      feedback_guard->set_feedback_to_drive_multiplier(axno,
                                                                       val);
                      return 0;
@@ -796,7 +810,7 @@ namespace cnc
                  "setpos",
                  [this](const nos::argv &argv, nos::ostream &) {
                      auto axno = symbol_to_index(argv[1][0]);
-                     double val = igris_atof64(argv[2].data(), NULL);
+                     cnc_float_type val = igris_atof64(argv[2].data(), NULL);
                      system_lock();
                      _final_position[axno] = val * planner->gears[axno];
                      revolver->get_steppers()[axno]->set_counter_value(val);
@@ -915,10 +929,10 @@ namespace cnc
             PRINTTO(os, revolver_frequency);
             PRINTTO(os, saved_acc);
             PRINTTO(os, saved_feed);
-            PRINTTO(os, shifts->head_index());
-            PRINTTO(os, shifts->tail_index());
+            // PRINTTO(os, shifts->head_index());
+            // PRINTTO(os, shifts->tail_index());
             nos::print_to(os, "vel: ");
-            nos::print_list_to(os, planner->velocities);
+            nos::print_list_to(os, revolver->current_velocities());
             nos::println_to(os);
             nos::print_to(os, "acc:");
             nos::print_list_to(os, planner->accelerations);
@@ -959,7 +973,7 @@ namespace cnc
             return newline(line.data(), line.size());
         }
 
-        void set_revolver_frequency(double freq)
+        void set_revolver_frequency(cnc_float_type freq)
         {
             revolver_frequency = freq;
         }

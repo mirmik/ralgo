@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <igris/container/flat_map.h>
 #include <nos/shell/argv.h>
+#include <ralgo/cnc/defs.h>
 #include <string.h>
 
 namespace cnc
@@ -61,6 +62,7 @@ namespace cnc
     }
 }
 
-igris::flat_map<int, double> args_to_index_value_map(const nos::argv &args);
+igris::flat_map<int, cnc_float_type>
+args_to_index_value_map(const nos::argv &args);
 
 #endif

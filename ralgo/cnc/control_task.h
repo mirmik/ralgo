@@ -14,16 +14,16 @@ namespace cnc
     struct idxpos
     {
         int idx;
-        double pos;
+        cnc_float_type pos;
     };
 
     class control_task
     {
     public:
         bool isok = false;
-        igris::static_vector<double, NMAX_AXES> _poses = {};
-        double feed = 0;
-        double acc = 0;
+        igris::static_vector<cnc_float_type, NMAX_AXES> _poses = {};
+        cnc_float_type feed = 0;
+        cnc_float_type acc = 0;
         std::vector<size_t> active_axes;
 
         control_task(size_t total_axes)
@@ -62,17 +62,17 @@ namespace cnc
             return *this;
         }
 
-        igris::static_vector<double, NMAX_AXES> &poses()
+        igris::static_vector<cnc_float_type, NMAX_AXES> &poses()
         {
             return _poses;
         }
 
-        const igris::static_vector<double, NMAX_AXES> &poses() const
+        const igris::static_vector<cnc_float_type, NMAX_AXES> &poses() const
         {
             return _poses;
         }
 
-        void set_poses(const igris::array_view<double> &arr)
+        void set_poses(const igris::array_view<cnc_float_type> &arr)
         {
             std::copy(arr.begin(), arr.end(), _poses.begin());
         }
@@ -82,7 +82,7 @@ namespace cnc
             for (unsigned int i = 0; i < argv.size(); ++i)
             {
                 char symb = argv[i].data()[0];
-                double val = atof(&argv[i].data()[1]);
+                cnc_float_type val = atof(&argv[i].data()[1]);
 
                 switch (tolower(symb))
                 {
@@ -158,35 +158,35 @@ namespace cnc
             int idx = symbol_to_index(symb);
             if (idx >= 0)
             {
-                double val = igris_atof64(&argv[i].data()[1], nullptr);
+                cnc_float_type val = igris_atof64(&argv[i].data()[1], nullptr);
                 ret.push_back({idx, val});
             }
         }
         return ret;
     }
 
-    static inline double get_task_feed_from_argv(const nos::argv &argv)
+    static inline cnc_float_type get_task_feed_from_argv(const nos::argv &argv)
     {
         for (unsigned int i = 0; i < argv.size(); ++i)
         {
             char symb = tolower(argv[i].data()[0]);
             if (symb == 'f')
             {
-                double val = igris_atof64(&argv[i].data()[1], nullptr);
+                cnc_float_type val = igris_atof64(&argv[i].data()[1], nullptr);
                 return val;
             }
         }
         return 0;
     }
 
-    static inline double get_task_acc_from_argv(const nos::argv &argv)
+    static inline cnc_float_type get_task_acc_from_argv(const nos::argv &argv)
     {
         for (unsigned int i = 0; i < argv.size(); ++i)
         {
             char symb = tolower(argv[i].data()[0]);
             if (symb == 'm')
             {
-                double val = igris_atof64(&argv[i].data()[1], nullptr);
+                cnc_float_type val = igris_atof64(&argv[i].data()[1], nullptr);
                 return val;
             }
         }

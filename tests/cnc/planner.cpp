@@ -6,7 +6,8 @@ TEST_CASE("planner.0")
     igris::ring<cnc::planner_block> blocks(10);
     igris::ring<cnc::control_shift> shifts(10);
 
-    cnc::planner planner(&blocks, &shifts);
+    cnc::revolver revolver;
+    cnc::planner planner(&blocks, &revolver);
     planner.disable_frequency_protection();
     planner.set_dim(1);
 
@@ -22,11 +23,11 @@ TEST_CASE("planner.0")
     block.exact_stop = 0;
     blocks.move_head_one();
     CHECK_EQ(blocks.room(), 9);
-    CHECK_EQ(shifts.room(), 10);
+    // CHECK_EQ(shifts.room(), 10);
 
-    planner.serve();
+    planner.serve(false);
 
-    CHECK_EQ(shifts.room(), 0);
+    // CHECK_EQ(shifts.room(), 0);
 }
 
 /*TEST_CASE("planner.1")

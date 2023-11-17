@@ -21,11 +21,10 @@
 
 igris::ring<cnc::planner_block> blocks{40};
 igris::ring<cnc::control_shift> shifts{400};
-cnc::planner planner(&blocks, &shifts);
-cnc::revolver revolver(&shifts);
+cnc::revolver revolver;
+cnc::planner planner(&blocks, &revolver);
 cnc::feedback_guard feedback_guard(&planner);
-cnc::interpreter
-    interpreter(&blocks, &planner, &revolver, &feedback_guard, &shifts);
+cnc::interpreter interpreter(&blocks, &planner, &revolver, &feedback_guard);
 robo::stepper steppers[3];
 robo::stepper *steppers_ptrs[] = {&steppers[0], &steppers[1], &steppers[2]};
 std::mutex mtx;
@@ -98,7 +97,7 @@ void telemetry_thread_function()
 
 namespace heimer
 {
-    double fast_cycle_frequence()
+    cnc_float_type fast_cycle_frequence()
     {
         return 5000;
     }
@@ -165,7 +164,7 @@ int main(int argc, char **argv)
     }
 
     interpreter.init_axes(3);
-    interpreter.set_scale(ralgo::vector<double>{1, 1, 1});
+    interpreter.set_scale(ralgo::vector<cnc_float_type>{1, 1, 1});
     planner.set_gears({100, 100, 100});
     interpreter.set_revolver_frequency(heimer::fast_cycle_frequence());
     revolver.set_steppers(steppers_ptrs, 3);

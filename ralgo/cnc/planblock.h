@@ -7,6 +7,7 @@
 #include <nos/log.h>
 #include <nos/print.h>
 #include <ralgo/cnc/defs.h>
+#include <ralgo/cnc/util.h>
 #include <ralgo/linalg/vecops.h>
 #include <ralgo/linalg/vector_view.h>
 #include <stdint.h>
@@ -25,15 +26,15 @@ namespace cnc
     class planner_block
     {
     public:
-        std::array<double, NMAX_AXES> axdist = {};
-        double nominal_velocity = 0;
-        double start_velocity = 0;
-        double final_velocity = 0;
-        double acceleration = 0;
-        double fullpath = 0;
+        std::array<cnc_float_type, NMAX_AXES> axdist = {};
+        cnc_float_type nominal_velocity = 0;
+        cnc_float_type start_velocity = 0;
+        cnc_float_type final_velocity = 0;
+        cnc_float_type acceleration = 0;
+        cnc_float_type fullpath = 0;
 
     private:
-        std::array<double, NMAX_AXES> _direction = {};
+        std::array<cnc_float_type, NMAX_AXES> _direction = {};
 
     public:
         // отметки времени хранят инкрементное время до планирования и
@@ -48,7 +49,8 @@ namespace cnc
             0; // < момент времени до которого идёт плоский учисток
         int64_t block_finish_ic =
             0; // < момент времени, когда блок будет завершён
-        int64_t active_finish_ic = 0; // < когда блок перестанет быть активным
+        // int64_t active_finish_ic = 0; // < когда блок перестанет быть
+        // активным
 
         int blockno = 0;
         uint8_t exact_stop = 0;
@@ -63,7 +65,7 @@ namespace cnc
             nos::println_to(
                 os, "deceleration_after_ic: ", deceleration_after_ic);
             nos::println_to(os, "block_finish_ic: ", block_finish_ic);
-            nos::println_to(os, "active_finish_ic: ", active_finish_ic);
+            // nos::println_to(os, "active_finish_ic: ", active_finish_ic);
             nos::println_to(os, "nominal_velocity: ", nominal_velocity);
             nos::println_to(os, "start_velocity: ", start_velocity);
             nos::println_to(os, "final_velocity: ", final_velocity);
@@ -73,23 +75,15 @@ namespace cnc
             nos::println_to(os, "direction: ", _direction);
         }
 
-        const std::array<double, NMAX_AXES> &direction()
+        const std::array<cnc_float_type, NMAX_AXES> &direction()
         {
             return _direction;
         }
 
-        void set_direction(const std::initializer_list<double> &dir)
+        void set_direction(const std::initializer_list<cnc_float_type> &dir)
         {
             std::copy(dir.begin(), dir.end(), _direction.begin());
         }
-
-        /*void immedeate_smooth_stop(int64_t iteration_counter)
-        {
-            int64_t shift = deceleration_after_ic - iteration_counter;
-            deceleration_after_ic = deceleration_after_ic - shift;
-            block_finish_ic = block_finish_ic - shift;
-            active_finish_ic = active_finish_ic - shift;
-        }*/
 
         planner_block() {}
         planner_block(const planner_block &) = default;
@@ -110,39 +104,39 @@ namespace cnc
             return deceleration_after_ic - acceleration_before_ic;
         }
 
-        double A_velocity()
+        cnc_float_type A_velocity()
         {
             return start_velocity;
         }
 
-        double B_velocity()
+        cnc_float_type B_velocity()
         {
             return nominal_velocity;
         }
 
-        double C_velocity()
+        cnc_float_type C_velocity()
         {
             return nominal_velocity;
         }
 
-        double D_velocity()
+        cnc_float_type D_velocity()
         {
             return nominal_velocity - acceleration * deceleration_time();
         }
 
-        double AB_distance()
+        cnc_float_type AB_distance()
         {
             return 0.5 * (start_velocity + nominal_velocity) *
                    acceleration_time();
         }
 
-        double CD_distance()
+        cnc_float_type CD_distance()
         {
             return 0.5 * (nominal_velocity + final_velocity) *
                    deceleration_time();
         }
 
-        double BC_distance()
+        cnc_float_type BC_distance()
         {
             return B_velocity() * flat_time();
         }
@@ -192,28 +186,44 @@ namespace cnc
             acceleration_before_ic += iteration_counter;
             deceleration_after_ic += iteration_counter;
             block_finish_ic += iteration_counter;
-            active_finish_ic += iteration_counter;
+            // active_finish_ic += iteration_counter;
         }
 
         bool is_active(int64_t interrupt_counter)
         {
             if (exact_stop)
-                return interrupt_counter < block_finish_ic;
+                return interrupt_counter < block_finish_ic &&
+                       interrupt_counter >= acceleration_before_ic;
             else
-                return interrupt_counter < active_finish_ic;
+                return interrupt_counter < deceleration_after_ic &&
+                       interrupt_counter >= acceleration_before_ic;
         }
 
         bool is_active_or_postactive(int64_t interrupt_counter)
         {
-            return interrupt_counter < block_finish_ic;
+            return interrupt_counter < block_finish_ic &&
+                   interrupt_counter >= acceleration_before_ic;
         }
 
         bool is_accel(int64_t interrupt_counter)
         {
-            return interrupt_counter < acceleration_before_ic;
+            return interrupt_counter < acceleration_before_ic &&
+                   interrupt_counter >= start_ic;
         }
 
-        double current_acceleration(int64_t interrupt_counter)
+        bool is_flat(int64_t interrupt_counter)
+        {
+            return interrupt_counter <= deceleration_after_ic &&
+                   interrupt_counter >= acceleration_before_ic;
+        }
+
+        bool is_decel(int64_t interrupt_counter)
+        {
+            return interrupt_counter <= block_finish_ic &&
+                   interrupt_counter > deceleration_after_ic;
+        }
+
+        cnc_float_type current_acceleration(int64_t interrupt_counter)
         {
             // Вычисление ускорения для трапециидального паттерна.
             if (interrupt_counter < acceleration_before_ic)
@@ -225,9 +235,10 @@ namespace cnc
             return 0;
         }
 
-        void assign_accelerations(double *accs, int len, int64_t itercounter)
+        void
+        assign_accelerations(cnc_float_type *accs, int len, int64_t itercounter)
         {
-            double acceleration = current_acceleration(itercounter);
+            cnc_float_type acceleration = current_acceleration(itercounter);
 
             if (acceleration == 0)
             {
@@ -242,9 +253,10 @@ namespace cnc
             }
         }
 
-        void append_accelerations(double *accs, int len, int64_t itercounter)
+        void
+        append_accelerations(cnc_float_type *accs, int len, int64_t itercounter)
         {
-            double acceleration = current_acceleration(itercounter);
+            cnc_float_type acceleration = current_acceleration(itercounter);
 
             if (acceleration == 0)
                 return;
@@ -255,16 +267,16 @@ namespace cnc
             }
         }
 
-        void set_state(const ralgo::vector_view<double> &axdist,
+        void set_state(const ralgo::vector_view<cnc_float_type> &axdist,
                        int axes,
-                       double velocity,
-                       double acceleration)
+                       cnc_float_type velocity,
+                       cnc_float_type acceleration)
         {
             start_velocity = 0;
             final_velocity = 0;
 
             auto direction =
-                ralgo::vecops::normalize<ralgo::vector<double>>(axdist);
+                ralgo::vecops::normalize<ralgo::vector<cnc_float_type>>(axdist);
 
             for (int i = 0; i < axes; ++i)
             {
@@ -272,11 +284,11 @@ namespace cnc
                 this->axdist[i] = axdist[i];
             }
 
-            double pathsqr = 0;
+            cnc_float_type pathsqr = 0;
             for (int i = 0; i < axes; ++i)
                 pathsqr += axdist[i] * axdist[i];
-            double path = sqrt(pathsqr); // area
-            double time = path / velocity;
+            cnc_float_type path = sqrt(pathsqr); // area
+            cnc_float_type time = path / velocity;
 
             // Поскольку время дискретно, движение должно быть завершено
             // в момент времени, соответствующий целому числу.
@@ -286,7 +298,7 @@ namespace cnc
             int preftime = ceil(velocity / acceleration);
 
             // Для трапециидального паттерна.
-            this->active_finish_ic = itime;
+            // this->active_finish_ic = itime;
             this->fullpath = path;
             this->start_ic = 0;
 
@@ -295,6 +307,7 @@ namespace cnc
                 // trapecidal pattern
                 this->acceleration_before_ic = preftime;
                 this->deceleration_after_ic = itime;
+                // this->active_finish_ic = itime;
                 this->block_finish_ic = itime + preftime;
                 this->nominal_velocity = path / itime;
                 this->acceleration = this->nominal_velocity / preftime;
@@ -303,12 +316,13 @@ namespace cnc
             else
             {
                 // triangle pattern
-                double maxspeed = sqrt(path * acceleration);
-                double halftime = path / maxspeed;
+                cnc_float_type maxspeed = sqrt(path * acceleration);
+                cnc_float_type halftime = path / maxspeed;
                 int itime2 = ceil(halftime);
 
                 this->acceleration_before_ic = itime2;
                 this->deceleration_after_ic = itime2;
+                // this->active_finish_ic = itime2;
                 this->block_finish_ic = itime2 * 2;
                 this->nominal_velocity = path / itime2;
                 this->acceleration = this->nominal_velocity / itime2;
@@ -317,14 +331,15 @@ namespace cnc
             assert(validation());
         }
 
-        bool set_stop_pattern(int axes,
-                              double velocity,
-                              double acceleration,
-                              const ralgo::vector_view<double> &_direction)
+        bool
+        set_stop_pattern(int axes,
+                         cnc_float_type velocity,
+                         cnc_float_type acceleration,
+                         const ralgo::vector_view<cnc_float_type> &_direction)
         {
             start_velocity = velocity;
             final_velocity = 0;
-            double path = velocity * velocity / (2 * acceleration);
+            cnc_float_type path = velocity * velocity / (2 * acceleration);
 
             for (int i = 0; i < axes; ++i)
             {

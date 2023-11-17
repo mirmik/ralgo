@@ -8,6 +8,7 @@ namespace robo
 {
     class quadgen : public robo::stepper
     {
+    public:
         uint8_t _curcode = 0;
 
     public:
@@ -29,7 +30,7 @@ namespace robo
                 _curcode = 0b10;
                 break;
             }
-            apply_state(_curcode);
+            apply_code(_curcode);
         }
 
         void dec() override
@@ -50,13 +51,13 @@ namespace robo
                 _curcode = 0b01;
                 break;
             }
-            apply_state(_curcode);
+            apply_code(_curcode);
         }
 
         void set_state(uint8_t state)
         {
             _curcode = igris::graycode(state);
-            apply_state(_curcode);
+            apply_code(_curcode);
         }
 
         uint8_t current_encoder_code()
@@ -66,11 +67,11 @@ namespace robo
 
         void no_action() override
         {
-            apply_state(_curcode);
+            apply_code(_curcode);
         }
 
-    protected:
-        void apply_state(uint8_t current_code)
+    public:
+        void apply_code(uint8_t current_code)
         {
             bool a = (current_code & 0b01);
             bool b = (current_code & 0b10);

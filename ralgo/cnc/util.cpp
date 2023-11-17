@@ -2,9 +2,10 @@
 #include <ralgo/cnc/util.h>
 #include <ralgo/log.h>
 
-igris::flat_map<int, double> args_to_index_value_map(const nos::argv &args)
+igris::flat_map<int, cnc_float_type>
+args_to_index_value_map(const nos::argv &args)
 {
-    igris::flat_map<int, double> ret;
+    igris::flat_map<int, cnc_float_type> ret;
     int cursor = 0;
     for (unsigned int i = 0; i < args.size(); ++i)
     {

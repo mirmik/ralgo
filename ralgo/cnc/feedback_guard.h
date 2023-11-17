@@ -18,7 +18,7 @@ namespace cnc
     {
         std::vector<size_t> _nums;
         std::vector<int64_t> _multipliers;
-        double _maximum_tandem_mistake;
+        cnc_float_type _maximum_tandem_mistake;
 
     public:
         bool in_operation = false;
@@ -26,13 +26,13 @@ namespace cnc
     public:
         feedback_guard_tandem(std::vector<size_t> nums,
                               std::vector<int64_t> muls,
-                              double mistake)
+                              cnc_float_type mistake)
             : _nums(nums), _multipliers(muls), _maximum_tandem_mistake(mistake)
         {
             assert(_nums.size() == _multipliers.size());
         }
 
-        double maximum_tandem_mistake() const
+        cnc_float_type maximum_tandem_mistake() const
         {
             return _maximum_tandem_mistake;
         }
@@ -67,19 +67,19 @@ namespace cnc
 
         std::vector<feedback_guard_tandem> _tandems = {};
 
-        std::array<double, NMAX_AXES> feedback_to_drive = {};
-        std::array<double, NMAX_AXES> control_to_drive =
+        std::array<cnc_float_type, NMAX_AXES> feedback_to_drive = {};
+        std::array<cnc_float_type, NMAX_AXES> control_to_drive =
             {}; //< этот массив равен gears
 
         // максимальное значение drop_pulses, после которого вызывается
         // planner->alarm_stop()
-        std::array<double, NMAX_AXES> maximum_drop_pulses = {};
+        std::array<cnc_float_type, NMAX_AXES> maximum_drop_pulses = {};
         cnc::planner *planner = nullptr;
 
     public:
         feedback_guard(cnc::planner *planner) : planner(planner)
         {
-            double default_max_drop = 6000000;
+            cnc_float_type default_max_drop = 6000000;
             for (size_t i = 0; i < NMAX_AXES; ++i)
             {
                 maximum_drop_pulses[i] = default_max_drop;
@@ -112,27 +112,27 @@ namespace cnc
             _set_feedback_position_by_axis_callback = dlg;
         }
 
-        void set_feedback_to_drive_multiplier(igris::span<double> mult)
+        void set_feedback_to_drive_multiplier(igris::span<cnc_float_type> mult)
         {
             std::copy(mult.begin(), mult.end(), feedback_to_drive.begin());
         }
 
-        void set_control_to_drive_multiplier(igris::span<double> mult)
+        void set_control_to_drive_multiplier(igris::span<cnc_float_type> mult)
         {
             std::copy(mult.begin(), mult.end(), control_to_drive.begin());
         }
 
-        void set_feedback_to_drive_multiplier(int axno, double mult)
+        void set_feedback_to_drive_multiplier(int axno, cnc_float_type mult)
         {
             feedback_to_drive[axno] = mult;
         }
 
-        void set_control_to_drive_multiplier(int axno, double mult)
+        void set_control_to_drive_multiplier(int axno, cnc_float_type mult)
         {
             control_to_drive[axno] = mult;
         }
 
-        void set_maximum_drop_pulses(igris::span<double> max_drop)
+        void set_maximum_drop_pulses(igris::span<cnc_float_type> max_drop)
         {
             std::copy(
                 max_drop.begin(), max_drop.end(), maximum_drop_pulses.begin());
@@ -261,7 +261,7 @@ namespace cnc
                 auto reference_mul = tandem.muls()[0];
                 auto reference_pos = feedback_position[reference_index];
                 auto reference_to = feedback_to_drive[reference_index];
-                double reference_drive =
+                cnc_float_type reference_drive =
                     reference_pos * reference_mul * reference_to;
                 for (size_t i = 1; i < tandem.nums().size(); ++i)
                 {
@@ -270,8 +270,8 @@ namespace cnc
                     auto it_pos = feedback_position[it_index];
                     auto it_to = feedback_to_drive[it_index];
 
-                    double it_drive = it_pos * it_mul * it_to;
-                    double diff = it_drive - reference_drive;
+                    cnc_float_type it_drive = it_pos * it_mul * it_to;
+                    cnc_float_type diff = it_drive - reference_drive;
                     if (std::abs(diff) > tandem.maximum_tandem_mistake())
                     {
                         return false;
@@ -283,7 +283,7 @@ namespace cnc
 
         void add_tandem(const std::vector<size_t> &tandem,
                         const std::vector<int64_t> &muls,
-                        double max_mistake)
+                        cnc_float_type max_mistake)
         {
             _tandems.emplace_back(tandem, muls, max_mistake);
         }
@@ -307,7 +307,7 @@ namespace cnc
 
         void add_tandem_command(const nos::argv &argv, nos::ostream &os)
         {
-            double mistake = MAXIMUM_TANDEM_MISTAKE;
+            cnc_float_type mistake = MAXIMUM_TANDEM_MISTAKE;
             std::vector<size_t> nums;
             std::vector<int64_t> muls;
 
