@@ -47,13 +47,15 @@ namespace cnc
         int _total_axes = 0;
 
     public:
+        bool pause = false;
         bool info_mode = true;
         int64_t iteration_counter = 0;
-        igris::static_vector<cnc_float_type, NMAX_AXES> gears = {};
-        igris::static_vector<cnc_float_type, NMAX_AXES> gears_high_trigger = {};
+        // igris::static_vector<cnc_float_type, NMAX_AXES> gears = {};
+        // igris::static_vector<cnc_float_type, NMAX_AXES> gears_high_trigger =
+        // {};
         std::array<cnc_float_type, NMAX_AXES> accelerations = {};
         // std::array<cnc_float_type, NMAX_AXES> velocities = {};
-        std::array<cnc_float_type, NMAX_AXES> dda_counters = {};
+        // std::array<cnc_float_type, NMAX_AXES> dda_counters = {};
         int active = 0; // index of active block
         planner_block *active_block = nullptr;
         igris::ring<cnc::planner_block> *blocks = {};
@@ -98,7 +100,7 @@ namespace cnc
         std::pair<int, size_t> iteration();
         void set_axes_count(int total);
         void set_gears(const igris::array_view<cnc_float_type> &);
-        igris::array_view<cnc_float_type> get_gears();
+        std::array<cnc_float_type, NMAX_AXES> get_gears();
         size_t get_total_axes();
         size_t total_axes();
         void set_gear(int index, cnc_float_type val);
@@ -109,6 +111,8 @@ namespace cnc
 
         void alarm_stop();
         void clear_for_stop();
+
+        void set_pause_mode(bool en);
 
         bool is_not_halt();
         bool is_halt();

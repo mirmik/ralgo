@@ -2,13 +2,9 @@
 
 cnc::revolver::revolver() : revolver_task_ring(100)
 {
-    ralgo::vecops::fill(dda_counters, 0);
-    ralgo::vecops::fill(velocities, 0);
-}
-
-void cnc::revolver::cleanup()
-{
-    // shifts_ring->reset();
+    std::fill(dda_counters_fixed.begin(), dda_counters_fixed.end(), 0);
+    std::fill(velocities_fixed.begin(), velocities_fixed.end(), 0);
+    current_revolver_task = nullptr;
 }
 
 bool cnc::revolver::is_empty()
@@ -77,6 +73,16 @@ int cnc::revolver::room()
     return ret;
 }
 
+void cnc::revolver::cleanup()
+{
+    system_lock();
+    std::fill(dda_counters_fixed.begin(), dda_counters_fixed.end(), 0);
+    std::fill(velocities_fixed.begin(), velocities_fixed.end(), 0);
+    revolver_task_ring.clear();
+    current_revolver_task = nullptr;
+    system_unlock();
+}
+
 // void cnc::revolver::push(uint16_t step, uint16_t dir)
 // {
 //     // Добавление данных в очередь не требует блокировки,
@@ -94,7 +100,7 @@ void cnc::revolver::serve()
     if (current_revolver_task == nullptr && !revolver_task_ring.empty())
     {
         current_revolver_task = &revolver_task_ring.tail();
-        iteration_counter = current_revolver_task->step_start;
+        counter = current_revolver_task->counter;
 
         // nos::println("REVOLVER TASK START");
         // nos::println("step_start", current_revolver_task->step_start);
@@ -104,7 +110,9 @@ void cnc::revolver::serve()
     }
 
     if (current_revolver_task == nullptr)
+    {
         return;
+    }
 
     // if (iteration_counter >= 3)
     // {
@@ -119,20 +127,23 @@ void cnc::revolver::serve()
         // {
         //     nos::println(current_revolver_task->accelerations[i]);
         // }
-        dda_counters[i] +=
-            velocities[i] +                                //* delta +
-            current_revolver_task->accelerations[i] * 0.5; //* delta_sqr_div_2;
+        dda_counters_fixed[i] +=
+            velocities_fixed[i] + //* delta +
+            (current_revolver_task->accelerations_fixed[i] >>
+             1); //* delta_sqr_div_2;
 
         // nos::println("dda_counters[i]", dda_counters[i]);
 
         // check frequency correctness
         // int gears_per_counter = dda_counters[i] / gears[i];
-        // assert(gears_per_counter >= -1 && gears_per_counter <= 1);
+        int64_t double_gears = gears_fixed[i] + gears_fixed[i];
+        assert(dda_counters_fixed[i] >= -double_gears &&
+               dda_counters_fixed[i] <= double_gears);
 
         auto &stepper = *steppers[i];
-        if (dda_counters[i] > gears_high_trigger[i])
+        if (dda_counters_fixed[i] > gears_high_trigger_fixed[i])
         {
-            dda_counters[i] -= gears[i];
+            dda_counters_fixed[i] -= gears_fixed[i];
             stepper.inc();
             //    dir |= mask;
             //    step |= mask;
@@ -141,17 +152,18 @@ void cnc::revolver::serve()
             //     dda_counter_overflow_error_detected = true;
             // }
         }
-        else if (dda_counters[i] < -gears_high_trigger[i])
+        else if (dda_counters_fixed[i] < -gears_high_trigger_fixed[i])
         {
             stepper.dec();
-            //    dda_counters[i] += gears[i];
+            dda_counters_fixed[i] += gears_fixed[i];
             //    dir |= mask;
             // if (dda_counters[i] <= gears[i])
             // {
             //     dda_counter_overflow_error_detected = true;
             // }
         }
-        velocities[i] += current_revolver_task->accelerations[i]; // * delta;
+        velocities_fixed[i] +=
+            current_revolver_task->accelerations_fixed[i]; // * delta;
     }
 
     // auto &shift = shifts_ring->tail();
@@ -182,10 +194,9 @@ void cnc::revolver::serve()
     // }
 
     // shifts_ring->move_tail_one();
-    iteration_counter++;
+    counter--;
 
-    if (current_revolver_task &&
-        iteration_counter >= current_revolver_task->step_end)
+    if (counter == 0)
     {
         revolver_task_ring.move_tail_one();
         current_revolver_task = nullptr;
@@ -201,9 +212,9 @@ void cnc::revolver::clear()
     // shifts_ring->clear();
     revolver_task_ring.clear();
     current_revolver_task = nullptr;
-    iteration_counter = 0;
-    std::fill(dda_counters.begin(), dda_counters.end(), 0);
-    std::fill(velocities.begin(), velocities.end(), 0);
+    counter = 0;
+    std::fill(dda_counters_fixed.begin(), dda_counters_fixed.end(), 0);
+    std::fill(velocities_fixed.begin(), velocities_fixed.end(), 0);
     system_unlock();
 }
 
@@ -214,7 +225,7 @@ void cnc::revolver::clear_no_velocity_drop()
     // shifts_ring->clear();
     revolver_task_ring.clear();
     current_revolver_task = nullptr;
-    iteration_counter = 0;
+    counter = 0;
     // std::fill(dda_counters.begin(), dda_counters.end(), 0);
     // std::fill(velocities.begin(), velocities.end(), 0);
     system_unlock();

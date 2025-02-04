@@ -13,7 +13,6 @@ void cnc::planner::cleanup()
     active = blocks->head_index();
     state = 0;
     // std::fill(velocities.begin(), velocities.end(), 0);
-    std::fill(dda_counters.begin(), dda_counters.end(), 0);
     std::fill(accelerations.begin(), accelerations.end(), 0);
     need_to_reevaluate = false;
     state = 0;
@@ -63,11 +62,7 @@ void cnc::planner::force_skip_all_blocks()
 
 void cnc::planner::update_triggers()
 {
-    for (unsigned int i = 0; i < gears.size(); ++i)
-    {
-        gears_high_trigger[i] = gears[i] * 0.9;
-        revolver->gears_high_trigger[i] = gears_high_trigger[i];
-    }
+    revolver->update_triggers();
 }
 
 void cnc::planner::set_dim(int axes)
@@ -86,7 +81,6 @@ cnc::planner::planner(igris::ring<cnc::planner_block> *blocks,
     : blocks(blocks), revolver(revolver)
 {
     std::fill(accelerations.begin(), accelerations.end(), 0);
-    std::fill(dda_counters.begin(), dda_counters.end(), 0);
     assert(revolver);
 }
 
@@ -179,9 +173,17 @@ void cnc::planner::evaluate_accelerations()
             accelerations.data(), _total_axes, iteration_counter);
 }
 
+void cnc::planner::set_pause_mode(bool en)
+{
+    pause = en;
+}
+
 int cnc::planner::serve(bool prevent_small_rooms)
 {
     (void)prevent_small_rooms;
+
+    if (pause)
+        return 0;
 
     system_lock();
     // bool shifts_empty = shifts->empty();
@@ -191,6 +193,7 @@ int cnc::planner::serve(bool prevent_small_rooms)
         in_operation)
     {
         in_operation = false;
+        revolver->cleanup();
         final_shift_pushed();
         system_unlock();
         return 0;
@@ -225,8 +228,7 @@ int cnc::planner::serve(bool prevent_small_rooms)
 void cnc::planner::iteration_planning_phase(size_t iter)
 {
     if (revolver)
-        revolver->revolver_task_ring.emplace(
-            accelerations, iteration_counter, iteration_counter + iter);
+        revolver->revolver_task_ring.emplace(accelerations, iter);
 
     // nos::println(
     //     "add_task", accelerations, iteration_counter, iteration_counter +
@@ -292,7 +294,9 @@ std::pair<int, size_t> cnc::planner::iteration()
     {
         bool empty = blocks->empty();
         if (empty)
+        {
             return {1, 0};
+        }
 
         // change_active_block может установить active_block,
         // поэтому значение проверяется повторно
@@ -367,14 +371,19 @@ std::pair<int, size_t> cnc::planner::iteration()
     for (int i = blocks->tail_index(); i != active;
          i = blocks->fixup_index(i + 1))
     {
-        // room = 1;
         if (!blocks->get(i).is_active_or_postactive(iteration_counter))
         {
             need_to_reevaluate = true;
+            // int counter_to_finish =
+            //    blocks->get(i).block_finish_ic - iteration_counter;
+            // room = std::min(room, (size_t)counter_to_finish);
+            room = 1;
+        }
+        else
+        {
             int counter_to_finish =
                 blocks->get(i).block_finish_ic - iteration_counter;
             room = std::min(room, (size_t)counter_to_finish);
-            // room = 1;
         }
     }
 
@@ -411,22 +420,19 @@ void cnc::planner::reevaluate_accelerations()
 void cnc::planner::set_axes_count(int total)
 {
     _total_axes = total;
-    gears.resize(total);
-    gears_high_trigger.resize(total);
-    ralgo::vecops::fill(gears, 1000);
+    revolver->gears_fill(1000);
     update_triggers();
 }
 
 void cnc::planner::set_gears(const igris::array_view<cnc_float_type> &arr)
 {
-    ralgo::vecops::copy(arr, gears);
-    ralgo::vecops::copy(arr, revolver->gears);
+    revolver->set_gears(arr.data(), arr.size());
     update_triggers();
 }
 
-igris::array_view<cnc_float_type> cnc::planner::get_gears()
+std::array<cnc_float_type, NMAX_AXES> cnc::planner::get_gears()
 {
-    return {gears.data(), gears.size()};
+    return revolver->get_gears();
 }
 
 size_t cnc::planner::get_total_axes()
@@ -442,7 +448,7 @@ size_t cnc::planner::total_axes()
 void cnc::planner::set_gear(int index, cnc_float_type val)
 {
     system_lock();
-    gears[index] = val;
+    revolver->set_gear(index, val);
     update_triggers();
     system_unlock();
 }
@@ -450,7 +456,6 @@ void cnc::planner::set_gear(int index, cnc_float_type val)
 void cnc::planner::clear()
 {
     blocks->clear();
-    std::fill(dda_counters.begin(), dda_counters.end(), 0);
     std::fill(accelerations.begin(), accelerations.end(), 0);
     // std::fill(velocities.begin(), velocities.end(), 0);
     active_block = nullptr;
@@ -466,7 +471,6 @@ void cnc::planner::clear_for_stop()
 {
     blocks->set_last_index(active);
     blocks->clear();
-    std::fill(dda_counters.begin(), dda_counters.end(), 0);
     std::fill(accelerations.begin(), accelerations.end(), 0);
     // std::fill(velocities.begin(), velocities.end(), 0);
     active_block = nullptr;
@@ -488,7 +492,6 @@ void cnc::planner::alarm_stop()
 {
     system_lock();
     blocks->clear();
-    std::fill(dda_counters.begin(), dda_counters.end(), 0);
     std::fill(accelerations.begin(), accelerations.end(), 0);
     // std::fill(velocities.begin(), velocities.end(), 0);
     active_block = nullptr;

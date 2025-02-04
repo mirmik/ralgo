@@ -23,6 +23,7 @@ file(GLOB RALGO_SOURCES
 	ralgo/imu/*.cpp
 	ralgo/rxsignal/*.cpp
 	ralgo/signal/*.cpp
+	ralgo/cnc/*.cpp
 )
 
 file(GLOB SOURCES_TEST 

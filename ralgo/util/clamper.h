@@ -38,6 +38,17 @@ namespace ralgo
 
             return std::clamp(x, lo, hi);
         }
+
+        T operator()(const T &x, bool reversed)
+        {
+            if (!enabled)
+                return x;
+
+            if (reversed)
+                return std::clamp(x, -hi, -lo);
+            else
+                return std::clamp(x, lo, hi);
+        }
     };
 }
 

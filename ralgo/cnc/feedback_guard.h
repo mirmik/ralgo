@@ -16,33 +16,49 @@ namespace cnc
 {
     class feedback_guard_tandem
     {
-        std::vector<size_t> _nums;
-        std::vector<int64_t> _multipliers;
+        igris::static_vector<size_t, NMAX_AXES> _nums = {};
+        igris::static_vector<int64_t, NMAX_AXES> _multipliers = {};
         cnc_float_type _maximum_tandem_mistake;
 
     public:
         bool in_operation = false;
 
     public:
-        feedback_guard_tandem(std::vector<size_t> nums,
-                              std::vector<int64_t> muls,
+        feedback_guard_tandem(igris::static_vector<size_t, NMAX_AXES> nums,
+                              igris::static_vector<int64_t, NMAX_AXES> muls,
                               cnc_float_type mistake)
             : _nums(nums), _multipliers(muls), _maximum_tandem_mistake(mistake)
         {
             assert(_nums.size() == _multipliers.size());
         }
 
+        feedback_guard_tandem(const std::vector<size_t> &nums,
+                              const std::vector<int64_t> &muls,
+                              cnc_float_type mistake)
+            : _nums(nums.begin(), nums.end()),
+              _multipliers(muls.begin(), muls.end()),
+              _maximum_tandem_mistake(mistake)
+        {
+            assert(_nums.size() == _multipliers.size());
+        }
+
+        feedback_guard_tandem &
+        operator=(const feedback_guard_tandem &) = default;
+        feedback_guard_tandem &operator=(feedback_guard_tandem &&) = default;
+        feedback_guard_tandem(const feedback_guard_tandem &) = default;
+        feedback_guard_tandem(feedback_guard_tandem &&) = default;
+
         cnc_float_type maximum_tandem_mistake() const
         {
             return _maximum_tandem_mistake;
         }
 
-        const std::vector<size_t> &nums() const
+        const igris::static_vector<size_t, NMAX_AXES> &nums() const
         {
             return _nums;
         }
 
-        const std::vector<int64_t> &muls() const
+        const igris::static_vector<int64_t, NMAX_AXES> &muls() const
         {
             return _multipliers;
         }
@@ -50,8 +66,8 @@ namespace cnc
         std::string info() const
         {
             return nos::format("{}: muls:{} max_mistake:{}",
-                               _nums,
-                               _multipliers,
+                               nos::ilist(_nums),
+                               nos::ilist(_multipliers),
                                _maximum_tandem_mistake);
         }
     };
@@ -65,7 +81,7 @@ namespace cnc
         igris::delegate<void, size_t, int64_t>
             _set_feedback_position_by_axis_callback;
 
-        std::vector<feedback_guard_tandem> _tandems = {};
+        igris::static_vector<feedback_guard_tandem, NMAX_AXES> _tandems = {};
 
         std::array<cnc_float_type, NMAX_AXES> feedback_to_drive = {};
         std::array<cnc_float_type, NMAX_AXES> control_to_drive =
@@ -74,10 +90,10 @@ namespace cnc
         // максимальное значение drop_pulses, после которого вызывается
         // planner->alarm_stop()
         std::array<cnc_float_type, NMAX_AXES> maximum_drop_pulses = {};
-        cnc::planner *planner = nullptr;
+        size_t total_axes;
 
     public:
-        feedback_guard(cnc::planner *planner) : planner(planner)
+        feedback_guard(size_t total_axes) : total_axes(total_axes)
         {
             cnc_float_type default_max_drop = 6000000;
             for (size_t i = 0; i < NMAX_AXES; ++i)
@@ -175,7 +191,7 @@ namespace cnc
         bool verify_position(igris::span<int64_t> feedback_position,
                              igris::span<int64_t> control_position)
         {
-            for (size_t i = 0; i < planner->total_axes(); ++i)
+            for (size_t i = 0; i < total_axes; ++i)
             {
                 int64_t drop_pulses =
                     feedback_position[i] * feedback_to_drive[i] -
@@ -193,8 +209,8 @@ namespace cnc
         feedback_position_as_drive(igris::span<int64_t> feedback_position)
         {
             std::vector<int64_t> vec;
-            vec.resize(planner->total_axes());
-            for (size_t i = 0; i < planner->total_axes(); ++i)
+            vec.resize(total_axes);
+            for (size_t i = 0; i < total_axes; ++i)
             {
                 vec[i] = feedback_position[i] * feedback_to_drive[i];
             }
@@ -205,8 +221,8 @@ namespace cnc
         control_position_as_drive(igris::span<int64_t> control_position)
         {
             std::vector<int64_t> vec;
-            vec.resize(planner->total_axes());
-            for (size_t i = 0; i < planner->total_axes(); ++i)
+            vec.resize(total_axes);
+            for (size_t i = 0; i < total_axes; ++i)
             {
                 vec[i] = control_position[i] * control_to_drive[i];
             }
@@ -217,7 +233,7 @@ namespace cnc
             igris::span<int64_t> feedback_position_as_drive,
             igris::span<int64_t> control_position_as_drive)
         {
-            for (size_t i = 0; i < planner->total_axes(); ++i)
+            for (size_t i = 0; i < total_axes; ++i)
             {
                 int64_t drop_pulses = feedback_position_as_drive[i] -
                                       control_position_as_drive[i];
@@ -361,9 +377,11 @@ namespace cnc
                 }
             }
 
+            system_lock();
             for (auto n : nums)
                 remove_tandem(n);
             add_tandem(nums, muls, mistake);
+            system_unlock();
         }
     };
 }

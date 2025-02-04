@@ -23,7 +23,7 @@ igris::ring<cnc::planner_block> blocks{40};
 igris::ring<cnc::control_shift> shifts{400};
 cnc::revolver revolver;
 cnc::planner planner(&blocks, &revolver);
-cnc::feedback_guard feedback_guard(&planner);
+cnc::feedback_guard feedback_guard(3);
 cnc::interpreter interpreter(&blocks, &planner, &revolver, &feedback_guard);
 robo::stepper steppers[3];
 robo::stepper *steppers_ptrs[] = {&steppers[0], &steppers[1], &steppers[2]};

@@ -4,7 +4,7 @@
 
 TEST_CASE("tandem")
 {
-    cnc::feedback_guard guard(nullptr);
+    cnc::feedback_guard guard(3);
     nos::stringstream ss;
 
     auto args = nos::tokens("8:5 maxmistake:25");
@@ -50,4 +50,16 @@ TEST_CASE("tandem")
     CHECK_EQ(guard.tandems()[3].muls()[1], 1);
     CHECK_EQ(guard.tandems()[3].maximum_tandem_mistake(),
              MAXIMUM_TANDEM_MISTAKE);
+
+    guard.remove_tandem(0);
+    CHECK_EQ(guard.tandems()[0].nums()[0], 8);
+    CHECK_EQ(guard.tandems()[1].nums()[0], 2);
+    CHECK_EQ(guard.tandems()[2].nums()[0], 4);
+
+    auto args5 = nos::tokens("X Y");
+    guard.add_tandem_command(args5, ss);
+    CHECK_EQ(guard.tandems()[0].nums()[0], 8);
+    CHECK_EQ(guard.tandems()[1].nums()[0], 2);
+    CHECK_EQ(guard.tandems()[2].nums()[0], 4);
+    CHECK_EQ(guard.tandems()[3].nums()[0], 0);
 }

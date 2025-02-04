@@ -136,7 +136,7 @@ namespace cnc
         {
             auto steps = revolver->current_steps();
             for (int i = 0; i < total_axes; ++i)
-                _final_position[i] = steps[i] * planner->gears[i];
+                _final_position[i] = steps[i] * planner->revolver->get_gear(i);
         }
 
         void final_shift_handle()
@@ -424,8 +424,9 @@ namespace cnc
             bool fastfinish = evaluate_interpreter_task(task, lastblock, os);
             if (fastfinish)
             {
+                _external_final_shift_handle();
                 ralgo::info("fastfinish");
-                print_interpreter_state(os);
+                //    print_interpreter_state(os);
                 return;
             }
 
@@ -649,7 +650,7 @@ namespace cnc
             }
 
             default:
-                nos::println_to(os, "Unresolved command");
+                nos::fprintln_to(os, "Unresolved command: {}", argv[0]);
             }
 
             return 0;
@@ -685,7 +686,8 @@ namespace cnc
                 return (*fptr)(argv, os);
             }
 
-            nos::println_to(os, "Unresolved command");
+            nos::fprintln_to(
+                os, "Unresolved command: {}", std::string(argv[0]));
             return 0;
         }
 
@@ -812,7 +814,8 @@ namespace cnc
                      auto axno = symbol_to_index(argv[1][0]);
                      cnc_float_type val = igris_atof64(argv[2].data(), NULL);
                      system_lock();
-                     _final_position[axno] = val * planner->gears[axno];
+                     _final_position[axno] =
+                         val * planner->revolver->get_gear(axno);
                      revolver->get_steppers()[axno]->set_counter_value(val);
                      feedback_guard->set_feedback_position(
                          axno, _final_position[axno]);
@@ -897,9 +900,15 @@ namespace cnc
                  "print guard info",
                  [this](const nos::argv &, nos::ostream &os) {
                      return feedback_guard->guard_info(os);
-                 }}
+                 }},
 
-            };
+                {"planner_pause",
+                 "Stop plannering",
+                 [this](const nos::argv &argv, nos::ostream &) {
+                     auto en = std::stoi(argv[1]);
+                     planner->set_pause_mode(en);
+                     return 0;
+                 }}};
 
         int gcode_drop_first(const nos::argv &argv, nos::ostream &os)
         {
@@ -970,7 +979,7 @@ namespace cnc
 
         std::string newline(const std::string &line)
         {
-            return newline(line.data(), line.size());
+            return newline(line.c_str(), line.size());
         }
 
         void set_revolver_frequency(cnc_float_type freq)
