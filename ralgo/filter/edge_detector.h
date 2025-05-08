@@ -56,27 +56,24 @@ namespace ralgo
             return _candidate_privdata;
         }
 
-        EdgeDetectorStatus serve(double signal)
+        
+        EdgeDetectorStatus opposite_direction_serve(double signal, SignalTone direction) 
         {
             EdgeDetectorStatus status = EdgeDetectorStatus::None;
-            if (signal == last)
-                return EdgeDetectorStatus::None;
+            start = signal;
 
-            SignalTone direction =
-                signal - last > 0 ? SignalTone::Rising : SignalTone::Falling;
-
-            if (last_direction != direction)
-            {
-                start = signal;
-
-                if (direction == SignalTone::Rising)
-                    status = EdgeDetectorStatus::UpdateRisingCandidate;
-                else
-                    status = EdgeDetectorStatus::UpdateFallingCandidate;
-            }
-
+            if (direction == SignalTone::Rising)
+                status = EdgeDetectorStatus::UpdateRisingCandidate;
             else
-            {
+                status = EdgeDetectorStatus::UpdateFallingCandidate;
+
+            return status;
+        }
+
+        EdgeDetectorStatus maintaining_direction_serve(double signal, SignalTone direction) 
+        {
+            EdgeDetectorStatus status = EdgeDetectorStatus::None;
+
                 if (fabs(signal - start) > trigger_level)
                 {
                     if (direction == SignalTone::Falling)
@@ -101,6 +98,26 @@ namespace ralgo
                         }
                     }
                 }
+            
+                return status;
+        }
+
+        EdgeDetectorStatus serve(double signal)
+        {
+            EdgeDetectorStatus status = EdgeDetectorStatus::None;
+            if (signal == last)
+                return EdgeDetectorStatus::None;
+
+            SignalTone direction =
+                signal - last > 0 ? SignalTone::Rising : SignalTone::Falling;
+
+            if (last_direction != direction)
+            {
+                status = opposite_direction_serve(signal, direction);
+            }
+            else
+            {
+                status = maintaining_direction_serve(signal, direction);
             }
 
             last_direction = direction;
