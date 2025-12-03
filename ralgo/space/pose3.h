@@ -80,8 +80,7 @@ namespace ralgo
         static pose3 from_screw(const screw<T, 3> &scr);
 
         static pose3<T> translation(linalg::vec<T, 3> vec);
-        static pose3<T>
-        euler_rotation(linalg::vec<T, 3> vec);
+        static pose3<T> euler_rotation(linalg::vec<T, 3> vec);
         static pose3<T> euler(linalg::vec<T, 3> vec);
 
         static pose3<T> from_trent(const nos::trent &tr)

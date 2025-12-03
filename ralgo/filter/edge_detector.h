@@ -56,8 +56,8 @@ namespace ralgo
             return _candidate_privdata;
         }
 
-        
-        EdgeDetectorStatus opposite_direction_serve(double signal, SignalTone direction) 
+        EdgeDetectorStatus opposite_direction_serve(double signal,
+                                                    SignalTone direction)
         {
             EdgeDetectorStatus status = EdgeDetectorStatus::None;
             start = signal;
@@ -70,36 +70,37 @@ namespace ralgo
             return status;
         }
 
-        EdgeDetectorStatus maintaining_direction_serve(double signal, SignalTone direction) 
+        EdgeDetectorStatus maintaining_direction_serve(double signal,
+                                                       SignalTone direction)
         {
             EdgeDetectorStatus status = EdgeDetectorStatus::None;
 
-                if (fabs(signal - start) > trigger_level)
+            if (fabs(signal - start) > trigger_level)
+            {
+                if (direction == SignalTone::Falling)
                 {
-                    if (direction == SignalTone::Falling)
+                    if (phase == SignalTone::Rising)
                     {
-                        if (phase == SignalTone::Rising)
-                        {
-                            phase = SignalTone::Falling;
+                        phase = SignalTone::Falling;
 
-                            if (!prevent_halfspaces_area || start > 0)
-                                status = EdgeDetectorStatus::FallingEvent;
-                        }
-                    }
-
-                    if (direction == SignalTone::Rising)
-                    {
-                        if (phase == SignalTone::Falling)
-                        {
-                            phase = SignalTone::Rising;
-
-                            if (!prevent_halfspaces_area || start < 0)
-                                status = EdgeDetectorStatus::RisingEvent;
-                        }
+                        if (!prevent_halfspaces_area || start > 0)
+                            status = EdgeDetectorStatus::FallingEvent;
                     }
                 }
-            
-                return status;
+
+                if (direction == SignalTone::Rising)
+                {
+                    if (phase == SignalTone::Falling)
+                    {
+                        phase = SignalTone::Rising;
+
+                        if (!prevent_halfspaces_area || start < 0)
+                            status = EdgeDetectorStatus::RisingEvent;
+                    }
+                }
+            }
+
+            return status;
         }
 
         EdgeDetectorStatus serve(double signal)
