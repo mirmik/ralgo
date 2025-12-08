@@ -40,7 +40,6 @@ namespace cnc
 
     private:
         igris::ring<planner_block> *blocks = nullptr;
-        // igris::ring<cnc::control_shift> *shifts = nullptr;
         int total_axes = 0;
         cnc_float_type revolver_frequency = 0;
 
@@ -227,50 +226,6 @@ namespace cnc
             task.set_active_axes(poses);
             return task;
         }
-
-        /*control_task g1_parse_task(const nos::argv &argv)
-        {
-            control_task task(total_axes);
-
-            task.feed = saved_feed;
-            task.acc = saved_acc;
-            int sts = task.parse(argv);
-            if (sts)
-            {
-                ralgo::warn("wrong task format");
-                task.isok = false;
-                return task;
-            }
-
-            saved_feed = task.feed;
-            saved_acc = task.acc;
-            task.isok = true;
-            return task;
-        }*/
-
-        /*control_task g1_parse_task(const nos::argv &argv,
-                                   const igris::array_view<cnc_float_type>
-        &fposes)
-        {
-            control_task task(total_axes);
-            task.set_poses(igris::array_view<cnc_float_type>((cnc_float_type
-        *)fposes.data(), fposes.size()));
-
-            task.feed = saved_feed;
-            task.acc = saved_acc;
-            int sts = task.parse(argv);
-            if (sts)
-            {
-                ralgo::warn("wrong task format");
-                task.isok = false;
-                return task;
-            }
-
-            saved_feed = task.feed;
-            saved_acc = task.acc;
-            task.isok = true;
-            return task;
-        }*/
 
         /// Расщитывает ускорение или скорость для блока на основании
         /// запрошенных скоростей или ускорений для отдельных осей и
@@ -531,8 +486,6 @@ namespace cnc
         void command_M112(const nos::argv &, nos::ostream &)
         {
             system_lock();
-            // blocks->clear();
-            // plan_stop_task();
             system_unlock();
         }
 
@@ -587,11 +540,8 @@ namespace cnc
             for (int i = 0; i < total_axes; ++i)
                 _final_position[i] += lastblock.axdist[i];
 
-            // shifts->clear();
-            // revolver->clear();
             planner->clear_for_stop();
             planner->force_skip_all_blocks();
-            // planner->set_current_velocity(curvels);
             auto &placeblock = blocks->head_place();
             lastblock.blockno = 0;
             placeblock = lastblock;
@@ -938,8 +888,6 @@ namespace cnc
             PRINTTO(os, revolver_frequency);
             PRINTTO(os, saved_acc);
             PRINTTO(os, saved_feed);
-            // PRINTTO(os, shifts->head_index());
-            // PRINTTO(os, shifts->tail_index());
             nos::print_to(os, "vel: ");
             nos::print_list_to(os, revolver->current_velocities());
             nos::println_to(os);

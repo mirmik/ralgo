@@ -50,16 +50,10 @@ namespace cnc
         bool pause = false;
         bool info_mode = true;
         int64_t iteration_counter = 0;
-        // igris::static_vector<cnc_float_type, NMAX_AXES> gears = {};
-        // igris::static_vector<cnc_float_type, NMAX_AXES> gears_high_trigger =
-        // {};
         std::array<cnc_float_type, NMAX_AXES> accelerations = {};
-        // std::array<cnc_float_type, NMAX_AXES> velocities = {};
-        // std::array<cnc_float_type, NMAX_AXES> dda_counters = {};
         int active = 0; // index of active block
         planner_block *active_block = nullptr;
         igris::ring<cnc::planner_block> *blocks = {};
-        // igris::ring<cnc::control_shift> *shifts = {};
         cnc::revolver *revolver = nullptr;
         bool need_to_reevaluate = false;
         bool in_operation = false;
@@ -81,19 +75,14 @@ namespace cnc
         bool is_dda_overflow_detected();
         void set_start_operation_handle(igris::delegate<void> dlg);
         void force_skip_all_blocks();
-        void set_current_velocity(const std::vector<cnc_float_type> &vel);
-        void
-        set_current_velocity(const std::array<cnc_float_type, NMAX_AXES> &vel);
         void update_triggers();
         void set_dim(int axes);
         void reset_iteration_counter();
         planner(igris::ring<cnc::planner_block> *blocks,
-                // igris::ring<cnc::control_shift> *shifts,
                 cnc::revolver *revolver);
         bool has_postactive_blocks();
         int count_of_postactive();
         void change_active_block();
-        const std::array<cnc_float_type, NMAX_AXES> &current_velocity();
         int serve(bool prevent_small_rooms = true);
         void evaluate_accelerations();
         void iteration_planning_phase(size_t iter);
@@ -105,7 +94,6 @@ namespace cnc
         size_t total_axes();
         void set_gear(int index, cnc_float_type val);
         void clear();
-        void clear_queue();
         int block_index(planner_block *it);
         void fixup_postactive_blocks();
 

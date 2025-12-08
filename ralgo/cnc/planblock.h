@@ -49,8 +49,6 @@ namespace cnc
             0; // < момент времени до которого идёт плоский учисток
         int64_t block_finish_ic =
             0; // < момент времени, когда блок будет завершён
-        // int64_t active_finish_ic = 0; // < когда блок перестанет быть
-        // активным
 
         int blockno = 0;
         uint8_t exact_stop = 0;
@@ -65,7 +63,6 @@ namespace cnc
             nos::println_to(
                 os, "deceleration_after_ic: ", deceleration_after_ic);
             nos::println_to(os, "block_finish_ic: ", block_finish_ic);
-            // nos::println_to(os, "active_finish_ic: ", active_finish_ic);
             nos::println_to(os, "nominal_velocity: ", nominal_velocity);
             nos::println_to(os, "start_velocity: ", start_velocity);
             nos::println_to(os, "final_velocity: ", final_velocity);
@@ -143,18 +140,6 @@ namespace cnc
 
         bool validation()
         {
-            // Проверка N1 работает нестабильно при малом количестве тактов?
-            // Ситуация:
-            // start_velocity = 470.7636939822022
-            // acceleration = 0.3362587010712585
-            // nominal_velocity  = 470.76218149976199
-            /*if (fabs(start_velocity + acceleration_time() * acceleration -
-                     nominal_velocity) > 1e-3)
-            {
-                nos::log::error("Block is not valid by reason N1");
-                return false;
-            }*/
-
             if (fabs(AB_distance() + BC_distance() + CD_distance() - fullpath) >
                 1e-5)
             {
@@ -186,7 +171,6 @@ namespace cnc
             acceleration_before_ic += iteration_counter;
             deceleration_after_ic += iteration_counter;
             block_finish_ic += iteration_counter;
-            // active_finish_ic += iteration_counter;
         }
 
         bool is_active(int64_t interrupt_counter)
@@ -297,8 +281,6 @@ namespace cnc
             int itime = ceil(time);
             int preftime = ceil(velocity / acceleration);
 
-            // Для трапециидального паттерна.
-            // this->active_finish_ic = itime;
             this->fullpath = path;
             this->start_ic = 0;
 
@@ -307,12 +289,10 @@ namespace cnc
                 // trapecidal pattern
                 this->acceleration_before_ic = preftime;
                 this->deceleration_after_ic = itime;
-                // this->active_finish_ic = itime;
                 this->block_finish_ic = itime + preftime;
                 this->nominal_velocity = path / itime;
                 this->acceleration = this->nominal_velocity / preftime;
             }
-
             else
             {
                 // triangle pattern
@@ -322,7 +302,6 @@ namespace cnc
 
                 this->acceleration_before_ic = itime2;
                 this->deceleration_after_ic = itime2;
-                // this->active_finish_ic = itime2;
                 this->block_finish_ic = itime2 * 2;
                 this->nominal_velocity = path / itime2;
                 this->acceleration = this->nominal_velocity / itime2;

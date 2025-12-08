@@ -1,4 +1,3 @@
-#include <chrono>
 #include <ralgo/cnc/planner.h>
 #include <ralgo/cnc/util.h>
 
@@ -6,13 +5,10 @@
 void cnc::planner::cleanup()
 {
     blocks->clear();
-    // shifts->clear();
-    // shifts->reset();
     blocks->reset();
     active_block = nullptr;
     active = blocks->head_index();
     state = 0;
-    // std::fill(velocities.begin(), velocities.end(), 0);
     std::fill(accelerations.begin(), accelerations.end(), 0);
     need_to_reevaluate = false;
     state = 0;
@@ -41,24 +37,7 @@ void cnc::planner::force_skip_all_blocks()
     active = blocks->head_index();
     state = 0;
     std::fill(accelerations.begin(), accelerations.end(), 0);
-    // memset(velocities, 0, sizeof(velocities));
-    // memset(dda_counters, 0, sizeof(dda_counters));
 }
-
-// void cnc::planner::set_current_velocity(const std::vector<cnc_float_type>
-// &vel)
-// {
-//     for (int i = 0; i < _total_axes; ++i)
-//     {
-//         velocities[i] = vel[i];
-//     }
-// }
-
-// void cnc::planner::set_current_velocity(
-//     const std::array<cnc_float_type, NMAX_AXES> &vel)
-// {
-//     velocities = vel;
-// }
 
 void cnc::planner::update_triggers()
 {
@@ -76,7 +55,6 @@ void cnc::planner::reset_iteration_counter()
 }
 
 cnc::planner::planner(igris::ring<cnc::planner_block> *blocks,
-                      // igris::ring<cnc::control_shift> *shifts,
                       cnc::revolver *revolver)
     : blocks(blocks), revolver(revolver)
 {
@@ -151,11 +129,6 @@ void cnc::planner::change_active_block()
     active_block->shift_timestampes(iteration_counter);
 }
 
-// const std::array<cnc_float_type, NMAX_AXES> &cnc::planner::current_velocity()
-// {
-//     return velocities;
-// }
-
 void cnc::planner::evaluate_accelerations()
 {
     if (active_block)
@@ -186,7 +159,6 @@ int cnc::planner::serve(bool prevent_small_rooms)
         return 0;
 
     system_lock();
-    // bool shifts_empty = shifts->empty();
     bool revolver_empty = revolver->is_empty();
     bool blocks_empty = blocks->empty();
     if (revolver_empty && blocks_empty && active_block == nullptr &&
@@ -230,65 +202,12 @@ void cnc::planner::iteration_planning_phase(size_t iter)
     if (revolver)
         revolver->revolver_task_ring.emplace(accelerations, iter);
 
-    // nos::println(
-    //     "add_task", accelerations, iteration_counter, iteration_counter +
-    //     iter);
-
-    /* while (iter--)
-     {
-         revolver_t mask, step = 0, dir = 0;
-         for (int i = 0; i < _total_axes; ++i)
-         {
-             mask = (1 << i);
-
-             dda_counters[i] += velocities[i] +         // delta +
-                                accelerations[i] * 0.5; // delta_sqr_div_2;
-
-             // check frequency correctness
-             if (_frequency_protection)
-             {
-                 int gears_per_counter = dda_counters[i] / gears[i];
-                 assert(gears_per_counter >= -1 && gears_per_counter <= 1);
-             }
-
-             if (dda_counters[i] > gears_high_trigger[i])
-             {
-                 dda_counters[i] -= gears[i];
-                 dir |= mask;
-                 step |= mask;
-                 // if (dda_counters[i] >= gears[i])
-                 // {
-                 //     dda_counter_overflow_error_detected = true;
-                 // }
-             }
-             else if (dda_counters[i] < -gears_high_trigger[i])
-             {
-                 dda_counters[i] += gears[i];
-                 dir |= mask;
-                 // if (dda_counters[i] <= gears[i])
-                 // {
-                 //     dda_counter_overflow_error_detected = true;
-                 // }
-             }
-             velocities[i] += accelerations[i]; // * delta;
-         }
-         system_lock();
-         shifts->emplace(dir, step);
-         system_unlock();
-
-         iteration_counter++;
-     }*/
     iteration_counter += iter;
 }
-
-int64_t nanoseconds_summury = 0;
 
 std::pair<int, size_t> cnc::planner::iteration()
 {
     size_t room = 10000;
-    (void)room;
-
-    //    auto stime = std::chrono::steady_clock::now();
 
     if (active_block == nullptr && !has_postactive_blocks())
     {
@@ -340,30 +259,16 @@ std::pair<int, size_t> cnc::planner::iteration()
         {
             if (!active_block->is_accel(iteration_counter))
             {
-                // go to flat
-                // int counter_to_active =
-                //     active_block->deceleration_after_ic - iteration_counter;
-                // room = std::min(room, (size_t)counter_to_active);
-
-                // need_to_reevaluate = true;
                 state = 1;
-                // room = 1;
             }
         }
-
         else
         {
             if (!active_block->is_active(iteration_counter))
             {
-                // go to decel
-                // int counter_to_decel =
-                //     active_block->deceleration_after_ic - iteration_counter;
-                // room = std::min(room, (size_t)counter_to_decel);
-
                 change_active_block();
                 need_to_reevaluate = true;
                 state = 0;
-                // room = 1;
             }
         }
     }
@@ -374,9 +279,6 @@ std::pair<int, size_t> cnc::planner::iteration()
         if (!blocks->get(i).is_active_or_postactive(iteration_counter))
         {
             need_to_reevaluate = true;
-            // int counter_to_finish =
-            //    blocks->get(i).block_finish_ic - iteration_counter;
-            // room = std::min(room, (size_t)counter_to_finish);
             room = 1;
         }
         else
@@ -390,28 +292,13 @@ std::pair<int, size_t> cnc::planner::iteration()
     if (need_to_reevaluate)
         reevaluate_accelerations();
 
-    // Это лишнее?
-    // if (active_block == nullptr && !has_postactive_blocks())
-    //    return 1;
-
-    // room = 1;
     iteration_planning_phase(room);
-    // if (room != 1)
-    //     nos::println(room);
-
-    // auto ftime = std::chrono::steady_clock::now();
-    // nanoseconds_summury +=
-    //     std::chrono::duration_cast<std::chrono::nanoseconds>(ftime - stime)
-    //         .count();
-
-    // nos::println("summary", nanoseconds_summury);
 
     return {0, room};
 }
 
 void cnc::planner::reevaluate_accelerations()
 {
-    // ralgo::info("reevaluate_accelerations");
     fixup_postactive_blocks();
     evaluate_accelerations();
     need_to_reevaluate = false;
@@ -457,7 +344,6 @@ void cnc::planner::clear()
 {
     blocks->clear();
     std::fill(accelerations.begin(), accelerations.end(), 0);
-    // std::fill(velocities.begin(), velocities.end(), 0);
     active_block = nullptr;
     active = blocks->head_index();
     need_to_reevaluate = true;
@@ -472,7 +358,6 @@ void cnc::planner::clear_for_stop()
     blocks->set_last_index(active);
     blocks->clear();
     std::fill(accelerations.begin(), accelerations.end(), 0);
-    // std::fill(velocities.begin(), velocities.end(), 0);
     active_block = nullptr;
     active = blocks->head_index();
     need_to_reevaluate = true;
@@ -482,25 +367,17 @@ void cnc::planner::clear_for_stop()
     change_active_block();
 }
 
-// void cnc::planner::clear_queue()
-//{
-// blocks->set_last_index(active);
-// clear();
-//}
-
 void cnc::planner::alarm_stop()
 {
     system_lock();
     blocks->clear();
     std::fill(accelerations.begin(), accelerations.end(), 0);
-    // std::fill(velocities.begin(), velocities.end(), 0);
     active_block = nullptr;
     active = blocks->head_index();
     need_to_reevaluate = true;
     state = 0;
     waited = 0;
     change_active_block();
-    // shifts->clear();
     revolver->clear();
     system_unlock();
 }

@@ -21,8 +21,6 @@ namespace cnc
     class revolver_task
     {
     public:
-        // std::array<cnc_float_type, NMAX_AXES> accelerations;
-        // std::array<cnc_float_type, NMAX_AXES> accelerations_mul05;
         std::array<int32_t, NMAX_AXES> accelerations_fixed;
         int32_t counter;
 
@@ -34,7 +32,6 @@ namespace cnc
         {
             for (int i = 0; i < NMAX_AXES; ++i)
             {
-                // accelerations_mul05[i] = accelerations[i] * 0.5;
                 accelerations_fixed[i] = accel[i] * FIXED_POINT_MUL;
             }
         }
@@ -69,14 +66,8 @@ namespace cnc
         cnc::revolver_task *current_revolver_task = {};
         control_shift zero_step = {};
 
-        // std::array<cnc_float_type, NMAX_AXES> velocities = {};
-        // std::array<cnc_float_type, NMAX_AXES> dda_counters = {};
-
         std::array<int64_t, NMAX_AXES> velocities_fixed = {};
         std::array<int64_t, NMAX_AXES> dda_counters_fixed = {};
-
-        // std::array<cnc_float_type, NMAX_AXES> gears = {};
-        // std::array<cnc_float_type, NMAX_AXES> gears_high_trigger = {};
 
         std::array<int64_t, NMAX_AXES> gears_fixed = {};
         std::array<int64_t, NMAX_AXES> gears_high_trigger_fixed = {};
@@ -114,9 +105,6 @@ namespace cnc
 
         void set_gear(int i, double val)
         {
-            // gears[i] = val;
-            // gears_high_trigger[i] = val * 0.9;
-
             gears_fixed[i] = val * FIXED_POINT_MUL;
             gears_high_trigger_fixed[i] = gears_fixed[i] * 0.9;
         }
@@ -133,7 +121,6 @@ namespace cnc
 
         std::array<cnc_float_type, NMAX_AXES> current_velocities() const
         {
-            // return velocities;
             std::array<cnc_float_type, NMAX_AXES> velocities;
             for (unsigned int i = 0; i < velocities.size(); ++i)
             {
@@ -148,17 +135,11 @@ namespace cnc
             {
                 this->gears_fixed[i] = gears[i] * FIXED_POINT_MUL;
             }
-
-            // std::copy(gears, gears + size, this->gears.begin());
             update_triggers();
         }
 
         void set_gears_high_trigger(double *gears_high_trigger, int size)
         {
-            // std::copy(gears_high_trigger,
-            //          gears_high_trigger + size,
-            //          this->gears_high_trigger.begin());
-
             for (int i = 0; i < size; ++i)
             {
                 this->gears_high_trigger_fixed[i] =

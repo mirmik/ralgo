@@ -178,16 +178,6 @@ namespace cnc
             maximum_drop_pulses[no] = val;
         }
 
-        // int64_t tandem_allowed_diff()
-        //{
-        //    return maximum_tandem_mistake;
-        //}
-
-        // void set_tandem_allowed_diff(int64_t val)
-        //{
-        //    maximum_tandem_mistake = val;
-        //}
-
         bool verify_position(igris::span<int64_t> feedback_position,
                              igris::span<int64_t> control_position)
         {
@@ -357,8 +347,6 @@ namespace cnc
                     {
                         index = symbol_to_index(name_or_index_or_command[0]);
                     }
-                    // assert(index == 0 || index == 1 || index == 2 ||
-                    //       index == 4);
                     nums.push_back(index);
 
                     if (lst.size() == 1)
