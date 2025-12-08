@@ -45,8 +45,9 @@ namespace cnc
         int total_axes = 0;
         cnc_float_type revolver_frequency = 0;
 
-        // Steps per mm for each axis (conversion factor mm -> steps)
-        std::array<cnc_float_type, NMAX_AXES> _steps_per_mm = {};
+        // Steps per unit for each axis (conversion factor units -> steps)
+        // For linear axes: steps/mm, for rotary axes: steps/rad
+        std::array<cnc_float_type, NMAX_AXES> _steps_per_unit = {};
 
         // Мультипликатор на входе интерпретатора.
         // Применяется к позициям, скоростям и ускорениям во входном потоке
@@ -141,9 +142,9 @@ namespace cnc
             ralgo::vecops::fill(_final_position, 0);
             ralgo::vecops::fill(max_axes_accelerations, 0);
             ralgo::vecops::fill(max_axes_velocities, 0);
-            // Default steps_per_mm = 1 (1:1 mapping)
+            // Default steps_per_unit = 1 (1:1 mapping)
             for (int i = 0; i < total_axes; ++i)
-                _steps_per_mm[i] = 1.0;
+                _steps_per_unit[i] = 1.0;
 
             planner->final_shift_pushed =
                 igris::make_delegate(&interpreter::final_shift_handle, this);
@@ -154,10 +155,10 @@ namespace cnc
             auto steps = revolver->current_steps();
             for (int i = 0; i < total_axes; ++i)
             {
-                // Convert steps to mm: mm = steps / steps_per_mm
-                if (_steps_per_mm[i] != 0)
+                // Convert steps to units: units = steps / steps_per_unit
+                if (_steps_per_unit[i] != 0)
                     _final_position[i] =
-                        static_cast<cnc_float_type>(steps[i]) / _steps_per_mm[i];
+                        static_cast<cnc_float_type>(steps[i]) / _steps_per_unit[i];
             }
         }
 
@@ -344,18 +345,18 @@ namespace cnc
                 return true;
             }
 
-            // Check steps_per_mm for active axes
+            // Check steps_per_unit for active axes
             for (auto idx : task.active_axes)
             {
-                if (idx >= 0 && idx < total_axes && _steps_per_mm[idx] <= 0)
+                if (idx >= 0 && idx < total_axes && _steps_per_unit[idx] <= 0)
                 {
-                    report_error(error_code::invalid_steps_per_mm, idx);
+                    report_error(error_code::invalid_steps_per_unit, idx);
                     return true;
                 }
             }
 
-            // Get steps_per_mm for unit conversion (from interpreter's own storage)
-            ralgo::vector_view<cnc_float_type> gears(_steps_per_mm.data(),
+            // Get steps_per_unit for unit conversion (from interpreter's own storage)
+            ralgo::vector_view<cnc_float_type> gears(_steps_per_unit.data(),
                                                      total_axes);
 
             // Apply gains (user-space scaling)
@@ -383,7 +384,7 @@ namespace cnc
             auto dirgain =
                 ralgo::vecops::norm(ralgo::vecops::mul_vv(direction, gains));
 
-            // Calculate steps_per_mm scaling factor for velocity/acceleration
+            // Calculate steps_per_unit scaling factor for velocity/acceleration
             // Uses direction-weighted average for multi-axis moves
             auto dirsteps =
                 ralgo::vecops::norm(ralgo::vecops::mul_vv(direction, gears));
@@ -471,8 +472,8 @@ namespace cnc
             // axdist is in steps, convert back to mm for _final_position
             for (int i = 0; i < total_axes; ++i)
             {
-                if (_steps_per_mm[i] != 0)
-                    _final_position[i] += lastblock.axdist[i] / _steps_per_mm[i];
+                if (_steps_per_unit[i] != 0)
+                    _final_position[i] += lastblock.axdist[i] / _steps_per_unit[i];
             }
 
             auto &placeblock = blocks->head_place();
@@ -627,8 +628,8 @@ namespace cnc
             // axdist is in steps, convert back to mm for _final_position
             for (int i = 0; i < total_axes; ++i)
             {
-                if (_steps_per_mm[i] != 0)
-                    _final_position[i] += lastblock.axdist[i] / _steps_per_mm[i];
+                if (_steps_per_unit[i] != 0)
+                    _final_position[i] += lastblock.axdist[i] / _steps_per_unit[i];
             }
 
             planner->clear_for_stop();
@@ -843,32 +844,32 @@ namespace cnc
                  }},
 
                 {"gears",
-                 "Print steps_per_mm (gears) for all axes (no args)",
+                 "Print steps_per_unit (gears) for all axes (no args)",
                  [this](const nos::argv &, nos::ostream &os) {
-                     nos::print_list_to(os, _steps_per_mm);
+                     nos::print_list_to(os, _steps_per_unit);
                      nos::println_to(os);
                      return 0;
                  }},
 
                 {"setgear",
-                 "Set steps_per_mm for axis. Args: <axis> <value>. "
+                 "Set steps_per_unit for axis. Args: <axis> <value>. "
                  "Example: setgear X 100.5",
                  [this](const nos::argv &argv, nos::ostream &os) {
                      if (argv.size() < 3)
                      {
-                         nos::println_to(os, "Usage: setgear <axis> <steps_per_mm>");
+                         nos::println_to(os, "Usage: setgear <axis> <steps_per_unit>");
                          nos::println_to(os, "  Example: setgear X 100.5");
                          return 0;
                      }
                      auto axno = symbol_to_index(argv[1][0]);
                      cnc_float_type val = igris_atof64(argv[2].data(), NULL);
-                     set_steps_per_mm(axno, val);
+                     set_steps_per_unit(axno, val);
                      feedback_guard->set_control_to_drive_multiplier(axno, val);
                      return 0;
                  }},
 
                 {"set_control_gear",
-                 "Set control gear (steps_per_mm). Args: <axis> <value>. "
+                 "Set control gear (steps_per_unit). Args: <axis> <value>. "
                  "Same as setgear",
                  [this](const nos::argv &argv, nos::ostream &os) {
                      if (argv.size() < 3)
@@ -878,7 +879,7 @@ namespace cnc
                      }
                      auto axno = symbol_to_index(argv[1][0]);
                      cnc_float_type val = igris_atof64(argv[2].data(), NULL);
-                     set_steps_per_mm(axno, val);
+                     set_steps_per_unit(axno, val);
                      feedback_guard->set_control_to_drive_multiplier(axno, val);
                      return 0;
                  }},
@@ -913,7 +914,7 @@ namespace cnc
                      cnc_float_type val_mm = igris_atof64(argv[2].data(), NULL);
                      system_lock();
                      _final_position[axno] = val_mm;
-                     steps_t steps = static_cast<steps_t>(val_mm * _steps_per_mm[axno]);
+                     steps_t steps = static_cast<steps_t>(val_mm * _steps_per_unit[axno]);
                      revolver->get_steppers()[axno]->set_counter_value(steps);
                      feedback_guard->set_feedback_position(axno, val_mm);
                      system_unlock();
@@ -1098,17 +1099,23 @@ namespace cnc
             PRINTTO(os, revolver_frequency);
             PRINTTO(os, saved_acc);
             PRINTTO(os, saved_feed);
-            nos::print_to(os, "vel: ");
+            nos::print_to(os, "cur_vel: ");
             nos::print_list_to(os, revolver->current_velocities());
             nos::println_to(os);
-            nos::print_to(os, "acc:");
+            nos::print_to(os, "cur_acc:");
             nos::print_list_to(os, planner->accelerations);
+            nos::println_to(os);
+            nos::print_to(os, "velmaxs:");
+            nos::print_list_to(os, max_axes_velocities);
+            nos::println_to(os);
+            nos::print_to(os, "accmaxs:");
+            nos::print_list_to(os, max_axes_accelerations);
             nos::println_to(os);
             nos::print_to(os, "gains:");
             nos::print_list_to(os, gains);
             nos::println_to(os);
             nos::print_to(os, "gears:");
-            nos::print_list_to(os, _steps_per_mm);
+            nos::print_list_to(os, _steps_per_unit);
             nos::println_to(os);
             nos::print_to(os, "active_block: ");
             nos::println_to(os, planner->active_block != nullptr);
@@ -1191,28 +1198,28 @@ namespace cnc
         }
 
         // Steps per mm management (gears)
-        void set_steps_per_mm(int axis, cnc_float_type value)
+        void set_steps_per_unit(int axis, cnc_float_type value)
         {
             if (axis >= 0 && axis < (int)NMAX_AXES)
-                _steps_per_mm[axis] = value;
+                _steps_per_unit[axis] = value;
         }
 
-        cnc_float_type get_steps_per_mm(int axis) const
+        cnc_float_type get_steps_per_unit(int axis) const
         {
             if (axis >= 0 && axis < (int)NMAX_AXES)
-                return _steps_per_mm[axis];
+                return _steps_per_unit[axis];
             return 0;
         }
 
-        const std::array<cnc_float_type, NMAX_AXES> &steps_per_mm() const
+        const std::array<cnc_float_type, NMAX_AXES> &steps_per_unit() const
         {
-            return _steps_per_mm;
+            return _steps_per_unit;
         }
 
         void set_gears(const igris::array_view<cnc_float_type> &arr)
         {
             for (size_t i = 0; i < arr.size() && i < NMAX_AXES; ++i)
-                _steps_per_mm[i] = arr[i];
+                _steps_per_unit[i] = arr[i];
         }
     };
 }

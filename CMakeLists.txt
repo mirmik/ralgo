@@ -26,7 +26,7 @@ file(GLOB RALGO_SOURCES
 	ralgo/cnc/*.cpp
 )
 
-file(GLOB SOURCES_TEST
+file(GLOB SOURCES_TEST CONFIGURE_DEPENDS
 	tests/*.cpp
 	tests/cnc/*.cpp
 )

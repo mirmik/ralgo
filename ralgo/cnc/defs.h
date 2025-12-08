@@ -7,9 +7,13 @@
 constexpr size_t NMAX_AXES = 10;
 
 // Fixed-point arithmetic for DDA
-// 2^24 gives ~7 bits of sub-step precision (1/128 step resolution)
-constexpr int FIXED_POINT_BITS = 24;
-constexpr int64_t FIXED_POINT_MUL = 1LL << FIXED_POINT_BITS;  // 16777216
+// 2^32 gives better precision for low accelerations
+// At freq=100kHz, steps_per_unit=1000, M=1 unit/s²:
+//   acc = 1e-7 steps/tick², acc_fixed = 1e-7 * 2^32 = 430
+// With 2^24: acc_fixed = 1.68 -> 40% error!
+// With 2^32: acc_fixed = 430 -> 0.2% error
+constexpr int FIXED_POINT_BITS = 32;
+constexpr int64_t FIXED_POINT_MUL = 1LL << FIXED_POINT_BITS;  // 4294967296
 
 // Type aliases for clarity
 using cnc_float_type = double;      // For configuration and planning (mm, mm/sec)

@@ -21,7 +21,7 @@ namespace cnc
 
         // === Configuration errors (100-199) ===
         invalid_frequency = 100,      ///< revolver_frequency <= 0
-        invalid_steps_per_mm = 101,   ///< steps_per_mm <= 0 for axis
+        invalid_steps_per_unit = 101, ///< steps_per_unit <= 0 for axis
         invalid_axes_count = 102,     ///< axes count out of range
         not_initialized = 103,        ///< system not properly initialized
 
@@ -220,7 +220,7 @@ namespace cnc
             {
             case error_code::ok: return "ok";
             case error_code::invalid_frequency: return "invalid_frequency";
-            case error_code::invalid_steps_per_mm: return "invalid_steps_per_mm";
+            case error_code::invalid_steps_per_unit: return "invalid_steps_per_unit";
             case error_code::invalid_axes_count: return "invalid_axes_count";
             case error_code::not_initialized: return "not_initialized";
             case error_code::invalid_velocity: return "invalid_velocity";
