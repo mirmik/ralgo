@@ -13,45 +13,56 @@
 #include <stdint.h>
 #include <string.h>
 
-/*         B         C
-           __________
-          /          \
-         /            \
-        /              \
-       A                D
-*/
+/**
+ * Trapezoidal velocity profile for a motion block.
+ *
+ * Velocity profile shape:
+ *         B         C
+ *           __________
+ *          /          \
+ *         /            \
+ *        /              \
+ *       A                D
+ *
+ * Where:
+ *   A = start_velocity (entry)
+ *   B = nominal_velocity (cruise start)
+ *   C = nominal_velocity (cruise end)
+ *   D = final_velocity (exit)
+ *
+ * All units are in steps and ticks (timer interrupts).
+ * Unit conversion (mm -> steps, sec -> tick) happens in Interpreter.
+ */
 
 namespace cnc
 {
     class planner_block
     {
     public:
-        std::array<cnc_float_type, NMAX_AXES> axdist = {};
-        cnc_float_type nominal_velocity = 0;
-        cnc_float_type start_velocity = 0;
-        cnc_float_type final_velocity = 0;
-        cnc_float_type acceleration = 0;
-        cnc_float_type fullpath = 0;
+        // === Geometry (in steps) ===
+        std::array<cnc_float_type, NMAX_AXES> axdist = {};  ///< Distance per axis [steps]
+        cnc_float_type fullpath = 0;  ///< Euclidean path length [steps]
+
+        // === Velocity profile (in steps/tick) ===
+        cnc_float_type nominal_velocity = 0;  ///< Cruise velocity [steps/tick]
+        cnc_float_type start_velocity = 0;    ///< Entry velocity [steps/tick]
+        cnc_float_type final_velocity = 0;    ///< Exit velocity [steps/tick]
+        cnc_float_type acceleration = 0;      ///< Acceleration magnitude [steps/tick²]
 
     private:
-        std::array<cnc_float_type, NMAX_AXES> _direction = {};
+        std::array<cnc_float_type, NMAX_AXES> _direction = {};  ///< Normalized direction vector [dimensionless, |d|=1]
 
     public:
-        // отметки времени хранят инкрементное время до планирования и
-        // абсолютное время после активации блока.
-        // Скорость показывает инкремент, который прибавляется к dda_counter
-        // за такт работы планировщика. При этом максимальная скорость
-        // равна параметру gears[i] оси i.
-        int64_t start_ic = 0;
-        int64_t acceleration_before_ic =
-            0; // < момент времени до которого идёт разгон
-        int64_t deceleration_after_ic =
-            0; // < момент времени до которого идёт плоский учисток
-        int64_t block_finish_ic =
-            0; // < момент времени, когда блок будет завершён
+        // === Timing (in ticks) ===
+        // Timestamps are relative before activation, absolute after.
+        int64_t start_ic = 0;                 ///< Block start time [tick]
+        int64_t acceleration_before_ic = 0;   ///< End of acceleration phase [tick]
+        int64_t deceleration_after_ic = 0;    ///< Start of deceleration phase [tick]
+        int64_t block_finish_ic = 0;          ///< Block end time [tick]
 
-        int blockno = 0;
-        uint8_t exact_stop = 0;
+        // === Metadata ===
+        int blockno = 0;        ///< Block sequence number
+        uint8_t exact_stop = 0; ///< If true, velocity must reach zero at block end
 
     public:
         void print_to_stream(nos::ostream &os)

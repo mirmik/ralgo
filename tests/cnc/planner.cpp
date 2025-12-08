@@ -10,12 +10,7 @@ TEST_CASE("planner.basic_setup")
 
     planner.set_axes_count(3);
     CHECK_EQ(planner.total_axes(), 3);
-
-    planner.set_gears({100, 200, 300});
-    auto gears = planner.get_gears();
-    CHECK_EQ(gears[0], 100);
-    CHECK_EQ(gears[1], 200);
-    CHECK_EQ(gears[2], 300);
+    CHECK_EQ(planner.get_total_axes(), 3);
 }
 
 TEST_CASE("planner.pause_mode")
@@ -25,7 +20,6 @@ TEST_CASE("planner.pause_mode")
     cnc::planner planner(&blocks, &revolver);
 
     planner.set_axes_count(1);
-    planner.set_gears({1000.0});
 
     auto &block = blocks.head_place();
     block.blockno = 0;

@@ -31,7 +31,7 @@ TEST_CASE("cnc.runtest with gears assigned one")
 
     interpreter.init_axes(3);
     interpreter.set_scale(ralgo::vector<cnc_float_type>{1, 1, 1});
-    planner.set_gears({1, 1, 1});
+    interpreter.set_gears({1, 1, 1});
     interpreter.set_revolver_frequency(freq);
     revolver.set_steppers(steppers_ptrs, 3);
     ralgo::global_protection = false;

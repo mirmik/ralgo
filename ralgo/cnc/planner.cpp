@@ -311,24 +311,6 @@ void cnc::planner::reevaluate_accelerations()
 void cnc::planner::set_axes_count(int total)
 {
     _total_axes = total;
-    // Default steps_per_mm
-    for (int i = 0; i < total; ++i)
-    {
-        _steps_per_mm[i] = 1000.0;
-    }
-}
-
-void cnc::planner::set_gears(const igris::array_view<cnc_float_type> &arr)
-{
-    for (size_t i = 0; i < arr.size() && i < NMAX_AXES; ++i)
-    {
-        _steps_per_mm[i] = arr[i];
-    }
-}
-
-std::array<cnc_float_type, NMAX_AXES> cnc::planner::get_gears()
-{
-    return _steps_per_mm;
 }
 
 size_t cnc::planner::get_total_axes()
@@ -339,13 +321,6 @@ size_t cnc::planner::get_total_axes()
 size_t cnc::planner::total_axes()
 {
     return _total_axes;
-}
-
-void cnc::planner::set_gear(int index, cnc_float_type val)
-{
-    system_lock();
-    _steps_per_mm[index] = val;
-    system_unlock();
 }
 
 void cnc::planner::clear()
@@ -400,15 +375,5 @@ bool cnc::planner::is_not_halt()
 bool cnc::planner::is_halt()
 {
     return !is_not_halt();
-}
-
-void cnc::planner::set_tick_frequency(uint32_t hz)
-{
-    _tick_frequency = hz;
-}
-
-uint32_t cnc::planner::get_tick_frequency() const
-{
-    return _tick_frequency;
 }
 #pragma GCC reset_options

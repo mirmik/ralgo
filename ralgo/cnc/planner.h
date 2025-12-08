@@ -43,10 +43,6 @@ namespace cnc
     {
     private:
         int _total_axes = 0;
-        // Steps per mm for each axis (used by interpreter for mm<->steps)
-        std::array<cnc_float_type, NMAX_AXES> _steps_per_mm = {};
-        // Timer tick frequency in Hz (for steps/sec -> steps/tick conversion)
-        uint32_t _tick_frequency = DEFAULT_TICK_FREQUENCY_HZ;
 
     public:
         bool pause = false;
@@ -90,11 +86,8 @@ namespace cnc
         void iteration_planning_phase(size_t iter);
         std::pair<int, size_t> iteration();
         void set_axes_count(int total);
-        void set_gears(const igris::array_view<cnc_float_type> &);
-        std::array<cnc_float_type, NMAX_AXES> get_gears();
         size_t get_total_axes();
         size_t total_axes();
-        void set_gear(int index, cnc_float_type val);
         void clear();
         int block_index(planner_block *it);
         void fixup_postactive_blocks();
@@ -107,10 +100,6 @@ namespace cnc
         bool is_not_halt();
         bool is_halt();
         void reevaluate_accelerations();
-
-        // Tick frequency management
-        void set_tick_frequency(uint32_t hz);
-        uint32_t get_tick_frequency() const;
     };
 }
 #pragma GCC reset_options
