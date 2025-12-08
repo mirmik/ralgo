@@ -55,7 +55,7 @@ namespace heimer
         }
 
         virtual ~control_node() = default;
-        constexpr control_node(const char *mnemo) : _mnemo(mnemo)
+        control_node(const char *mnemo) : _mnemo(mnemo)
         {
             dlist_add(&control_node_list_lnk, &control_node_list);
         }
