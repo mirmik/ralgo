@@ -599,14 +599,28 @@ namespace cnc
                 return;
             }
 
+            // Create direction vector with only active axes (total_axes)
+            ralgo::vector<cnc_float_type> direction_vec(total_axes);
+            for (int i = 0; i < total_axes; ++i)
+                direction_vec[i] = curvels[i];
             auto direction =
                 ralgo::vecops::normalize<ralgo::vector<cnc_float_type>>(
-                    curvels);
-            auto external_acceleration = smooth_stop_acceleration(direction) /
-                                         revolver_frequency /
+                    direction_vec);
+
+            // Convert acceleration from units/s² to steps/tick²
+            // smooth_stop_acceleration() returns units/s² (same as saved_acc)
+            // We need to multiply by steps_per_unit factor to get steps/s²,
+            // then divide by freq² to get steps/tick²
+            ralgo::vector_view<cnc_float_type> gears(_steps_per_unit.data(),
+                                                      total_axes);
+            auto dirsteps =
+                ralgo::vecops::norm(ralgo::vecops::mul_vv(direction, gears));
+
+            auto external_acceleration = smooth_stop_acceleration(direction) *
+                                         dirsteps / revolver_frequency /
                                          revolver_frequency;
 
-            auto velocity = ralgo::vecops::norm(curvels);
+            auto velocity = ralgo::vecops::norm(direction_vec);
             if (velocity == 0)
             {
                 ralgo::info("prevented because velocity is not valid");

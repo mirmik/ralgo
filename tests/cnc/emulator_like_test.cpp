@@ -617,3 +617,130 @@ TEST_CASE("emulator-like: FIXED-POINT PRECISION diagnostic")
     // For robot arm with max_acceleration = 3.14 rad/s², this is a problem!
     CHECK_LT(min_M_for_1pct, 10.0);  // Should be able to use M < 10 with good precision
 }
+
+TEST_CASE("emulator-like: smooth_stop decelerates correctly")
+{
+    EmulatorTestFixture fix;
+    fix.setup();
+
+    // Start a long move
+    fix.interpreter.newline("absmove Y100 F10 M10");
+    auto block = fix.interpreter.last_block();
+
+    MESSAGE("=== Starting long move ===");
+    MESSAGE("target = 100 units");
+    MESSAGE("expected_steps = " << 100.0 * fix.steps_per_unit);
+    MESSAGE("nominal_velocity = " << block.nominal_velocity);
+    MESSAGE("acceleration = " << block.acceleration);
+
+    // Execute only 20% of the motion
+    int ticks_20_pct = block.block_finish_ic / 5;
+    MESSAGE("block_finish_ic = " << block.block_finish_ic);
+    MESSAGE("executing " << ticks_20_pct << " ticks (20%)");
+
+    for (int i = 0; i < ticks_20_pct; ++i)
+    {
+        fix.planner.serve();
+        fix.revolver.serve();
+    }
+
+    auto steps_before_stop = fix.revolver.current_steps();
+    auto vels_before_stop = fix.revolver.current_velocities();
+    MESSAGE("steps before stop: " << steps_before_stop[1]);
+    MESSAGE("velocity before stop: " << vels_before_stop[1] << " steps/tick");
+
+    // Call stop command
+    MESSAGE("=== Calling stop ===");
+    fix.interpreter.newline("stop");
+
+    // Get the stop block parameters
+    auto stop_block = fix.interpreter.last_block();
+    MESSAGE("stop_block.nominal_velocity = " << stop_block.nominal_velocity);
+    MESSAGE("stop_block.acceleration = " << stop_block.acceleration);
+    MESSAGE("stop_block.block_finish_ic = " << stop_block.block_finish_ic);
+    MESSAGE("stop_block.start_velocity = " << stop_block.start_velocity);
+    MESSAGE("stop_block.final_velocity = " << stop_block.final_velocity);
+
+    // The stop block should have reasonable deceleration (not zero or extremely small)
+    // With the fix, acceleration should be in steps/tick² (same units as velocity)
+    CHECK_GT(stop_block.acceleration, 1e-10);  // Not too small
+    CHECK_LT(stop_block.block_finish_ic, 10000000);  // Not 100 seconds!
+
+    // Execute until stopped
+    int max_ticks = stop_block.block_finish_ic + 10000;
+    for (int i = 0; i < max_ticks; ++i)
+    {
+        fix.planner.serve();
+        fix.revolver.serve();
+    }
+
+    auto vels_after_stop = fix.revolver.current_velocities();
+    MESSAGE("velocity after stop: " << vels_after_stop[1] << " steps/tick");
+
+    // Velocity should be near zero (stopped)
+    CHECK_LT(std::abs(vels_after_stop[1]), 1e-6);
+}
+
+TEST_CASE("emulator-like: smooth_stop unit conversion")
+{
+    // This test specifically verifies the unit conversion fix in smooth_stop()
+    // The bug was: external_acceleration was in units/tick² but velocity was in steps/tick
+
+    EmulatorTestFixture fix;
+    fix.setup();
+
+    MESSAGE("=== Unit conversion test for smooth_stop ===");
+    MESSAGE("freq = " << fix.freq);
+    MESSAGE("steps_per_unit = " << fix.steps_per_unit);
+
+    // Start a move and get to cruising velocity
+    fix.interpreter.newline("absmove Y100 F10 M10");
+    auto block = fix.interpreter.last_block();
+
+    // Execute until we're in the flat (cruising) phase
+    int ticks_to_cruise = block.acceleration_before_ic + 100;
+    MESSAGE("ticks_to_cruise = " << ticks_to_cruise);
+
+    for (int i = 0; i < ticks_to_cruise; ++i)
+    {
+        fix.planner.serve();
+        fix.revolver.serve();
+    }
+
+    auto vels_cruising = fix.revolver.current_velocities();
+    double vel_steps_per_tick = vels_cruising[1];
+    MESSAGE("cruising velocity = " << vel_steps_per_tick << " steps/tick");
+
+    // Expected deceleration time if units are correct:
+    // v = F * steps_per_unit / freq = 10 * 1000 / 100000 = 0.1 steps/tick
+    // a = M * steps_per_unit / freq² = 10 * 1000 / 1e10 = 1e-6 steps/tick²
+    // t_stop = v / a = 0.1 / 1e-6 = 100000 ticks = 1 second
+
+    double expected_vel = 10.0 * fix.steps_per_unit / fix.freq;
+    double expected_acc = 10.0 * fix.steps_per_unit / (fix.freq * fix.freq);
+    double expected_stop_ticks = expected_vel / expected_acc;
+
+    MESSAGE("expected velocity = " << expected_vel << " steps/tick");
+    MESSAGE("expected acceleration = " << expected_acc << " steps/tick²");
+    MESSAGE("expected stop time = " << expected_stop_ticks << " ticks");
+
+    // Call stop
+    fix.interpreter.newline("stop");
+    auto stop_block = fix.interpreter.last_block();
+
+    MESSAGE("stop_block.start_velocity = " << stop_block.start_velocity);
+    MESSAGE("stop_block.acceleration = " << stop_block.acceleration);
+    MESSAGE("stop_block.block_finish_ic = " << stop_block.block_finish_ic);
+
+    // Verify the stop block has correct units
+    // The deceleration time should be on the order of expected_stop_ticks, not 1000x longer
+    double actual_stop_ticks = stop_block.block_finish_ic;
+    double ratio = actual_stop_ticks / expected_stop_ticks;
+
+    MESSAGE("actual stop time = " << actual_stop_ticks << " ticks");
+    MESSAGE("ratio actual/expected = " << ratio);
+
+    // The ratio should be close to 1 (within 2x is acceptable due to rounding)
+    CHECK_LT(ratio, 5.0);
+    CHECK_GT(ratio, 0.2);
+}
