@@ -741,61 +741,93 @@ namespace cnc
             return 0;
         }
 
+        int gcode_help(nos::ostream &os)
+        {
+            nos::println_to(os, "G1 <axis><pos>... F<feed> M<accel> - linear move (relative)");
+            nos::println_to(os, "  Example: G1 X10 Y-5 F100 M500");
+            nos::println_to(os, "M112 - emergency stop");
+            nos::println_to(os, "M204 [<accel>] - get/set default acceleration");
+            return 0;
+        }
+
         igris::static_callable_collection<int(const nos::argv &,
                                               nos::ostream &),
                                           50>
             clicommands{
                 {"setprotect",
-                 "setprotect",
+                 "Disable global protection (no args)",
                  [](const nos::argv &, nos::ostream &) {
                      ralgo::global_protection = false;
                      ralgo::info("Protection disabled");
                      return 0;
                  }},
+
                 {"stop",
-                 "stop",
+                 "Smooth stop all axes with deceleration (no args)",
                  [this](const nos::argv &, nos::ostream &) {
                      smooth_stop();
                      return 0;
                  }},
 
                 {"lastblock",
-                 "lastblock",
+                 "Print info about last/current motion block (no args)",
                  [this](const nos::argv &, nos::ostream &os) {
                      last_block().print_to_stream(os);
                      return 0;
                  }},
 
                 {"relmove",
-                 "relmove",
+                 "Relative move. Args: <axis><dist>... F<feed> M<accel>. "
+                 "Example: relmove X10 Y-5 F100 M500",
                  [this](const nos::argv &argv, nos::ostream &os) {
+                     if (argv.size() < 2)
+                     {
+                         nos::println_to(os, "Usage: relmove <axis><dist>... F<feed_mm/s> M<accel_mm/s2>");
+                         nos::println_to(os, "  Axes: X,Y,Z,A,B,C,I,J,K (0-8)");
+                         nos::println_to(os, "  Example: relmove X10 Y-5.5 Z2 F100 M500");
+                         return 0;
+                     }
                      command_incremental_move(argv.without(1), os);
                      return 0;
                  }},
 
                 {"absmove",
-                 "absmove",
+                 "Absolute move. Args: <axis><pos>... F<feed> M<accel>. "
+                 "Example: absmove X100 Y50 F100 M500",
                  [this](const nos::argv &argv, nos::ostream &os) {
+                     if (argv.size() < 2)
+                     {
+                         nos::println_to(os, "Usage: absmove <axis><pos>... F<feed_mm/s> M<accel_mm/s2>");
+                         nos::println_to(os, "  Axes: X,Y,Z,A,B,C,I,J,K (0-8)");
+                         nos::println_to(os, "  Example: absmove X100 Y50 Z0 F100 M500");
+                         return 0;
+                     }
                      command_absolute_move(argv.without(1), os);
                      return 0;
                  }},
 
                 {"abspulses",
-                 "abspulses",
+                 "Absolute move in pulses (steps). Args: <axis><steps>... F<feed> M<accel>",
                  [this](const nos::argv &argv, nos::ostream &os) {
+                     if (argv.size() < 2)
+                     {
+                         nos::println_to(os, "Usage: abspulses <axis><steps>... F<feed> M<accel>");
+                         nos::println_to(os, "  Example: abspulses X1000 Y500 F100 M500");
+                         return 0;
+                     }
                      command_absolute_pulses(argv.without(1), os);
                      return 0;
                  }},
 
                 {"steps",
-                 "steps",
+                 "Print current position in steps/pulses for all axes (no args)",
                  [this](const nos::argv &, nos::ostream &os) {
                      nos::println_to(os, current_steps());
                      return 0;
                  }},
 
                 {"finishes",
-                 "finishes",
+                 "Print current/final position in mm for all axes (no args)",
                  [this](const nos::argv &, nos::ostream &os) {
                      nos::print_list_to(os, _final_position);
                      nos::println_to(os);
@@ -803,7 +835,7 @@ namespace cnc
                  }},
 
                 {"gains",
-                 "gains",
+                 "Print input scaling factors for all axes (no args)",
                  [this](const nos::argv &, nos::ostream &os) {
                      nos::print_list_to(os, gains);
                      nos::println_to(os);
@@ -811,7 +843,7 @@ namespace cnc
                  }},
 
                 {"gears",
-                 "gears",
+                 "Print steps_per_mm (gears) for all axes (no args)",
                  [this](const nos::argv &, nos::ostream &os) {
                      nos::print_list_to(os, _steps_per_mm);
                      nos::println_to(os);
@@ -819,8 +851,15 @@ namespace cnc
                  }},
 
                 {"setgear",
-                 "setgear",
-                 [this](const nos::argv &argv, nos::ostream &) {
+                 "Set steps_per_mm for axis. Args: <axis> <value>. "
+                 "Example: setgear X 100.5",
+                 [this](const nos::argv &argv, nos::ostream &os) {
+                     if (argv.size() < 3)
+                     {
+                         nos::println_to(os, "Usage: setgear <axis> <steps_per_mm>");
+                         nos::println_to(os, "  Example: setgear X 100.5");
+                         return 0;
+                     }
                      auto axno = symbol_to_index(argv[1][0]);
                      cnc_float_type val = igris_atof64(argv[2].data(), NULL);
                      set_steps_per_mm(axno, val);
@@ -829,8 +868,14 @@ namespace cnc
                  }},
 
                 {"set_control_gear",
-                 "set_control_gear",
-                 [this](const nos::argv &argv, nos::ostream &) {
+                 "Set control gear (steps_per_mm). Args: <axis> <value>. "
+                 "Same as setgear",
+                 [this](const nos::argv &argv, nos::ostream &os) {
+                     if (argv.size() < 3)
+                     {
+                         nos::println_to(os, "Usage: set_control_gear <axis> <value>");
+                         return 0;
+                     }
                      auto axno = symbol_to_index(argv[1][0]);
                      cnc_float_type val = igris_atof64(argv[2].data(), NULL);
                      set_steps_per_mm(axno, val);
@@ -839,8 +884,13 @@ namespace cnc
                  }},
 
                 {"set_feedback_gear",
-                 "set_feedback_gear",
-                 [this](const nos::argv &argv, nos::ostream &) {
+                 "Set feedback gear (encoder multiplier). Args: <axis> <value>",
+                 [this](const nos::argv &argv, nos::ostream &os) {
+                     if (argv.size() < 3)
+                     {
+                         nos::println_to(os, "Usage: set_feedback_gear <axis> <value>");
+                         return 0;
+                     }
                      auto axno = symbol_to_index(argv[1][0]);
                      cnc_float_type val = igris_atof64(argv[2].data(), NULL);
                      feedback_guard->set_feedback_to_drive_multiplier(axno,
@@ -849,34 +899,55 @@ namespace cnc
                  }},
 
                 {"setpos",
-                 "setpos",
-                 [this](const nos::argv &argv, nos::ostream &) {
+                 "Set current position without moving. Args: <axis> <pos_mm>. "
+                 "Example: setpos X 0",
+                 [this](const nos::argv &argv, nos::ostream &os) {
+                     if (argv.size() < 3)
+                     {
+                         nos::println_to(os, "Usage: setpos <axis> <position_mm>");
+                         nos::println_to(os, "  Sets current position without moving (for homing)");
+                         nos::println_to(os, "  Example: setpos X 0");
+                         return 0;
+                     }
                      auto axno = symbol_to_index(argv[1][0]);
                      cnc_float_type val_mm = igris_atof64(argv[2].data(), NULL);
                      system_lock();
-                     _final_position[axno] = val_mm;  // Store in mm
-                     // Set stepper counter in steps
+                     _final_position[axno] = val_mm;
                      steps_t steps = static_cast<steps_t>(val_mm * _steps_per_mm[axno]);
                      revolver->get_steppers()[axno]->set_counter_value(steps);
                      feedback_guard->set_feedback_position(axno, val_mm);
                      system_unlock();
                      return 0;
                  }},
+
                 {"disable_tandem_protection",
-                 "disable_tandem_protection",
-                 [this](const nos::argv &argv, nos::ostream &) {
+                 "Disable tandem protection by index. Args: <index>",
+                 [this](const nos::argv &argv, nos::ostream &os) {
+                     if (argv.size() < 2)
+                     {
+                         nos::println_to(os, "Usage: disable_tandem_protection <index>");
+                         return 0;
+                     }
                      auto idx = std::stoi(argv[1]);
                      feedback_guard->remove_tandem(idx);
                      return 0;
                  }},
+
                 {"enable_tandem_protection",
-                 "enable_tandem_protection",
+                 "Enable tandem protection. Args: <master_axis>,<slave_axis>:<max_error>",
                  [this](const nos::argv &argv, nos::ostream &os) {
+                     if (argv.size() < 2)
+                     {
+                         nos::println_to(os, "Usage: enable_tandem_protection <master>,<slave>:<max_error>");
+                         nos::println_to(os, "  Example: enable_tandem_protection 0,1:10");
+                         return 0;
+                     }
                      feedback_guard->add_tandem_command(argv.without(1), os);
                      return 0;
                  }},
+
                 {"tandem_info",
-                 "tandem_info",
+                 "Print info about configured tandem axes (no args)",
                  [this](const nos::argv &, nos::ostream &os) {
                      const auto &tandems = feedback_guard->tandems();
                      if (tandems.size() == 0)
@@ -889,14 +960,22 @@ namespace cnc
                      }
                      return 0;
                  }},
+
                 {"drop_pulses_allowed",
-                 "drop_pulses_allowed",
+                 "Get/set max following error. Args: <axis> [<pulses>]. "
+                 "Without value - prints current",
                  [this](const nos::argv &argv, nos::ostream &os) {
+                     if (argv.size() < 2)
+                     {
+                         nos::println_to(os, "Usage: drop_pulses_allowed <axis> [<max_pulses>]");
+                         nos::println_to(os, "  Without value - prints current setting");
+                         return 0;
+                     }
                      size_t no = std::stoi(argv[1]);
 
                      if (argv.size() > 2)
                      {
-                         int64_t pulses = std::stoi(argv[1]);
+                         int64_t pulses = std::stoi(argv[2]);
                          feedback_guard->set_drop_pulses_allowed(no, pulses);
                      }
                      else
@@ -906,9 +985,17 @@ namespace cnc
                      }
                      return 0;
                  }},
+
                 {"velmaxs",
-                 "Set maximum velocity for axes",
-                 [this](const nos::argv &argv, nos::ostream &) {
+                 "Set max velocities (mm/s). Args: <idx>:<vel>... "
+                 "Example: velmaxs 0:100 1:100 2:50",
+                 [this](const nos::argv &argv, nos::ostream &os) {
+                     if (argv.size() < 2)
+                     {
+                         nos::println_to(os, "Usage: velmaxs <axis>:<velocity>...");
+                         nos::println_to(os, "  Example: velmaxs 0:100 1:100 2:50");
+                         return 0;
+                     }
                      auto fmap = args_to_index_value_map(argv.without(1));
                      for (auto &[key, val] : fmap)
                      {
@@ -916,35 +1003,68 @@ namespace cnc
                      }
                      return 0;
                  }},
+
                 {"accmaxs",
-                 "Set maximum accelerations for axes",
-                 [this](const nos::argv &argv, nos::ostream &) {
+                 "Set max accelerations (mm/s^2). Args: <idx>:<acc>... "
+                 "Example: accmaxs 0:1000 1:1000 2:500",
+                 [this](const nos::argv &argv, nos::ostream &os) {
+                     if (argv.size() < 2)
+                     {
+                         nos::println_to(os, "Usage: accmaxs <axis>:<acceleration>...");
+                         nos::println_to(os, "  Example: accmaxs 0:1000 1:1000 2:500");
+                         return 0;
+                     }
                      auto fmap = args_to_index_value_map(argv.without(1));
                      for (auto &[key, val] : fmap)
                          max_axes_accelerations[key] = val;
                      return 0;
                  }},
+
                 {"help",
-                 "print this help",
+                 "Print all commands (text + G-code)",
+                 [this](const nos::argv &, nos::ostream &os) {
+                     nos::println_to(os, "=== Text commands ===");
+                     command_help(os);
+                     nos::println_to(os, "\n=== G-code commands ===");
+                     gcode_help(os);
+                     return 0;
+                 }},
+
+                {"help-cmd",
+                 "Print text commands help",
                  [this](const nos::argv &, nos::ostream &os) {
                      command_help(os);
                      return 0;
                  }},
+
+                {"help-cnc",
+                 "Print G-code commands help",
+                 [this](const nos::argv &, nos::ostream &os) {
+                     gcode_help(os);
+                     return 0;
+                 }},
+
                 {"state",
-                 "print interpreter state",
+                 "Print interpreter state: freq, vel, acc, gears, etc (no args)",
                  [this](const nos::argv &, nos::ostream &os) {
                      return print_interpreter_state(os);
                  }},
 
                 {"guard_info",
-                 "print guard info",
+                 "Print feedback guard state and errors (no args)",
                  [this](const nos::argv &, nos::ostream &os) {
                      return feedback_guard->guard_info(os);
                  }},
 
                 {"planner_pause",
-                 "Stop plannering",
-                 [this](const nos::argv &argv, nos::ostream &) {
+                 "Pause/resume planner. Args: <0|1>. 1=pause, 0=resume",
+                 [this](const nos::argv &argv, nos::ostream &os) {
+                     if (argv.size() < 2)
+                     {
+                         nos::println_to(os, "Usage: planner_pause <0|1>");
+                         nos::println_to(os, "  1 = pause, 0 = resume");
+                         return 0;
+                     }
                      auto en = std::stoi(argv[1]);
                      planner->set_pause_mode(en);
                      return 0;
@@ -999,19 +1119,54 @@ namespace cnc
             return 0;
         }
 
+        // Check if command is G-code (starts with G or M + digit)
+        static bool is_gcode_command(const std::string_view &cmd)
+        {
+            if (cmd.size() < 2)
+                return false;
+            char c = cmd[0];
+            return (c == 'G' || c == 'M') && std::isdigit(cmd[1]);
+        }
+
+        // Legacy executor for backward compatibility with cmd/cnc prefixes
         nos::executor executor = nos::executor({
             {"cmd",
-             "commands",
+             "text commands (legacy prefix)",
              nos::make_delegate(&interpreter::command_drop_first, this)},
             {"cnc",
-             "gcode commands",
+             "gcode commands (legacy prefix)",
              nos::make_delegate(&interpreter::gcode_drop_first, this)},
         });
 
         std::string newline(const char *line, size_t)
         {
             nos::string_buffer output;
-            executor.execute(nos::tokens(line), output);
+            auto tokens = nos::tokens(line);
+
+            if (tokens.empty())
+                return output.str();
+
+            const auto &first = tokens[0];
+
+            // Check for legacy prefixes (backward compatibility)
+            if (first == "cmd" || first == "cnc")
+            {
+                executor.execute(tokens, output);
+                return output.str();
+            }
+
+            // Auto-detect command type
+            if (is_gcode_command(first))
+            {
+                // G-code command
+                gcode(nos::argv(tokens), output);
+            }
+            else
+            {
+                // Text command
+                command(nos::argv(tokens), output);
+            }
+
             return output.str();
         }
 

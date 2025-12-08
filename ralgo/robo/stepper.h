@@ -1,6 +1,8 @@
 #ifndef RALGO_ROBO_STEPPER_H
 #define RALGO_ROBO_STEPPER_H
 
+#include <cstdint>
+
 namespace robo
 {
     class stepper
