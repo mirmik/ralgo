@@ -1,16 +1,17 @@
 #include <ralgo/cnc/revolver.h>
+#include <ralgo/cnc/util.h>
 
-cnc::revolver::revolver() : revolver_task_ring(100)
+cnc::revolver::revolver() : task_queue(100)
 {
-    std::fill(dda_counters_fixed.begin(), dda_counters_fixed.end(), 0);
-    std::fill(velocities_fixed.begin(), velocities_fixed.end(), 0);
-    current_revolver_task = nullptr;
+    positions_fixed.fill(0);
+    velocities_fixed.fill(0);
+    current_task = nullptr;
 }
 
-bool cnc::revolver::is_empty()
+void cnc::revolver::set_steppers(robo::stepper **steppers_table, int count)
 {
-    igris::syslock_guard guard;
-    return revolver_task_ring.empty();
+    steppers = steppers_table;
+    steppers_total = count;
 }
 
 robo::stepper **cnc::revolver::get_steppers()
@@ -18,122 +19,147 @@ robo::stepper **cnc::revolver::get_steppers()
     return steppers;
 }
 
-void cnc::revolver::set_steppers(robo::stepper **steppers_table, int size)
+bool cnc::revolver::is_empty()
 {
-    steppers = steppers_table;
-    steppers_total = size;
+    igris::syslock_guard guard;
+    return task_queue.empty() && current_task == nullptr;
 }
 
-void cnc::revolver::current_steps(int64_t *steps)
+int cnc::revolver::queue_room()
 {
-    system_lock();
-    for (int i = 0; i < steppers_total; ++i)
-        steps[i] = steppers[i]->steps_count();
-    system_unlock();
+    igris::syslock_guard guard;
+    return task_queue.room();
 }
 
-std::vector<int64_t> cnc::revolver::current_steps()
+int cnc::revolver::queue_size()
 {
-    std::vector<int64_t> vec(steppers_total);
-    system_lock();
-    for (int i = 0; i < steppers_total; ++i)
-        vec[i] = steppers[i]->steps_count();
-    system_unlock();
-    return vec;
+    igris::syslock_guard guard;
+    return task_queue.avail();
 }
 
-std::vector<int64_t> cnc::revolver::current_steps_no_lock()
+void cnc::revolver::advance_to_next_task()
 {
-    std::vector<int64_t> vec(steppers_total);
-    for (int i = 0; i < steppers_total; ++i)
-        vec[i] = steppers[i]->steps_count();
-    return vec;
-}
-
-int cnc::revolver::room()
-{
-    // Операция взятия оставшегося места над кольцевым буфером
-    // требует сравнения head и tail, изменяемых в разных потоках,
-    // поэтому не является атомарной.
-    system_lock();
-    int ret = revolver_task_ring.room();
-    system_unlock();
-
-    return ret;
-}
-
-void cnc::revolver::cleanup()
-{
-    system_lock();
-    std::fill(dda_counters_fixed.begin(), dda_counters_fixed.end(), 0);
-    std::fill(velocities_fixed.begin(), velocities_fixed.end(), 0);
-    revolver_task_ring.clear();
-    current_revolver_task = nullptr;
-    system_unlock();
+    if (!task_queue.empty())
+    {
+        current_task = &task_queue.tail();
+        ticks_remaining = current_task->duration_ticks;
+    }
+    else
+    {
+        current_task = nullptr;
+        ticks_remaining = 0;
+    }
 }
 
 void cnc::revolver::serve()
 {
-    if (current_revolver_task == nullptr && !revolver_task_ring.empty())
+    // Get next task if needed
+    if (current_task == nullptr)
     {
-        current_revolver_task = &revolver_task_ring.tail();
-        counter = current_revolver_task->counter;
+        if (task_queue.empty())
+            return;
+        advance_to_next_task();
     }
 
-    if (current_revolver_task == nullptr)
-    {
+    if (current_task == nullptr)
         return;
-    }
 
+    // DDA integration for each axis
     for (int i = 0; i < steppers_total; ++i)
     {
-        dda_counters_fixed[i] +=
-            velocities_fixed[i] +
-            (current_revolver_task->accelerations_fixed[i] >> 1);
+        // Integrate: velocity += acceleration (using midpoint for better accuracy)
+        fixed_t half_accel = current_task->accelerations_fixed[i] >> 1;
+        positions_fixed[i] += velocities_fixed[i] + half_accel;
+        velocities_fixed[i] += current_task->accelerations_fixed[i];
 
-        int64_t double_gears = gears_fixed[i] + gears_fixed[i];
-        assert(dda_counters_fixed[i] >= -double_gears &&
-               dda_counters_fixed[i] <= double_gears);
-
+        // Generate steps when position crosses integer boundaries
         auto &stepper = *steppers[i];
-        if (dda_counters_fixed[i] > gears_high_trigger_fixed[i])
+
+        while (positions_fixed[i] >= FIXED_POINT_MUL)
         {
-            dda_counters_fixed[i] -= gears_fixed[i];
+            positions_fixed[i] -= FIXED_POINT_MUL;
             stepper.inc();
         }
-        else if (dda_counters_fixed[i] < -gears_high_trigger_fixed[i])
+
+        while (positions_fixed[i] < 0)
         {
+            positions_fixed[i] += FIXED_POINT_MUL;
             stepper.dec();
-            dda_counters_fixed[i] += gears_fixed[i];
         }
-        velocities_fixed[i] += current_revolver_task->accelerations_fixed[i];
     }
 
-    counter--;
+    // Advance tick counter
+    ticks_remaining--;
 
-    if (counter == 0)
+    if (ticks_remaining <= 0)
     {
-        revolver_task_ring.move_tail_one();
-        current_revolver_task = nullptr;
+        task_queue.move_tail_one();
+        advance_to_next_task();
     }
+}
+
+void cnc::revolver::get_current_steps(steps_t *out_steps)
+{
+    igris::syslock_guard guard;
+    for (int i = 0; i < steppers_total; ++i)
+    {
+        out_steps[i] = steppers[i]->steps_count();
+    }
+}
+
+std::vector<steps_t> cnc::revolver::get_current_steps()
+{
+    std::vector<steps_t> result(steppers_total);
+    igris::syslock_guard guard;
+    for (int i = 0; i < steppers_total; ++i)
+    {
+        result[i] = steppers[i]->steps_count();
+    }
+    return result;
+}
+
+std::vector<steps_t> cnc::revolver::get_current_steps_no_lock()
+{
+    std::vector<steps_t> result(steppers_total);
+    for (int i = 0; i < steppers_total; ++i)
+    {
+        result[i] = steppers[i]->steps_count();
+    }
+    return result;
+}
+
+std::array<cnc_float_type, NMAX_AXES> cnc::revolver::get_current_velocities()
+    const
+{
+    std::array<cnc_float_type, NMAX_AXES> result = {};
+    for (size_t i = 0; i < NMAX_AXES; ++i)
+    {
+        result[i] =
+            static_cast<cnc_float_type>(velocities_fixed[i]) / FIXED_POINT_MUL;
+    }
+    return result;
 }
 
 void cnc::revolver::clear()
 {
-    system_lock();
-    revolver_task_ring.clear();
-    current_revolver_task = nullptr;
-    counter = 0;
-    std::fill(dda_counters_fixed.begin(), dda_counters_fixed.end(), 0);
-    std::fill(velocities_fixed.begin(), velocities_fixed.end(), 0);
-    system_unlock();
+    igris::syslock_guard guard;
+    task_queue.clear();
+    current_task = nullptr;
+    ticks_remaining = 0;
+    positions_fixed.fill(0);
+    velocities_fixed.fill(0);
 }
 
-void cnc::revolver::clear_no_velocity_drop()
+void cnc::revolver::clear_keep_velocity()
 {
-    system_lock();
-    revolver_task_ring.clear();
-    current_revolver_task = nullptr;
-    counter = 0;
-    system_unlock();
+    igris::syslock_guard guard;
+    task_queue.clear();
+    current_task = nullptr;
+    ticks_remaining = 0;
+    // Keep velocities for smooth stop
+}
+
+void cnc::revolver::reset()
+{
+    clear();
 }

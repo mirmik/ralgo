@@ -134,8 +134,14 @@ namespace cnc
         void restore_finishes()
         {
             auto steps = revolver->current_steps();
+            auto gears = planner->get_gears();  // steps_per_mm
             for (int i = 0; i < total_axes; ++i)
-                _final_position[i] = steps[i] * planner->revolver->get_gear(i);
+            {
+                // Convert steps to mm: mm = steps / steps_per_mm
+                if (gears[i] != 0)
+                    _final_position[i] =
+                        static_cast<cnc_float_type>(steps[i]) / gears[i];
+            }
         }
 
         void final_shift_handle()
@@ -299,10 +305,21 @@ namespace cnc
             if (tasknorm == 0)
                 return true;
 
-            // Это записано для инкрементального режима:
-            auto intdists =
+            // Get steps_per_mm for unit conversion
+            auto gears_full = planner->get_gears();  // steps_per_mm [NMAX_AXES]
+            // Create view with only total_axes elements
+            ralgo::vector_view<cnc_float_type> gears(gears_full.data(),
+                                                     total_axes);
+
+            // Apply gains (user-space scaling)
+            auto intdists_mm =
                 ralgo::vecops::mul_vv<ralgo::vector<cnc_float_type>>(
                     task.poses(), gains);
+
+            // Convert mm to steps
+            auto intdists_steps =
+                ralgo::vecops::mul_vv<ralgo::vector<cnc_float_type>>(
+                    intdists_mm, gears);
 
             auto direction =
                 ralgo::vecops::normalize<ralgo::vector<cnc_float_type>>(
@@ -310,6 +327,11 @@ namespace cnc
 
             auto dirgain =
                 ralgo::vecops::norm(ralgo::vecops::mul_vv(direction, gains));
+
+            // Calculate steps_per_mm scaling factor for velocity/acceleration
+            // Uses direction-weighted average for multi-axis moves
+            auto dirsteps =
+                ralgo::vecops::norm(ralgo::vecops::mul_vv(direction, gears));
 
             auto evalfeed = evaluate_external_accfeed_2(
                 direction, task.feed, max_axes_velocities);
@@ -328,13 +350,16 @@ namespace cnc
                 return true;
             }
 
-            cnc_float_type feed = evalfeed * dirgain;
-            cnc_float_type acc = evalacc * dirgain;
+            // Convert mm/sec to steps/sec
+            cnc_float_type feed_mm = evalfeed * dirgain;
+            cnc_float_type acc_mm = evalacc * dirgain;
+            cnc_float_type feed_steps = feed_mm * dirsteps;
+            cnc_float_type acc_steps = acc_mm * dirsteps;
 
-            // scale feed and acc by revolver freqs settings.
-            cnc_float_type reduced_feed = feed / revolver_frequency;
+            // Convert steps/sec to steps/tick
+            cnc_float_type reduced_feed = feed_steps / revolver_frequency;
             cnc_float_type reduced_acc =
-                acc / (revolver_frequency * revolver_frequency);
+                acc_steps / (revolver_frequency * revolver_frequency);
 
             if (feedback_guard)
                 for (auto idx : task.active_axes)
@@ -342,8 +367,9 @@ namespace cnc
                     feedback_guard->enable_tandem_protection_for_axis(idx);
                 }
 
-            // output
-            block.set_state(intdists, total_axes, reduced_feed, reduced_acc);
+            // Output: distances in steps, velocity/acc in steps/tick
+            block.set_state(
+                intdists_steps, total_axes, reduced_feed, reduced_acc);
             return false;
         }
 
@@ -385,8 +411,13 @@ namespace cnc
                 return;
             }
 
+            // axdist is in steps, convert back to mm for _final_position
+            auto gears = planner->get_gears();  // steps_per_mm
             for (int i = 0; i < total_axes; ++i)
-                _final_position[i] += lastblock.axdist[i];
+            {
+                if (gears[i] != 0)
+                    _final_position[i] += lastblock.axdist[i] / gears[i];
+            }
 
             auto &placeblock = blocks->head_place();
             lastblock.blockno = blockno++;
@@ -537,8 +568,13 @@ namespace cnc
             }
 
             restore_finishes();
+            // axdist is in steps, convert back to mm for _final_position
+            auto gears = planner->get_gears();  // steps_per_mm
             for (int i = 0; i < total_axes; ++i)
-                _final_position[i] += lastblock.axdist[i];
+            {
+                if (gears[i] != 0)
+                    _final_position[i] += lastblock.axdist[i] / gears[i];
+            }
 
             planner->clear_for_stop();
             planner->force_skip_all_blocks();
@@ -762,13 +798,14 @@ namespace cnc
                  "setpos",
                  [this](const nos::argv &argv, nos::ostream &) {
                      auto axno = symbol_to_index(argv[1][0]);
-                     cnc_float_type val = igris_atof64(argv[2].data(), NULL);
+                     cnc_float_type val_mm = igris_atof64(argv[2].data(), NULL);
+                     auto gears = planner->get_gears();  // steps_per_mm
                      system_lock();
-                     _final_position[axno] =
-                         val * planner->revolver->get_gear(axno);
-                     revolver->get_steppers()[axno]->set_counter_value(val);
-                     feedback_guard->set_feedback_position(
-                         axno, _final_position[axno]);
+                     _final_position[axno] = val_mm;  // Store in mm
+                     // Set stepper counter in steps
+                     steps_t steps = static_cast<steps_t>(val_mm * gears[axno]);
+                     revolver->get_steppers()[axno]->set_counter_value(steps);
+                     feedback_guard->set_feedback_position(axno, val_mm);
                      system_unlock();
                      return 0;
                  }},

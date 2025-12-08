@@ -41,7 +41,7 @@ void cnc::planner::force_skip_all_blocks()
 
 void cnc::planner::update_triggers()
 {
-    revolver->update_triggers();
+    // No longer needed - gears are stored in planner now
 }
 
 void cnc::planner::set_dim(int axes)
@@ -197,10 +197,14 @@ int cnc::planner::serve(bool prevent_small_rooms)
 
 /// В этой фазе расчитывается программе револьвера
 /// на основе интегрирования ускорений и скоростей.
+/// Ускорения уже в steps/tick² (конвертация mm→steps в interpreter)
 void cnc::planner::iteration_planning_phase(size_t iter)
 {
     if (revolver)
-        revolver->revolver_task_ring.emplace(accelerations, iter);
+    {
+        // accelerations already in steps/tick² (converted by interpreter)
+        revolver->task_queue.emplace(accelerations, iter);
+    }
 
     iteration_counter += iter;
 }
@@ -307,19 +311,24 @@ void cnc::planner::reevaluate_accelerations()
 void cnc::planner::set_axes_count(int total)
 {
     _total_axes = total;
-    revolver->gears_fill(1000);
-    update_triggers();
+    // Default steps_per_mm
+    for (int i = 0; i < total; ++i)
+    {
+        _steps_per_mm[i] = 1000.0;
+    }
 }
 
 void cnc::planner::set_gears(const igris::array_view<cnc_float_type> &arr)
 {
-    revolver->set_gears(arr.data(), arr.size());
-    update_triggers();
+    for (size_t i = 0; i < arr.size() && i < NMAX_AXES; ++i)
+    {
+        _steps_per_mm[i] = arr[i];
+    }
 }
 
 std::array<cnc_float_type, NMAX_AXES> cnc::planner::get_gears()
 {
-    return revolver->get_gears();
+    return _steps_per_mm;
 }
 
 size_t cnc::planner::get_total_axes()
@@ -335,8 +344,7 @@ size_t cnc::planner::total_axes()
 void cnc::planner::set_gear(int index, cnc_float_type val)
 {
     system_lock();
-    revolver->set_gear(index, val);
-    update_triggers();
+    _steps_per_mm[index] = val;
     system_unlock();
 }
 
@@ -392,5 +400,15 @@ bool cnc::planner::is_not_halt()
 bool cnc::planner::is_halt()
 {
     return !is_not_halt();
+}
+
+void cnc::planner::set_tick_frequency(uint32_t hz)
+{
+    _tick_frequency = hz;
+}
+
+uint32_t cnc::planner::get_tick_frequency() const
+{
+    return _tick_frequency;
 }
 #pragma GCC reset_options

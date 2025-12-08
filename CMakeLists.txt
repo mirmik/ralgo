@@ -26,8 +26,9 @@ file(GLOB RALGO_SOURCES
 	ralgo/cnc/*.cpp
 )
 
-file(GLOB SOURCES_TEST 
+file(GLOB SOURCES_TEST
 	tests/*.cpp
+	tests/cnc/*.cpp
 )
 	
 if(${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME})

@@ -1,225 +1,210 @@
 #include <doctest/doctest.h>
 #include <ralgo/cnc/planner.h>
+#include <ralgo/robo/stepper.h>
 
-TEST_CASE("planner.0")
+TEST_CASE("planner.basic_setup")
 {
     igris::ring<cnc::planner_block> blocks(10);
-    igris::ring<cnc::control_shift> shifts(10);
-
     cnc::revolver revolver;
     cnc::planner planner(&blocks, &revolver);
-    planner.disable_frequency_protection();
-    planner.set_dim(1);
 
+    planner.set_axes_count(3);
+    CHECK_EQ(planner.total_axes(), 3);
+
+    planner.set_gears({100, 200, 300});
+    auto gears = planner.get_gears();
+    CHECK_EQ(gears[0], 100);
+    CHECK_EQ(gears[1], 200);
+    CHECK_EQ(gears[2], 300);
+}
+
+TEST_CASE("planner.block_lifecycle")
+{
+    igris::ring<cnc::planner_block> blocks(10);
+    cnc::revolver revolver;
+    cnc::planner planner(&blocks, &revolver);
+    robo::stepper steppers[2];
+    robo::stepper *steppers_ptrs[] = {&steppers[0], &steppers[1]};
+
+    revolver.set_steppers(steppers_ptrs, 2);
+    planner.set_axes_count(2);
+    planner.set_gears({1000.0, 1000.0});
+
+    CHECK(blocks.empty());
+    CHECK_EQ(planner.active_block, nullptr);
+
+    // Добавляем блок с большой длительностью, чтобы он не завершился за один serve()
     auto &block = blocks.head_place();
-
+    block.blockno = 0;  // Important for planner validation
     block.nominal_velocity = 0.5;
     block.acceleration = 0.1;
-    block.set_direction({1});
-    block.acceleration_before_ic = 5;
-    block.deceleration_after_ic = 95;
-    block.block_finish_ic = 100;
-
-    block.exact_stop = 0;
+    block.set_direction({1, 0});
+    block.start_ic = 0;
+    block.acceleration_before_ic = 500;
+    block.deceleration_after_ic = 1000;
+    block.block_finish_ic = 1500;
+    block.fullpath = 10;
+    block.exact_stop = 1;
     blocks.move_head_one();
-    CHECK_EQ(blocks.room(), 9);
-    // CHECK_EQ(shifts.room(), 10);
+
+    CHECK_FALSE(blocks.empty());
+    CHECK_EQ(blocks.avail(), 1);
+
+    // После serve блок должен стать активным
+    planner.serve(false);
+    CHECK(planner.active_block != nullptr);
+}
+
+TEST_CASE("planner.state_transitions")
+{
+    igris::ring<cnc::planner_block> blocks(10);
+    cnc::revolver revolver;
+    cnc::planner planner(&blocks, &revolver);
+    robo::stepper steppers[1];
+    robo::stepper *steppers_ptrs[] = {&steppers[0]};
+
+    revolver.set_steppers(steppers_ptrs, 1);
+    planner.set_axes_count(1);
+    planner.set_gears({1000.0});
+
+    // Создаём блок с чётким профилем: 2 такта разгон, 2 такта плоский, 2 такта
+    // торможение
+    auto &block = blocks.head_place();
+    block.blockno = 0;
+    block.nominal_velocity = 500.0;
+    block.acceleration = 250.0;
+    block.set_direction({1});
+    block.start_ic = 0;
+    block.acceleration_before_ic = 2;
+    block.deceleration_after_ic = 4;
+    block.block_finish_ic = 6;
+    block.fullpath = 2;
+    block.exact_stop = 1;
+    blocks.move_head_one();
+
+    // Начальное состояние
+    CHECK_EQ(planner.state, 0);
+
+    // Первая итерация — разгон
+    planner.serve(false);
+    CHECK(planner.active_block != nullptr);
+
+    // Проверяем ускорения во время разгона
+    CHECK_EQ(planner.accelerations[0], doctest::Approx(250.0));
+
+    // Прогоняем до конца разгона
+    planner.iteration();
+    CHECK_EQ(planner.state, 0); // ещё разгон
+
+    planner.iteration();
+    CHECK_EQ(planner.state, 1); // переход на плоский участок
+    CHECK_EQ(planner.accelerations[0], doctest::Approx(0.0));
+}
+
+TEST_CASE("planner.acceleration_evaluation")
+{
+    igris::ring<cnc::planner_block> blocks(10);
+    cnc::revolver revolver;
+    cnc::planner planner(&blocks, &revolver);
+    robo::stepper steppers[2];
+    robo::stepper *steppers_ptrs[] = {&steppers[0], &steppers[1]};
+
+    revolver.set_steppers(steppers_ptrs, 2);
+    planner.set_axes_count(2);
+    planner.set_gears({1000.0, 1000.0});
+
+    // Блок с направлением (0.6, 0.8) — нормализованный вектор
+    auto &block = blocks.head_place();
+    block.blockno = 0;
+    block.nominal_velocity = 1000.0;
+    block.acceleration = 500.0;
+    block.set_direction({0.6, 0.8});
+    block.start_ic = 0;
+    block.acceleration_before_ic = 2;
+    block.deceleration_after_ic = 4;
+    block.block_finish_ic = 6;
+    block.fullpath = 5000;
+    block.exact_stop = 1;
+    blocks.move_head_one();
 
     planner.serve(false);
 
-    // CHECK_EQ(shifts.room(), 0);
+    // Ускорения должны быть пропорциональны направлению
+    CHECK_EQ(planner.accelerations[0], doctest::Approx(500.0 * 0.6));
+    CHECK_EQ(planner.accelerations[1], doctest::Approx(500.0 * 0.8));
 }
 
-/*TEST_CASE("planner.1")
+TEST_CASE("planner.pause_mode")
 {
-    igris::ring<cnc::planner_block, 10> blocks;
-    igris::ring<cnc::control_shift, 20> shifts;
+    igris::ring<cnc::planner_block> blocks(10);
+    cnc::revolver revolver;
+    cnc::planner planner(&blocks, &revolver);
 
-    cnc::planner planner(&blocks, &shifts);
-    planner.set_dim(1);
+    planner.set_axes_count(1);
+    planner.set_gears({1000.0});
 
-    auto & block = blocks.head_place();
-
-    block.nominal_velocity = 0.5;
-
-    block.acceleration = 0.1;
-    block.multipliers[0] = 1;
-
-    block.active_finish_ic = 5;
-    block.acceleration_before_ic = 2;
-    block.deceleration_after_ic = 5;
-    block.block_finish_ic = 7;
-
-    block.exact_stop = 0;
-    blocks.move_head_one();
-
-    planner.serve();
-
-    CHECK_EQ(planner.iteration_counter, 7);
-    CHECK_EQ(shifts.avail(), 7);
-}*/
-
-/*TEST_CASE("planner.2")
-{
-    igris::ring<cnc::planner_block, 10> blocks;
-    igris::ring<cnc::control_shift, 20> shifts;
-
-    cnc::planner planner(&blocks, &shifts);
-    planner.set_dim(1);
-
-    auto & block = blocks.head_place();
-
-    block.nominal_velocity = 0.5;
-
-    block.acceleration = 0.25;
-    block.multipliers[0] = 1;
-
-    block.active_finish_ic = 6;
-    block.acceleration_before_ic = 2;
-    block.deceleration_after_ic = 6;
-    block.block_finish_ic = 8;
-
-    block.exact_stop = 0;
-    blocks.move_head_one();
-
-    //planner.start_with_first_block();
-
-    planner.iteration();
-    CHECK_EQ(planner.count_of_reevaluation, 1);
-    CHECK_EQ(planner.state, 0);
-    CHECK(planner.active_block);
-    CHECK_EQ(planner.accelerations[0], 0.25);
-    CHECK_EQ(planner.velocities[0], 0.25);
-    CHECK_EQ(planner.dda_counters[0], 0.125);
-    CHECK_EQ(planner.steps[0], 0);
-
-    planner.iteration();
-    CHECK_EQ(planner.count_of_reevaluation, 1);
-    CHECK_EQ(planner.state, 0);
-    CHECK(planner.active_block);
-    CHECK_EQ(planner.accelerations[0], 0.25);
-    CHECK_EQ(planner.velocities[0], 0.5);
-    CHECK_EQ(planner.dda_counters[0], 0.125 + 0.25 + 0.125);
-    CHECK_EQ(planner.iteration_counter, 2);
-    CHECK_EQ(planner.steps[0], 0);
-
-    planner.iteration();
-    CHECK_EQ(planner.count_of_reevaluation, 2);
-    CHECK_EQ(planner.state, 1);
-    CHECK(planner.active_block);
-    CHECK_EQ(planner.count_of_postactive(), 0);
-    CHECK_EQ(planner.accelerations[0], 0);
-    CHECK_EQ(planner.velocities[0], 0.5);
-    CHECK_EQ(planner.dda_counters[0], 0);
-    CHECK_EQ(planner.steps[0], 1);
-
-    planner.iteration();
-    CHECK_EQ(planner.count_of_reevaluation, 2);
-    CHECK_EQ(planner.state, 1);
-    CHECK_EQ(planner.count_of_postactive(), 0);
-    CHECK_EQ(planner.accelerations[0], 0);
-    CHECK_EQ(planner.velocities[0], 0.5);
-    CHECK_EQ(planner.dda_counters[0], 0.5);
-    CHECK_EQ(planner.steps[0], 1);
-
-    planner.iteration();
-    CHECK_EQ(planner.count_of_reevaluation, 2);
-    CHECK_EQ(planner.state, 1);
-    CHECK_EQ(planner.count_of_postactive(), 0);
-    CHECK_EQ(planner.accelerations[0], 0);
-    CHECK_EQ(planner.velocities[0], 0.5);
-    CHECK_EQ(planner.dda_counters[0], 0);
-    CHECK_EQ(planner.steps[0], 2);
-
-    planner.iteration();
-    CHECK_EQ(planner.count_of_reevaluation, 2);
-    CHECK_EQ(planner.state, 1);
-    CHECK_EQ(planner.count_of_postactive(), 0);
-    CHECK_EQ(planner.accelerations[0], 0);
-    CHECK_EQ(planner.velocities[0], 0.5);
-    CHECK_EQ(planner.dda_counters[0], 0.5);
-    CHECK_EQ(planner.steps[0], 2);
-
-    planner.iteration();
-    CHECK_EQ(planner.count_of_reevaluation, 3);
-    CHECK_EQ(planner.state, 0);
-    CHECK_EQ(planner.count_of_postactive(), 1);
-    CHECK_EQ(planner.accelerations[0], -0.25);
-    CHECK_EQ(planner.velocities[0], 0.25);
-    CHECK_EQ(planner.dda_counters[0], 0.875);
-    CHECK_EQ(planner.steps[0], 2);
-
-    planner.iteration();
-    CHECK_EQ(planner.count_of_reevaluation, 3);
-    CHECK_EQ(planner.state, 0);
-    CHECK_EQ(planner.count_of_postactive(), 1);
-    CHECK_EQ(planner.accelerations[0], -0.25);
-    CHECK_EQ(planner.velocities[0], 0);
-    CHECK_EQ(planner.dda_counters[0], 0);
-    CHECK_EQ(planner.steps[0], 3);
-
-    CHECK_EQ(shifts.get(0).step, 0);
-    CHECK_EQ(shifts.get(1).step, 0);
-    CHECK_EQ(shifts.get(2).step, 1);
-    CHECK_EQ(shifts.get(3).step, 0);
-    CHECK_EQ(shifts.get(4).step, 1);
-    CHECK_EQ(shifts.get(5).step, 0);
-    CHECK_EQ(shifts.get(6).step, 0);
-    CHECK_EQ(shifts.get(7).step, 1);
-
-    CHECK_EQ(shifts.get(0).direction, 0);
-    CHECK_EQ(shifts.get(1).direction, 0);
-    CHECK_EQ(shifts.get(2).direction, 1);
-    CHECK_EQ(shifts.get(3).direction, 0);
-    CHECK_EQ(shifts.get(4).direction, 1);
-    CHECK_EQ(shifts.get(5).direction, 0);
-    CHECK_EQ(shifts.get(6).direction, 0);
-    CHECK_EQ(shifts.get(7).direction, 1);
-}
-
-TEST_CASE("planner.3")
-{
-    igris::ring<cnc::planner_block, 10> blocks;
-    igris::ring<cnc::control_shift, 400> shifts;
-
-    cnc::planner planner(&blocks, &shifts);
-    planner.set_dim(1);
-
-    auto & block = blocks.head_place();
-
-    block.nominal_velocity = 0.5;
-
-    block.acceleration = 0.25;
-    block.multipliers[0] = 1;
-    block.fullpath = 3;
-
+    auto &block = blocks.head_place();
+    block.blockno = 0;
+    block.nominal_velocity = 500.0;
+    block.acceleration = 100.0;
+    block.set_direction({1});
     block.start_ic = 0;
-    block.acceleration_before_ic = 2;
-    block.deceleration_after_ic = 6;
-    block.block_finish_ic = 8;
-
-    block.exact_stop = 0;
+    block.acceleration_before_ic = 5;
+    block.deceleration_after_ic = 10;
+    block.block_finish_ic = 15;
+    block.exact_stop = 1;
     blocks.move_head_one();
 
-    CHECK(block.validation());
+    int64_t ic_before = planner.iteration_counter;
 
-    planner.serve();
+    // Включаем паузу
+    planner.set_pause_mode(true);
+    planner.serve(false);
 
-    CHECK_EQ(shifts.get(0).step, 0);
-    CHECK_EQ(shifts.get(1).step, 0);
-    CHECK_EQ(shifts.get(2).step, 1);
-    CHECK_EQ(shifts.get(3).step, 0);
-    CHECK_EQ(shifts.get(4).step, 1);
-    CHECK_EQ(shifts.get(5).step, 0);
-    CHECK_EQ(shifts.get(6).step, 0);
-    CHECK_EQ(shifts.get(7).step, 1);
+    // iteration_counter не должен измениться
+    CHECK_EQ(planner.iteration_counter, ic_before);
 
-    CHECK_EQ(shifts.get(0).direction, 0);
-    CHECK_EQ(shifts.get(1).direction, 0);
-    CHECK_EQ(shifts.get(2).direction, 1);
-    CHECK_EQ(shifts.get(3).direction, 0);
-    CHECK_EQ(shifts.get(4).direction, 1);
-    CHECK_EQ(shifts.get(5).direction, 0);
-    CHECK_EQ(shifts.get(6).direction, 0);
-    CHECK_EQ(shifts.get(7).direction, 1);
-}*/
+    // Выключаем паузу
+    planner.set_pause_mode(false);
+    planner.serve(false);
+
+    // Теперь должен продвинуться
+    CHECK_GT(planner.iteration_counter, ic_before);
+}
+
+TEST_CASE("planner.clear")
+{
+    igris::ring<cnc::planner_block> blocks(10);
+    cnc::revolver revolver;
+    cnc::planner planner(&blocks, &revolver);
+    robo::stepper steppers[1];
+    robo::stepper *steppers_ptrs[] = {&steppers[0]};
+
+    revolver.set_steppers(steppers_ptrs, 1);
+    planner.set_axes_count(1);
+    planner.set_gears({1000.0});
+
+    // Добавляем блок и запускаем
+    auto &block = blocks.head_place();
+    block.blockno = 0;
+    block.nominal_velocity = 500.0;
+    block.acceleration = 100.0;
+    block.set_direction({1});
+    block.start_ic = 0;
+    block.acceleration_before_ic = 5;
+    block.deceleration_after_ic = 10;
+    block.block_finish_ic = 15;
+    block.exact_stop = 1;
+    blocks.move_head_one();
+
+    planner.serve(false);
+    CHECK(planner.active_block != nullptr);
+
+    // Очищаем
+    planner.clear();
+
+    CHECK(planner.active_block == nullptr);
+    CHECK(blocks.empty());
+    CHECK_EQ(planner.accelerations[0], 0);
+    CHECK_EQ(planner.state, 0);
+}

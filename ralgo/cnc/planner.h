@@ -17,8 +17,6 @@
 #include <ralgo/linalg/vecops.h>
 #include <ralgo/log.h>
 
-#define NMAX_AXES 10
-
 #pragma GCC optimize("Ofast")
 namespace cnc
 {
@@ -45,6 +43,10 @@ namespace cnc
     {
     private:
         int _total_axes = 0;
+        // Steps per mm for each axis (used by interpreter for mm<->steps)
+        std::array<cnc_float_type, NMAX_AXES> _steps_per_mm = {};
+        // Timer tick frequency in Hz (for steps/sec -> steps/tick conversion)
+        uint32_t _tick_frequency = DEFAULT_TICK_FREQUENCY_HZ;
 
     public:
         bool pause = false;
@@ -105,6 +107,10 @@ namespace cnc
         bool is_not_halt();
         bool is_halt();
         void reevaluate_accelerations();
+
+        // Tick frequency management
+        void set_tick_frequency(uint32_t hz);
+        uint32_t get_tick_frequency() const;
     };
 }
 #pragma GCC reset_options
