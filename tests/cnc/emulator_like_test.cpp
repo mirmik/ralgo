@@ -1,6 +1,8 @@
 
 #include <chrono>
 #include <doctest/doctest.h>
+#include <iomanip>
+#include <limits>
 #include <mutex>
 #include <thread>
 
@@ -392,13 +394,182 @@ TEST_CASE("emulator-like: M < 1 should still work")
     CHECK_LE(final_steps, 1010);
 }
 
+TEST_CASE("emulator-like: INTEGRATION ERROR diagnostic")
+{
+    // Analyze where the 2-step error comes from
+    EmulatorTestFixture fix;
+    fix.setup();
+
+    fix.interpreter.newline("absmove Y1 F1 M1");
+    auto block = fix.interpreter.last_block();
+
+    MESSAGE("=== Block parameters ===");
+    MESSAGE("axdist[1] = " << block.axdist[1]);
+    MESSAGE("fullpath = " << block.fullpath);
+    MESSAGE("nominal_velocity = " << std::setprecision(15) << block.nominal_velocity);
+    MESSAGE("acceleration = " << std::setprecision(15) << block.acceleration);
+    MESSAGE("acceleration_before_ic = " << block.acceleration_before_ic);
+    MESSAGE("deceleration_after_ic = " << block.deceleration_after_ic);
+    MESSAGE("block_finish_ic = " << block.block_finish_ic);
+
+    // Calculate theoretical path
+    // For triangle: path = 0.5 * a * t_accel² + 0.5 * a * t_decel²
+    //             = a * t² (when t_accel = t_decel = t)
+    int64_t t = block.acceleration_before_ic;  // half-time for triangle
+    cnc_float_type theoretical_path = block.acceleration * t * t * 2;  // both phases
+    MESSAGE("theoretical_path from a*t² = " << theoretical_path);
+
+    // Also check: path = v_max * t (area of triangle = 0.5 * base * height * 2 triangles)
+    cnc_float_type path_from_velocity = block.nominal_velocity * t;
+    MESSAGE("path_from_velocity = v*t = " << path_from_velocity);
+
+    // Fixed-point representation
+    int64_t acc_fixed = static_cast<int64_t>(block.acceleration * FIXED_POINT_MUL);
+    int64_t vel_fixed_max = static_cast<int64_t>(block.nominal_velocity * FIXED_POINT_MUL);
+    MESSAGE("acc_fixed = " << acc_fixed);
+    MESSAGE("vel_fixed_max = " << vel_fixed_max);
+
+    // Simulate integration manually for first few ticks
+    MESSAGE("=== Manual integration check ===");
+    int64_t pos = 0;
+    int64_t vel = 0;
+    int64_t total_ticks = block.block_finish_ic;
+
+    // Accel phase
+    for (int64_t tick = 0; tick < t; ++tick)
+    {
+        int64_t half_acc = acc_fixed >> 1;
+        pos += vel + half_acc;
+        vel += acc_fixed;
+    }
+    MESSAGE("After accel phase: pos_fixed=" << pos << ", vel_fixed=" << vel);
+    MESSAGE("  pos in steps = " << (double)pos / FIXED_POINT_MUL);
+    MESSAGE("  vel in steps/tick = " << (double)vel / FIXED_POINT_MUL);
+
+    // Decel phase
+    for (int64_t tick = 0; tick < t; ++tick)
+    {
+        int64_t half_acc = (-acc_fixed) >> 1;
+        pos += vel + half_acc;
+        vel -= acc_fixed;
+    }
+    MESSAGE("After decel phase: pos_fixed=" << pos << ", vel_fixed=" << vel);
+    MESSAGE("  pos in steps = " << (double)pos / FIXED_POINT_MUL);
+    MESSAGE("  vel in steps/tick = " << (double)vel / FIXED_POINT_MUL);
+
+    // Expected vs actual
+    double final_pos_steps = (double)pos / FIXED_POINT_MUL;
+    MESSAGE("Expected: 1000 steps");
+    MESSAGE("Calculated: " << final_pos_steps << " steps");
+    MESSAGE("Error: " << (1000 - final_pos_steps) << " steps");
+
+    // Run actual simulation
+    fix.run_for(30000ms);
+    int64_t actual_steps = fix.get_steps(1);
+    MESSAGE("Actual from simulation: " << actual_steps << " steps");
+
+    CHECK_GE(actual_steps, 999);
+    CHECK_LE(actual_steps, 1001);
+}
+
+TEST_CASE("emulator-like: OVERFLOW LIMITS analysis")
+{
+    // Analyze maximum values before int64_t overflow with FIXED_POINT_BITS=40
+    //
+    // int64_t max = 2^63 - 1 ≈ 9.22 × 10^18
+    // FIXED_POINT_MUL = 2^40 ≈ 1.1 × 10^12
+
+    constexpr int64_t INT64_MAX_VAL = std::numeric_limits<int64_t>::max();
+    constexpr double freq = 100000.0;  // 100 kHz
+    constexpr double steps_per_unit = 1000.0;
+
+    MESSAGE("=== OVERFLOW LIMITS with FIXED_POINT_BITS = " << FIXED_POINT_BITS << " ===");
+    MESSAGE("FIXED_POINT_MUL = " << FIXED_POINT_MUL);
+    MESSAGE("int64_t max = " << INT64_MAX_VAL);
+    MESSAGE("");
+
+    // 1. Maximum velocity in fixed-point
+    // velocities_fixed must fit in int64_t
+    // vel_fixed = vel_steps_per_tick * FIXED_POINT_MUL < INT64_MAX
+    // vel_steps_per_tick < INT64_MAX / FIXED_POINT_MUL = 2^63 / 2^40 = 2^23
+    double max_vel_steps_per_tick = (double)INT64_MAX_VAL / FIXED_POINT_MUL;
+    double max_vel_units_per_sec = max_vel_steps_per_tick * freq / steps_per_unit;
+
+    MESSAGE("=== VELOCITY LIMITS ===");
+    MESSAGE("Max velocity: " << max_vel_steps_per_tick << " steps/tick");
+    MESSAGE("Max velocity: " << max_vel_units_per_sec << " units/sec");
+    MESSAGE("  (at freq=" << freq << " Hz, steps_per_unit=" << steps_per_unit << ")");
+    MESSAGE("");
+
+    // 2. Maximum acceleration in fixed-point
+    // Same logic: acc_fixed < INT64_MAX
+    double max_acc_steps_per_tick2 = (double)INT64_MAX_VAL / FIXED_POINT_MUL;
+    double max_acc_units_per_sec2 = max_acc_steps_per_tick2 * freq * freq / steps_per_unit;
+
+    MESSAGE("=== ACCELERATION LIMITS ===");
+    MESSAGE("Max acceleration: " << max_acc_steps_per_tick2 << " steps/tick²");
+    MESSAGE("Max acceleration: " << max_acc_units_per_sec2 << " units/sec²");
+    MESSAGE("");
+
+    // 3. Position accumulation risk
+    // positions_fixed resets when crossing integer step boundaries
+    // So positions_fixed is always in range [0, FIXED_POINT_MUL) or (-FIXED_POINT_MUL, 0]
+    // No overflow risk for position itself
+
+    MESSAGE("=== POSITION ===");
+    MESSAGE("positions_fixed always < FIXED_POINT_MUL (resets at each step)");
+    MESSAGE("No overflow risk for position accumulation");
+    MESSAGE("");
+
+    // 4. Practical limits for robot arm config
+    MESSAGE("=== PRACTICAL LIMITS for robot_arm.json config ===");
+    MESSAGE("freq=100kHz, steps_per_unit=1000:");
+    MESSAGE("  Max velocity: " << max_vel_units_per_sec << " rad/s");
+    MESSAGE("    (typical robot: 1-10 rad/s, margin: " << max_vel_units_per_sec / 10 << "x)");
+    MESSAGE("  Max acceleration: " << max_acc_units_per_sec2 << " rad/s²");
+    MESSAGE("    (typical robot: 1-100 rad/s², margin: " << max_acc_units_per_sec2 / 100 << "x)");
+
+    // Verify we have huge safety margins
+    CHECK_GT(max_vel_units_per_sec, 1e6);   // > 1 million units/s
+    CHECK_GT(max_acc_units_per_sec2, 1e10); // > 10 billion units/s²
+
+    // === HIGH RESOLUTION CASE ===
+    // steps_per_unit = 1 000 000 (high-res encoder)
+    // velocity = 100 units/s
+    MESSAGE("");
+    MESSAGE("=== HIGH RESOLUTION CASE (steps_per_unit=1000000) ===");
+    constexpr double high_res_steps_per_unit = 1000000.0;
+    constexpr double typical_velocity = 100.0;  // units/s
+
+    double vel_steps_per_tick = typical_velocity * high_res_steps_per_unit / freq;
+    double vel_fixed_value = vel_steps_per_tick * FIXED_POINT_MUL;
+
+    MESSAGE("At velocity=" << typical_velocity << " units/s:");
+    MESSAGE("  vel_steps_per_tick = " << vel_steps_per_tick);
+    MESSAGE("  vel_fixed = " << std::scientific << vel_fixed_value);
+    MESSAGE("  int64_t max = " << (double)INT64_MAX_VAL);
+    MESSAGE("  margin = " << (double)INT64_MAX_VAL / vel_fixed_value << "x");
+
+    double max_vel_high_res = max_vel_steps_per_tick * freq / high_res_steps_per_unit;
+    MESSAGE("  Max velocity before overflow: " << max_vel_high_res << " units/s");
+    MESSAGE("");
+
+    // WARNING: at 1000 steps/tick, the while loop in serve() runs 1000 times!
+    MESSAGE("=== PERFORMANCE WARNING ===");
+    MESSAGE("At " << vel_steps_per_tick << " steps/tick:");
+    MESSAGE("  The step generation loop runs ~" << (int)vel_steps_per_tick << " iterations per serve() call");
+    MESSAGE("  At 100kHz this may be too slow for real-time!");
+    MESSAGE("  Consider reducing steps_per_unit or frequency for high-speed motion");
+
+    // This config still works but with reduced margin
+    CHECK_GT(max_vel_high_res, typical_velocity);  // Must be able to do 100 units/s
+}
+
 TEST_CASE("emulator-like: FIXED-POINT PRECISION diagnostic")
 {
-    // After fix: FIXED_POINT_MUL = 2^32 = 4294967296
+    // After fix: FIXED_POINT_MUL = 2^40
     // For M=1: acceleration = 1 unit/s² * 1000 steps/unit / (100000 Hz)² = 1e-7 steps/tick²
-    // acceleration_fixed = 1e-7 * 2^32 = 430 -> ~0.2% error (good!)
-    //
-    // Before fix (2^24): acceleration_fixed = 1.68 -> 40% error!
+    // acceleration_fixed = 1e-7 * 2^40 = 109951 -> ~0.0004% error (excellent!)
 
     EmulatorTestFixture fix;
     fix.setup();

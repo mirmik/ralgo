@@ -146,6 +146,21 @@ void cnc::revolver::clear()
     task_queue.clear();
     current_task = nullptr;
     ticks_remaining = 0;
+
+    // Final position correction: if fractional part > 0.5, round up
+    // This eliminates the last-step error from integration truncation
+    for (int i = 0; i < steppers_total; ++i)
+    {
+        if (positions_fixed[i] >= FIXED_POINT_MUL / 2)
+        {
+            steppers[i]->inc();
+        }
+        else if (positions_fixed[i] <= -FIXED_POINT_MUL / 2)
+        {
+            steppers[i]->dec();
+        }
+    }
+
     positions_fixed.fill(0);
     velocities_fixed.fill(0);
 }
