@@ -17,6 +17,7 @@
 #include <nos/shell/executor.h>
 #include <nos/util/string.h>
 #include <ralgo/cnc/control_task.h>
+#include <ralgo/cnc/error_handler.h>
 #include <ralgo/cnc/feedback_guard.h>
 #include <ralgo/cnc/planblock.h>
 #include <ralgo/cnc/planner.h>
@@ -37,6 +38,7 @@ namespace cnc
         cnc::planner *planner = nullptr;
         cnc::revolver *revolver = nullptr;
         cnc::feedback_guard *feedback_guard = nullptr;
+        cnc::error_handler *errors = nullptr;
 
     private:
         igris::ring<planner_block> *blocks = nullptr;
@@ -70,9 +72,10 @@ namespace cnc
         interpreter(igris::ring<planner_block> *blocks,
                     cnc::planner *planner,
                     cnc::revolver *revolver,
-                    cnc::feedback_guard *feedback_guard)
+                    cnc::feedback_guard *feedback_guard,
+                    cnc::error_handler *errors = nullptr)
             : planner(planner), revolver(revolver),
-              feedback_guard(feedback_guard), blocks(blocks)
+              feedback_guard(feedback_guard), errors(errors), blocks(blocks)
         {
         }
 
@@ -81,6 +84,15 @@ namespace cnc
         interpreter &operator=(const interpreter &) = delete;
         interpreter &operator=(interpreter &&) = delete;
 
+    private:
+        /// Report error if error_handler is configured
+        void report_error(error_code code, int8_t axis = -1, int32_t context = 0)
+        {
+            if (errors)
+                errors->report(code, axis, context);
+        }
+
+    public:
         void cleanup()
         {
             blockno = 0;
@@ -172,8 +184,16 @@ namespace cnc
 
         int check_correctness(nos::ostream &os)
         {
-            assert(total_axes == (int)planner->get_total_axes());
-            assert(total_axes == revolver->steppers_total);
+            if (total_axes != (int)planner->get_total_axes())
+            {
+                nos::println_to(os, "total_axes mismatch with planner");
+                return 1;
+            }
+            if (total_axes != revolver->steppers_total)
+            {
+                nos::println_to(os, "total_axes mismatch with revolver");
+                return 1;
+            }
 
             if (ralgo::global_protection)
             {
@@ -306,9 +326,33 @@ namespace cnc
             saved_acc = task.acc;
             saved_feed = task.feed;
 
-            cnc_float_type tasknorm = ralgo::vecops::norm(task.poses());
-            if (tasknorm == 0)
+            // === Input validation ===
+
+            // Check frequency is configured
+            if (revolver_frequency <= 0)
+            {
+                report_error(error_code::invalid_frequency, -1,
+                             static_cast<int32_t>(revolver_frequency));
                 return true;
+            }
+
+            // Check task has non-zero movement
+            cnc_float_type tasknorm = ralgo::vecops::norm(task.poses());
+            if (tasknorm < 1e-10)
+            {
+                // Empty move - not an error, just skip
+                return true;
+            }
+
+            // Check steps_per_mm for active axes
+            for (auto idx : task.active_axes)
+            {
+                if (idx >= 0 && idx < total_axes && _steps_per_mm[idx] <= 0)
+                {
+                    report_error(error_code::invalid_steps_per_mm, idx);
+                    return true;
+                }
+            }
 
             // Get steps_per_mm for unit conversion (from interpreter's own storage)
             ralgo::vector_view<cnc_float_type> gears(_steps_per_mm.data(),
@@ -328,6 +372,14 @@ namespace cnc
                 ralgo::vecops::normalize<ralgo::vector<cnc_float_type>>(
                     task.poses());
 
+            // Check direction is valid (not zero after normalization)
+            cnc_float_type dirnorm = ralgo::vecops::norm(direction);
+            if (dirnorm < 0.99 || dirnorm > 1.01)
+            {
+                report_error(error_code::invalid_direction);
+                return true;
+            }
+
             auto dirgain =
                 ralgo::vecops::norm(ralgo::vecops::mul_vv(direction, gains));
 
@@ -341,15 +393,17 @@ namespace cnc
             auto evalacc = evaluate_external_accfeed_2(
                 direction, task.acc, max_axes_accelerations);
 
-            if (evalacc == 0)
+            if (evalacc <= 0)
             {
-                ralgo::info("Acceleration is not defined");
+                report_error(error_code::invalid_acceleration, -1,
+                             static_cast<int32_t>(evalacc * 1000));
                 return true;
             }
 
-            if (evalfeed == 0)
+            if (evalfeed <= 0)
             {
-                ralgo::info("Feed is not defined");
+                report_error(error_code::invalid_velocity, -1,
+                             static_cast<int32_t>(evalfeed * 1000));
                 return true;
             }
 
@@ -359,7 +413,7 @@ namespace cnc
             cnc_float_type feed_steps = feed_mm * dirsteps;
             cnc_float_type acc_steps = acc_mm * dirsteps;
 
-            // Convert steps/sec to steps/tick
+            // Convert steps/sec to steps/tick (division is safe - frequency checked above)
             cnc_float_type reduced_feed = feed_steps / revolver_frequency;
             cnc_float_type reduced_acc =
                 acc_steps / (revolver_frequency * revolver_frequency);

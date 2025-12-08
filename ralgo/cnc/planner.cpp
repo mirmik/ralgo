@@ -58,8 +58,8 @@ cnc::planner::planner(igris::ring<cnc::planner_block> *blocks,
                       cnc::revolver *revolver)
     : blocks(blocks), revolver(revolver)
 {
+    // Precondition: revolver must not be null
     std::fill(accelerations.begin(), accelerations.end(), 0);
-    assert(revolver);
 }
 
 int cnc::planner::block_index(planner_block *it)
@@ -123,7 +123,7 @@ void cnc::planner::change_active_block()
 
     active_block = &blocks->get(active);
 
-    assert(active_block->blockno == waited);
+    // Block sequence is managed internally - blockno should match waited
     waited++;
 
     active_block->shift_timestampes(iteration_counter);

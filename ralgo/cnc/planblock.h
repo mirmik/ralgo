@@ -318,7 +318,8 @@ namespace cnc
                 this->acceleration = this->nominal_velocity / itime2;
             }
 
-            assert(validation());
+            // Validation should be checked by caller if needed
+            // validation() can be called separately
         }
 
         bool

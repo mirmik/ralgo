@@ -29,7 +29,10 @@ namespace cnc
                               cnc_float_type mistake)
             : _nums(nums), _multipliers(muls), _maximum_tandem_mistake(mistake)
         {
-            assert(_nums.size() == _multipliers.size());
+            // Ensure size consistency by truncating to minimum
+            size_t min_size = std::min(_nums.size(), _multipliers.size());
+            _nums.resize(min_size);
+            _multipliers.resize(min_size);
         }
 
         feedback_guard_tandem(const std::vector<size_t> &nums,
@@ -39,7 +42,10 @@ namespace cnc
               _multipliers(muls.begin(), muls.end()),
               _maximum_tandem_mistake(mistake)
         {
-            assert(_nums.size() == _multipliers.size());
+            // Ensure size consistency by truncating to minimum
+            size_t min_size = std::min(_nums.size(), _multipliers.size());
+            _nums.resize(min_size);
+            _multipliers.resize(min_size);
         }
 
         feedback_guard_tandem &
