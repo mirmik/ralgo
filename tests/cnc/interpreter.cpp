@@ -147,3 +147,164 @@ TEST_CASE("interpreter.buffering")
         CHECK_EQ(planner.pause, false);
     }
 }
+
+TEST_CASE("interpreter.positioning_mode")
+{
+    igris::ring<cnc::planner_block> blocks_ring(10);
+    cnc::revolver revolver;
+    cnc::planner planner(&blocks_ring, &revolver);
+    cnc::feedback_guard guard(2);
+    cnc::interpreter interpreter(&blocks_ring, &planner, &revolver, &guard);
+
+    interpreter.init_axes(2);
+
+    SUBCASE("По умолчанию абсолютный режим (G90)")
+    {
+        CHECK(interpreter.is_absolute_mode());
+    }
+
+    SUBCASE("set_absolute_mode переключает режим")
+    {
+        interpreter.set_absolute_mode(false);
+        CHECK_EQ(interpreter.is_absolute_mode(), false);
+
+        interpreter.set_absolute_mode(true);
+        CHECK(interpreter.is_absolute_mode());
+    }
+
+    SUBCASE("G90 включает абсолютный режим")
+    {
+        interpreter.set_absolute_mode(false);
+        CHECK_EQ(interpreter.is_absolute_mode(), false);
+
+        interpreter.newline("G90");
+        CHECK(interpreter.is_absolute_mode());
+    }
+
+    SUBCASE("G91 включает относительный режим")
+    {
+        CHECK(interpreter.is_absolute_mode());
+
+        interpreter.newline("G91");
+        CHECK_EQ(interpreter.is_absolute_mode(), false);
+    }
+
+    SUBCASE("mode command показывает и меняет режим")
+    {
+        // Проверяем что команда mode работает
+        interpreter.set_absolute_mode(true);
+        auto result = interpreter.newline("mode rel");
+        CHECK_EQ(interpreter.is_absolute_mode(), false);
+
+        result = interpreter.newline("mode abs");
+        CHECK(interpreter.is_absolute_mode());
+    }
+}
+
+TEST_CASE("interpreter.G92_set_position")
+{
+    igris::ring<cnc::planner_block> blocks_ring(10);
+    cnc::revolver revolver;
+    robo::stepper steppers[2];
+    robo::stepper *steppers_ptrs[] = {&steppers[0], &steppers[1]};
+    revolver.set_steppers(steppers_ptrs, 2);
+    cnc::planner planner(&blocks_ring, &revolver);
+    cnc::feedback_guard guard(2);
+    cnc::interpreter interpreter(&blocks_ring, &planner, &revolver, &guard);
+
+    interpreter.init_axes(2);
+    interpreter.set_steps_per_unit(0, 100); // 100 steps/mm
+    interpreter.set_steps_per_unit(1, 100);
+
+    SUBCASE("G92 устанавливает позицию")
+    {
+        // Начальная позиция 0
+        auto pos = interpreter.final_position();
+        CHECK_EQ(pos[0], 0);
+        CHECK_EQ(pos[1], 0);
+
+        // Устанавливаем позицию через G92
+        interpreter.newline("G92 X10 Y20");
+
+        pos = interpreter.final_position();
+        CHECK_EQ(pos[0], 10);
+        CHECK_EQ(pos[1], 20);
+
+        // Проверяем что счётчики шагов тоже обновились
+        auto steps = interpreter.current_steps();
+        CHECK_EQ(steps[0], 1000); // 10 * 100
+        CHECK_EQ(steps[1], 2000); // 20 * 100
+    }
+
+    SUBCASE("G92 с одной осью не меняет другие")
+    {
+        interpreter.newline("G92 X5");
+
+        auto pos = interpreter.final_position();
+        CHECK_EQ(pos[0], 5);
+        CHECK_EQ(pos[1], 0); // Y не изменился
+    }
+}
+
+TEST_CASE("interpreter.G0_G1_with_modes")
+{
+    igris::ring<cnc::planner_block> blocks_ring(10);
+    cnc::revolver revolver;
+    robo::stepper steppers[2];
+    robo::stepper *steppers_ptrs[] = {&steppers[0], &steppers[1]};
+    revolver.set_steppers(steppers_ptrs, 2);
+    cnc::planner planner(&blocks_ring, &revolver);
+    cnc::feedback_guard guard(2);
+    cnc::interpreter interpreter(&blocks_ring, &planner, &revolver, &guard);
+
+    interpreter.init_axes(2);
+    interpreter.set_revolver_frequency(10000);
+    interpreter.set_steps_per_unit(0, 100);
+    interpreter.set_steps_per_unit(1, 100);
+    interpreter.set_saved_acc(1000);
+    interpreter.set_saved_feed(100);
+
+    SUBCASE("G1 в абсолютном режиме создаёт блок до целевой позиции")
+    {
+        interpreter.set_absolute_mode(true);
+        interpreter.newline("G1 X10 F100 M1000");
+
+        // Проверяем что final_position обновился
+        auto pos = interpreter.final_position();
+        CHECK_EQ(pos[0], doctest::Approx(10.0));
+
+        // Проверяем что блок добавлен в очередь
+        CHECK_EQ(blocks_ring.avail(), 1);
+    }
+
+    SUBCASE("G1 в относительном режиме создаёт блок со смещением")
+    {
+        // Сначала установим начальную позицию
+        interpreter.newline("G92 X5");
+        auto pos = interpreter.final_position();
+        CHECK_EQ(pos[0], 5);
+
+        // Переключаемся в относительный режим
+        interpreter.newline("G91");
+
+        // G1 X10 должен добавить 10 к текущей позиции
+        interpreter.newline("G1 X10 F100 M1000");
+
+        pos = interpreter.final_position();
+        CHECK_EQ(pos[0], doctest::Approx(15.0)); // 5 + 10
+    }
+
+    SUBCASE("G0 использует максимальную скорость")
+    {
+        // Устанавливаем ограничение скорости по оси
+        // G0 должен использовать feed=0 (что означает max velocity)
+        interpreter.set_absolute_mode(true);
+        interpreter.newline("G0 X10 M1000");
+
+        // Блок должен быть создан
+        CHECK_EQ(blocks_ring.avail(), 1);
+
+        auto pos = interpreter.final_position();
+        CHECK_EQ(pos[0], doctest::Approx(10.0));
+    }
+}

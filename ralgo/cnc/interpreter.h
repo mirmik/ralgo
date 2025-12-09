@@ -65,6 +65,7 @@ namespace cnc
         int blockno = 0;
         cnc_float_type saved_acc = 0;
         cnc_float_type saved_feed = 0;
+        bool _absolute_mode = true; // G90 by default (стандарт G-code)
         cnc_float_type _smooth_stop_acceleration = 0;
         igris::delegate<void> _external_final_shift_handle = {};
         planner_block lastblock = {};
@@ -589,6 +590,86 @@ namespace cnc
             evaluate_task(task, os);
         }
 
+        /// G0 - rapid move (uses max velocities)
+        void command_rapid_move(const nos::argv &argv, nos::ostream &os)
+        {
+            if (stop_procedure_started)
+                return;
+
+            ralgo::info("command_rapid_move (G0)");
+
+            if (check_correctness(os))
+                return;
+
+            auto poses = get_task_poses_from_argv(argv);
+            cnc_float_type acc = get_task_acc_from_argv(argv);
+            // G0 uses max velocity (feed=0 means use axis limits)
+            cnc_float_type feed = 0;
+
+            control_task task(total_axes);
+            if (_absolute_mode)
+                task = create_task_for_absolute_move(poses, feed, acc);
+            else
+                task = create_task_for_relative_move(poses, feed, acc);
+
+            if (!task.isok)
+                return;
+            evaluate_task(task, os);
+        }
+
+        /// G1 - linear move with feed (respects G90/G91 mode)
+        void command_linear_move(const nos::argv &argv, nos::ostream &os)
+        {
+            if (stop_procedure_started)
+                return;
+
+            ralgo::info("command_linear_move (G1)");
+
+            if (check_correctness(os))
+                return;
+
+            auto poses = get_task_poses_from_argv(argv);
+            cnc_float_type feed = get_task_feed_from_argv(argv);
+            cnc_float_type acc = get_task_acc_from_argv(argv);
+
+            control_task task(total_axes);
+            if (_absolute_mode)
+                task = create_task_for_absolute_move(poses, feed, acc);
+            else
+                task = create_task_for_relative_move(poses, feed, acc);
+
+            if (!task.isok)
+                return;
+            evaluate_task(task, os);
+        }
+
+        /// G92 - set position without moving
+        void command_G92(const nos::argv &argv, nos::ostream &os)
+        {
+            ralgo::info("command_G92 (set position)");
+
+            auto poses = get_task_poses_from_argv(argv);
+            if (poses.empty())
+            {
+                nos::println_to(os, "Usage: G92 <axis><pos>...");
+                nos::println_to(os, "  Example: G92 X0 Y0 Z0");
+                return;
+            }
+
+            system_lock();
+            for (auto &p : poses)
+            {
+                int axno = p.idx;
+                cnc_float_type val_mm = p.pos;
+                _final_position[axno] = val_mm;
+                steps_t steps = static_cast<steps_t>(val_mm * _steps_per_unit[axno]);
+                revolver->get_steppers()[axno]->set_counter_value(steps);
+                if (feedback_guard)
+                    feedback_guard->set_feedback_position(axno, val_mm);
+            }
+            system_unlock();
+        }
+
         void command_absolute_move(const nos::argv &argv, nos::ostream &os)
         {
             if (stop_procedure_started)
@@ -747,8 +828,20 @@ namespace cnc
             int cmd = atoi(&argv[0].data()[1]);
             switch (cmd)
             {
-            case 1:
-                command_incremental_move(argv.without(1), os);
+            case 0: // G0 - rapid move
+                command_rapid_move(argv.without(1), os);
+                break;
+            case 1: // G1 - linear move with feed
+                command_linear_move(argv.without(1), os);
+                break;
+            case 90: // G90 - absolute mode
+                _absolute_mode = true;
+                break;
+            case 91: // G91 - relative mode
+                _absolute_mode = false;
+                break;
+            case 92: // G92 - set position
+                command_G92(argv.without(1), os);
                 break;
             default:
                 nos::println_to(os, "Unresolved G command");
@@ -844,8 +937,14 @@ namespace cnc
 
         int gcode_help(nos::ostream &os)
         {
-            nos::println_to(os, "G1 <axis><pos>... F<feed> M<accel> - linear move (relative)");
+            nos::println_to(os, "G0 <axis><pos>... [M<accel>] - rapid move (max velocity)");
+            nos::println_to(os, "G1 <axis><pos>... F<feed> [M<accel>] - linear move");
+            nos::println_to(os, "  G0/G1 respect G90/G91 mode");
             nos::println_to(os, "  Example: G1 X10 Y-5 F100 M500");
+            nos::println_to(os, "G90 - absolute positioning mode (default)");
+            nos::println_to(os, "G91 - relative/incremental positioning mode");
+            nos::println_to(os, "G92 <axis><pos>... - set position without moving");
+            nos::println_to(os, "  Example: G92 X0 Y0 Z0");
             nos::println_to(os, "M112 - emergency stop");
             nos::println_to(os, "M204 [<accel>] - get/set default acceleration");
             return 0;
@@ -1151,6 +1250,28 @@ namespace cnc
                      return print_interpreter_state(os);
                  }},
 
+                {"mode",
+                 "Print or set positioning mode. Args: [abs|rel]",
+                 [this](const nos::argv &argv, nos::ostream &os) {
+                     if (argv.size() >= 2)
+                     {
+                         std::string_view arg = argv[1];
+                         if (arg == "abs" || arg == "absolute" || arg == "90")
+                             _absolute_mode = true;
+                         else if (arg == "rel" || arg == "relative" || arg == "91")
+                             _absolute_mode = false;
+                         else
+                         {
+                             nos::println_to(os, "Usage: mode [abs|rel]");
+                             return 0;
+                         }
+                     }
+                     nos::fprintln_to(os, "mode: {} ({})",
+                                      _absolute_mode ? "absolute" : "relative",
+                                      _absolute_mode ? "G90" : "G91");
+                     return 0;
+                 }},
+
                 {"guard_info",
                  "Print feedback guard state and errors (no args)",
                  [this](const nos::argv &, nos::ostream &os) {
@@ -1359,6 +1480,10 @@ namespace cnc
             nos::fprintln_to(os, "lookahead_enabled: {}", _lookahead_enabled);
             nos::fprintln_to(os, "junction_deviation: {} mm ({} steps)",
                              _junction_deviation, _junction_deviation_steps);
+            // Positioning mode
+            nos::fprintln_to(os, "positioning_mode: {} ({})",
+                             _absolute_mode ? "absolute" : "relative",
+                             _absolute_mode ? "G90" : "G91");
             return 0;
         }
 
@@ -1431,6 +1556,17 @@ namespace cnc
         size_t get_axes_count()
         {
             return total_axes;
+        }
+
+        // Positioning mode (G90/G91)
+        void set_absolute_mode(bool absolute)
+        {
+            _absolute_mode = absolute;
+        }
+
+        bool is_absolute_mode() const
+        {
+            return _absolute_mode;
         }
 
         // Steps per mm management (gears)
