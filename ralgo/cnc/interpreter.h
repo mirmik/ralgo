@@ -16,10 +16,13 @@
 #include <nos/print/stdtype.h>
 #include <nos/shell/executor.h>
 #include <nos/util/string.h>
+#include <ralgo/cnc/buffer_controller.h>
+#include <ralgo/cnc/cnc_math.h>
 #include <ralgo/cnc/control_task.h>
 #include <ralgo/cnc/error_handler.h>
 #include <ralgo/cnc/feedback_guard.h>
 #include <ralgo/cnc/flow_controller.h>
+#include <ralgo/cnc/lookahead.h>
 #include <ralgo/cnc/planblock.h>
 #include <ralgo/cnc/planner.h>
 #include <ralgo/cnc/revolver.h>
@@ -72,35 +75,11 @@ namespace cnc
         bool with_cleanup = true;
         volatile bool stop_procedure_started = false;
 
-        // === Look-ahead parameters ===
-        // Junction deviation в units (мм для линейных осей).
-        // Определяет допустимое отклонение от траектории на поворотах.
-        // Типичные значения: 0.01-0.05 мм для 3D-принтеров.
-        // При 0 - look-ahead отключен (старое поведение).
-        cnc_float_type _junction_deviation = 0;
+        // Look-ahead parameters (junction deviation algorithm)
+        cnc::lookahead_params _lookahead;
 
-        // Junction deviation в steps (конвертированное значение)
-        cnc_float_type _junction_deviation_steps = 0;
-
-        // Включен ли look-ahead
-        bool _lookahead_enabled = false;
-
-        // === Buffering parameters ===
-        // Минимальное количество блоков перед стартом (0 = без буферизации)
-        int _min_blocks_to_start = 0;
-
-        // Таймаут ожидания блоков в тиках revolver (0 = без таймаута)
-        // При таймауте старт происходит даже если блоков меньше min_blocks
-        int64_t _buffer_timeout_ticks = 0;
-
-        // Тик, когда первый блок был добавлен в пустую очередь
-        int64_t _buffer_start_tick = 0;
-
-        // Явный режим буферизации (buffer enable/start)
-        bool _explicit_buffer_mode = false;
-
-        // Готов ли буфер к старту (для явного режима)
-        bool _buffer_ready_to_start = false;
+        // Buffering controller for look-ahead optimization
+        cnc::buffer_controller _buffer;
 
     public:
         interpreter(igris::ring<planner_block> *blocks,
@@ -141,7 +120,7 @@ namespace cnc
             cnc_float_type maximum_acceleration =
                 _smooth_stop_acceleration != 0 ? _smooth_stop_acceleration
                                                : saved_acc;
-            return evaluate_external_accfeed_2(
+            return cnc::evaluate_external_accfeed_2(
                 direction, maximum_acceleration, max_axes_accelerations);
         }
 
@@ -302,67 +281,6 @@ namespace cnc
             return task;
         }
 
-        /// Расщитывает ускорение или скорость для блока на основании
-        /// запрошенных скоростей или ускорений для отдельных осей и
-        /// скоростей или ускорений для точки в евклидовом пространстве.
-        static cnc_float_type evaluate_external_accfeed(
-            const ralgo::vector<cnc_float_type> &direction,
-            cnc_float_type absolute_maximum,
-            const igris::static_vector<cnc_float_type, NMAX_AXES>
-                &element_maximums)
-        {
-            int total_axes = (int)direction.size();
-            cnc_float_type minmul = std::numeric_limits<cnc_float_type>::max();
-
-            if (absolute_maximum == 0 &&
-                ralgo::vecops::norm(element_maximums) == 0)
-                return 0;
-
-            if (absolute_maximum != 0)
-                minmul = absolute_maximum;
-
-            for (int i = 0; i < total_axes; i++)
-                if (element_maximums[i] != 0)
-                {
-                    cnc_float_type lmul =
-                        element_maximums[i] / fabs(direction[i]);
-                    if (minmul > lmul)
-                        minmul = lmul;
-                }
-
-            if (minmul == std::numeric_limits<cnc_float_type>::max())
-                return 1000;
-            return minmul;
-        }
-
-        static cnc_float_type evaluate_external_accfeed_2(
-            const ralgo::vector<cnc_float_type> &direction,
-            cnc_float_type absolute_maximum,
-            const igris::static_vector<cnc_float_type, NMAX_AXES>
-                &element_maximums)
-        {
-            if (ralgo::vecops::norm(element_maximums) == 0)
-            {
-                return absolute_maximum;
-            }
-
-            if (absolute_maximum == 0)
-            {
-                auto bounded =
-                    ralgo::vecops::ray_to_box<ralgo::vector<cnc_float_type>>(
-                        direction, element_maximums);
-                return ralgo::vecops::norm(bounded);
-            }
-            else
-            {
-                auto vec = ralgo::vecops::mul_vs(direction, absolute_maximum);
-                auto bounded =
-                    ralgo::vecops::bound_to_box<ralgo::vector<cnc_float_type>>(
-                        vec, element_maximums);
-                return ralgo::vecops::norm(bounded);
-            }
-        }
-
         bool evaluate_interpreter_task(const control_task &task,
                                        planner_block &block,
                                        nos::ostream &)
@@ -432,9 +350,9 @@ namespace cnc
             auto dirsteps =
                 ralgo::vecops::norm(ralgo::vecops::mul_vv(direction, gears));
 
-            auto evalfeed = evaluate_external_accfeed_2(
+            auto evalfeed = cnc::evaluate_external_accfeed_2(
                 direction, task.feed, max_axes_velocities);
-            auto evalacc = evaluate_external_accfeed_2(
+            auto evalacc = cnc::evaluate_external_accfeed_2(
                 direction, task.acc, max_axes_accelerations);
 
             if (evalacc <= 0)
@@ -532,10 +450,10 @@ namespace cnc
             bool was_empty = blocks->empty() && planner->active_block == nullptr;
             if (was_empty)
             {
-                _buffer_start_tick = planner->iteration_counter;
+                _buffer.record_start_tick(planner->iteration_counter);
 
                 // Включаем паузу если нужна автоматическая буферизация
-                if (_min_blocks_to_start > 0 && !_explicit_buffer_mode)
+                if (_buffer.should_pause_on_first_block())
                 {
                     planner->set_pause_mode(true);
                 }
@@ -550,19 +468,16 @@ namespace cnc
 
             // Вызываем look-ahead пересчёт скоростей если он включен
             // (в явном режиме пересчёт будет при buffer_start)
-            if (_lookahead_enabled && _junction_deviation_steps > 0 &&
-                !_explicit_buffer_mode)
+            if (_lookahead.is_enabled() && !_buffer.is_explicit_mode())
             {
-                planner->recalculate_block_velocities(_junction_deviation_steps);
+                planner->recalculate_block_velocities(_lookahead.junction_deviation_steps());
             }
 
             // Проверяем готовность буфера для автоматического режима
-            if (!_explicit_buffer_mode && _min_blocks_to_start > 0)
+            if (_buffer.is_ready(blocks->avail(), planner->iteration_counter,
+                                 planner->active_block != nullptr))
             {
-                if (is_buffer_ready())
-                {
-                    planner->set_pause_mode(false);
-                }
+                planner->set_pause_mode(false);
             }
 
             system_unlock();
@@ -823,73 +738,9 @@ namespace cnc
             system_unlock();
         }
 
-        void g_command(const nos::argv &argv, nos::ostream &os)
-        {
-            int cmd = atoi(&argv[0].data()[1]);
-            switch (cmd)
-            {
-            case 0: // G0 - rapid move
-                command_rapid_move(argv.without(1), os);
-                break;
-            case 1: // G1 - linear move with feed
-                command_linear_move(argv.without(1), os);
-                break;
-            case 90: // G90 - absolute mode
-                _absolute_mode = true;
-                break;
-            case 91: // G91 - relative mode
-                _absolute_mode = false;
-                break;
-            case 92: // G92 - set position
-                command_G92(argv.without(1), os);
-                break;
-            default:
-                nos::println_to(os, "Unresolved G command");
-            }
-        }
-
-        void m_command(const nos::argv &argv, nos::ostream &os)
-        {
-            int cmd = atoi(&argv[0].data()[1]);
-            switch (cmd)
-            {
-            case 112:
-                command_M204(argv.without(1), os);
-                break;
-            case 204:
-                command_M204(argv.without(1), os);
-                break;
-            default:
-                nos::println_to(os, "Unresolved M command");
-            }
-        }
-
-        int gcode(const nos::argv &argv, nos::ostream &os)
-        {
-            if (argv.size() == 0)
-                return 0;
-
-            char cmdsymb = argv[0][0];
-            switch (cmdsymb)
-            {
-            case 'G':
-            {
-                g_command(argv, os);
-                break;
-            }
-
-            case 'M':
-            {
-                m_command(argv, os);
-                break;
-            }
-
-            default:
-                nos::fprintln_to(os, "Unresolved command: {}", argv[0]);
-            }
-
-            return 0;
-        }
+        void g_command(const nos::argv &argv, nos::ostream &os);
+        void m_command(const nos::argv &argv, nos::ostream &os);
+        int gcode(const nos::argv &argv, nos::ostream &os);
 
         std::vector<size_t> args_to_index_vector(const nos::argv &args)
         {
@@ -926,502 +777,109 @@ namespace cnc
             return 0;
         }
 
-        int command_help(nos::ostream &os)
-        {
-            for (auto &rec : clicommands)
-            {
-                nos::fprintln_to(os, "{} - {}", rec.key, rec.help);
-            }
-            return 0;
-        }
+        int command_help(nos::ostream &os);
 
-        int gcode_help(nos::ostream &os)
-        {
-            nos::println_to(os, "G0 <axis><pos>... [M<accel>] - rapid move (max velocity)");
-            nos::println_to(os, "G1 <axis><pos>... F<feed> [M<accel>] - linear move");
-            nos::println_to(os, "  G0/G1 respect G90/G91 mode");
-            nos::println_to(os, "  Example: G1 X10 Y-5 F100 M500");
-            nos::println_to(os, "G90 - absolute positioning mode (default)");
-            nos::println_to(os, "G91 - relative/incremental positioning mode");
-            nos::println_to(os, "G92 <axis><pos>... - set position without moving");
-            nos::println_to(os, "  Example: G92 X0 Y0 Z0");
-            nos::println_to(os, "M112 - emergency stop");
-            nos::println_to(os, "M204 [<accel>] - get/set default acceleration");
-            return 0;
-        }
+        int gcode_help(nos::ostream &os);
+        int print_interpreter_state(nos::ostream &os);
 
-        igris::static_callable_collection<int(const nos::argv &,
-                                              nos::ostream &),
-                                          50>
+        // CLI command handlers (implemented in interpreter.cpp)
+        int cmd_setprotect(const nos::argv &, nos::ostream &);
+        int cmd_stop(const nos::argv &, nos::ostream &);
+        int cmd_lastblock(const nos::argv &, nos::ostream &os);
+        int cmd_relmove(const nos::argv &argv, nos::ostream &os);
+        int cmd_absmove(const nos::argv &argv, nos::ostream &os);
+        int cmd_abspulses(const nos::argv &argv, nos::ostream &os);
+        int cmd_steps(const nos::argv &, nos::ostream &os);
+        int cmd_finishes(const nos::argv &, nos::ostream &os);
+        int cmd_gains(const nos::argv &, nos::ostream &os);
+        int cmd_gears(const nos::argv &, nos::ostream &os);
+        int cmd_setgear(const nos::argv &argv, nos::ostream &os);
+        int cmd_set_control_gear(const nos::argv &argv, nos::ostream &os);
+        int cmd_set_feedback_gear(const nos::argv &argv, nos::ostream &os);
+        int cmd_setpos(const nos::argv &argv, nos::ostream &os);
+        int cmd_disable_tandem_protection(const nos::argv &argv, nos::ostream &os);
+        int cmd_enable_tandem_protection(const nos::argv &argv, nos::ostream &os);
+        int cmd_tandem_info(const nos::argv &, nos::ostream &os);
+        int cmd_drop_pulses_allowed(const nos::argv &argv, nos::ostream &os);
+        int cmd_velmaxs(const nos::argv &argv, nos::ostream &os);
+        int cmd_accmaxs(const nos::argv &argv, nos::ostream &os);
+        int cmd_help(const nos::argv &, nos::ostream &os);
+        int cmd_help_cmd(const nos::argv &, nos::ostream &os);
+        int cmd_help_cnc(const nos::argv &, nos::ostream &os);
+        int cmd_state(const nos::argv &, nos::ostream &os);
+        int cmd_mode(const nos::argv &argv, nos::ostream &os);
+        int cmd_guard_info(const nos::argv &, nos::ostream &os);
+        int cmd_planner_pause(const nos::argv &argv, nos::ostream &os);
+        int cmd_set_junction_deviation(const nos::argv &argv, nos::ostream &os);
+        int cmd_queue_status(const nos::argv &, nos::ostream &os);
+        int cmd_flow_control(const nos::argv &argv, nos::ostream &os);
+        int cmd_buffer(const nos::argv &argv, nos::ostream &os);
+
+        // CLI commands table - implementations in interpreter.cpp
+        igris::static_callable_collection<int(const nos::argv &, nos::ostream &), 50>
             clicommands{
-                {"setprotect",
-                 "Disable global protection (no args)",
-                 [](const nos::argv &, nos::ostream &) {
-                     ralgo::global_protection = false;
-                     ralgo::info("Protection disabled");
-                     return 0;
-                 }},
-
-                {"stop",
-                 "Smooth stop all axes with deceleration (no args)",
-                 [this](const nos::argv &, nos::ostream &) {
-                     smooth_stop();
-                     return 0;
-                 }},
-
-                {"lastblock",
-                 "Print info about last/current motion block (no args)",
-                 [this](const nos::argv &, nos::ostream &os) {
-                     last_block().print_to_stream(os);
-                     return 0;
-                 }},
-
-                {"relmove",
-                 "Relative move. Args: <axis><dist>... F<feed> M<accel>. "
-                 "Example: relmove X10 Y-5 F100 M500",
-                 [this](const nos::argv &argv, nos::ostream &os) {
-                     if (argv.size() < 2)
-                     {
-                         nos::println_to(os, "Usage: relmove <axis><dist>... F<feed_mm/s> M<accel_mm/s2>");
-                         nos::println_to(os, "  Axes: X,Y,Z,A,B,C,I,J,K (0-8)");
-                         nos::println_to(os, "  Example: relmove X10 Y-5.5 Z2 F100 M500");
-                         return 0;
-                     }
-                     command_incremental_move(argv.without(1), os);
-                     return 0;
-                 }},
-
-                {"absmove",
-                 "Absolute move. Args: <axis><pos>... F<feed> M<accel>. "
-                 "Example: absmove X100 Y50 F100 M500",
-                 [this](const nos::argv &argv, nos::ostream &os) {
-                     if (argv.size() < 2)
-                     {
-                         nos::println_to(os, "Usage: absmove <axis><pos>... F<feed_mm/s> M<accel_mm/s2>");
-                         nos::println_to(os, "  Axes: X,Y,Z,A,B,C,I,J,K (0-8)");
-                         nos::println_to(os, "  Example: absmove X100 Y50 Z0 F100 M500");
-                         return 0;
-                     }
-                     command_absolute_move(argv.without(1), os);
-                     return 0;
-                 }},
-
-                {"abspulses",
-                 "Absolute move in pulses (steps). Args: <axis><steps>... F<feed> M<accel>",
-                 [this](const nos::argv &argv, nos::ostream &os) {
-                     if (argv.size() < 2)
-                     {
-                         nos::println_to(os, "Usage: abspulses <axis><steps>... F<feed> M<accel>");
-                         nos::println_to(os, "  Example: abspulses X1000 Y500 F100 M500");
-                         return 0;
-                     }
-                     command_absolute_pulses(argv.without(1), os);
-                     return 0;
-                 }},
-
-                {"steps",
-                 "Print current position in steps/pulses for all axes (no args)",
-                 [this](const nos::argv &, nos::ostream &os) {
-                     nos::println_to(os, current_steps());
-                     return 0;
-                 }},
-
-                {"finishes",
-                 "Print current/final position in mm for all axes (no args)",
-                 [this](const nos::argv &, nos::ostream &os) {
-                     nos::print_list_to(os, _final_position);
-                     nos::println_to(os);
-                     return 0;
-                 }},
-
-                {"gains",
-                 "Print input scaling factors for all axes (no args)",
-                 [this](const nos::argv &, nos::ostream &os) {
-                     nos::print_list_to(os, gains);
-                     nos::println_to(os);
-                     return 0;
-                 }},
-
-                {"gears",
-                 "Print steps_per_unit (gears) for all axes (no args)",
-                 [this](const nos::argv &, nos::ostream &os) {
-                     nos::print_list_to(os, _steps_per_unit);
-                     nos::println_to(os);
-                     return 0;
-                 }},
-
-                {"setgear",
-                 "Set steps_per_unit for axis. Args: <axis> <value>. "
-                 "Example: setgear X 100.5",
-                 [this](const nos::argv &argv, nos::ostream &os) {
-                     if (argv.size() < 3)
-                     {
-                         nos::println_to(os, "Usage: setgear <axis> <steps_per_unit>");
-                         nos::println_to(os, "  Example: setgear X 100.5");
-                         return 0;
-                     }
-                     auto axno = symbol_to_index(argv[1][0]);
-                     cnc_float_type val = igris_atof64(argv[2].data(), NULL);
-                     set_steps_per_unit(axno, val);
-                     feedback_guard->set_control_to_drive_multiplier(axno, val);
-                     return 0;
-                 }},
-
-                {"set_control_gear",
-                 "Set control gear (steps_per_unit). Args: <axis> <value>. "
-                 "Same as setgear",
-                 [this](const nos::argv &argv, nos::ostream &os) {
-                     if (argv.size() < 3)
-                     {
-                         nos::println_to(os, "Usage: set_control_gear <axis> <value>");
-                         return 0;
-                     }
-                     auto axno = symbol_to_index(argv[1][0]);
-                     cnc_float_type val = igris_atof64(argv[2].data(), NULL);
-                     set_steps_per_unit(axno, val);
-                     feedback_guard->set_control_to_drive_multiplier(axno, val);
-                     return 0;
-                 }},
-
-                {"set_feedback_gear",
-                 "Set feedback gear (encoder multiplier). Args: <axis> <value>",
-                 [this](const nos::argv &argv, nos::ostream &os) {
-                     if (argv.size() < 3)
-                     {
-                         nos::println_to(os, "Usage: set_feedback_gear <axis> <value>");
-                         return 0;
-                     }
-                     auto axno = symbol_to_index(argv[1][0]);
-                     cnc_float_type val = igris_atof64(argv[2].data(), NULL);
-                     feedback_guard->set_feedback_to_drive_multiplier(axno,
-                                                                      val);
-                     return 0;
-                 }},
-
-                {"setpos",
-                 "Set current position without moving. Args: <axis> <pos_mm>. "
-                 "Example: setpos X 0",
-                 [this](const nos::argv &argv, nos::ostream &os) {
-                     if (argv.size() < 3)
-                     {
-                         nos::println_to(os, "Usage: setpos <axis> <position_mm>");
-                         nos::println_to(os, "  Sets current position without moving (for homing)");
-                         nos::println_to(os, "  Example: setpos X 0");
-                         return 0;
-                     }
-                     auto axno = symbol_to_index(argv[1][0]);
-                     cnc_float_type val_mm = igris_atof64(argv[2].data(), NULL);
-                     system_lock();
-                     _final_position[axno] = val_mm;
-                     steps_t steps = static_cast<steps_t>(val_mm * _steps_per_unit[axno]);
-                     revolver->get_steppers()[axno]->set_counter_value(steps);
-                     feedback_guard->set_feedback_position(axno, val_mm);
-                     system_unlock();
-                     return 0;
-                 }},
-
-                {"disable_tandem_protection",
-                 "Disable tandem protection by index. Args: <index>",
-                 [this](const nos::argv &argv, nos::ostream &os) {
-                     if (argv.size() < 2)
-                     {
-                         nos::println_to(os, "Usage: disable_tandem_protection <index>");
-                         return 0;
-                     }
-                     auto idx = std::stoi(argv[1]);
-                     feedback_guard->remove_tandem(idx);
-                     return 0;
-                 }},
-
-                {"enable_tandem_protection",
-                 "Enable tandem protection. Args: <master_axis>,<slave_axis>:<max_error>",
-                 [this](const nos::argv &argv, nos::ostream &os) {
-                     if (argv.size() < 2)
-                     {
-                         nos::println_to(os, "Usage: enable_tandem_protection <master>,<slave>:<max_error>");
-                         nos::println_to(os, "  Example: enable_tandem_protection 0,1:10");
-                         return 0;
-                     }
-                     feedback_guard->add_tandem_command(argv.without(1), os);
-                     return 0;
-                 }},
-
-                {"tandem_info",
-                 "Print info about configured tandem axes (no args)",
-                 [this](const nos::argv &, nos::ostream &os) {
-                     const auto &tandems = feedback_guard->tandems();
-                     if (tandems.size() == 0)
-                     {
-                         nos::println_to(os, "Tandem list is empty");
-                     }
-                     for (auto &tandem : tandems)
-                     {
-                         nos::println_to(os, tandem.info());
-                     }
-                     return 0;
-                 }},
-
-                {"drop_pulses_allowed",
-                 "Get/set max following error. Args: <axis> [<pulses>]. "
-                 "Without value - prints current",
-                 [this](const nos::argv &argv, nos::ostream &os) {
-                     if (argv.size() < 2)
-                     {
-                         nos::println_to(os, "Usage: drop_pulses_allowed <axis> [<max_pulses>]");
-                         nos::println_to(os, "  Without value - prints current setting");
-                         return 0;
-                     }
-                     size_t no = std::stoi(argv[1]);
-
-                     if (argv.size() > 2)
-                     {
-                         int64_t pulses = std::stoi(argv[2]);
-                         feedback_guard->set_drop_pulses_allowed(no, pulses);
-                     }
-                     else
-                     {
-                         nos::println_to(
-                             os, feedback_guard->drop_pulses_allowed(no));
-                     }
-                     return 0;
-                 }},
-
-                {"velmaxs",
-                 "Set max velocities (mm/s). Args: <idx>:<vel>... "
-                 "Example: velmaxs 0:100 1:100 2:50",
-                 [this](const nos::argv &argv, nos::ostream &os) {
-                     if (argv.size() < 2)
-                     {
-                         nos::println_to(os, "Usage: velmaxs <axis>:<velocity>...");
-                         nos::println_to(os, "  Example: velmaxs 0:100 1:100 2:50");
-                         return 0;
-                     }
-                     auto fmap = args_to_index_value_map(argv.without(1));
-                     for (auto &[key, val] : fmap)
-                     {
-                         max_axes_velocities[key] = val;
-                     }
-                     return 0;
-                 }},
-
-                {"accmaxs",
-                 "Set max accelerations (mm/s^2). Args: <idx>:<acc>... "
-                 "Example: accmaxs 0:1000 1:1000 2:500",
-                 [this](const nos::argv &argv, nos::ostream &os) {
-                     if (argv.size() < 2)
-                     {
-                         nos::println_to(os, "Usage: accmaxs <axis>:<acceleration>...");
-                         nos::println_to(os, "  Example: accmaxs 0:1000 1:1000 2:500");
-                         return 0;
-                     }
-                     auto fmap = args_to_index_value_map(argv.without(1));
-                     for (auto &[key, val] : fmap)
-                         max_axes_accelerations[key] = val;
-                     return 0;
-                 }},
-
-                {"help",
-                 "Print all commands (text + G-code)",
-                 [this](const nos::argv &, nos::ostream &os) {
-                     nos::println_to(os, "=== Text commands ===");
-                     command_help(os);
-                     nos::println_to(os, "\n=== G-code commands ===");
-                     gcode_help(os);
-                     return 0;
-                 }},
-
-                {"help-cmd",
-                 "Print text commands help",
-                 [this](const nos::argv &, nos::ostream &os) {
-                     command_help(os);
-                     return 0;
-                 }},
-
-                {"help-cnc",
-                 "Print G-code commands help",
-                 [this](const nos::argv &, nos::ostream &os) {
-                     gcode_help(os);
-                     return 0;
-                 }},
-
-                {"state",
-                 "Print interpreter state: freq, vel, acc, gears, etc (no args)",
-                 [this](const nos::argv &, nos::ostream &os) {
-                     return print_interpreter_state(os);
-                 }},
-
-                {"mode",
-                 "Print or set positioning mode. Args: [abs|rel]",
-                 [this](const nos::argv &argv, nos::ostream &os) {
-                     if (argv.size() >= 2)
-                     {
-                         std::string_view arg = argv[1];
-                         if (arg == "abs" || arg == "absolute" || arg == "90")
-                             _absolute_mode = true;
-                         else if (arg == "rel" || arg == "relative" || arg == "91")
-                             _absolute_mode = false;
-                         else
-                         {
-                             nos::println_to(os, "Usage: mode [abs|rel]");
-                             return 0;
-                         }
-                     }
-                     nos::fprintln_to(os, "mode: {} ({})",
-                                      _absolute_mode ? "absolute" : "relative",
-                                      _absolute_mode ? "G90" : "G91");
-                     return 0;
-                 }},
-
-                {"guard_info",
-                 "Print feedback guard state and errors (no args)",
-                 [this](const nos::argv &, nos::ostream &os) {
-                     return feedback_guard->guard_info(os);
-                 }},
-
-                {"planner_pause",
-                 "Pause/resume planner. Args: <0|1>. 1=pause, 0=resume",
-                 [this](const nos::argv &argv, nos::ostream &os) {
-                     if (argv.size() < 2)
-                     {
-                         nos::println_to(os, "Usage: planner_pause <0|1>");
-                         nos::println_to(os, "  1 = pause, 0 = resume");
-                         return 0;
-                     }
-                     auto en = std::stoi(argv[1]);
-                     planner->set_pause_mode(en);
-                     return 0;
-                 }},
-
-                {"set_junction_deviation",
-                 "Set junction deviation for look-ahead (mm). Args: [<value>]. "
-                 "0 = disable, typical: 0.01-0.05 mm",
-                 [this](const nos::argv &argv, nos::ostream &os) {
-                     if (argv.size() < 2)
-                     {
-                         nos::fprintln_to(os, "junction_deviation: {} mm", _junction_deviation);
-                         nos::fprintln_to(os, "junction_deviation_steps: {}", _junction_deviation_steps);
-                         nos::fprintln_to(os, "lookahead_enabled: {}", _lookahead_enabled);
-                         nos::println_to(os, "Usage: set_junction_deviation <value_mm>");
-                         nos::println_to(os, "  0 = disable look-ahead");
-                         nos::println_to(os, "  Typical values: 0.01-0.05 mm");
-                         return 0;
-                     }
-                     cnc_float_type val = igris_atof64(argv[1].data(), NULL);
-                     set_junction_deviation(val);
-                     nos::fprintln_to(os, "junction_deviation set to {} mm", val);
-                     if (val > 0)
-                         nos::fprintln_to(os, "look-ahead enabled ({} steps)", _junction_deviation_steps);
-                     else
-                         nos::println_to(os, "look-ahead disabled");
-                     return 0;
-                 }},
-
-                {"queue_status",
-                 "Print block queue status (no args)",
-                 [this](const nos::argv &, nos::ostream &os) {
-                     nos::fprintln_to(os, "queue_capacity: {}", blocks->size());
-                     nos::fprintln_to(os, "queue_used: {}", blocks->avail());
-                     nos::fprintln_to(os, "queue_room: {}", blocks->room());
-                     nos::fprintln_to(os, "active_block: {}", planner->active_block != nullptr);
-                     nos::fprintln_to(os, "flow_control: {}", flow ? (flow->is_enabled() ? "enabled" : "disabled") : "not configured");
-                     return 0;
-                 }},
-
-                {"flow_control",
-                 "Enable/disable flow control. Args: <0|1>. Without args - show status",
-                 [this](const nos::argv &argv, nos::ostream &os) {
-                     if (!flow)
-                     {
-                         nos::println_to(os, "flow_control: not configured");
-                         return 0;
-                     }
-                     if (argv.size() < 2)
-                     {
-                         nos::fprintln_to(os, "flow_control: {}", flow->is_enabled() ? "enabled" : "disabled");
-                         return 0;
-                     }
-                     auto en = std::stoi(argv[1]);
-                     flow->set_enabled(en != 0);
-                     nos::fprintln_to(os, "flow_control: {}", flow->is_enabled() ? "enabled" : "disabled");
-                     return 0;
-                 }},
-
-                {"buffer",
-                 "Buffer control. Args: enable|start|cancel|status|config <min_blocks> [timeout_ms]",
-                 [this](const nos::argv &argv, nos::ostream &os) {
-                     if (argv.size() < 2)
-                     {
-                         nos::println_to(os, "Usage: buffer <command>");
-                         nos::println_to(os, "  enable  - start buffering mode");
-                         nos::println_to(os, "  start   - execute buffered commands");
-                         nos::println_to(os, "  cancel  - cancel buffering and clear queue");
-                         nos::println_to(os, "  status  - show buffer status");
-                         nos::println_to(os, "  config <min_blocks> [timeout_ms] - set auto-buffer params");
-                         return 0;
-                     }
-
-                     std::string_view cmd = argv[1];
-
-                     if (cmd == "enable")
-                     {
-                         buffer_enable();
-                         nos::println_to(os, "buffer: enabled, waiting for commands");
-                         return 0;
-                     }
-                     else if (cmd == "start")
-                     {
-                         if (!_explicit_buffer_mode)
-                         {
-                             nos::println_to(os, "buffer: not in buffer mode");
-                             return 0;
-                         }
-                         int queued = blocks->avail();
-                         buffer_start();
-                         nos::fprintln_to(os, "buffer: started {} blocks", queued);
-                         return 0;
-                     }
-                     else if (cmd == "cancel")
-                     {
-                         buffer_cancel();
-                         nos::println_to(os, "buffer: cancelled");
-                         return 0;
-                     }
-                     else if (cmd == "status")
-                     {
-                         nos::fprintln_to(os, "explicit_mode: {}", _explicit_buffer_mode);
-                         nos::fprintln_to(os, "min_blocks_to_start: {}", _min_blocks_to_start);
-                         nos::fprintln_to(os, "buffer_timeout_ms: {}", get_buffer_timeout_ms());
-                         nos::fprintln_to(os, "blocks_pending: {}", blocks->avail());
-                         nos::fprintln_to(os, "buffer_ready: {}", is_buffer_ready());
-                         nos::fprintln_to(os, "planner_paused: {}", planner->pause);
-                         return 0;
-                     }
-                     else if (cmd == "config")
-                     {
-                         if (argv.size() < 3)
-                         {
-                             nos::println_to(os, "Usage: buffer config <min_blocks> [timeout_ms]");
-                             nos::fprintln_to(os, "Current: min_blocks={}, timeout_ms={}",
-                                              _min_blocks_to_start, get_buffer_timeout_ms());
-                             return 0;
-                         }
-                         int min_blocks = std::stoi(argv[2]);
-                         int timeout_ms = 100; // default 100ms
-                         if (argv.size() >= 4)
-                             timeout_ms = std::stoi(argv[3]);
-
-                         set_min_blocks_to_start(min_blocks);
-                         set_buffer_timeout_ms(timeout_ms);
-                         nos::fprintln_to(os, "buffer: min_blocks={}, timeout_ms={}",
-                                          min_blocks, timeout_ms);
-                         return 0;
-                     }
-                     else
-                     {
-                         nos::fprintln_to(os, "Unknown buffer command: {}", cmd);
-                         return 0;
-                     }
-                 }}};
+                {"setprotect", "Disable global protection",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_setprotect(a, o); }},
+                {"stop", "Smooth stop all axes",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_stop(a, o); }},
+                {"lastblock", "Print last motion block info",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_lastblock(a, o); }},
+                {"relmove", "Relative move. Args: <axis><dist>... F<feed> M<accel>",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_relmove(a, o); }},
+                {"absmove", "Absolute move. Args: <axis><pos>... F<feed> M<accel>",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_absmove(a, o); }},
+                {"abspulses", "Absolute move in steps. Args: <axis><steps>... F<feed> M<accel>",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_abspulses(a, o); }},
+                {"steps", "Print position in steps",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_steps(a, o); }},
+                {"finishes", "Print position in mm",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_finishes(a, o); }},
+                {"gains", "Print input scaling factors",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_gains(a, o); }},
+                {"gears", "Print steps_per_unit",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_gears(a, o); }},
+                {"setgear", "Set steps_per_unit. Args: <axis> <value>",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_setgear(a, o); }},
+                {"set_control_gear", "Set control gear. Args: <axis> <value>",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_set_control_gear(a, o); }},
+                {"set_feedback_gear", "Set feedback gear. Args: <axis> <value>",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_set_feedback_gear(a, o); }},
+                {"setpos", "Set position without moving. Args: <axis> <pos_mm>",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_setpos(a, o); }},
+                {"disable_tandem_protection", "Disable tandem protection. Args: <index>",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_disable_tandem_protection(a, o); }},
+                {"enable_tandem_protection", "Enable tandem protection. Args: <master>,<slave>:<max_error>",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_enable_tandem_protection(a, o); }},
+                {"tandem_info", "Print tandem axes info",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_tandem_info(a, o); }},
+                {"drop_pulses_allowed", "Get/set max following error. Args: <axis> [<pulses>]",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_drop_pulses_allowed(a, o); }},
+                {"velmaxs", "Set max velocities. Args: <idx>:<vel>...",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_velmaxs(a, o); }},
+                {"accmaxs", "Set max accelerations. Args: <idx>:<acc>...",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_accmaxs(a, o); }},
+                {"help", "Print all commands",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_help(a, o); }},
+                {"help-cmd", "Print text commands",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_help_cmd(a, o); }},
+                {"help-cnc", "Print G-code commands",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_help_cnc(a, o); }},
+                {"state", "Print interpreter state",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_state(a, o); }},
+                {"mode", "Print or set positioning mode. Args: [abs|rel]",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_mode(a, o); }},
+                {"guard_info", "Print feedback guard state",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_guard_info(a, o); }},
+                {"planner_pause", "Pause/resume planner. Args: <0|1>",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_planner_pause(a, o); }},
+                {"set_junction_deviation", "Set junction deviation (mm). Args: [<value>]",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_set_junction_deviation(a, o); }},
+                {"queue_status", "Print block queue status",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_queue_status(a, o); }},
+                {"flow_control", "Enable/disable flow control. Args: [<0|1>]",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_flow_control(a, o); }},
+                {"buffer", "Buffer control. Args: enable|start|cancel|status|config",
+                 [this](const nos::argv &a, nos::ostream &o) { return cmd_buffer(a, o); }}};
 
         int gcode_drop_first(const nos::argv &argv, nos::ostream &os)
         {
@@ -1446,46 +904,6 @@ namespace cnc
             return vect;
         }
 
-        int print_interpreter_state(nos::ostream &os)
-        {
-            PRINTTO(os, revolver_frequency);
-            PRINTTO(os, saved_acc);
-            PRINTTO(os, saved_feed);
-            nos::print_to(os, "cur_vel: ");
-            nos::print_list_to(os, revolver->current_velocities());
-            nos::println_to(os);
-            nos::print_to(os, "cur_acc:");
-            nos::print_list_to(os, planner->accelerations);
-            nos::println_to(os);
-            nos::print_to(os, "velmaxs:");
-            nos::print_list_to(os, max_axes_velocities);
-            nos::println_to(os);
-            nos::print_to(os, "accmaxs:");
-            nos::print_list_to(os, max_axes_accelerations);
-            nos::println_to(os);
-            nos::print_to(os, "gains:");
-            nos::print_list_to(os, gains);
-            nos::println_to(os);
-            nos::print_to(os, "gears:");
-            nos::print_list_to(os, _steps_per_unit);
-            nos::println_to(os);
-            nos::print_to(os, "active_block: ");
-            nos::println_to(os, planner->active_block != nullptr);
-            nos::print_to(os, "active: ");
-            nos::println_to(os, planner->active);
-            nos::print_to(os, "head: ");
-            nos::println_to(os, planner->blocks->head_index());
-            nos::println_to(os);
-            // Look-ahead status
-            nos::fprintln_to(os, "lookahead_enabled: {}", _lookahead_enabled);
-            nos::fprintln_to(os, "junction_deviation: {} mm ({} steps)",
-                             _junction_deviation, _junction_deviation_steps);
-            // Positioning mode
-            nos::fprintln_to(os, "positioning_mode: {} ({})",
-                             _absolute_mode ? "absolute" : "relative",
-                             _absolute_mode ? "G90" : "G91");
-            return 0;
-        }
 
         // Check if command is G-code (starts with G or M + digit)
         static bool is_gcode_command(const std::string_view &cmd)
@@ -1546,6 +964,7 @@ namespace cnc
         void set_revolver_frequency(cnc_float_type freq)
         {
             revolver_frequency = freq;
+            _buffer.set_frequency(freq);
         }
 
         void set_axes_count(int total)
@@ -1576,7 +995,7 @@ namespace cnc
             {
                 _steps_per_unit[axis] = value;
                 // Пересчитываем junction_deviation_steps при изменении gears
-                update_junction_deviation_steps();
+                _lookahead.update_steps_per_unit(_steps_per_unit, total_axes);
             }
         }
 
@@ -1605,21 +1024,20 @@ namespace cnc
         /// @param value - допустимое отклонение в units (типично 0.01-0.05 мм)
         void set_junction_deviation(cnc_float_type value)
         {
-            _junction_deviation = value;
-            _lookahead_enabled = (value > 0);
-            update_junction_deviation_steps();
+            _lookahead.set_junction_deviation(value);
+            _lookahead.update_steps_per_unit(_steps_per_unit, total_axes);
         }
 
         /// Получить текущее значение junction deviation в units.
         cnc_float_type get_junction_deviation() const
         {
-            return _junction_deviation;
+            return _lookahead.junction_deviation();
         }
 
         /// Проверить, включен ли look-ahead.
         bool is_lookahead_enabled() const
         {
-            return _lookahead_enabled;
+            return _lookahead.is_enabled();
         }
 
         // === Buffering management ===
@@ -1628,39 +1046,31 @@ namespace cnc
         /// @param n - количество блоков (0 = без буферизации)
         void set_min_blocks_to_start(int n)
         {
-            _min_blocks_to_start = n;
+            _buffer.set_min_blocks_to_start(n);
         }
 
         int get_min_blocks_to_start() const
         {
-            return _min_blocks_to_start;
+            return _buffer.min_blocks_to_start();
         }
 
         /// Установить таймаут буферизации в миллисекундах.
         /// @param ms - таймаут (0 = без таймаута)
         void set_buffer_timeout_ms(int ms)
         {
-            if (revolver_frequency > 0)
-                _buffer_timeout_ticks =
-                    static_cast<int64_t>(ms * revolver_frequency / 1000);
-            else
-                _buffer_timeout_ticks = 0;
+            _buffer.set_timeout_ms(ms);
         }
 
         int get_buffer_timeout_ms() const
         {
-            if (revolver_frequency > 0)
-                return static_cast<int>(_buffer_timeout_ticks * 1000 /
-                                        revolver_frequency);
-            return 0;
+            return _buffer.timeout_ms();
         }
 
         /// Включить явный режим буферизации.
         /// Блоки накапливаются но не исполняются до вызова buffer_start().
         void buffer_enable()
         {
-            _explicit_buffer_mode = true;
-            _buffer_ready_to_start = false;
+            _buffer.enable_explicit();
             planner->set_pause_mode(true);
         }
 
@@ -1668,16 +1078,13 @@ namespace cnc
         /// Выполняет look-ahead пересчёт и запускает движение.
         void buffer_start()
         {
-            if (_explicit_buffer_mode)
+            if (_buffer.start_explicit())
             {
                 // Пересчитываем скорости всех блоков перед стартом
-                if (_lookahead_enabled && _junction_deviation_steps > 0)
+                if (_lookahead.is_enabled())
                 {
-                    planner->recalculate_block_velocities(_junction_deviation_steps);
+                    planner->recalculate_block_velocities(_lookahead.junction_deviation_steps());
                 }
-
-                _explicit_buffer_mode = false;
-                _buffer_ready_to_start = true;
                 planner->set_pause_mode(false);
             }
         }
@@ -1685,8 +1092,7 @@ namespace cnc
         /// Отменить буферизацию и очистить очередь.
         void buffer_cancel()
         {
-            _explicit_buffer_mode = false;
-            _buffer_ready_to_start = false;
+            _buffer.cancel_explicit();
             planner->set_pause_mode(false);
             planner->clear();
         }
@@ -1694,78 +1100,16 @@ namespace cnc
         /// Проверить, активен ли режим буферизации.
         bool is_buffer_mode() const
         {
-            return _explicit_buffer_mode;
+            return _buffer.is_explicit_mode();
         }
 
         /// Проверить, готов ли буфер к старту (автоматический режим).
-        /// Возвращает true если:
-        /// - накопилось достаточно блоков, ИЛИ
-        /// - истёк таймаут ожидания
         bool is_buffer_ready() const
         {
-            // Если явный режим - управляется вручную
-            if (_explicit_buffer_mode)
-                return false;
-
-            // Если буферизация отключена - всегда готов
-            if (_min_blocks_to_start <= 0)
-                return true;
-
-            // Если уже в движении - готов
-            if (planner->active_block != nullptr)
-                return true;
-
-            int pending = blocks->avail();
-
-            // Достаточно блоков?
-            if (pending >= _min_blocks_to_start)
-                return true;
-
-            // Таймаут?
-            if (_buffer_timeout_ticks > 0 && pending > 0)
-            {
-                int64_t current_tick = planner->iteration_counter;
-                if (current_tick - _buffer_start_tick >= _buffer_timeout_ticks)
-                    return true;
-            }
-
-            return false;
+            return _buffer.is_ready(blocks->avail(), planner->iteration_counter,
+                                    planner->active_block != nullptr);
         }
 
-    private:
-        /// Пересчитать junction_deviation из units в steps.
-        /// Использует средний steps_per_unit для всех осей.
-        void update_junction_deviation_steps()
-        {
-            if (_junction_deviation <= 0 || total_axes == 0)
-            {
-                _junction_deviation_steps = 0;
-                return;
-            }
-
-            // Используем среднее steps_per_unit для конвертации
-            // (для более точной работы можно использовать минимальное значение)
-            cnc_float_type sum = 0;
-            int count = 0;
-            for (int i = 0; i < total_axes; ++i)
-            {
-                if (_steps_per_unit[i] > 0)
-                {
-                    sum += _steps_per_unit[i];
-                    count++;
-                }
-            }
-
-            if (count > 0)
-            {
-                cnc_float_type avg_steps_per_unit = sum / count;
-                _junction_deviation_steps = _junction_deviation * avg_steps_per_unit;
-            }
-            else
-            {
-                _junction_deviation_steps = _junction_deviation;
-            }
-        }
     };
 }
 
