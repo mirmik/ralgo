@@ -84,6 +84,23 @@ namespace cnc
         // Включен ли look-ahead
         bool _lookahead_enabled = false;
 
+        // === Buffering parameters ===
+        // Минимальное количество блоков перед стартом (0 = без буферизации)
+        int _min_blocks_to_start = 0;
+
+        // Таймаут ожидания блоков в тиках revolver (0 = без таймаута)
+        // При таймауте старт происходит даже если блоков меньше min_blocks
+        int64_t _buffer_timeout_ticks = 0;
+
+        // Тик, когда первый блок был добавлен в пустую очередь
+        int64_t _buffer_start_tick = 0;
+
+        // Явный режим буферизации (buffer enable/start)
+        bool _explicit_buffer_mode = false;
+
+        // Готов ли буфер к старту (для явного режима)
+        bool _buffer_ready_to_start = false;
+
     public:
         interpreter(igris::ring<planner_block> *blocks,
                     cnc::planner *planner,
@@ -510,6 +527,19 @@ namespace cnc
                     _final_position[i] += lastblock.axdist[i] / _steps_per_unit[i];
             }
 
+            // Запоминаем время первого блока для таймаута буферизации
+            bool was_empty = blocks->empty() && planner->active_block == nullptr;
+            if (was_empty)
+            {
+                _buffer_start_tick = planner->iteration_counter;
+
+                // Включаем паузу если нужна автоматическая буферизация
+                if (_min_blocks_to_start > 0 && !_explicit_buffer_mode)
+                {
+                    planner->set_pause_mode(true);
+                }
+            }
+
             auto &placeblock = blocks->head_place();
             lastblock.blockno = blockno++;
             placeblock = lastblock;
@@ -518,9 +548,20 @@ namespace cnc
             blocks->move_head_one();
 
             // Вызываем look-ahead пересчёт скоростей если он включен
-            if (_lookahead_enabled && _junction_deviation_steps > 0)
+            // (в явном режиме пересчёт будет при buffer_start)
+            if (_lookahead_enabled && _junction_deviation_steps > 0 &&
+                !_explicit_buffer_mode)
             {
                 planner->recalculate_block_velocities(_junction_deviation_steps);
+            }
+
+            // Проверяем готовность буфера для автоматического режима
+            if (!_explicit_buffer_mode && _min_blocks_to_start > 0)
+            {
+                if (is_buffer_ready())
+                {
+                    planner->set_pause_mode(false);
+                }
             }
 
             system_unlock();
@@ -1182,6 +1223,83 @@ namespace cnc
                      flow->set_enabled(en != 0);
                      nos::fprintln_to(os, "flow_control: {}", flow->is_enabled() ? "enabled" : "disabled");
                      return 0;
+                 }},
+
+                {"buffer",
+                 "Buffer control. Args: enable|start|cancel|status|config <min_blocks> [timeout_ms]",
+                 [this](const nos::argv &argv, nos::ostream &os) {
+                     if (argv.size() < 2)
+                     {
+                         nos::println_to(os, "Usage: buffer <command>");
+                         nos::println_to(os, "  enable  - start buffering mode");
+                         nos::println_to(os, "  start   - execute buffered commands");
+                         nos::println_to(os, "  cancel  - cancel buffering and clear queue");
+                         nos::println_to(os, "  status  - show buffer status");
+                         nos::println_to(os, "  config <min_blocks> [timeout_ms] - set auto-buffer params");
+                         return 0;
+                     }
+
+                     std::string_view cmd = argv[1];
+
+                     if (cmd == "enable")
+                     {
+                         buffer_enable();
+                         nos::println_to(os, "buffer: enabled, waiting for commands");
+                         return 0;
+                     }
+                     else if (cmd == "start")
+                     {
+                         if (!_explicit_buffer_mode)
+                         {
+                             nos::println_to(os, "buffer: not in buffer mode");
+                             return 0;
+                         }
+                         int queued = blocks->avail();
+                         buffer_start();
+                         nos::fprintln_to(os, "buffer: started {} blocks", queued);
+                         return 0;
+                     }
+                     else if (cmd == "cancel")
+                     {
+                         buffer_cancel();
+                         nos::println_to(os, "buffer: cancelled");
+                         return 0;
+                     }
+                     else if (cmd == "status")
+                     {
+                         nos::fprintln_to(os, "explicit_mode: {}", _explicit_buffer_mode);
+                         nos::fprintln_to(os, "min_blocks_to_start: {}", _min_blocks_to_start);
+                         nos::fprintln_to(os, "buffer_timeout_ms: {}", get_buffer_timeout_ms());
+                         nos::fprintln_to(os, "blocks_pending: {}", blocks->avail());
+                         nos::fprintln_to(os, "buffer_ready: {}", is_buffer_ready());
+                         nos::fprintln_to(os, "planner_paused: {}", planner->pause);
+                         return 0;
+                     }
+                     else if (cmd == "config")
+                     {
+                         if (argv.size() < 3)
+                         {
+                             nos::println_to(os, "Usage: buffer config <min_blocks> [timeout_ms]");
+                             nos::fprintln_to(os, "Current: min_blocks={}, timeout_ms={}",
+                                              _min_blocks_to_start, get_buffer_timeout_ms());
+                             return 0;
+                         }
+                         int min_blocks = std::stoi(argv[2]);
+                         int timeout_ms = 100; // default 100ms
+                         if (argv.size() >= 4)
+                             timeout_ms = std::stoi(argv[3]);
+
+                         set_min_blocks_to_start(min_blocks);
+                         set_buffer_timeout_ms(timeout_ms);
+                         nos::fprintln_to(os, "buffer: min_blocks={}, timeout_ms={}",
+                                          min_blocks, timeout_ms);
+                         return 0;
+                     }
+                     else
+                     {
+                         nos::fprintln_to(os, "Unknown buffer command: {}", cmd);
+                         return 0;
+                     }
                  }}};
 
         int gcode_drop_first(const nos::argv &argv, nos::ostream &os)
@@ -1366,6 +1484,116 @@ namespace cnc
         bool is_lookahead_enabled() const
         {
             return _lookahead_enabled;
+        }
+
+        // === Buffering management ===
+
+        /// Установить минимальное количество блоков перед стартом.
+        /// @param n - количество блоков (0 = без буферизации)
+        void set_min_blocks_to_start(int n)
+        {
+            _min_blocks_to_start = n;
+        }
+
+        int get_min_blocks_to_start() const
+        {
+            return _min_blocks_to_start;
+        }
+
+        /// Установить таймаут буферизации в миллисекундах.
+        /// @param ms - таймаут (0 = без таймаута)
+        void set_buffer_timeout_ms(int ms)
+        {
+            if (revolver_frequency > 0)
+                _buffer_timeout_ticks =
+                    static_cast<int64_t>(ms * revolver_frequency / 1000);
+            else
+                _buffer_timeout_ticks = 0;
+        }
+
+        int get_buffer_timeout_ms() const
+        {
+            if (revolver_frequency > 0)
+                return static_cast<int>(_buffer_timeout_ticks * 1000 /
+                                        revolver_frequency);
+            return 0;
+        }
+
+        /// Включить явный режим буферизации.
+        /// Блоки накапливаются но не исполняются до вызова buffer_start().
+        void buffer_enable()
+        {
+            _explicit_buffer_mode = true;
+            _buffer_ready_to_start = false;
+            planner->set_pause_mode(true);
+        }
+
+        /// Запустить накопленные блоки.
+        /// Выполняет look-ahead пересчёт и запускает движение.
+        void buffer_start()
+        {
+            if (_explicit_buffer_mode)
+            {
+                // Пересчитываем скорости всех блоков перед стартом
+                if (_lookahead_enabled && _junction_deviation_steps > 0)
+                {
+                    planner->recalculate_block_velocities(_junction_deviation_steps);
+                }
+
+                _explicit_buffer_mode = false;
+                _buffer_ready_to_start = true;
+                planner->set_pause_mode(false);
+            }
+        }
+
+        /// Отменить буферизацию и очистить очередь.
+        void buffer_cancel()
+        {
+            _explicit_buffer_mode = false;
+            _buffer_ready_to_start = false;
+            planner->set_pause_mode(false);
+            planner->clear();
+        }
+
+        /// Проверить, активен ли режим буферизации.
+        bool is_buffer_mode() const
+        {
+            return _explicit_buffer_mode;
+        }
+
+        /// Проверить, готов ли буфер к старту (автоматический режим).
+        /// Возвращает true если:
+        /// - накопилось достаточно блоков, ИЛИ
+        /// - истёк таймаут ожидания
+        bool is_buffer_ready() const
+        {
+            // Если явный режим - управляется вручную
+            if (_explicit_buffer_mode)
+                return false;
+
+            // Если буферизация отключена - всегда готов
+            if (_min_blocks_to_start <= 0)
+                return true;
+
+            // Если уже в движении - готов
+            if (planner->active_block != nullptr)
+                return true;
+
+            int pending = blocks->avail();
+
+            // Достаточно блоков?
+            if (pending >= _min_blocks_to_start)
+                return true;
+
+            // Таймаут?
+            if (_buffer_timeout_ticks > 0 && pending > 0)
+            {
+                int64_t current_tick = planner->iteration_counter;
+                if (current_tick - _buffer_start_tick >= _buffer_timeout_ticks)
+                    return true;
+            }
+
+            return false;
         }
 
     private:

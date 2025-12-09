@@ -90,3 +90,60 @@ TEST_CASE("interpreter.lookahead_integration")
         CHECK_EQ(interpreter.get_junction_deviation(), 0);
     }
 }
+
+TEST_CASE("interpreter.buffering")
+{
+    igris::ring<cnc::planner_block> blocks_ring(10);
+    cnc::revolver revolver;
+    cnc::planner planner(&blocks_ring, &revolver);
+    cnc::feedback_guard guard(2);
+    cnc::interpreter interpreter(&blocks_ring, &planner, &revolver, &guard);
+
+    interpreter.init_axes(2);
+    interpreter.set_revolver_frequency(10000);
+
+    SUBCASE("По умолчанию буферизация выключена")
+    {
+        CHECK_EQ(interpreter.get_min_blocks_to_start(), 0);
+        CHECK_EQ(interpreter.is_buffer_mode(), false);
+        CHECK(interpreter.is_buffer_ready());
+    }
+
+    SUBCASE("set_min_blocks_to_start настраивает автобуферизацию")
+    {
+        interpreter.set_min_blocks_to_start(3);
+        CHECK_EQ(interpreter.get_min_blocks_to_start(), 3);
+    }
+
+    SUBCASE("set_buffer_timeout_ms конвертирует в тики")
+    {
+        interpreter.set_buffer_timeout_ms(100);
+        // 100ms при 10000Hz = 1000 тиков
+        CHECK_EQ(interpreter.get_buffer_timeout_ms(), 100);
+    }
+
+    SUBCASE("buffer_enable включает явный режим")
+    {
+        interpreter.buffer_enable();
+        CHECK(interpreter.is_buffer_mode());
+        CHECK(planner.pause); // planner должен быть на паузе
+    }
+
+    SUBCASE("buffer_start выключает режим и снимает паузу")
+    {
+        interpreter.buffer_enable();
+        CHECK(interpreter.is_buffer_mode());
+
+        interpreter.buffer_start();
+        CHECK_EQ(interpreter.is_buffer_mode(), false);
+        CHECK_EQ(planner.pause, false);
+    }
+
+    SUBCASE("buffer_cancel очищает режим")
+    {
+        interpreter.buffer_enable();
+        interpreter.buffer_cancel();
+        CHECK_EQ(interpreter.is_buffer_mode(), false);
+        CHECK_EQ(planner.pause, false);
+    }
+}
