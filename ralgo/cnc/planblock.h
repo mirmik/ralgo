@@ -83,7 +83,7 @@ namespace cnc
             nos::println_to(os, "direction: ", _direction);
         }
 
-        const std::array<cnc_float_type, NMAX_AXES> &direction()
+        const std::array<cnc_float_type, NMAX_AXES> &direction() const
         {
             return _direction;
         }
@@ -91,6 +91,65 @@ namespace cnc
         void set_direction(const std::initializer_list<cnc_float_type> &dir)
         {
             std::copy(dir.begin(), dir.end(), _direction.begin());
+        }
+
+        /// Рассчитать максимальную скорость на стыке двух блоков.
+        /// Использует алгоритм Junction Deviation (как в Marlin/Grbl).
+        ///
+        /// @param dir1 - направление первого блока (нормализованное)
+        /// @param dir2 - направление второго блока (нормализованное)
+        /// @param nominal_velocity - номинальная скорость (steps/tick)
+        /// @param acceleration - ускорение (steps/tick²)
+        /// @param junction_deviation - допустимое отклонение (steps)
+        /// @param axes - количество осей
+        /// @return максимальная скорость на стыке (steps/tick)
+        static cnc_float_type calculate_junction_velocity(
+            const std::array<cnc_float_type, NMAX_AXES> &dir1,
+            const std::array<cnc_float_type, NMAX_AXES> &dir2,
+            cnc_float_type nominal_velocity,
+            cnc_float_type acceleration,
+            cnc_float_type junction_deviation,
+            int axes)
+        {
+            // Вычисляем косинус угла между направлениями
+            cnc_float_type cos_theta = 0;
+            for (int i = 0; i < axes; ++i)
+            {
+                cos_theta += dir1[i] * dir2[i];
+            }
+
+            // Ограничиваем cos_theta в [-1, 1] для защиты от численных ошибок
+            if (cos_theta > 1.0)
+                cos_theta = 1.0;
+            if (cos_theta < -1.0)
+                cos_theta = -1.0;
+
+            // Если направления почти совпадают - возвращаем номинальную скорость
+            if (cos_theta > 0.9999)
+            {
+                return nominal_velocity;
+            }
+
+            // Если разворот на 180° - возвращаем 0
+            if (cos_theta < -0.9999)
+            {
+                return 0;
+            }
+
+            // sin(theta/2) = sqrt((1 - cos_theta) / 2)
+            cnc_float_type sin_half_theta = sqrt(0.5 * (1.0 - cos_theta));
+
+            // Junction velocity из условия ограничения центростремительного ускорения:
+            // v² / R = a, где R = junction_deviation / sin(theta/2)
+            // => v = sqrt(a * R) = sqrt(a * junction_deviation / sin(theta/2))
+            cnc_float_type v_junction =
+                sqrt(acceleration * junction_deviation / sin_half_theta);
+
+            // Ограничиваем номинальной скоростью
+            if (v_junction > nominal_velocity)
+                v_junction = nominal_velocity;
+
+            return v_junction;
         }
 
         planner_block() {}
@@ -262,14 +321,31 @@ namespace cnc
             }
         }
 
+        /// Установить состояние блока с заданными граничными скоростями.
+        ///
+        /// Трапецеидальный профиль скорости:
+        ///
+        ///        B______________C
+        ///       /                \
+        ///      /                  \
+        ///     /                    \
+        ///    A                      D
+        ///    ^                      ^
+        /// start_vel              final_vel
+        ///
+        /// @param axdist - расстояние по каждой оси [steps]
+        /// @param axes - количество осей
+        /// @param velocity - номинальная (крейсерская) скорость [steps/tick]
+        /// @param acceleration - ускорение [steps/tick²]
+        /// @param start_vel - начальная скорость [steps/tick], по умолчанию 0
+        /// @param final_vel - конечная скорость [steps/tick], по умолчанию 0
         void set_state(const ralgo::vector_view<cnc_float_type> &axdist,
                        int axes,
                        cnc_float_type velocity,
-                       cnc_float_type acceleration)
+                       cnc_float_type acceleration,
+                       cnc_float_type start_vel = 0,
+                       cnc_float_type final_vel = 0)
         {
-            start_velocity = 0;
-            final_velocity = 0;
-
             auto direction =
                 ralgo::vecops::normalize<ralgo::vector<cnc_float_type>>(axdist);
 
@@ -282,44 +358,125 @@ namespace cnc
             cnc_float_type pathsqr = 0;
             for (int i = 0; i < axes; ++i)
                 pathsqr += axdist[i] * axdist[i];
-            cnc_float_type path = sqrt(pathsqr); // area
-            cnc_float_type time = path / velocity;
-
-            // Поскольку время дискретно, движение должно быть завершено
-            // в момент времени, соответствующий целому числу.
-            // Для этого выполняется округление расчётного времени
-            // и небольшая модификация скорости и ускорения.
-            int itime = ceil(time);
-            int preftime = ceil(velocity / acceleration);
+            cnc_float_type path = sqrt(pathsqr);
 
             this->fullpath = path;
+            this->acceleration = acceleration;
             this->start_ic = 0;
 
-            if (itime > preftime)
+            // Ограничиваем граничные скорости номинальной
+            if (start_vel > velocity)
+                start_vel = velocity;
+            if (final_vel > velocity)
+                final_vel = velocity;
+
+            this->start_velocity = start_vel;
+            this->final_velocity = final_vel;
+            this->nominal_velocity = velocity;
+
+            // Вычисляем тайминги
+            recalculate_timing();
+        }
+
+        /// Пересчитать тайминги блока с текущими start_velocity и final_velocity.
+        /// Вызывается после изменения граничных скоростей (например, после
+        /// backward/forward pass в look-ahead алгоритме).
+        ///
+        /// Формулы для трапецеидального профиля:
+        /// - Расстояние разгона: d_acc = (V² - Vs²) / (2*a)
+        /// - Расстояние торможения: d_dec = (V² - Vf²) / (2*a)
+        /// - Расстояние круиза: d_cruise = fullpath - d_acc - d_dec
+        ///
+        /// Если d_cruise < 0, это треугольный профиль - nominal_velocity снижается.
+        void recalculate_timing()
+        {
+            cnc_float_type path = this->fullpath;
+            cnc_float_type acc = this->acceleration;
+            cnc_float_type Vs = this->start_velocity;
+            cnc_float_type Vf = this->final_velocity;
+            cnc_float_type Vn = this->nominal_velocity;
+
+            if (acc <= 0 || path <= 0)
             {
-                // trapecidal pattern
-                this->acceleration_before_ic = preftime;
-                this->deceleration_after_ic = itime;
-                this->block_finish_ic = itime + preftime;
-                this->nominal_velocity = path / itime;
-                this->acceleration = this->nominal_velocity / preftime;
+                // Некорректные параметры - нулевой блок
+                this->acceleration_before_ic = 0;
+                this->deceleration_after_ic = 0;
+                this->block_finish_ic = 0;
+                return;
+            }
+
+            // Расстояние для разгона от Vs до Vn
+            cnc_float_type d_acc = (Vn * Vn - Vs * Vs) / (2 * acc);
+            // Расстояние для торможения от Vn до Vf
+            cnc_float_type d_dec = (Vn * Vn - Vf * Vf) / (2 * acc);
+            // Расстояние круиза
+            cnc_float_type d_cruise = path - d_acc - d_dec;
+
+            if (d_cruise >= 0)
+            {
+                // Трапецеидальный профиль
+                // Время разгона: t_acc = (Vn - Vs) / acc
+                cnc_float_type t_acc = (Vn - Vs) / acc;
+                // Время торможения: t_dec = (Vn - Vf) / acc
+                cnc_float_type t_dec = (Vn - Vf) / acc;
+                // Время круиза: t_cruise = d_cruise / Vn
+                cnc_float_type t_cruise = d_cruise / Vn;
+
+                int64_t i_acc = static_cast<int64_t>(ceil(t_acc));
+                int64_t i_cruise = static_cast<int64_t>(ceil(t_cruise));
+                int64_t i_dec = static_cast<int64_t>(ceil(t_dec));
+
+                this->acceleration_before_ic = i_acc;
+                this->deceleration_after_ic = i_acc + i_cruise;
+                this->block_finish_ic = i_acc + i_cruise + i_dec;
             }
             else
             {
-                // triangle pattern
-                cnc_float_type maxspeed = sqrt(path * acceleration);
-                cnc_float_type halftime = path / maxspeed;
-                int itime2 = ceil(halftime);
+                // Треугольный профиль - не достигаем nominal_velocity
+                // Находим пиковую скорость Vp: d_acc + d_dec = path
+                // (Vp² - Vs²)/(2a) + (Vp² - Vf²)/(2a) = path
+                // 2*Vp² - Vs² - Vf² = 2*a*path
+                // Vp = sqrt((2*a*path + Vs² + Vf²) / 2)
+                cnc_float_type Vp_sq = (2 * acc * path + Vs * Vs + Vf * Vf) / 2;
 
-                this->acceleration_before_ic = itime2;
-                this->deceleration_after_ic = itime2;
-                this->block_finish_ic = itime2 * 2;
-                this->nominal_velocity = path / itime2;
-                this->acceleration = this->nominal_velocity / itime2;
+                if (Vp_sq < Vs * Vs || Vp_sq < Vf * Vf)
+                {
+                    // Невозможно выполнить движение с заданными параметрами
+                    // (слишком короткий путь для торможения)
+                    // Используем минимальный профиль
+                    Vp_sq = fmax(Vs * Vs, Vf * Vf);
+                }
+
+                cnc_float_type Vp = sqrt(Vp_sq);
+
+                // Обновляем nominal_velocity на реально достижимую
+                this->nominal_velocity = Vp;
+
+                // Время разгона и торможения
+                cnc_float_type t_acc = (Vp - Vs) / acc;
+                cnc_float_type t_dec = (Vp - Vf) / acc;
+
+                int64_t i_acc = static_cast<int64_t>(ceil(t_acc));
+                int64_t i_dec = static_cast<int64_t>(ceil(t_dec));
+
+                this->acceleration_before_ic = i_acc;
+                this->deceleration_after_ic = i_acc;  // Без круиза
+                this->block_finish_ic = i_acc + i_dec;
             }
 
-            // Validation should be checked by caller if needed
-            // validation() can be called separately
+            // Минимальная длительность блока - 1 тик
+            if (this->block_finish_ic < 1)
+                this->block_finish_ic = 1;
+        }
+
+        /// Установить новые граничные скорости и пересчитать тайминги.
+        /// Используется в backward/forward pass look-ahead алгоритма.
+        void set_junction_velocities(cnc_float_type start_vel,
+                                     cnc_float_type final_vel)
+        {
+            this->start_velocity = start_vel;
+            this->final_velocity = final_vel;
+            recalculate_timing();
         }
 
         bool

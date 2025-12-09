@@ -376,4 +376,203 @@ bool cnc::planner::is_halt()
 {
     return !is_not_halt();
 }
+
+void cnc::planner::recalculate_block_velocities(cnc_float_type junction_deviation)
+{
+    // Пересчитываем только pending блоки (от active+1 до head)
+    // Active блок уже в исполнении - его не трогаем
+
+    int head = blocks->head_index();
+    int start_idx = active_block ? blocks->fixup_index(active + 1) : active;
+
+    // Если нет pending блоков - выходим
+    if (start_idx == head)
+        return;
+
+    // Шаг 1: Вычислить junction velocity между соседними блоками
+    // и установить начальные значения start/final velocity
+
+    int prev_idx = start_idx;
+    for (int i = blocks->fixup_index(start_idx + 1); i != head;
+         i = blocks->fixup_index(i + 1))
+    {
+        auto &prev = blocks->get(prev_idx);
+        auto &curr = blocks->get(i);
+
+        // Вычисляем junction velocity на основе угла между блоками
+        cnc_float_type jv = planner_block::calculate_junction_velocity(
+            prev.direction(), curr.direction(),
+            std::min(prev.nominal_velocity, curr.nominal_velocity),
+            std::min(prev.acceleration, curr.acceleration), junction_deviation,
+            _total_axes);
+
+        // Ограничиваем junction velocity номинальными скоростями блоков
+        if (jv > prev.nominal_velocity)
+            jv = prev.nominal_velocity;
+        if (jv > curr.nominal_velocity)
+            jv = curr.nominal_velocity;
+
+        prev.final_velocity = jv;
+        curr.start_velocity = jv;
+
+        prev_idx = i;
+    }
+
+    // Последний блок должен остановиться (final_velocity = 0)
+    // если нет следующего блока
+    int last_idx = blocks->fixup_index(head - 1);
+    if (last_idx != head)
+    {
+        blocks->get(last_idx).final_velocity = 0;
+    }
+
+    // Первый pending блок: если есть active, то start_velocity = junction с ним
+    // если нет active - start_velocity = 0
+    if (start_idx != head)
+    {
+        if (active_block)
+        {
+            auto &first_pending = blocks->get(start_idx);
+            cnc_float_type jv = planner_block::calculate_junction_velocity(
+                active_block->direction(), first_pending.direction(),
+                std::min(active_block->nominal_velocity,
+                         first_pending.nominal_velocity),
+                std::min(active_block->acceleration, first_pending.acceleration),
+                junction_deviation, _total_axes);
+
+            // Ограничиваем
+            if (jv > active_block->nominal_velocity)
+                jv = active_block->nominal_velocity;
+            if (jv > first_pending.nominal_velocity)
+                jv = first_pending.nominal_velocity;
+
+            first_pending.start_velocity = jv;
+            // Примечание: active_block.final_velocity не меняем - он уже в исполнении
+        }
+        else
+        {
+            blocks->get(start_idx).start_velocity = 0;
+        }
+    }
+
+    // Шаг 2: Backward pass - гарантируем возможность торможения
+    backward_pass();
+
+    // Шаг 3: Forward pass - гарантируем возможность разгона
+    forward_pass();
+
+    // Шаг 4: Пересчитываем тайминги всех pending блоков
+    for (int i = start_idx; i != head; i = blocks->fixup_index(i + 1))
+    {
+        blocks->get(i).recalculate_timing();
+    }
+}
+
+void cnc::planner::backward_pass()
+{
+    // Идём от конца к началу pending блоков
+    // Для каждого блока проверяем: может ли он затормозить до final_velocity?
+    // Если нет - снижаем final_velocity предыдущего блока
+
+    int head = blocks->head_index();
+    int start_idx = active_block ? blocks->fixup_index(active + 1) : active;
+
+    if (start_idx == head)
+        return;
+
+    // Начинаем с предпоследнего блока (последний уже имеет final=0)
+    int last_idx = blocks->fixup_index(head - 1);
+
+    for (int i = last_idx; i != start_idx;)
+    {
+        int prev_idx = blocks->fixup_index(i - 1);
+        if (prev_idx == blocks->fixup_index(start_idx - 1))
+            break;
+
+        auto &curr = blocks->get(i);
+        auto &prev = blocks->get(prev_idx);
+
+        // Максимальная скорость входа в curr при торможении до final_velocity
+        // v_max² = v_final² + 2 * a * d
+        cnc_float_type max_entry_sq =
+            curr.final_velocity * curr.final_velocity +
+            2 * curr.acceleration * curr.fullpath;
+        cnc_float_type max_entry = sqrt(max_entry_sq);
+
+        // Если start_velocity больше max_entry - снижаем
+        if (curr.start_velocity > max_entry)
+        {
+            curr.start_velocity = max_entry;
+            prev.final_velocity = max_entry;
+        }
+
+        i = prev_idx;
+    }
+
+    // Проверяем первый pending блок
+    if (start_idx != head)
+    {
+        auto &first = blocks->get(start_idx);
+        cnc_float_type max_entry_sq = first.final_velocity * first.final_velocity +
+                                      2 * first.acceleration * first.fullpath;
+        cnc_float_type max_entry = sqrt(max_entry_sq);
+
+        if (first.start_velocity > max_entry)
+        {
+            first.start_velocity = max_entry;
+        }
+    }
+}
+
+void cnc::planner::forward_pass()
+{
+    // Идём от начала к концу pending блоков
+    // Для каждого блока проверяем: может ли он разогнаться от start_velocity?
+    // Если нет - снижаем final_velocity текущего блока и start следующего
+
+    int head = blocks->head_index();
+    int start_idx = active_block ? blocks->fixup_index(active + 1) : active;
+
+    if (start_idx == head)
+        return;
+
+    for (int i = start_idx; i != head;)
+    {
+        int next_idx = blocks->fixup_index(i + 1);
+
+        auto &curr = blocks->get(i);
+
+        // Максимальная скорость выхода из curr при разгоне от start_velocity
+        // v_max² = v_start² + 2 * a * d
+        cnc_float_type max_exit_sq = curr.start_velocity * curr.start_velocity +
+                                     2 * curr.acceleration * curr.fullpath;
+        cnc_float_type max_exit = sqrt(max_exit_sq);
+
+        // Если final_velocity больше max_exit - снижаем
+        if (curr.final_velocity > max_exit)
+        {
+            curr.final_velocity = max_exit;
+        }
+
+        // Также ограничиваем nominal_velocity если не можем достичь
+        if (curr.nominal_velocity > max_exit)
+        {
+            // Пиковая скорость будет меньше nominal
+            // recalculate_timing() обработает это
+        }
+
+        // Обновляем start_velocity следующего блока
+        if (next_idx != head)
+        {
+            auto &next = blocks->get(next_idx);
+            if (next.start_velocity > curr.final_velocity)
+            {
+                next.start_velocity = curr.final_velocity;
+            }
+        }
+
+        i = next_idx;
+    }
+}
+
 #pragma GCC reset_options

@@ -19,6 +19,7 @@
 #include <ralgo/cnc/control_task.h>
 #include <ralgo/cnc/error_handler.h>
 #include <ralgo/cnc/feedback_guard.h>
+#include <ralgo/cnc/flow_controller.h>
 #include <ralgo/cnc/planblock.h>
 #include <ralgo/cnc/planner.h>
 #include <ralgo/cnc/revolver.h>
@@ -39,6 +40,7 @@ namespace cnc
         cnc::revolver *revolver = nullptr;
         cnc::feedback_guard *feedback_guard = nullptr;
         cnc::error_handler *errors = nullptr;
+        cnc::flow_controller *flow = nullptr;
 
     private:
         igris::ring<planner_block> *blocks = nullptr;
@@ -69,14 +71,29 @@ namespace cnc
         bool with_cleanup = true;
         volatile bool stop_procedure_started = false;
 
+        // === Look-ahead parameters ===
+        // Junction deviation в units (мм для линейных осей).
+        // Определяет допустимое отклонение от траектории на поворотах.
+        // Типичные значения: 0.01-0.05 мм для 3D-принтеров.
+        // При 0 - look-ahead отключен (старое поведение).
+        cnc_float_type _junction_deviation = 0;
+
+        // Junction deviation в steps (конвертированное значение)
+        cnc_float_type _junction_deviation_steps = 0;
+
+        // Включен ли look-ahead
+        bool _lookahead_enabled = false;
+
     public:
         interpreter(igris::ring<planner_block> *blocks,
                     cnc::planner *planner,
                     cnc::revolver *revolver,
                     cnc::feedback_guard *feedback_guard,
-                    cnc::error_handler *errors = nullptr)
+                    cnc::error_handler *errors = nullptr,
+                    cnc::flow_controller *flow = nullptr)
             : planner(planner), revolver(revolver),
-              feedback_guard(feedback_guard), errors(errors), blocks(blocks)
+              feedback_guard(feedback_guard), errors(errors), flow(flow),
+              blocks(blocks)
         {
         }
 
@@ -148,6 +165,10 @@ namespace cnc
 
             planner->final_shift_pushed =
                 igris::make_delegate(&interpreter::final_shift_handle, this);
+
+            // Initialize flow controller with queue capacity
+            if (flow)
+                flow->set_queue_capacity(blocks->size());
         }
 
         void restore_finishes()
@@ -175,6 +196,10 @@ namespace cnc
                     revolver->cleanup();
                     cleanup();
                 }
+
+                // Notify flow controller that motion is complete
+                if (flow)
+                    flow->report_complete();
 
                 if (_external_final_shift_handle)
                     _external_final_shift_handle();
@@ -460,6 +485,15 @@ namespace cnc
 
         void evaluate_task(const control_task &task, nos::ostream &os)
         {
+            // Check queue has room before processing
+            if (blocks->room() == 0)
+            {
+                report_error(error_code::queue_overflow);
+                if (flow)
+                    flow->report_full(blocks->avail());
+                return;
+            }
+
             bool fastfinish = evaluate_interpreter_task(task, lastblock, os);
             if (fastfinish)
             {
@@ -482,7 +516,18 @@ namespace cnc
 
             system_lock();
             blocks->move_head_one();
+
+            // Вызываем look-ahead пересчёт скоростей если он включен
+            if (_lookahead_enabled && _junction_deviation_steps > 0)
+            {
+                planner->recalculate_block_velocities(_junction_deviation_steps);
+            }
+
             system_unlock();
+
+            // Report successful command to flow controller
+            if (flow)
+                flow->report_ok(blocks->avail(), blocks->room(), lastblock.blockno);
         }
 
         void command_incremental_move(const nos::argv &argv, nos::ostream &os)
@@ -1083,6 +1128,60 @@ namespace cnc
                      auto en = std::stoi(argv[1]);
                      planner->set_pause_mode(en);
                      return 0;
+                 }},
+
+                {"set_junction_deviation",
+                 "Set junction deviation for look-ahead (mm). Args: [<value>]. "
+                 "0 = disable, typical: 0.01-0.05 mm",
+                 [this](const nos::argv &argv, nos::ostream &os) {
+                     if (argv.size() < 2)
+                     {
+                         nos::fprintln_to(os, "junction_deviation: {} mm", _junction_deviation);
+                         nos::fprintln_to(os, "junction_deviation_steps: {}", _junction_deviation_steps);
+                         nos::fprintln_to(os, "lookahead_enabled: {}", _lookahead_enabled);
+                         nos::println_to(os, "Usage: set_junction_deviation <value_mm>");
+                         nos::println_to(os, "  0 = disable look-ahead");
+                         nos::println_to(os, "  Typical values: 0.01-0.05 mm");
+                         return 0;
+                     }
+                     cnc_float_type val = igris_atof64(argv[1].data(), NULL);
+                     set_junction_deviation(val);
+                     nos::fprintln_to(os, "junction_deviation set to {} mm", val);
+                     if (val > 0)
+                         nos::fprintln_to(os, "look-ahead enabled ({} steps)", _junction_deviation_steps);
+                     else
+                         nos::println_to(os, "look-ahead disabled");
+                     return 0;
+                 }},
+
+                {"queue_status",
+                 "Print block queue status (no args)",
+                 [this](const nos::argv &, nos::ostream &os) {
+                     nos::fprintln_to(os, "queue_capacity: {}", blocks->size());
+                     nos::fprintln_to(os, "queue_used: {}", blocks->avail());
+                     nos::fprintln_to(os, "queue_room: {}", blocks->room());
+                     nos::fprintln_to(os, "active_block: {}", planner->active_block != nullptr);
+                     nos::fprintln_to(os, "flow_control: {}", flow ? (flow->is_enabled() ? "enabled" : "disabled") : "not configured");
+                     return 0;
+                 }},
+
+                {"flow_control",
+                 "Enable/disable flow control. Args: <0|1>. Without args - show status",
+                 [this](const nos::argv &argv, nos::ostream &os) {
+                     if (!flow)
+                     {
+                         nos::println_to(os, "flow_control: not configured");
+                         return 0;
+                     }
+                     if (argv.size() < 2)
+                     {
+                         nos::fprintln_to(os, "flow_control: {}", flow->is_enabled() ? "enabled" : "disabled");
+                         return 0;
+                     }
+                     auto en = std::stoi(argv[1]);
+                     flow->set_enabled(en != 0);
+                     nos::fprintln_to(os, "flow_control: {}", flow->is_enabled() ? "enabled" : "disabled");
+                     return 0;
                  }}};
 
         int gcode_drop_first(const nos::argv &argv, nos::ostream &os)
@@ -1137,6 +1236,11 @@ namespace cnc
             nos::println_to(os, planner->active);
             nos::print_to(os, "head: ");
             nos::println_to(os, planner->blocks->head_index());
+            nos::println_to(os);
+            // Look-ahead status
+            nos::fprintln_to(os, "lookahead_enabled: {}", _lookahead_enabled);
+            nos::fprintln_to(os, "junction_deviation: {} mm ({} steps)",
+                             _junction_deviation, _junction_deviation_steps);
             return 0;
         }
 
@@ -1215,7 +1319,11 @@ namespace cnc
         void set_steps_per_unit(int axis, cnc_float_type value)
         {
             if (axis >= 0 && axis < (int)NMAX_AXES)
+            {
                 _steps_per_unit[axis] = value;
+                // Пересчитываем junction_deviation_steps при изменении gears
+                update_junction_deviation_steps();
+            }
         }
 
         cnc_float_type get_steps_per_unit(int axis) const
@@ -1234,6 +1342,65 @@ namespace cnc
         {
             for (size_t i = 0; i < arr.size() && i < NMAX_AXES; ++i)
                 _steps_per_unit[i] = arr[i];
+        }
+
+        // === Look-ahead management ===
+
+        /// Установить junction deviation в units (мм).
+        /// Включает look-ahead если value > 0.
+        /// @param value - допустимое отклонение в units (типично 0.01-0.05 мм)
+        void set_junction_deviation(cnc_float_type value)
+        {
+            _junction_deviation = value;
+            _lookahead_enabled = (value > 0);
+            update_junction_deviation_steps();
+        }
+
+        /// Получить текущее значение junction deviation в units.
+        cnc_float_type get_junction_deviation() const
+        {
+            return _junction_deviation;
+        }
+
+        /// Проверить, включен ли look-ahead.
+        bool is_lookahead_enabled() const
+        {
+            return _lookahead_enabled;
+        }
+
+    private:
+        /// Пересчитать junction_deviation из units в steps.
+        /// Использует средний steps_per_unit для всех осей.
+        void update_junction_deviation_steps()
+        {
+            if (_junction_deviation <= 0 || total_axes == 0)
+            {
+                _junction_deviation_steps = 0;
+                return;
+            }
+
+            // Используем среднее steps_per_unit для конвертации
+            // (для более точной работы можно использовать минимальное значение)
+            cnc_float_type sum = 0;
+            int count = 0;
+            for (int i = 0; i < total_axes; ++i)
+            {
+                if (_steps_per_unit[i] > 0)
+                {
+                    sum += _steps_per_unit[i];
+                    count++;
+                }
+            }
+
+            if (count > 0)
+            {
+                cnc_float_type avg_steps_per_unit = sum / count;
+                _junction_deviation_steps = _junction_deviation * avg_steps_per_unit;
+            }
+            else
+            {
+                _junction_deviation_steps = _junction_deviation;
+            }
         }
     };
 }

@@ -100,6 +100,25 @@ namespace cnc
         bool is_not_halt();
         bool is_halt();
         void reevaluate_accelerations();
+
+        // === Look-ahead planning ===
+
+        /// Пересчитать скорости всех pending блоков в очереди.
+        /// Выполняет backward и forward pass для обеспечения
+        /// физически возможных переходов между блоками.
+        /// @param junction_deviation - допустимое отклонение на стыках [steps]
+        void recalculate_block_velocities(cnc_float_type junction_deviation);
+
+    private:
+        /// Backward pass: от конца к началу, гарантирует возможность торможения.
+        /// Для каждого блока проверяет, что предыдущий блок может замедлиться
+        /// до требуемой final_velocity.
+        void backward_pass();
+
+        /// Forward pass: от начала к концу, гарантирует возможность разгона.
+        /// Для каждого блока проверяет, что он может разогнаться от start_velocity
+        /// до требуемой скорости.
+        void forward_pass();
     };
 }
 #pragma GCC reset_options
