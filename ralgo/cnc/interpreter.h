@@ -7,7 +7,6 @@
 #include <igris/container/ring.h>
 #include <igris/container/static_vector.h>
 #include <igris/datastruct/argvc.h>
-#include <igris/shell/callable_collection.h>
 #include <igris/sync/syslock.h>
 #include <igris/util/numconvert.h>
 #include <nos/ilist.h>
@@ -166,6 +165,9 @@ namespace cnc
             // Initialize flow controller with queue capacity
             if (flow)
                 flow->set_queue_capacity(blocks->size());
+
+            // Initialize command executor
+            init_executor();
         }
 
         void restore_finishes()
@@ -766,15 +768,18 @@ namespace cnc
 
         int command(const nos::argv &argv, nos::ostream &os)
         {
-            auto *fptr = clicommands.find(argv[0].data());
-            if (fptr)
+            if (argv.size() == 0)
+                return 0;
+
+            auto *cmd = executor.find(argv[0]);
+            if (cmd)
             {
-                return (*fptr)(argv, os);
+                return cmd->execute(argv, os);
             }
 
             nos::fprintln_to(
                 os, "Unresolved command: {}", std::string(argv[0]));
-            return 0;
+            return -1;
         }
 
         int command_help(nos::ostream &os);
@@ -815,71 +820,78 @@ namespace cnc
         int cmd_flow_control(const nos::argv &argv, nos::ostream &os);
         int cmd_buffer(const nos::argv &argv, nos::ostream &os);
 
-        // CLI commands table - implementations in interpreter.cpp
-        igris::static_callable_collection<int(const nos::argv &, nos::ostream &), 50>
-            clicommands{
-                {"setprotect", "Disable global protection",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_setprotect(a, o); }},
-                {"stop", "Smooth stop all axes",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_stop(a, o); }},
-                {"lastblock", "Print last motion block info",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_lastblock(a, o); }},
-                {"relmove", "Relative move. Args: <axis><dist>... F<feed> M<accel>",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_relmove(a, o); }},
-                {"absmove", "Absolute move. Args: <axis><pos>... F<feed> M<accel>",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_absmove(a, o); }},
-                {"abspulses", "Absolute move in steps. Args: <axis><steps>... F<feed> M<accel>",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_abspulses(a, o); }},
-                {"steps", "Print position in steps",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_steps(a, o); }},
-                {"finishes", "Print position in mm",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_finishes(a, o); }},
-                {"gains", "Print input scaling factors",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_gains(a, o); }},
-                {"gears", "Print steps_per_unit",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_gears(a, o); }},
-                {"setgear", "Set steps_per_unit. Args: <axis> <value>",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_setgear(a, o); }},
-                {"set_control_gear", "Set control gear. Args: <axis> <value>",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_set_control_gear(a, o); }},
-                {"set_feedback_gear", "Set feedback gear. Args: <axis> <value>",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_set_feedback_gear(a, o); }},
-                {"setpos", "Set position without moving. Args: <axis> <pos_mm>",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_setpos(a, o); }},
-                {"disable_tandem_protection", "Disable tandem protection. Args: <index>",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_disable_tandem_protection(a, o); }},
-                {"enable_tandem_protection", "Enable tandem protection. Args: <master>,<slave>:<max_error>",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_enable_tandem_protection(a, o); }},
-                {"tandem_info", "Print tandem axes info",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_tandem_info(a, o); }},
-                {"drop_pulses_allowed", "Get/set max following error. Args: <axis> [<pulses>]",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_drop_pulses_allowed(a, o); }},
-                {"velmaxs", "Set max velocities. Args: <idx>:<vel>...",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_velmaxs(a, o); }},
-                {"accmaxs", "Set max accelerations. Args: <idx>:<acc>...",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_accmaxs(a, o); }},
-                {"help", "Print all commands",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_help(a, o); }},
-                {"help-cmd", "Print text commands",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_help_cmd(a, o); }},
-                {"help-cnc", "Print G-code commands",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_help_cnc(a, o); }},
-                {"state", "Print interpreter state",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_state(a, o); }},
-                {"mode", "Print or set positioning mode. Args: [abs|rel]",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_mode(a, o); }},
-                {"guard_info", "Print feedback guard state",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_guard_info(a, o); }},
-                {"planner_pause", "Pause/resume planner. Args: <0|1>",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_planner_pause(a, o); }},
-                {"set_junction_deviation", "Set junction deviation (mm). Args: [<value>]",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_set_junction_deviation(a, o); }},
-                {"queue_status", "Print block queue status",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_queue_status(a, o); }},
-                {"flow_control", "Enable/disable flow control. Args: [<0|1>]",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_flow_control(a, o); }},
-                {"buffer", "Buffer control. Args: enable|start|cancel|status|config",
-                 [this](const nos::argv &a, nos::ostream &o) { return cmd_buffer(a, o); }}};
+        // CLI commands executor
+        nos::executor executor;
+
+        void init_executor()
+        {
+            executor.add_command({"setprotect", "Disable global protection",
+                nos::make_delegate(&interpreter::cmd_setprotect, this)});
+            executor.add_command({"stop", "Smooth stop all axes",
+                nos::make_delegate(&interpreter::cmd_stop, this)});
+            executor.add_command({"lastblock", "Print last motion block info",
+                nos::make_delegate(&interpreter::cmd_lastblock, this)});
+            executor.add_command({"relmove", "Relative move. Args: <axis><dist>... F<feed> M<accel>",
+                nos::make_delegate(&interpreter::cmd_relmove, this)});
+            executor.add_command({"absmove", "Absolute move. Args: <axis><pos>... F<feed> M<accel>",
+                nos::make_delegate(&interpreter::cmd_absmove, this)});
+            executor.add_command({"abspulses", "Absolute move in steps. Args: <axis><steps>... F<feed> M<accel>",
+                nos::make_delegate(&interpreter::cmd_abspulses, this)});
+            executor.add_command({"steps", "Print position in steps",
+                nos::make_delegate(&interpreter::cmd_steps, this)});
+            executor.add_command({"finishes", "Print position in mm",
+                nos::make_delegate(&interpreter::cmd_finishes, this)});
+            executor.add_command({"gains", "Print input scaling factors",
+                nos::make_delegate(&interpreter::cmd_gains, this)});
+            executor.add_command({"gears", "Print steps_per_unit",
+                nos::make_delegate(&interpreter::cmd_gears, this)});
+            executor.add_command({"setgear", "Set steps_per_unit. Args: <axis> <value>",
+                nos::make_delegate(&interpreter::cmd_setgear, this)});
+            executor.add_command({"set_control_gear", "Set control gear. Args: <axis> <value>",
+                nos::make_delegate(&interpreter::cmd_set_control_gear, this)});
+            executor.add_command({"set_feedback_gear", "Set feedback gear. Args: <axis> <value>",
+                nos::make_delegate(&interpreter::cmd_set_feedback_gear, this)});
+            executor.add_command({"setpos", "Set position without moving. Args: <axis> <pos_mm>",
+                nos::make_delegate(&interpreter::cmd_setpos, this)});
+            executor.add_command({"disable_tandem_protection", "Disable tandem protection. Args: <index>",
+                nos::make_delegate(&interpreter::cmd_disable_tandem_protection, this)});
+            executor.add_command({"enable_tandem_protection", "Enable tandem protection. Args: <master>,<slave>:<max_error>",
+                nos::make_delegate(&interpreter::cmd_enable_tandem_protection, this)});
+            executor.add_command({"tandem_info", "Print tandem axes info",
+                nos::make_delegate(&interpreter::cmd_tandem_info, this)});
+            executor.add_command({"drop_pulses_allowed", "Get/set max following error. Args: <axis> [<pulses>]",
+                nos::make_delegate(&interpreter::cmd_drop_pulses_allowed, this)});
+            executor.add_command({"velmaxs", "Set max velocities. Args: <idx>:<vel>...",
+                nos::make_delegate(&interpreter::cmd_velmaxs, this)});
+            executor.add_command({"accmaxs", "Set max accelerations. Args: <idx>:<acc>...",
+                nos::make_delegate(&interpreter::cmd_accmaxs, this)});
+            executor.add_command({"help", "Print all commands",
+                nos::make_delegate(&interpreter::cmd_help, this)});
+            executor.add_command({"help-cmd", "Print text commands",
+                nos::make_delegate(&interpreter::cmd_help_cmd, this)});
+            executor.add_command({"help-cnc", "Print G-code commands",
+                nos::make_delegate(&interpreter::cmd_help_cnc, this)});
+            executor.add_command({"state", "Print interpreter state",
+                nos::make_delegate(&interpreter::cmd_state, this)});
+            executor.add_command({"mode", "Print or set positioning mode. Args: [abs|rel]",
+                nos::make_delegate(&interpreter::cmd_mode, this)});
+            executor.add_command({"guard_info", "Print feedback guard state",
+                nos::make_delegate(&interpreter::cmd_guard_info, this)});
+            executor.add_command({"planner_pause", "Pause/resume planner. Args: <0|1>",
+                nos::make_delegate(&interpreter::cmd_planner_pause, this)});
+            executor.add_command({"set_junction_deviation", "Set junction deviation (mm). Args: [<value>]",
+                nos::make_delegate(&interpreter::cmd_set_junction_deviation, this)});
+            executor.add_command({"queue_status", "Print block queue status",
+                nos::make_delegate(&interpreter::cmd_queue_status, this)});
+            executor.add_command({"flow_control", "Enable/disable flow control. Args: [<0|1>]",
+                nos::make_delegate(&interpreter::cmd_flow_control, this)});
+            executor.add_command({"buffer", "Buffer control. Args: enable|start|cancel|status|config",
+                nos::make_delegate(&interpreter::cmd_buffer, this)});
+            executor.add_command({"cmd", "text commands (legacy prefix)",
+                nos::make_delegate(&interpreter::command_drop_first, this)});
+            executor.add_command({"cnc", "gcode commands (legacy prefix)",
+                nos::make_delegate(&interpreter::gcode_drop_first, this)});
+        }
 
         int gcode_drop_first(const nos::argv &argv, nos::ostream &os)
         {
@@ -904,7 +916,6 @@ namespace cnc
             return vect;
         }
 
-
         // Check if command is G-code (starts with G or M + digit)
         static bool is_gcode_command(const std::string_view &cmd)
         {
@@ -913,16 +924,6 @@ namespace cnc
             char c = cmd[0];
             return (c == 'G' || c == 'M') && std::isdigit(cmd[1]);
         }
-
-        // Legacy executor for backward compatibility with cmd/cnc prefixes
-        nos::executor executor = nos::executor({
-            {"cmd",
-             "text commands (legacy prefix)",
-             nos::make_delegate(&interpreter::command_drop_first, this)},
-            {"cnc",
-             "gcode commands (legacy prefix)",
-             nos::make_delegate(&interpreter::gcode_drop_first, this)},
-        });
 
         std::string newline(const char *line, size_t)
         {

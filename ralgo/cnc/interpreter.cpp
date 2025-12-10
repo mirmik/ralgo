@@ -503,10 +503,7 @@ namespace cnc
 
     int interpreter::command_help(nos::ostream &os)
     {
-        for (auto &rec : clicommands)
-        {
-            nos::fprintln_to(os, "{} - {}", rec.key, rec.help);
-        }
+        executor.print_help_to(os);
         return 0;
     }
 
