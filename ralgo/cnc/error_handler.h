@@ -24,6 +24,9 @@ namespace cnc
         invalid_steps_per_unit = 101, ///< steps_per_unit <= 0 for axis
         invalid_axes_count = 102,     ///< axes count out of range
         not_initialized = 103,        ///< system not properly initialized
+        global_protection_enabled = 104, ///< motion blocked by protection
+        axes_count_mismatch = 105,    ///< axes count mismatch between components
+        gains_not_set = 106,          ///< gains must be 1 (not tested otherwise)
 
         // === Motion errors (200-299) ===
         invalid_velocity = 200,       ///< velocity <= 0
@@ -223,6 +226,9 @@ namespace cnc
             case error_code::invalid_steps_per_unit: return "invalid_steps_per_unit";
             case error_code::invalid_axes_count: return "invalid_axes_count";
             case error_code::not_initialized: return "not_initialized";
+            case error_code::global_protection_enabled: return "global_protection_enabled";
+            case error_code::axes_count_mismatch: return "axes_count_mismatch";
+            case error_code::gains_not_set: return "gains_not_set";
             case error_code::invalid_velocity: return "invalid_velocity";
             case error_code::invalid_acceleration: return "invalid_acceleration";
             case error_code::invalid_distance: return "invalid_distance";

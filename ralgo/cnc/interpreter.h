@@ -212,22 +212,26 @@ namespace cnc
             if (total_axes != (int)planner->get_total_axes())
             {
                 nos::println_to(os, "total_axes mismatch with planner");
+                report_error(error_code::axes_count_mismatch, -1, planner->get_total_axes());
                 return 1;
             }
             if (total_axes != revolver->steppers_total)
             {
                 nos::println_to(os, "total_axes mismatch with revolver");
+                report_error(error_code::axes_count_mismatch, -1, revolver->steppers_total);
                 return 1;
             }
 
             if (ralgo::global_protection)
             {
                 nos::println_to(os, "need_to_disable_global_protection");
+                report_error(error_code::global_protection_enabled);
                 return 1;
             }
             if (revolver_frequency == 0)
             {
                 nos::println_to(os, "revolver_frequency is null");
+                report_error(error_code::invalid_frequency);
                 return 1;
             }
             for (auto &i : gains)
@@ -237,6 +241,7 @@ namespace cnc
                     nos::println_to(os,
                                     "gains must be 1, becourse another variant "
                                     "is not tested");
+                    report_error(error_code::gains_not_set);
                     return 1;
                 }
             }
