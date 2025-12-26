@@ -28,7 +28,7 @@ public:
     robo::stepper *steppers_ptrs[4] = {&steppers[0], &steppers[1], &steppers[2], &steppers[3]};
 
     cnc_float_type freq = 100000.0;  // Same as emulator config
-    cnc_float_type steps_per_unit = 1000.0;  // Same as robot_arm.json
+    cnc_float_type control_scale = 1000.0;  // Same as robot_arm.json (pulses_per_unit)
 
     ralgo::freq_invoke_imitation imitator = {
         {1ms, [this]() { planner.serve(); }},
@@ -44,10 +44,10 @@ public:
         interpreter.set_revolver_frequency(freq);
         revolver.set_steppers(steppers_ptrs, 4);
 
-        // Set gears like emulator does
+        // Set control_scale like emulator does
         for (int i = 0; i < 4; ++i)
         {
-            interpreter.set_steps_per_unit(i, steps_per_unit);
+            interpreter.set_control_scale(i, control_scale);
         }
     }
 
@@ -145,7 +145,7 @@ TEST_CASE("emulator-like: basic move reaches target")
     MESSAGE("nominal_velocity = " << last_block.nominal_velocity);
     MESSAGE("acceleration = " << last_block.acceleration);
 
-    // Expected: 10 units * 1000 steps/unit = 10000 steps
+    // Expected: 10 units * 1000 pulses/unit = 10000 pulses
     CHECK_EQ(last_block.axdist[1], 10000);
     CHECK_EQ(last_block.fullpath, 10000);
 
@@ -239,7 +239,7 @@ TEST_CASE("emulator-like: velmaxs limits velocity")
 
     // Velocity should be limited
     // Expected: 50 units/s * 1000 steps/unit / 100000 Hz = 0.5 steps/tick
-    cnc_float_type expected_max = 50.0 * fix.steps_per_unit / fix.freq;
+    cnc_float_type expected_max = 50.0 * fix.control_scale / fix.freq;
 
     MESSAGE("nominal_velocity = " << block.nominal_velocity);
     MESSAGE("expected_max = " << expected_max);
@@ -263,7 +263,7 @@ TEST_CASE("emulator-like: position accuracy with high gear ratio")
 
         double pos = fix.get_position(1);
         int64_t steps = fix.get_steps(1);
-        int64_t expected_steps = static_cast<int64_t>(target * fix.steps_per_unit);
+        int64_t expected_steps = static_cast<int64_t>(target * fix.control_scale);
 
         MESSAGE("target = " << target);
         MESSAGE("position = " << pos);
@@ -293,8 +293,8 @@ TEST_CASE("emulator-like: check F/M parsing without prefixes")
 
     // F=50 units/s, M=200 units/s^2
     // Convert to steps/tick and steps/tick^2
-    cnc_float_type expected_vel = 50.0 * fix.steps_per_unit / fix.freq;
-    cnc_float_type expected_acc = 200.0 * fix.steps_per_unit / (fix.freq * fix.freq);
+    cnc_float_type expected_vel = 50.0 * fix.control_scale / fix.freq;
+    cnc_float_type expected_acc = 200.0 * fix.control_scale / (fix.freq * fix.freq);
 
     MESSAGE("block.nominal_velocity = " << block.nominal_velocity);
     MESSAGE("expected_vel = " << expected_vel);
@@ -577,14 +577,14 @@ TEST_CASE("emulator-like: FIXED-POINT PRECISION diagnostic")
     MESSAGE("=== Fixed-point precision analysis ===");
     MESSAGE("FIXED_POINT_MUL = " << FIXED_POINT_MUL);
     MESSAGE("freq = " << fix.freq << " Hz");
-    MESSAGE("steps_per_unit = " << fix.steps_per_unit);
+    MESSAGE("steps_per_unit = " << fix.control_scale);
 
     std::vector<double> m_values = {0.1, 0.5, 1, 2, 5, 10, 50, 100, 500, 1000};
 
     for (double m_val : m_values)
     {
         // Calculate expected acceleration in steps/tick²
-        cnc_float_type acc_steps_per_tick2 = m_val * fix.steps_per_unit / (fix.freq * fix.freq);
+        cnc_float_type acc_steps_per_tick2 = m_val * fix.control_scale / (fix.freq * fix.freq);
 
         // What it becomes in fixed-point
         int64_t acc_fixed = static_cast<int64_t>(acc_steps_per_tick2 * FIXED_POINT_MUL);
@@ -611,7 +611,7 @@ TEST_CASE("emulator-like: FIXED-POINT PRECISION diagnostic")
     // For 1% precision, we need acc_fixed >= 100 (so truncation error < 1%)
     // acc_fixed = M * steps_per_unit / freq² * FIXED_POINT_MUL >= 100
     // M >= 100 * freq² / (steps_per_unit * FIXED_POINT_MUL)
-    double min_M_for_1pct = 100.0 * fix.freq * fix.freq / (fix.steps_per_unit * FIXED_POINT_MUL);
+    double min_M_for_1pct = 100.0 * fix.freq * fix.freq / (fix.control_scale * FIXED_POINT_MUL);
     MESSAGE("Minimum M for 1% precision = " << min_M_for_1pct << " units/s²");
 
     // For robot arm with max_acceleration = 3.14 rad/s², this is a problem!
@@ -629,7 +629,7 @@ TEST_CASE("emulator-like: smooth_stop decelerates correctly")
 
     MESSAGE("=== Starting long move ===");
     MESSAGE("target = 100 units");
-    MESSAGE("expected_steps = " << 100.0 * fix.steps_per_unit);
+    MESSAGE("expected_steps = " << 100.0 * fix.control_scale);
     MESSAGE("nominal_velocity = " << block.nominal_velocity);
     MESSAGE("acceleration = " << block.acceleration);
 
@@ -691,7 +691,7 @@ TEST_CASE("emulator-like: smooth_stop unit conversion")
 
     MESSAGE("=== Unit conversion test for smooth_stop ===");
     MESSAGE("freq = " << fix.freq);
-    MESSAGE("steps_per_unit = " << fix.steps_per_unit);
+    MESSAGE("steps_per_unit = " << fix.control_scale);
 
     // Start a move and get to cruising velocity
     fix.interpreter.newline("absmove Y100 F10 M10");
@@ -716,8 +716,8 @@ TEST_CASE("emulator-like: smooth_stop unit conversion")
     // a = M * steps_per_unit / freq² = 10 * 1000 / 1e10 = 1e-6 steps/tick²
     // t_stop = v / a = 0.1 / 1e-6 = 100000 ticks = 1 second
 
-    double expected_vel = 10.0 * fix.steps_per_unit / fix.freq;
-    double expected_acc = 10.0 * fix.steps_per_unit / (fix.freq * fix.freq);
+    double expected_vel = 10.0 * fix.control_scale / fix.freq;
+    double expected_acc = 10.0 * fix.control_scale / (fix.freq * fix.freq);
     double expected_stop_ticks = expected_vel / expected_acc;
 
     MESSAGE("expected velocity = " << expected_vel << " steps/tick");

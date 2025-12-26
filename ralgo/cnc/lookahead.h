@@ -15,7 +15,7 @@
  * Usage:
  *   cnc::lookahead_params params;
  *   params.set_junction_deviation(0.02);  // 0.02 mm
- *   params.update_steps_per_unit(steps_per_unit_array, num_axes);
+ *   params.update_control_scale(control_scale_array, num_axes);
  *
  *   if (params.is_enabled()) {
  *       planner.recalculate_block_velocities(params.junction_deviation_steps());
@@ -45,8 +45,8 @@ namespace cnc
         // Whether look-ahead is enabled
         bool _enabled = false;
 
-        // Cached average steps_per_unit for conversion
-        cnc_float_type _avg_steps_per_unit = 1.0;
+        // Cached average control_scale for conversion (pulses_per_unit)
+        cnc_float_type _avg_control_scale = 1.0;
 
     public:
         lookahead_params() = default;
@@ -65,50 +65,50 @@ namespace cnc
         }
 
         /**
-         * Update steps_per_unit conversion factor.
-         * Call this when gears/steps_per_unit change.
+         * Update control_scale conversion factor.
+         * Call this when control_scale (pulses_per_unit) changes.
          *
-         * @param steps_per_unit Array of steps_per_unit for each axis
+         * @param control_scale Array of control_scale for each axis
          * @param num_axes Number of axes
          */
-        void update_steps_per_unit(const cnc_float_type *steps_per_unit,
-                                   int num_axes)
+        void update_control_scale(const cnc_float_type *control_scale,
+                                  int num_axes)
         {
             if (num_axes <= 0)
             {
-                _avg_steps_per_unit = 1.0;
+                _avg_control_scale = 1.0;
                 recalculate_steps();
                 return;
             }
 
-            // Calculate average steps_per_unit from active axes
+            // Calculate average control_scale from active axes
             cnc_float_type sum = 0;
             int count = 0;
             for (int i = 0; i < num_axes; ++i)
             {
-                if (steps_per_unit[i] > 0)
+                if (control_scale[i] > 0)
                 {
-                    sum += steps_per_unit[i];
+                    sum += control_scale[i];
                     count++;
                 }
             }
 
             if (count > 0)
-                _avg_steps_per_unit = sum / count;
+                _avg_control_scale = sum / count;
             else
-                _avg_steps_per_unit = 1.0;
+                _avg_control_scale = 1.0;
 
             recalculate_steps();
         }
 
         /**
-         * Update from std::array of steps_per_unit.
+         * Update from std::array of control_scale.
          */
         template <size_t N>
-        void update_steps_per_unit(const std::array<cnc_float_type, N> &steps_per_unit,
-                                   int num_axes)
+        void update_control_scale(const std::array<cnc_float_type, N> &control_scale,
+                                  int num_axes)
         {
-            update_steps_per_unit(steps_per_unit.data(), num_axes);
+            update_control_scale(control_scale.data(), num_axes);
         }
 
         /**
@@ -154,7 +154,7 @@ namespace cnc
                 return;
             }
 
-            _junction_deviation_steps = _junction_deviation * _avg_steps_per_unit;
+            _junction_deviation_steps = _junction_deviation * _avg_control_scale;
         }
     };
 }

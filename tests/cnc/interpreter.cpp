@@ -41,10 +41,10 @@ TEST_CASE("interpreter.lookahead_settings")
         CHECK_EQ(interpreter.is_lookahead_enabled(), false);
     }
 
-    SUBCASE("junction_deviation_steps пересчитывается при изменении gears")
+    SUBCASE("junction_deviation_steps пересчитывается при изменении control_scale")
     {
         interpreter.set_junction_deviation(0.01);  // 0.01 мм
-        interpreter.set_steps_per_unit(0, 100);    // 100 steps/mm
+        interpreter.set_control_scale(0, 100);     // 100 pulses/mm
 
         // С одной осью avg = 100, junction_deviation_steps = 0.01 * 100 = 1
         // Проверить точное значение сложно, т.к. используется среднее
@@ -66,18 +66,18 @@ TEST_CASE("interpreter.lookahead_integration")
     // Сначала устанавливаем gears, потом junction_deviation
     // Это более реалистичный сценарий использования
 
-    SUBCASE("junction_deviation_steps обновляется при изменении gears")
+    SUBCASE("junction_deviation_steps обновляется при изменении control_scale")
     {
         // Включаем look-ahead
         interpreter.set_junction_deviation(0.01);  // 0.01 мм
         CHECK(interpreter.is_lookahead_enabled());
         CHECK_EQ(interpreter.get_junction_deviation(), 0.01);
 
-        // После init_axes default gears = 1, avg_steps_per_unit = 1
+        // После init_axes default control_scale = 1, avg = 1
         // junction_deviation_steps = 0.01 * 1 = 0.01
 
-        // Теперь устанавливаем gears через public API (не CLI)
-        // set_steps_per_unit вызывает update_junction_deviation_steps
+        // Теперь устанавливаем control_scale через public API (не CLI)
+        // set_control_scale вызывает update_junction_deviation_steps
     }
 
     SUBCASE("look-ahead выключается при junction_deviation = 0")
@@ -213,8 +213,8 @@ TEST_CASE("interpreter.G92_set_position")
     cnc::interpreter interpreter(&blocks_ring, &planner, &revolver, &guard);
 
     interpreter.init_axes(2);
-    interpreter.set_steps_per_unit(0, 100); // 100 steps/mm
-    interpreter.set_steps_per_unit(1, 100);
+    interpreter.set_control_scale(0, 100); // 100 pulses/mm
+    interpreter.set_control_scale(1, 100);
 
     SUBCASE("G92 устанавливает позицию")
     {
@@ -259,8 +259,8 @@ TEST_CASE("interpreter.G0_G1_with_modes")
 
     interpreter.init_axes(2);
     interpreter.set_revolver_frequency(10000);
-    interpreter.set_steps_per_unit(0, 100);
-    interpreter.set_steps_per_unit(1, 100);
+    interpreter.set_control_scale(0, 100);
+    interpreter.set_control_scale(1, 100);
     interpreter.set_saved_acc(1000);
     interpreter.set_saved_feed(100);
 

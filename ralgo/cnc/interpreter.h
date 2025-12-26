@@ -49,15 +49,10 @@ namespace cnc
         int total_axes = 0;
         cnc_float_type revolver_frequency = 0;
 
-        // Steps per unit for each axis (conversion factor units -> steps)
-        // For linear axes: steps/mm, for rotary axes: steps/rad
-        std::array<cnc_float_type, NMAX_AXES> _steps_per_unit = {};
-
-        // Мультипликатор на входе интерпретатора.
-        // Применяется к позициям, скоростям и ускорениям во входном потоке
-        // комманд. Есть подозрение, что механика gains переусложнена и его надо
-        // заменить на единый множитель для всех осей.
-        igris::static_vector<cnc_float_type, NMAX_AXES> gains = {};
+        // Control scale: control_pulses per user_unit for each axis
+        // (e.g., control_pulses/mm for linear, control_pulses/rad for rotary)
+        // Controls conversion from user units (mm, cm) to command pulses
+        std::array<cnc_float_type, NMAX_AXES> _control_scale = {};
 
         igris::static_vector<cnc_float_type, NMAX_AXES> _final_position = {};
         igris::static_vector<cnc_float_type, NMAX_AXES> max_axes_velocities =
@@ -146,18 +141,16 @@ namespace cnc
         void init_axes(int total_axes)
         {
             this->total_axes = total_axes;
-            gains.resize(total_axes);
             _final_position.resize(total_axes);
             max_axes_velocities.resize(total_axes);
             max_axes_accelerations.resize(total_axes);
             planner->set_axes_count(total_axes);
-            ralgo::vecops::fill(gains, 1);
             ralgo::vecops::fill(_final_position, 0);
             ralgo::vecops::fill(max_axes_accelerations, 0);
             ralgo::vecops::fill(max_axes_velocities, 0);
-            // Default steps_per_unit = 1 (1:1 mapping)
+            // Default control_scale = 1 (1:1 mapping, working in control pulses)
             for (int i = 0; i < total_axes; ++i)
-                _steps_per_unit[i] = 1.0;
+                _control_scale[i] = 1.0;
 
             planner->final_shift_pushed =
                 igris::make_delegate(&interpreter::final_shift_handle, this);
@@ -175,10 +168,10 @@ namespace cnc
             auto steps = revolver->current_steps();
             for (int i = 0; i < total_axes; ++i)
             {
-                // Convert steps to units: units = steps / steps_per_unit
-                if (_steps_per_unit[i] != 0)
+                // Convert pulses to units: units = pulses / control_scale
+                if (_control_scale[i] != 0)
                     _final_position[i] =
-                        static_cast<cnc_float_type>(steps[i]) / _steps_per_unit[i];
+                        static_cast<cnc_float_type>(steps[i]) / _control_scale[i];
             }
         }
 
@@ -233,17 +226,6 @@ namespace cnc
                 nos::println_to(os, "revolver_frequency is null");
                 report_error(error_code::invalid_frequency);
                 return 1;
-            }
-            for (auto &i : gains)
-            {
-                if (i != 1)
-                {
-                    nos::println_to(os,
-                                    "gains must be 1, becourse another variant "
-                                    "is not tested");
-                    report_error(error_code::gains_not_set);
-                    return 1;
-                }
             }
             return 0;
         }
@@ -313,29 +295,24 @@ namespace cnc
                 return true;
             }
 
-            // Check steps_per_unit for active axes
+            // Check control_scale for active axes
             for (auto idx : task.active_axes)
             {
-                if (idx >= 0 && idx < total_axes && _steps_per_unit[idx] <= 0)
+                if (idx >= 0 && idx < total_axes && _control_scale[idx] <= 0)
                 {
-                    report_error(error_code::invalid_steps_per_unit, idx);
+                    report_error(error_code::invalid_control_scale, idx);
                     return true;
                 }
             }
 
-            // Get steps_per_unit for unit conversion (from interpreter's own storage)
-            ralgo::vector_view<cnc_float_type> gears(_steps_per_unit.data(),
-                                                     total_axes);
+            // Get control_scale for unit conversion (user_units -> control_pulses)
+            ralgo::vector_view<cnc_float_type> control_scale(_control_scale.data(),
+                                                              total_axes);
 
-            // Apply gains (user-space scaling)
-            auto intdists_mm =
+            // Convert user units (mm/cm) to control pulses
+            auto intdists_pulses =
                 ralgo::vecops::mul_vv<ralgo::vector<cnc_float_type>>(
-                    task.poses(), gains);
-
-            // Convert mm to steps
-            auto intdists_steps =
-                ralgo::vecops::mul_vv<ralgo::vector<cnc_float_type>>(
-                    intdists_mm, gears);
+                    task.poses(), control_scale);
 
             auto direction =
                 ralgo::vecops::normalize<ralgo::vector<cnc_float_type>>(
@@ -349,13 +326,10 @@ namespace cnc
                 return true;
             }
 
-            auto dirgain =
-                ralgo::vecops::norm(ralgo::vecops::mul_vv(direction, gains));
-
-            // Calculate steps_per_unit scaling factor for velocity/acceleration
+            // Calculate control_scale scaling factor for velocity/acceleration
             // Uses direction-weighted average for multi-axis moves
-            auto dirsteps =
-                ralgo::vecops::norm(ralgo::vecops::mul_vv(direction, gears));
+            auto dir_scale =
+                ralgo::vecops::norm(ralgo::vecops::mul_vv(direction, control_scale));
 
             auto evalfeed = cnc::evaluate_external_accfeed_2(
                 direction, task.feed, max_axes_velocities);
@@ -376,16 +350,16 @@ namespace cnc
                 return true;
             }
 
-            // Convert mm/sec to steps/sec
-            cnc_float_type feed_mm = evalfeed * dirgain;
-            cnc_float_type acc_mm = evalacc * dirgain;
-            cnc_float_type feed_steps = feed_mm * dirsteps;
-            cnc_float_type acc_steps = acc_mm * dirsteps;
+            // Convert units/sec to pulses/sec
+            cnc_float_type feed_units = evalfeed;
+            cnc_float_type acc_units = evalacc;
+            cnc_float_type feed_pulses = feed_units * dir_scale;
+            cnc_float_type acc_pulses = acc_units * dir_scale;
 
-            // Convert steps/sec to steps/tick (division is safe - frequency checked above)
-            cnc_float_type reduced_feed = feed_steps / revolver_frequency;
+            // Convert pulses/sec to pulses/tick (division is safe - frequency checked above)
+            cnc_float_type reduced_feed = feed_pulses / revolver_frequency;
             cnc_float_type reduced_acc =
-                acc_steps / (revolver_frequency * revolver_frequency);
+                acc_pulses / (revolver_frequency * revolver_frequency);
 
             if (feedback_guard)
                 for (auto idx : task.active_axes)
@@ -393,27 +367,25 @@ namespace cnc
                     feedback_guard->enable_tandem_protection_for_axis(idx);
                 }
 
-            // Output: distances in steps, velocity/acc in steps/tick
+            // Output: distances in pulses, velocity/acc in pulses/tick
             block.set_state(
-                intdists_steps, total_axes, reduced_feed, reduced_acc);
+                intdists_pulses, total_axes, reduced_feed, reduced_acc);
             return false;
         }
 
-        std::vector<cnc_float_type> final_gained_position()
+        /// Get final position in user units
+        std::vector<cnc_float_type> final_position_in_units()
         {
             std::vector<cnc_float_type> ret(total_axes);
             for (int i = 0; i < total_axes; ++i)
-                ret[i] = _final_position[i] / gains[i];
+                ret[i] = _final_position[i];
             return ret;
         }
 
-        void set_scale(const ralgo::vector_view<cnc_float_type> &vec)
+        // Legacy alias
+        std::vector<cnc_float_type> final_gained_position()
         {
-            if (vec.size() != static_cast<size_t>(total_axes))
-            {
-                ralgo::warn("set_scale fail");
-            }
-            std::copy(vec.begin(), vec.end(), gains.begin());
+            return final_position_in_units();
         }
 
         void set_saved_acc(cnc_float_type acc)
@@ -449,8 +421,8 @@ namespace cnc
             // axdist is in steps, convert back to mm for _final_position
             for (int i = 0; i < total_axes; ++i)
             {
-                if (_steps_per_unit[i] != 0)
-                    _final_position[i] += lastblock.axdist[i] / _steps_per_unit[i];
+                if (_control_scale[i] != 0)
+                    _final_position[i] += lastblock.axdist[i] / _control_scale[i];
             }
 
             // Запоминаем время первого блока для таймаута буферизации
@@ -584,7 +556,7 @@ namespace cnc
                 int axno = p.idx;
                 cnc_float_type val_mm = p.pos;
                 _final_position[axno] = val_mm;
-                steps_t steps = static_cast<steps_t>(val_mm * _steps_per_unit[axno]);
+                steps_t steps = static_cast<steps_t>(val_mm * _control_scale[axno]);
                 revolver->get_steppers()[axno]->set_counter_value(steps);
                 if (feedback_guard)
                     feedback_guard->set_feedback_position(axno, val_mm);
@@ -696,17 +668,17 @@ namespace cnc
                 ralgo::vecops::normalize<ralgo::vector<cnc_float_type>>(
                     direction_vec);
 
-            // Convert acceleration from units/s² to steps/tick²
+            // Convert acceleration from units/s² to pulses/tick²
             // smooth_stop_acceleration() returns units/s² (same as saved_acc)
-            // We need to multiply by steps_per_unit factor to get steps/s²,
-            // then divide by freq² to get steps/tick²
-            ralgo::vector_view<cnc_float_type> gears(_steps_per_unit.data(),
-                                                      total_axes);
-            auto dirsteps =
-                ralgo::vecops::norm(ralgo::vecops::mul_vv(direction, gears));
+            // We need to multiply by control_scale to get pulses/s²,
+            // then divide by freq² to get pulses/tick²
+            ralgo::vector_view<cnc_float_type> cscale(_control_scale.data(),
+                                                       total_axes);
+            auto dir_scale =
+                ralgo::vecops::norm(ralgo::vecops::mul_vv(direction, cscale));
 
             auto external_acceleration = smooth_stop_acceleration(direction) *
-                                         dirsteps / revolver_frequency /
+                                         dir_scale / revolver_frequency /
                                          revolver_frequency;
 
             auto velocity = ralgo::vecops::norm(direction_vec);
@@ -731,8 +703,8 @@ namespace cnc
             // axdist is in steps, convert back to mm for _final_position
             for (int i = 0; i < total_axes; ++i)
             {
-                if (_steps_per_unit[i] != 0)
-                    _final_position[i] += lastblock.axdist[i] / _steps_per_unit[i];
+                if (_control_scale[i] != 0)
+                    _final_position[i] += lastblock.axdist[i] / _control_scale[i];
             }
 
             planner->clear_for_stop();
@@ -801,11 +773,9 @@ namespace cnc
         int cmd_abspulses(const nos::argv &argv, nos::ostream &os);
         int cmd_steps(const nos::argv &, nos::ostream &os);
         int cmd_finishes(const nos::argv &, nos::ostream &os);
-        int cmd_gains(const nos::argv &, nos::ostream &os);
-        int cmd_gears(const nos::argv &, nos::ostream &os);
-        int cmd_setgear(const nos::argv &argv, nos::ostream &os);
-        int cmd_set_control_gear(const nos::argv &argv, nos::ostream &os);
-        int cmd_set_feedback_gear(const nos::argv &argv, nos::ostream &os);
+        int cmd_cscale(const nos::argv &, nos::ostream &os);
+        int cmd_set_cscale(const nos::argv &argv, nos::ostream &os);
+        int cmd_set_fscale(const nos::argv &argv, nos::ostream &os);
         int cmd_setpos(const nos::argv &argv, nos::ostream &os);
         int cmd_disable_tandem_protection(const nos::argv &argv, nos::ostream &os);
         int cmd_enable_tandem_protection(const nos::argv &argv, nos::ostream &os);
@@ -842,20 +812,21 @@ namespace cnc
                 nos::make_delegate(&interpreter::cmd_absmove, this)});
             executor.add_command({"abspulses", "Absolute move in steps. Args: <axis><steps>... F<feed> M<accel>",
                 nos::make_delegate(&interpreter::cmd_abspulses, this)});
-            executor.add_command({"steps", "Print position in steps",
+            executor.add_command({"steps", "Print position in control pulses",
                 nos::make_delegate(&interpreter::cmd_steps, this)});
-            executor.add_command({"finishes", "Print position in mm",
+            executor.add_command({"finishes", "Print position in user units",
                 nos::make_delegate(&interpreter::cmd_finishes, this)});
-            executor.add_command({"gains", "Print input scaling factors",
-                nos::make_delegate(&interpreter::cmd_gains, this)});
-            executor.add_command({"gears", "Print steps_per_unit",
-                nos::make_delegate(&interpreter::cmd_gears, this)});
-            executor.add_command({"setgear", "Set steps_per_unit. Args: <axis> <value>",
-                nos::make_delegate(&interpreter::cmd_setgear, this)});
-            executor.add_command({"set_control_gear", "Set control gear. Args: <axis> <value>",
-                nos::make_delegate(&interpreter::cmd_set_control_gear, this)});
-            executor.add_command({"set_feedback_gear", "Set feedback gear. Args: <axis> <value>",
-                nos::make_delegate(&interpreter::cmd_set_feedback_gear, this)});
+            executor.add_command({"cscale", "Print control_scale (control_pulses_per_unit)",
+                nos::make_delegate(&interpreter::cmd_cscale, this)});
+            executor.add_command({"set_cscale", "Set control_scale. Args: <axis> <pulses_per_unit>",
+                nos::make_delegate(&interpreter::cmd_set_cscale, this)});
+            executor.add_command({"set_fscale", "Set feedback_scale. Args: <axis> <pulses_per_unit>",
+                nos::make_delegate(&interpreter::cmd_set_fscale, this)});
+            // Legacy aliases for backward compatibility
+            executor.add_command({"setgear", "(deprecated, use set_cscale) Set control_scale",
+                nos::make_delegate(&interpreter::cmd_set_cscale, this)});
+            executor.add_command({"set_feedback_gear", "(deprecated, use set_fscale) Set feedback_scale",
+                nos::make_delegate(&interpreter::cmd_set_fscale, this)});
             executor.add_command({"setpos", "Set position without moving. Args: <axis> <pos_mm>",
                 nos::make_delegate(&interpreter::cmd_setpos, this)});
             executor.add_command({"disable_tandem_protection", "Disable tandem protection. Args: <index>",
@@ -994,33 +965,33 @@ namespace cnc
             return _absolute_mode;
         }
 
-        // Steps per mm management (gears)
-        void set_steps_per_unit(int axis, cnc_float_type value)
+        // Control scale management (control_pulses_per_unit)
+        void set_control_scale(int axis, cnc_float_type value)
         {
             if (axis >= 0 && axis < (int)NMAX_AXES)
             {
-                _steps_per_unit[axis] = value;
-                // Пересчитываем junction_deviation_steps при изменении gears
-                _lookahead.update_steps_per_unit(_steps_per_unit, total_axes);
+                _control_scale[axis] = value;
+                _lookahead.update_control_scale(_control_scale, total_axes);
             }
         }
 
-        cnc_float_type get_steps_per_unit(int axis) const
+        cnc_float_type get_control_scale(int axis) const
         {
             if (axis >= 0 && axis < (int)NMAX_AXES)
-                return _steps_per_unit[axis];
+                return _control_scale[axis];
             return 0;
         }
 
-        const std::array<cnc_float_type, NMAX_AXES> &steps_per_unit() const
+        const std::array<cnc_float_type, NMAX_AXES> &control_scale() const
         {
-            return _steps_per_unit;
+            return _control_scale;
         }
 
-        void set_gears(const igris::array_view<cnc_float_type> &arr)
+        void set_all_control_scale(const igris::array_view<cnc_float_type> &arr)
         {
             for (size_t i = 0; i < arr.size() && i < NMAX_AXES; ++i)
-                _steps_per_unit[i] = arr[i];
+                _control_scale[i] = arr[i];
+            _lookahead.update_control_scale(_control_scale, total_axes);
         }
 
         // === Look-ahead management ===
@@ -1031,7 +1002,7 @@ namespace cnc
         void set_junction_deviation(cnc_float_type value)
         {
             _lookahead.set_junction_deviation(value);
-            _lookahead.update_steps_per_unit(_steps_per_unit, total_axes);
+            _lookahead.update_control_scale(_control_scale, total_axes);
         }
 
         /// Получить текущее значение junction deviation в units.

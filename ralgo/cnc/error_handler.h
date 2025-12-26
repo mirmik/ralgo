@@ -20,13 +20,12 @@ namespace cnc
         ok = 0,
 
         // === Configuration errors (100-199) ===
-        invalid_frequency = 100,      ///< revolver_frequency <= 0
-        invalid_steps_per_unit = 101, ///< steps_per_unit <= 0 for axis
-        invalid_axes_count = 102,     ///< axes count out of range
-        not_initialized = 103,        ///< system not properly initialized
+        invalid_frequency = 100,         ///< revolver_frequency <= 0
+        invalid_control_scale = 101,     ///< control_scale <= 0 for axis
+        invalid_axes_count = 102,        ///< axes count out of range
+        not_initialized = 103,           ///< system not properly initialized
         global_protection_enabled = 104, ///< motion blocked by protection
-        axes_count_mismatch = 105,    ///< axes count mismatch between components
-        gains_not_set = 106,          ///< gains must be 1 (not tested otherwise)
+        axes_count_mismatch = 105,       ///< axes count mismatch between components
 
         // === Motion errors (200-299) ===
         invalid_velocity = 200,       ///< velocity <= 0
@@ -223,12 +222,11 @@ namespace cnc
             {
             case error_code::ok: return "ok";
             case error_code::invalid_frequency: return "invalid_frequency";
-            case error_code::invalid_steps_per_unit: return "invalid_steps_per_unit";
+            case error_code::invalid_control_scale: return "invalid_control_scale";
             case error_code::invalid_axes_count: return "invalid_axes_count";
             case error_code::not_initialized: return "not_initialized";
             case error_code::global_protection_enabled: return "global_protection_enabled";
             case error_code::axes_count_mismatch: return "axes_count_mismatch";
-            case error_code::gains_not_set: return "gains_not_set";
             case error_code::invalid_velocity: return "invalid_velocity";
             case error_code::invalid_acceleration: return "invalid_acceleration";
             case error_code::invalid_distance: return "invalid_distance";

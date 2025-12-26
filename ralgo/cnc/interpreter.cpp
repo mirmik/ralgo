@@ -74,59 +74,42 @@ namespace cnc
         return 0;
     }
 
-    int interpreter::cmd_gains(const nos::argv &, nos::ostream &os)
+    int interpreter::cmd_cscale(const nos::argv &, nos::ostream &os)
     {
-        nos::print_list_to(os, gains);
+        nos::print_to(os, "control_scale (pulses_per_unit): ");
+        nos::print_list_to(os, _control_scale);
         nos::println_to(os);
         return 0;
     }
 
-    int interpreter::cmd_gears(const nos::argv &, nos::ostream &os)
-    {
-        nos::print_list_to(os, _steps_per_unit);
-        nos::println_to(os);
-        return 0;
-    }
-
-    int interpreter::cmd_setgear(const nos::argv &argv, nos::ostream &os)
+    int interpreter::cmd_set_cscale(const nos::argv &argv, nos::ostream &os)
     {
         if (argv.size() < 3)
         {
-            nos::println_to(os, "Usage: setgear <axis> <steps_per_unit>");
-            nos::println_to(os, "  Example: setgear X 100.5");
+            nos::println_to(os, "Usage: set_cscale <axis> <pulses_per_unit>");
+            nos::println_to(os, "  Sets control_scale: control_pulses per user_unit");
+            nos::println_to(os, "  Example: set_cscale X 1000  (1000 pulses per mm)");
             return 0;
         }
         auto axno = symbol_to_index(argv[1][0]);
         cnc_float_type val = igris_atof64(argv[2].data(), NULL);
-        set_steps_per_unit(axno, val);
-        feedback_guard->set_control_to_drive_multiplier(axno, val);
+        set_control_scale(axno, val);
+        feedback_guard->set_control_scale(axno, val);
         return 0;
     }
 
-    int interpreter::cmd_set_control_gear(const nos::argv &argv, nos::ostream &os)
+    int interpreter::cmd_set_fscale(const nos::argv &argv, nos::ostream &os)
     {
         if (argv.size() < 3)
         {
-            nos::println_to(os, "Usage: set_control_gear <axis> <value>");
+            nos::println_to(os, "Usage: set_fscale <axis> <pulses_per_unit>");
+            nos::println_to(os, "  Sets feedback_scale: feedback_pulses per user_unit");
+            nos::println_to(os, "  Example: set_fscale X 1000  (1000 encoder pulses per mm)");
             return 0;
         }
         auto axno = symbol_to_index(argv[1][0]);
         cnc_float_type val = igris_atof64(argv[2].data(), NULL);
-        set_steps_per_unit(axno, val);
-        feedback_guard->set_control_to_drive_multiplier(axno, val);
-        return 0;
-    }
-
-    int interpreter::cmd_set_feedback_gear(const nos::argv &argv, nos::ostream &os)
-    {
-        if (argv.size() < 3)
-        {
-            nos::println_to(os, "Usage: set_feedback_gear <axis> <value>");
-            return 0;
-        }
-        auto axno = symbol_to_index(argv[1][0]);
-        cnc_float_type val = igris_atof64(argv[2].data(), NULL);
-        feedback_guard->set_feedback_to_drive_multiplier(axno, val);
+        feedback_guard->set_feedback_scale(axno, val);
         return 0;
     }
 
@@ -143,7 +126,7 @@ namespace cnc
         cnc_float_type val_mm = igris_atof64(argv[2].data(), NULL);
         system_lock();
         _final_position[axno] = val_mm;
-        steps_t steps = static_cast<steps_t>(val_mm * _steps_per_unit[axno]);
+        steps_t steps = static_cast<steps_t>(val_mm * _control_scale[axno]);
         revolver->get_steppers()[axno]->set_counter_value(steps);
         feedback_guard->set_feedback_position(axno, val_mm);
         system_unlock();
@@ -539,11 +522,8 @@ namespace cnc
         nos::print_to(os, "accmaxs:");
         nos::print_list_to(os, max_axes_accelerations);
         nos::println_to(os);
-        nos::print_to(os, "gains:");
-        nos::print_list_to(os, gains);
-        nos::println_to(os);
-        nos::print_to(os, "gears:");
-        nos::print_list_to(os, _steps_per_unit);
+        nos::print_to(os, "control_scale:");
+        nos::print_list_to(os, _control_scale);
         nos::println_to(os);
         nos::print_to(os, "active_block: ");
         nos::println_to(os, planner->active_block != nullptr);

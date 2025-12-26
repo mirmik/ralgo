@@ -13,7 +13,7 @@
 nos::log::logger logger;
 using namespace std::chrono_literals;
 
-TEST_CASE("cnc.runtest with gears assigned one")
+TEST_CASE("cnc.runtest with control_scale assigned one")
 {
     ralgo::set_logger(&logger);
     igris::ring<cnc::planner_block> blocks{40};
@@ -30,8 +30,9 @@ TEST_CASE("cnc.runtest with gears assigned one")
     };
 
     interpreter.init_axes(3);
-    interpreter.set_scale(ralgo::vector<cnc_float_type>{1, 1, 1});
-    interpreter.set_gears({1, 1, 1});
+    // Set control_scale = 1 for all axes (1 pulse per unit)
+    for (int i = 0; i < 3; i++)
+        interpreter.set_control_scale(i, 1);
     interpreter.set_revolver_frequency(freq);
     revolver.set_steppers(steppers_ptrs, 3);
     ralgo::global_protection = false;

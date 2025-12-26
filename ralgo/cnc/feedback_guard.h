@@ -89,9 +89,10 @@ namespace cnc
 
         igris::static_vector<feedback_guard_tandem, NMAX_AXES> _tandems = {};
 
-        std::array<cnc_float_type, NMAX_AXES> feedback_to_drive = {};
-        std::array<cnc_float_type, NMAX_AXES> control_to_drive =
-            {}; //< этот массив равен gears
+        // feedback_scale: feedback_pulses per user_unit (e.g., encoder pulses per mm)
+        std::array<cnc_float_type, NMAX_AXES> _feedback_scale = {};
+        // control_scale: control_pulses per user_unit (e.g., command pulses per mm)
+        std::array<cnc_float_type, NMAX_AXES> _control_scale = {};
 
         // максимальное значение drop_pulses, после которого вызывается
         // planner->alarm_stop()
@@ -105,16 +106,16 @@ namespace cnc
             for (size_t i = 0; i < NMAX_AXES; ++i)
             {
                 maximum_drop_pulses[i] = default_max_drop;
-                feedback_to_drive[i] = 1;
-                control_to_drive[i] = 1;
+                _feedback_scale[i] = 1;
+                _control_scale[i] = 1;
             }
         }
 
         std::string guard_info()
         {
-            return nos::format("feed_to_drive: {}\r\nctrl_to_drive: {}\r\n",
-                               nos::ilist(feedback_to_drive),
-                               nos::ilist(control_to_drive));
+            return nos::format("feedback_scale: {}\r\ncontrol_scale: {}\r\n",
+                               nos::ilist(_feedback_scale),
+                               nos::ilist(_control_scale));
         }
 
         int guard_info(nos::ostream &os)
@@ -134,24 +135,24 @@ namespace cnc
             _set_feedback_position_by_axis_callback = dlg;
         }
 
-        void set_feedback_to_drive_multiplier(igris::span<cnc_float_type> mult)
+        void set_feedback_scale(igris::span<cnc_float_type> scale)
         {
-            std::copy(mult.begin(), mult.end(), feedback_to_drive.begin());
+            std::copy(scale.begin(), scale.end(), _feedback_scale.begin());
         }
 
-        void set_control_to_drive_multiplier(igris::span<cnc_float_type> mult)
+        void set_control_scale(igris::span<cnc_float_type> scale)
         {
-            std::copy(mult.begin(), mult.end(), control_to_drive.begin());
+            std::copy(scale.begin(), scale.end(), _control_scale.begin());
         }
 
-        void set_feedback_to_drive_multiplier(int axno, cnc_float_type mult)
+        void set_feedback_scale(int axno, cnc_float_type scale)
         {
-            feedback_to_drive[axno] = mult;
+            _feedback_scale[axno] = scale;
         }
 
-        void set_control_to_drive_multiplier(int axno, cnc_float_type mult)
+        void set_control_scale(int axno, cnc_float_type scale)
         {
-            control_to_drive[axno] = mult;
+            _control_scale[axno] = scale;
         }
 
         void set_maximum_drop_pulses(igris::span<cnc_float_type> max_drop)
@@ -164,13 +165,13 @@ namespace cnc
         {
             std::array<int64_t, NMAX_AXES> fpos;
             for (size_t i = 0; i < pos.size(); ++i)
-                fpos[i] = static_cast<int64_t>(pos[i] / feedback_to_drive[i]);
+                fpos[i] = static_cast<int64_t>(pos[i] / _feedback_scale[i]);
             _set_feedback_position_callback(igris::span(fpos));
         }
 
         void set_feedback_position(size_t axno, int64_t val)
         {
-            int64_t fpos = static_cast<int64_t>(val / feedback_to_drive[axno]);
+            int64_t fpos = static_cast<int64_t>(val / _feedback_scale[axno]);
             _set_feedback_position_by_axis_callback(axno, fpos);
         }
 
@@ -190,8 +191,8 @@ namespace cnc
             for (size_t i = 0; i < total_axes; ++i)
             {
                 int64_t drop_pulses =
-                    feedback_position[i] * feedback_to_drive[i] -
-                    control_position[i] * control_to_drive[i];
+                    feedback_position[i] * _feedback_scale[i] -
+                    control_position[i] * _control_scale[i];
 
                 if (std::abs(drop_pulses) > maximum_drop_pulses[i])
                 {
@@ -202,25 +203,25 @@ namespace cnc
         }
 
         std::vector<int64_t>
-        feedback_position_as_drive(igris::span<int64_t> feedback_position)
+        feedback_position_as_unit(igris::span<int64_t> feedback_position)
         {
             std::vector<int64_t> vec;
             vec.resize(total_axes);
             for (size_t i = 0; i < total_axes; ++i)
             {
-                vec[i] = feedback_position[i] * feedback_to_drive[i];
+                vec[i] = feedback_position[i] * _feedback_scale[i];
             }
             return vec;
         }
 
         std::vector<int64_t>
-        control_position_as_drive(igris::span<int64_t> control_position)
+        control_position_as_unit(igris::span<int64_t> control_position)
         {
             std::vector<int64_t> vec;
             vec.resize(total_axes);
             for (size_t i = 0; i < total_axes; ++i)
             {
-                vec[i] = control_position[i] * control_to_drive[i];
+                vec[i] = control_position[i] * _control_scale[i];
             }
             return vec;
         }
@@ -272,18 +273,18 @@ namespace cnc
                 size_t reference_index = tandem.nums()[0];
                 auto reference_mul = tandem.muls()[0];
                 auto reference_pos = feedback_position[reference_index];
-                auto reference_to = feedback_to_drive[reference_index];
-                cnc_float_type reference_drive =
-                    reference_pos * reference_mul * reference_to;
+                auto reference_scale = _feedback_scale[reference_index];
+                cnc_float_type reference_unit =
+                    reference_pos * reference_mul * reference_scale;
                 for (size_t i = 1; i < tandem.nums().size(); ++i)
                 {
                     size_t it_index = tandem.nums()[i];
                     auto it_mul = tandem.muls()[i];
                     auto it_pos = feedback_position[it_index];
-                    auto it_to = feedback_to_drive[it_index];
+                    auto it_scale = _feedback_scale[it_index];
 
-                    cnc_float_type it_drive = it_pos * it_mul * it_to;
-                    cnc_float_type diff = it_drive - reference_drive;
+                    cnc_float_type it_unit = it_pos * it_mul * it_scale;
+                    cnc_float_type diff = it_unit - reference_unit;
                     if (std::abs(diff) > tandem.maximum_tandem_mistake())
                     {
                         return false;
