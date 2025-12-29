@@ -792,6 +792,7 @@ namespace cnc
         int cmd_planner_pause(const nos::argv &argv, nos::ostream &os);
         int cmd_set_junction_deviation(const nos::argv &argv, nos::ostream &os);
         int cmd_queue_status(const nos::argv &, nos::ostream &os);
+        int cmd_is_idle(const nos::argv &, nos::ostream &os);
         int cmd_flow_control(const nos::argv &argv, nos::ostream &os);
         int cmd_buffer(const nos::argv &argv, nos::ostream &os);
 
@@ -859,6 +860,8 @@ namespace cnc
                 nos::make_delegate(&interpreter::cmd_set_junction_deviation, this)});
             executor.add_command({"queue_status", "Print block queue status",
                 nos::make_delegate(&interpreter::cmd_queue_status, this)});
+            executor.add_command({"is_idle", "Check if motion is complete (true/false)",
+                nos::make_delegate(&interpreter::cmd_is_idle, this)});
             executor.add_command({"flow_control", "Enable/disable flow control. Args: [<0|1>]",
                 nos::make_delegate(&interpreter::cmd_flow_control, this)});
             executor.add_command({"buffer", "Buffer control. Args: enable|start|cancel|status|config",

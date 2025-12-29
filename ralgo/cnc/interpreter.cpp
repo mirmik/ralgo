@@ -320,6 +320,13 @@ namespace cnc
         return 0;
     }
 
+    int interpreter::cmd_is_idle(const nos::argv &, nos::ostream &os)
+    {
+        bool idle = (blocks->avail() == 0) && (planner->active_block == nullptr);
+        nos::println_to(os, idle ? "true" : "false");
+        return 0;
+    }
+
     int interpreter::cmd_flow_control(const nos::argv &argv, nos::ostream &os)
     {
         if (!flow)
