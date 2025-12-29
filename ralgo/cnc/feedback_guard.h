@@ -161,17 +161,21 @@ namespace cnc
                 max_drop.begin(), max_drop.end(), maximum_drop_pulses.begin());
         }
 
-        void set_feedback_position(igris::span<int64_t> pos)
+        // Set feedback position from user units (e.g., mm)
+        // Converts to feedback_pulses by multiplying by feedback_scale
+        void set_feedback_position(igris::span<cnc_float_type> pos)
         {
             std::array<int64_t, NMAX_AXES> fpos;
             for (size_t i = 0; i < pos.size(); ++i)
-                fpos[i] = static_cast<int64_t>(pos[i] / _feedback_scale[i]);
+                fpos[i] = static_cast<int64_t>(pos[i] * _feedback_scale[i]);
             _set_feedback_position_callback(igris::span(fpos));
         }
 
-        void set_feedback_position(size_t axno, int64_t val)
+        // Set feedback position for single axis from user units (e.g., mm)
+        // Converts to feedback_pulses by multiplying by feedback_scale
+        void set_feedback_position(size_t axno, cnc_float_type val)
         {
-            int64_t fpos = static_cast<int64_t>(val / _feedback_scale[axno]);
+            int64_t fpos = static_cast<int64_t>(val * _feedback_scale[axno]);
             _set_feedback_position_by_axis_callback(axno, fpos);
         }
 
@@ -185,16 +189,25 @@ namespace cnc
             maximum_drop_pulses[no] = val;
         }
 
+        // Verify that feedback position matches control position within tolerance.
+        // Both positions are converted to user units for comparison.
+        // Returns true if positions match within maximum_drop_pulses tolerance.
         bool verify_position(igris::span<int64_t> feedback_position,
                              igris::span<int64_t> control_position)
         {
             for (size_t i = 0; i < total_axes; ++i)
             {
-                int64_t drop_pulses =
-                    feedback_position[i] * _feedback_scale[i] -
-                    control_position[i] * _control_scale[i];
+                // Convert both to user units for comparison
+                // feedback_position is in feedback_pulses
+                // control_position is in control_pulses
+                cnc_float_type feedback_units =
+                    feedback_position[i] / _feedback_scale[i];
+                cnc_float_type control_units =
+                    control_position[i] / _control_scale[i];
+                cnc_float_type error_units = feedback_units - control_units;
 
-                if (std::abs(drop_pulses) > maximum_drop_pulses[i])
+                // maximum_drop_pulses is in user units (despite the name)
+                if (std::abs(error_units) > maximum_drop_pulses[i])
                 {
                     return false;
                 }
@@ -202,26 +215,30 @@ namespace cnc
             return true;
         }
 
-        std::vector<int64_t>
+        // Convert feedback position from feedback_pulses to user units.
+        // Returns position in user units (e.g., mm).
+        std::vector<cnc_float_type>
         feedback_position_as_unit(igris::span<int64_t> feedback_position)
         {
-            std::vector<int64_t> vec;
+            std::vector<cnc_float_type> vec;
             vec.resize(total_axes);
             for (size_t i = 0; i < total_axes; ++i)
             {
-                vec[i] = feedback_position[i] * _feedback_scale[i];
+                vec[i] = feedback_position[i] / _feedback_scale[i];
             }
             return vec;
         }
 
-        std::vector<int64_t>
+        // Convert control position from control_pulses to user units.
+        // Returns position in user units (e.g., mm).
+        std::vector<cnc_float_type>
         control_position_as_unit(igris::span<int64_t> control_position)
         {
-            std::vector<int64_t> vec;
+            std::vector<cnc_float_type> vec;
             vec.resize(total_axes);
             for (size_t i = 0; i < total_axes; ++i)
             {
-                vec[i] = control_position[i] * _control_scale[i];
+                vec[i] = control_position[i] / _control_scale[i];
             }
             return vec;
         }
@@ -263,6 +280,10 @@ namespace cnc
             }
         }
 
+        // Verify tandem axes have matching positions within tolerance.
+        // Tandem axes must move together (e.g., dual-motor gantry).
+        // feedback_position is in feedback_pulses.
+        // Returns true if all tandems are within tolerance.
         bool verify_tandems(igris::span<int64_t> feedback_position)
         {
             for (auto &tandem : _tandems)
@@ -274,8 +295,11 @@ namespace cnc
                 auto reference_mul = tandem.muls()[0];
                 auto reference_pos = feedback_position[reference_index];
                 auto reference_scale = _feedback_scale[reference_index];
+                // Convert to user units: pulses / (pulses/unit) = units
+                // Multiplier accounts for gear ratio between tandem axes
                 cnc_float_type reference_unit =
-                    reference_pos * reference_mul * reference_scale;
+                    (reference_pos * reference_mul) / reference_scale;
+
                 for (size_t i = 1; i < tandem.nums().size(); ++i)
                 {
                     size_t it_index = tandem.nums()[i];
@@ -283,7 +307,7 @@ namespace cnc
                     auto it_pos = feedback_position[it_index];
                     auto it_scale = _feedback_scale[it_index];
 
-                    cnc_float_type it_unit = it_pos * it_mul * it_scale;
+                    cnc_float_type it_unit = (it_pos * it_mul) / it_scale;
                     cnc_float_type diff = it_unit - reference_unit;
                     if (std::abs(diff) > tandem.maximum_tandem_mistake())
                     {
