@@ -86,6 +86,8 @@ namespace cnc
               feedback_guard(feedback_guard), errors(errors), flow(flow),
               blocks(blocks)
         {
+            // Set global error handler for planblock timing errors
+            block_error_handler = errors;
         }
 
         interpreter(const interpreter &) = delete;
@@ -238,6 +240,11 @@ namespace cnc
             control_task task(total_axes);
             task.feed = feed == 0 ? saved_feed : feed;
             task.acc = acc == 0 ? saved_acc : acc;
+            // Инициализируем все оси нулями перед установкой указанных
+            for (int i = 0; i < total_axes; ++i)
+            {
+                task.poses()[i] = 0;
+            }
             for (auto &i : poses)
             {
                 task.poses()[i.idx] = i.pos;
@@ -309,6 +316,49 @@ namespace cnc
             ralgo::vector_view<cnc_float_type> control_scale(_control_scale.data(),
                                                               total_axes);
 
+            // Диагностика входных данных ПЕРЕД умножением
+            {
+                // Проверяем каждую ось отдельно
+                for (int i = 0; i < total_axes; ++i)
+                {
+                    cnc_float_type val = task.poses()[i];
+                    if (std::isnan(val))
+                    {
+                        // ctx=100+axis: NaN в task.poses()[axis]
+                        report_error(error_code::timing_overflow, static_cast<int8_t>(i), 100 + i);
+                    }
+                    else if (std::isinf(val))
+                    {
+                        // ctx=110+axis: Inf в task.poses()[axis]
+                        report_error(error_code::timing_overflow, static_cast<int8_t>(i), 110 + i);
+                    }
+                    else if (std::abs(val) > 1e10)
+                    {
+                        // ctx=120+axis: слишком большое значение в task.poses()[axis]
+                        // Сохраняем порядок величины в context
+                        int order = static_cast<int>(std::log10(std::abs(val)));
+                        report_error(error_code::timing_overflow, static_cast<int8_t>(i), 120 + order);
+                    }
+                }
+
+                cnc_float_type task_norm = ralgo::vecops::norm(task.poses());
+                bool task_bad = std::isnan(task_norm) || std::isinf(task_norm) || task_norm > 1e10;
+
+                cnc_float_type scale_norm = ralgo::vecops::norm(control_scale);
+                bool scale_bad = std::isnan(scale_norm) || std::isinf(scale_norm) || scale_norm > 1e10;
+
+                if (task_bad)
+                {
+                    // ctx=14: task.poses() содержит плохие значения (суммарно)
+                    report_error(error_code::timing_overflow, -1, 14);
+                }
+                if (scale_bad)
+                {
+                    // ctx=15: control_scale содержит плохие значения
+                    report_error(error_code::timing_overflow, -1, 15);
+                }
+            }
+
             // Convert user units (mm/cm) to control pulses
             auto intdists_pulses =
                 ralgo::vecops::mul_vv<ralgo::vector<cnc_float_type>>(
@@ -360,6 +410,35 @@ namespace cnc
             cnc_float_type reduced_feed = feed_pulses / revolver_frequency;
             cnc_float_type reduced_acc =
                 acc_pulses / (revolver_frequency * revolver_frequency);
+
+            // Диагностика входных параметров перед set_state
+            {
+                // Проверяем intdists_pulses на NaN/Inf
+                cnc_float_type dist_norm = ralgo::vecops::norm(intdists_pulses);
+                if (std::isnan(dist_norm) || std::isinf(dist_norm) || dist_norm > 1e15)
+                {
+                    report_error(error_code::timing_overflow, -1, 8); // ctx=8: bad intdists_pulses
+                }
+
+                // Проверяем reduced_feed и reduced_acc
+                if (std::isnan(reduced_feed) || std::isinf(reduced_feed) ||
+                    reduced_feed <= 0 || reduced_feed > 1e10)
+                {
+                    report_error(error_code::timing_overflow, -1, 9); // ctx=9: bad reduced_feed
+                }
+
+                if (std::isnan(reduced_acc) || std::isinf(reduced_acc) ||
+                    reduced_acc <= 0 || reduced_acc > 1e10)
+                {
+                    report_error(error_code::timing_overflow, -1, 10); // ctx=10: bad reduced_acc
+                }
+
+                // Проверяем промежуточные значения
+                if (std::isnan(dir_scale) || std::isinf(dir_scale) || dir_scale <= 0)
+                {
+                    report_error(error_code::timing_overflow, -1, 11); // ctx=11: bad dir_scale
+                }
+            }
 
             if (feedback_guard)
                 for (auto idx : task.active_axes)
@@ -418,6 +497,18 @@ namespace cnc
                 return;
             }
 
+            // Валидация блока перед добавлением в очередь
+            if (lastblock.fullpath > 1e15 ||
+                std::isnan(lastblock.fullpath) || std::isinf(lastblock.fullpath) ||
+                std::isnan(lastblock.acceleration) || std::isinf(lastblock.acceleration) ||
+                std::isnan(lastblock.nominal_velocity) || std::isinf(lastblock.nominal_velocity) ||
+                lastblock.block_finish_ic < 0 || lastblock.block_finish_ic > 1000000000)
+            {
+                report_error(error_code::block_validation_failed, -1,
+                    static_cast<int32_t>(lastblock.fullpath));
+                return;  // Блокируем добавление невалидного блока
+            }
+
             // axdist is in steps, convert back to mm for _final_position
             for (int i = 0; i < total_axes; ++i)
             {
@@ -444,11 +535,26 @@ namespace cnc
             placeblock = lastblock;
             blocks->move_head_one();
 
+            // Диагностика: проверяем блок сразу после копирования
+            if (placeblock.fullpath != lastblock.fullpath ||
+                placeblock.fullpath > 1e15 ||
+                std::isnan(placeblock.fullpath) || std::isinf(placeblock.fullpath))
+            {
+                report_error(error_code::timing_overflow, -1, 13); // 13 = corrupted after copy
+            }
+
             // Вызываем look-ahead пересчёт скоростей если он включен
             // (в явном режиме пересчёт будет при buffer_start)
             if (_lookahead.is_enabled() && !_buffer.is_explicit_mode())
             {
                 planner->recalculate_block_velocities(_lookahead.junction_deviation_steps());
+
+                // Диагностика: проверяем блок после look-ahead
+                if (placeblock.fullpath > 1e15 ||
+                    std::isnan(placeblock.fullpath) || std::isinf(placeblock.fullpath))
+                {
+                    report_error(error_code::timing_overflow, -1, 3); // 3 = corrupted after look-ahead
+                }
             }
 
             // Проверяем готовность буфера для автоматического режима
@@ -474,7 +580,7 @@ namespace cnc
 
             if (check_correctness(os))
                 return;
-            auto poses = get_task_poses_from_argv(argv);
+            auto poses = get_task_poses_from_argv(argv, errors);
             cnc_float_type feed = get_task_feed_from_argv(argv);
             cnc_float_type acc = get_task_acc_from_argv(argv);
             auto task = create_task_for_relative_move(poses, feed, acc);
@@ -494,7 +600,7 @@ namespace cnc
             if (check_correctness(os))
                 return;
 
-            auto poses = get_task_poses_from_argv(argv);
+            auto poses = get_task_poses_from_argv(argv, errors);
             cnc_float_type acc = get_task_acc_from_argv(argv);
             // G0 uses max velocity (feed=0 means use axis limits)
             cnc_float_type feed = 0;
@@ -521,7 +627,7 @@ namespace cnc
             if (check_correctness(os))
                 return;
 
-            auto poses = get_task_poses_from_argv(argv);
+            auto poses = get_task_poses_from_argv(argv, errors);
             cnc_float_type feed = get_task_feed_from_argv(argv);
             cnc_float_type acc = get_task_acc_from_argv(argv);
 
@@ -541,7 +647,7 @@ namespace cnc
         {
             ralgo::info("command_G92 (set position)");
 
-            auto poses = get_task_poses_from_argv(argv);
+            auto poses = get_task_poses_from_argv(argv, errors);
             if (poses.empty())
             {
                 nos::println_to(os, "Usage: G92 <axis><pos>...");
@@ -572,7 +678,7 @@ namespace cnc
 
             if (check_correctness(os))
                 return;
-            auto poses = get_task_poses_from_argv(argv);
+            auto poses = get_task_poses_from_argv(argv, errors);
             cnc_float_type feed = get_task_feed_from_argv(argv);
             cnc_float_type acc = get_task_acc_from_argv(argv);
             auto task = create_task_for_absolute_move(poses, feed, acc);
@@ -595,7 +701,7 @@ namespace cnc
             if (check_correctness(os))
                 return;
 
-            auto poses = get_task_poses_from_argv(argv);
+            auto poses = get_task_poses_from_argv(argv, errors);
             cnc_float_type feed = get_task_feed_from_argv(argv);
             cnc_float_type acc = get_task_acc_from_argv(argv);
             (void)poses;
@@ -797,6 +903,7 @@ namespace cnc
         int cmd_buffer(const nos::argv &argv, nos::ostream &os);
         int cmd_ring_debug(const nos::argv &, nos::ostream &os);
         int cmd_ring_history(const nos::argv &argv, nos::ostream &os);
+        int cmd_test_reset(const nos::argv &, nos::ostream &os);
 
         // CLI commands executor
         nos::executor executor;
@@ -874,6 +981,8 @@ namespace cnc
                 nos::make_delegate(&interpreter::cmd_ring_debug, this)});
             executor.add_command({"ring_history", "Show last N blocks (including deleted). Args: [count]",
                 nos::make_delegate(&interpreter::cmd_ring_history, this)});
+            executor.add_command({"test_reset", "Reset to clean state for testing",
+                nos::make_delegate(&interpreter::cmd_test_reset, this)});
             executor.add_command({"cmd", "text commands (legacy prefix)",
                 nos::make_delegate(&interpreter::command_drop_first, this)});
             executor.add_command({"cnc", "gcode commands (legacy prefix)",

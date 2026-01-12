@@ -555,6 +555,44 @@ namespace cnc
         return 0;
     }
 
+    int interpreter::cmd_test_reset(const nos::argv &, nos::ostream &os)
+    {
+        nos::println_to(os, "Resetting to clean state...");
+
+        // 1. Stop any motion (non-blocking clear)
+        system_lock();
+
+        // 2. Clear planner queue
+        planner->clear();
+
+        // 3. Clear revolver
+        revolver->clear();
+
+        // 4. Reset interpreter state
+        cleanup();
+
+        // 5. Reset positions to zero
+        for (size_t i = 0; i < total_axes; i++)
+        {
+            _final_position[i] = 0;
+            revolver->get_steppers()[i]->set_counter_value(0);
+            if (feedback_guard)
+                feedback_guard->set_feedback_position(i, 0);
+        }
+
+        // 6. Reset buffer controller
+        _buffer.cancel_explicit();
+
+        // 8. Reset flags
+        stop_procedure_started = false;
+        _absolute_mode = true;  // G90 default
+
+        system_unlock();
+
+        nos::println_to(os, "Reset complete");
+        return 0;
+    }
+
     // === G-code methods ===
 
     void interpreter::g_command(const nos::argv &argv, nos::ostream &os)

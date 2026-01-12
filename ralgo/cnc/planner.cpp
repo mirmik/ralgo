@@ -434,7 +434,18 @@ void cnc::planner::recalculate_block_velocities(cnc_float_type junction_deviatio
     // Шаг 4: Пересчитываем тайминги всех pending блоков
     for (int i = start_idx; i != head; i = blocks->fixup_index(i + 1))
     {
-        blocks->get(i).recalculate_timing();
+        auto &block = blocks->get(i);
+
+        // Диагностика: проверяем fullpath ДО recalculate_timing
+        if (block.fullpath > 1e15 || std::isnan(block.fullpath) || std::isinf(block.fullpath))
+        {
+            // fullpath уже испорчен до пересчёта - проблема в памяти
+            // ctx = индекс блока в ring buffer
+            if (block_error_handler)
+                block_error_handler->report(error_code::timing_overflow, static_cast<int8_t>(i), 4); // 4 = corrupt before recalc
+        }
+
+        block.recalculate_timing();
     }
 }
 

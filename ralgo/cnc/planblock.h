@@ -8,6 +8,7 @@
 #include <nos/log.h>
 #include <nos/print.h>
 #include <ralgo/cnc/defs.h>
+#include <ralgo/cnc/error_handler.h>
 #include <ralgo/log.h>
 #include <ralgo/cnc/util.h>
 #include <ralgo/linalg/vecops.h>
@@ -38,6 +39,9 @@
 
 namespace cnc
 {
+    /// Global error handler for planblock errors (set by interpreter)
+    inline error_handler* block_error_handler = nullptr;
+
     class planner_block
     {
     public:
@@ -348,13 +352,28 @@ namespace cnc
                 pathsqr += axdist[i] * axdist[i];
             cnc_float_type path = sqrt(pathsqr);
 
-            // DEBUG: Sanity check for corruption detection
+            // Диагностика входных данных в set_state
             if (path > 1e15 || path < 0 || std::isnan(path) || std::isinf(path))
             {
-                ralgo::warn("CORRUPTION in set_state");
+                if (block_error_handler)
+                    block_error_handler->report(error_code::timing_overflow, -1, 6); // 6 = bad path in set_state
+            }
+            if (velocity <= 0 || std::isnan(velocity) || std::isinf(velocity) ||
+                acceleration <= 0 || std::isnan(acceleration) || std::isinf(acceleration))
+            {
+                if (block_error_handler)
+                    block_error_handler->report(error_code::timing_overflow, -1, 7); // 7 = bad vel/acc in set_state
             }
 
             this->fullpath = path;
+
+            // Диагностика: проверяем что fullpath записалось правильно
+            if (this->fullpath != path ||
+                this->fullpath > 1e15 || std::isnan(this->fullpath) || std::isinf(this->fullpath))
+            {
+                if (block_error_handler)
+                    block_error_handler->report(error_code::timing_overflow, -1, 12); // 12 = fullpath corruption after assignment
+            }
 
             this->acceleration = acceleration;
             this->start_ic = 0;
@@ -391,10 +410,21 @@ namespace cnc
             cnc_float_type Vf = this->final_velocity;
             cnc_float_type Vn = this->nominal_velocity;
 
-            // DEBUG: Check if fullpath is corrupted at recalculate_timing entry
+            // Диагностика: corrupted fullpath на входе
             if (path > 1e15 || std::isnan(path) || std::isinf(path))
             {
-                ralgo::warn("recalculate_timing: CORRUPTED fullpath");
+                if (block_error_handler)
+                    block_error_handler->report(error_code::timing_overflow, -1, 0); // 0 = corrupted fullpath
+            }
+
+            // Диагностика: NaN/Inf во входных данных
+            if (std::isnan(Vn) || std::isinf(Vn) ||
+                std::isnan(Vs) || std::isinf(Vs) ||
+                std::isnan(Vf) || std::isinf(Vf) ||
+                std::isnan(acc) || std::isinf(acc))
+            {
+                if (block_error_handler)
+                    block_error_handler->report(error_code::timing_nan_input);
             }
 
             if (acc <= 0 || path <= 0)
@@ -422,6 +452,16 @@ namespace cnc
                 cnc_float_type t_dec = (Vn - Vf) / acc;
                 // Время круиза: t_cruise = d_cruise / Vn
                 cnc_float_type t_cruise = d_cruise / Vn;
+
+                // Диагностика: сообщаем об overflow но не блокируем
+                constexpr cnc_float_type MAX_TICKS = 36000000.0;
+                if (std::isnan(t_acc) || std::isinf(t_acc) || t_acc > MAX_TICKS ||
+                    std::isnan(t_dec) || std::isinf(t_dec) || t_dec > MAX_TICKS ||
+                    std::isnan(t_cruise) || std::isinf(t_cruise) || t_cruise > MAX_TICKS)
+                {
+                    if (block_error_handler)
+                        block_error_handler->report(error_code::timing_overflow, -1, 1); // 1 = trapezoidal
+                }
 
                 int64_t i_acc = static_cast<int64_t>(ceil(t_acc));
                 int64_t i_cruise = static_cast<int64_t>(ceil(t_cruise));
@@ -457,6 +497,15 @@ namespace cnc
                 cnc_float_type t_acc = (Vp - Vs) / acc;
                 cnc_float_type t_dec = (Vp - Vf) / acc;
 
+                // Диагностика: сообщаем об overflow но не блокируем
+                constexpr cnc_float_type MAX_TICKS = 36000000.0;
+                if (std::isnan(t_acc) || std::isinf(t_acc) || t_acc > MAX_TICKS ||
+                    std::isnan(t_dec) || std::isinf(t_dec) || t_dec > MAX_TICKS)
+                {
+                    if (block_error_handler)
+                        block_error_handler->report(error_code::timing_overflow, -1, 2); // 2 = triangle
+                }
+
                 int64_t i_acc = static_cast<int64_t>(ceil(t_acc));
                 int64_t i_dec = static_cast<int64_t>(ceil(t_dec));
 
@@ -468,6 +517,18 @@ namespace cnc
             // Минимальная длительность блока - 1 тик
             if (this->block_finish_ic < 1)
                 this->block_finish_ic = 1;
+
+            // Проверка консистентности временных меток
+            // Должно быть: start_ic <= acceleration_before_ic <= deceleration_after_ic <= block_finish_ic
+            if (this->acceleration_before_ic < this->start_ic ||
+                this->deceleration_after_ic < this->acceleration_before_ic ||
+                this->block_finish_ic < this->deceleration_after_ic ||
+                this->block_finish_ic < 0 ||
+                this->block_finish_ic > 1000000000)  // ~27 часов на 10kHz - явно ошибка
+            {
+                if (block_error_handler)
+                    block_error_handler->report(error_code::timing_overflow, -1, 5); // 5 = inconsistent timestamps
+            }
         }
 
         /// Установить новые граничные скорости и пересчитать тайминги.

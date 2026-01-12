@@ -2,15 +2,73 @@
 #define CONTROL_TASK_H
 
 #include <algorithm>
+#include <cmath>
+#include <cstdlib>
 #include <igris/container/static_vector.h>
-#include <igris/util/numconvert.h>
 #include <nos/shell/argv.h>
 #include <ralgo/cnc/defs.h>
+#include <ralgo/cnc/error_handler.h>
 #include <ralgo/cnc/util.h>
 #include <ralgo/linalg/vector_view.h>
 
 namespace cnc
 {
+    /// Parse double with correct scientific notation support
+    /// (igris_atof64 has a bug with negative exponents)
+    static inline double parse_double(const char* str, char** endptr = nullptr)
+    {
+        if (!str) return 0.0;
+
+        char* end = nullptr;
+        double mantissa = 0.0;
+        int exponent = 0;
+        int sign = 1;
+        int exp_sign = 1;
+
+        // Skip whitespace
+        while (*str == ' ' || *str == '\t') str++;
+
+        // Parse sign
+        if (*str == '-') { sign = -1; str++; }
+        else if (*str == '+') { str++; }
+
+        // Parse mantissa integer part
+        while (*str >= '0' && *str <= '9') {
+            mantissa = mantissa * 10.0 + (*str - '0');
+            str++;
+        }
+
+        // Parse decimal part
+        if (*str == '.') {
+            str++;
+            double decimal_place = 0.1;
+            while (*str >= '0' && *str <= '9') {
+                mantissa += (*str - '0') * decimal_place;
+                decimal_place *= 0.1;
+                str++;
+            }
+        }
+
+        // Parse exponent
+        if (*str == 'e' || *str == 'E') {
+            str++;
+            if (*str == '-') { exp_sign = -1; str++; }
+            else if (*str == '+') { str++; }
+
+            while (*str >= '0' && *str <= '9') {
+                exponent = exponent * 10 + (*str - '0');
+                str++;
+            }
+        }
+
+        if (endptr) *endptr = const_cast<char*>(str);
+
+        double result = sign * mantissa;
+        if (exponent != 0) {
+            result *= std::pow(10.0, exp_sign * exponent);
+        }
+        return result;
+    }
     struct idxpos
     {
         int idx;
@@ -29,6 +87,11 @@ namespace cnc
         control_task(size_t total_axes)
         {
             _poses.resize(total_axes);
+            // Явно инициализируем нулями для надёжности
+            for (size_t i = 0; i < total_axes; ++i)
+            {
+                _poses[i] = 0;
+            }
         }
 
         control_task(const control_task &other)
@@ -149,7 +212,7 @@ namespace cnc
     };
 
     static inline std::vector<idxpos>
-    get_task_poses_from_argv(const nos::argv &argv)
+    get_task_poses_from_argv(const nos::argv &argv, error_handler* err_handler = nullptr)
     {
         std::vector<idxpos> ret;
         for (unsigned int i = 0; i < argv.size(); ++i)
@@ -158,7 +221,13 @@ namespace cnc
             int idx = symbol_to_index(symb);
             if (idx >= 0)
             {
-                cnc_float_type val = igris_atof64(&argv[i].data()[1], nullptr);
+                cnc_float_type val = parse_double(&argv[i].data()[1], nullptr);
+                // Диагностика: проверяем что парсинг не дал мусор
+                if (err_handler && (std::isnan(val) || std::isinf(val) || std::abs(val) > 1e10))
+                {
+                    // ctx=200+idx: плохое значение при парсинге оси idx
+                    err_handler->report(error_code::timing_overflow, static_cast<int8_t>(idx), 200 + idx);
+                }
                 ret.push_back({idx, val});
             }
         }
@@ -172,7 +241,7 @@ namespace cnc
             char symb = tolower(argv[i].data()[0]);
             if (symb == 'f')
             {
-                cnc_float_type val = igris_atof64(&argv[i].data()[1], nullptr);
+                cnc_float_type val = parse_double(&argv[i].data()[1], nullptr);
                 return val;
             }
         }
@@ -186,7 +255,7 @@ namespace cnc
             char symb = tolower(argv[i].data()[0]);
             if (symb == 'm')
             {
-                cnc_float_type val = igris_atof64(&argv[i].data()[1], nullptr);
+                cnc_float_type val = parse_double(&argv[i].data()[1], nullptr);
                 return val;
             }
         }

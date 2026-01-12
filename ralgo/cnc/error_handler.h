@@ -34,6 +34,8 @@ namespace cnc
         invalid_direction = 203,      ///< direction vector is zero
         block_validation_failed = 204,///< planner_block validation failed
         queue_overflow = 205,         ///< block queue is full
+        timing_overflow = 206,        ///< NaN/Inf in timing calculation
+        timing_nan_input = 207,       ///< NaN/Inf in velocity/acceleration input
 
         // === Runtime errors (300-399) ===
         position_limit_exceeded = 300,///< soft limit hit
@@ -233,6 +235,8 @@ namespace cnc
             case error_code::invalid_direction: return "invalid_direction";
             case error_code::block_validation_failed: return "block_validation_failed";
             case error_code::queue_overflow: return "queue_overflow";
+            case error_code::timing_overflow: return "timing_overflow";
+            case error_code::timing_nan_input: return "timing_nan_input";
             case error_code::position_limit_exceeded: return "position_limit_exceeded";
             case error_code::following_error: return "following_error";
             case error_code::emergency_stop: return "emergency_stop";
