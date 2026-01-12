@@ -69,34 +69,21 @@ int cnc::planner::block_index(planner_block *it)
 
 void cnc::planner::fixup_postactive_blocks()
 {
-    while (blocks->tail_index() != active)
-    {
-        if (!blocks->tail().is_active_or_postactive(iteration_counter))
-            blocks->pop();
-
-        else
-            break;
-    }
+    // В классической CNC модели нет postactive блоков.
+    // Блоки удаляются сразу при смене в change_active_block().
 }
 
 bool cnc::planner::has_postactive_blocks()
 {
-    system_lock();
-    auto ret = active != blocks->tail_index();
-    system_unlock();
-    return ret;
-}
-
-int cnc::planner::count_of_postactive()
-{
-    system_lock();
-    auto ret = blocks->distance(active, blocks->tail_index());
-    system_unlock();
-    return ret;
+    // В классической модели postactive блоков не существует
+    return false;
 }
 
 void cnc::planner::change_active_block()
 {
+    // Классическая CNC модель: удаляем завершённый блок сразу,
+    // затем загружаем следующий. Без postactive блоков.
+
     if (info_mode)
     {
         ralgo::info("planner: change_active_block");
@@ -104,17 +91,25 @@ void cnc::planner::change_active_block()
 
     system_lock();
 
+    // Удаляем предыдущий блок из буфера (он полностью завершён)
     if (active_block)
-        active = blocks->fixup_index(active + 1);
+    {
+        blocks->pop();
+    }
 
+    // active всегда указывает на tail (первый блок в очереди)
+    active = blocks->tail_index();
     int head = blocks->head_index();
+
     system_unlock();
 
+    // Уведомляем о начале операции при загрузке первого блока
     if (active_block == nullptr && active != head)
     {
         _start_operation_handle();
     }
 
+    // Если очередь пуста — нет активного блока
     if (active == head)
     {
         active_block = nullptr;
@@ -131,6 +126,8 @@ void cnc::planner::change_active_block()
 
 void cnc::planner::evaluate_accelerations()
 {
+    // В классической CNC модели только один блок активен в любой момент времени.
+    // Ускорение берётся только от active_block, без суммирования с postactive.
     if (active_block)
         active_block->assign_accelerations(
             accelerations.data(), _total_axes, iteration_counter);
@@ -139,11 +136,6 @@ void cnc::planner::evaluate_accelerations()
         for (int i = 0; i < _total_axes; ++i)
             accelerations[i] = 0;
     }
-
-    for (int i = blocks->tail_index(); i != active;
-         i = blocks->fixup_index(i + 1))
-        blocks->get(i).append_accelerations(
-            accelerations.data(), _total_axes, iteration_counter);
 }
 
 void cnc::planner::set_pause_mode(bool en)
@@ -211,9 +203,13 @@ void cnc::planner::iteration_planning_phase(size_t iter)
 
 std::pair<int, size_t> cnc::planner::iteration()
 {
+    // Классическая CNC модель: один блок исполняется полностью,
+    // затем переключаемся на следующий. Без перекрытия блоков.
+
     size_t room = 10000;
 
-    if (active_block == nullptr && !has_postactive_blocks())
+    // Если нет активного блока — загружаем следующий из очереди
+    if (active_block == nullptr)
     {
         bool empty = blocks->empty();
         if (empty)
@@ -233,63 +229,37 @@ std::pair<int, size_t> cnc::planner::iteration()
 
     if (active_block)
     {
-        // // room = 1;
+        // Определяем room — сколько тиков до смены фазы
         if (active_block->is_accel(iteration_counter))
         {
-            int counter_to_active =
+            int counter_to_phase_end =
                 active_block->acceleration_before_ic - iteration_counter;
-            room = std::min(room, (size_t)counter_to_active);
+            room = std::min(room, (size_t)counter_to_phase_end);
             need_to_reevaluate = true;
         }
         else if (active_block->is_flat(iteration_counter))
         {
-            int counter_to_active =
+            int counter_to_phase_end =
                 active_block->deceleration_after_ic - iteration_counter;
-            room = std::min(room, (size_t)counter_to_active);
+            room = std::min(room, (size_t)counter_to_phase_end);
             need_to_reevaluate = true;
         }
         else if (active_block->is_decel(iteration_counter))
         {
-            int counter_to_active =
+            int counter_to_phase_end =
                 active_block->block_finish_ic - iteration_counter;
-            room = std::min(room, (size_t)counter_to_active);
+            room = std::min(room, (size_t)counter_to_phase_end);
             need_to_reevaluate = true;
         }
 
         if (room == 0)
             room = 1;
 
-        if (state == 0)
+        // Проверяем завершение блока (классическая модель: ждём полного завершения)
+        if (iteration_counter >= active_block->block_finish_ic)
         {
-            if (!active_block->is_accel(iteration_counter))
-            {
-                state = 1;
-            }
-        }
-        else
-        {
-            if (!active_block->is_active(iteration_counter))
-            {
-                change_active_block();
-                need_to_reevaluate = true;
-                state = 0;
-            }
-        }
-    }
-
-    for (int i = blocks->tail_index(); i != active;
-         i = blocks->fixup_index(i + 1))
-    {
-        if (!blocks->get(i).is_active_or_postactive(iteration_counter))
-        {
+            change_active_block();
             need_to_reevaluate = true;
-            room = 1;
-        }
-        else
-        {
-            int counter_to_finish =
-                blocks->get(i).block_finish_ic - iteration_counter;
-            room = std::min(room, (size_t)counter_to_finish);
         }
     }
 
@@ -303,7 +273,7 @@ std::pair<int, size_t> cnc::planner::iteration()
 
 void cnc::planner::reevaluate_accelerations()
 {
-    fixup_postactive_blocks();
+    // В классической модели нет postactive блоков — просто пересчитываем ускорения
     evaluate_accelerations();
     need_to_reevaluate = false;
 }
@@ -368,8 +338,8 @@ void cnc::planner::alarm_stop()
 bool cnc::planner::is_not_halt()
 {
     igris::syslock_guard lock;
-    return !revolver->is_empty() || active_block != nullptr ||
-           has_postactive_blocks() || !blocks->empty();
+    // В классической модели нет postactive — проверяем только active_block и очередь
+    return !revolver->is_empty() || active_block != nullptr || !blocks->empty();
 }
 
 bool cnc::planner::is_halt()

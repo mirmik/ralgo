@@ -322,7 +322,13 @@ namespace cnc
 
     int interpreter::cmd_is_idle(const nos::argv &, nos::ostream &os)
     {
-        bool idle = (blocks->avail() == 0) && (planner->active_block == nullptr);
+        // Must check all three conditions for true idle:
+        // 1. No blocks in queue
+        // 2. No active block in planner
+        // 3. Revolver finished executing all tasks
+        bool idle = (blocks->avail() == 0) &&
+                    (planner->active_block == nullptr) &&
+                    revolver->is_empty();
         nos::println_to(os, idle ? "true" : "false");
         return 0;
     }

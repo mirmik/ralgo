@@ -307,20 +307,6 @@ namespace cnc
             }
         }
 
-        void
-        append_accelerations(cnc_float_type *accs, int len, int64_t itercounter)
-        {
-            cnc_float_type acceleration = current_acceleration(itercounter);
-
-            if (acceleration == 0)
-                return;
-
-            for (int i = 0; i < len; ++i)
-            {
-                accs[i] += acceleration * _direction[i];
-            }
-        }
-
         /// Установить состояние блока с заданными граничными скоростями.
         ///
         /// Трапецеидальный профиль скорости:

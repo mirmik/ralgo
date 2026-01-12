@@ -78,8 +78,7 @@ namespace cnc
         void reset_iteration_counter();
         planner(igris::ring<cnc::planner_block> *blocks,
                 cnc::revolver *revolver);
-        bool has_postactive_blocks();
-        int count_of_postactive();
+        bool has_postactive_blocks();  // Всегда возвращает false в классической модели
         void change_active_block();
         int serve(bool prevent_small_rooms = true);
         void evaluate_accelerations();
