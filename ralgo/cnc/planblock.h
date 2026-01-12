@@ -2,11 +2,13 @@
 #define RALGO_CNC_PLANBLOCK_H
 
 #include <assert.h>
+#include <cmath>
 #include <math.h>
 #include <nos/io/ostream.h>
 #include <nos/log.h>
 #include <nos/print.h>
 #include <ralgo/cnc/defs.h>
+#include <ralgo/log.h>
 #include <ralgo/cnc/util.h>
 #include <ralgo/linalg/vecops.h>
 #include <ralgo/linalg/vector_view.h>
@@ -346,7 +348,14 @@ namespace cnc
                 pathsqr += axdist[i] * axdist[i];
             cnc_float_type path = sqrt(pathsqr);
 
+            // DEBUG: Sanity check for corruption detection
+            if (path > 1e15 || path < 0 || std::isnan(path) || std::isinf(path))
+            {
+                ralgo::warn("CORRUPTION in set_state");
+            }
+
             this->fullpath = path;
+
             this->acceleration = acceleration;
             this->start_ic = 0;
 
@@ -381,6 +390,12 @@ namespace cnc
             cnc_float_type Vs = this->start_velocity;
             cnc_float_type Vf = this->final_velocity;
             cnc_float_type Vn = this->nominal_velocity;
+
+            // DEBUG: Check if fullpath is corrupted at recalculate_timing entry
+            if (path > 1e15 || std::isnan(path) || std::isinf(path))
+            {
+                ralgo::warn("recalculate_timing: CORRUPTED fullpath");
+            }
 
             if (acc <= 0 || path <= 0)
             {

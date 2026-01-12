@@ -438,11 +438,10 @@ namespace cnc
                 }
             }
 
+            system_lock();
             auto &placeblock = blocks->head_place();
             lastblock.blockno = blockno++;
             placeblock = lastblock;
-
-            system_lock();
             blocks->move_head_one();
 
             // Вызываем look-ahead пересчёт скоростей если он включен
@@ -768,6 +767,7 @@ namespace cnc
         int cmd_setprotect(const nos::argv &, nos::ostream &);
         int cmd_stop(const nos::argv &, nos::ostream &);
         int cmd_lastblock(const nos::argv &, nos::ostream &os);
+        int cmd_active_block(const nos::argv &, nos::ostream &os);
         int cmd_relmove(const nos::argv &argv, nos::ostream &os);
         int cmd_absmove(const nos::argv &argv, nos::ostream &os);
         int cmd_abspulses(const nos::argv &argv, nos::ostream &os);
@@ -795,6 +795,8 @@ namespace cnc
         int cmd_is_idle(const nos::argv &, nos::ostream &os);
         int cmd_flow_control(const nos::argv &argv, nos::ostream &os);
         int cmd_buffer(const nos::argv &argv, nos::ostream &os);
+        int cmd_ring_debug(const nos::argv &, nos::ostream &os);
+        int cmd_ring_history(const nos::argv &argv, nos::ostream &os);
 
         // CLI commands executor
         nos::executor executor;
@@ -807,6 +809,8 @@ namespace cnc
                 nos::make_delegate(&interpreter::cmd_stop, this)});
             executor.add_command({"lastblock", "Print last motion block info",
                 nos::make_delegate(&interpreter::cmd_lastblock, this)});
+            executor.add_command({"active_block", "Print currently executing block",
+                nos::make_delegate(&interpreter::cmd_active_block, this)});
             executor.add_command({"relmove", "Relative move. Args: <axis><dist>... F<feed> M<accel>",
                 nos::make_delegate(&interpreter::cmd_relmove, this)});
             executor.add_command({"absmove", "Absolute move. Args: <axis><pos>... F<feed> M<accel>",
@@ -866,6 +870,10 @@ namespace cnc
                 nos::make_delegate(&interpreter::cmd_flow_control, this)});
             executor.add_command({"buffer", "Buffer control. Args: enable|start|cancel|status|config",
                 nos::make_delegate(&interpreter::cmd_buffer, this)});
+            executor.add_command({"ring_debug", "Debug ring buffer indices and blocks",
+                nos::make_delegate(&interpreter::cmd_ring_debug, this)});
+            executor.add_command({"ring_history", "Show last N blocks (including deleted). Args: [count]",
+                nos::make_delegate(&interpreter::cmd_ring_history, this)});
             executor.add_command({"cmd", "text commands (legacy prefix)",
                 nos::make_delegate(&interpreter::command_drop_first, this)});
             executor.add_command({"cnc", "gcode commands (legacy prefix)",

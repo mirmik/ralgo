@@ -23,6 +23,34 @@ namespace cnc
         return 0;
     }
 
+    int interpreter::cmd_active_block(const nos::argv &, nos::ostream &os)
+    {
+        if (planner->active_block == nullptr)
+        {
+            nos::println_to(os, "No active block");
+            return 0;
+        }
+        auto *block = planner->active_block;
+        block->print_to_stream(os);
+        nos::fprintln_to(os, "iteration_counter: {}", planner->iteration_counter);
+
+        // Hex dump of potentially corrupted fields
+        nos::println_to(os, "=== HEX DUMP ===");
+        nos::print_to(os, "fullpath bytes: ");
+        auto *fp = reinterpret_cast<const uint8_t*>(&block->fullpath);
+        for (int i = 0; i < 8; ++i)
+            nos::fprint_to(os, "{:02x} ", fp[i]);
+        nos::println_to(os);
+
+        nos::print_to(os, "decel_after bytes: ");
+        auto *da = reinterpret_cast<const uint8_t*>(&block->deceleration_after_ic);
+        for (int i = 0; i < 8; ++i)
+            nos::fprint_to(os, "{:02x} ", da[i]);
+        nos::println_to(os);
+
+        return 0;
+    }
+
     int interpreter::cmd_relmove(const nos::argv &argv, nos::ostream &os)
     {
         if (argv.size() < 2)
@@ -425,6 +453,106 @@ namespace cnc
             nos::fprintln_to(os, "Unknown buffer command: {}", cmd);
             return 0;
         }
+    }
+
+    int interpreter::cmd_ring_debug(const nos::argv &, nos::ostream &os)
+    {
+        nos::println_to(os, "=== Ring Buffer Debug ===");
+        nos::fprintln_to(os, "sizeof(planner_block): {}", sizeof(planner_block));
+        nos::fprintln_to(os, "ring buffer addr: {:x}", (uintptr_t)&blocks->get(0));
+        nos::fprintln_to(os, "lastblock addr: {:x}", (uintptr_t)&lastblock);
+        nos::fprintln_to(os, "ring.r.head: {}", blocks->head_index());
+        nos::fprintln_to(os, "ring.r.tail: {}", blocks->tail_index());
+        nos::fprintln_to(os, "ring.r.size: {}", blocks->size());
+        nos::fprintln_to(os, "ring.avail: {}", blocks->avail());
+        nos::fprintln_to(os, "ring.room: {}", blocks->room());
+        nos::fprintln_to(os, "planner.active: {}", planner->active);
+        nos::fprintln_to(os, "planner.active_block: {}",
+            planner->active_block ? "valid" : "null");
+
+        // Print first few blocks from tail
+        int tail = blocks->tail_index();
+        int head = blocks->head_index();
+        int count = 0;
+        for (int i = tail; i != head && count < 5; i = blocks->fixup_index(i + 1), count++)
+        {
+            auto &block = blocks->get(i);
+            nos::fprintln_to(os, "\n--- Block at index {} ---", i);
+            nos::fprintln_to(os, "blockno: {}", block.blockno);
+            nos::fprintln_to(os, "fullpath: {:.5f}", block.fullpath);
+            // Print raw bytes of fullpath
+            uint8_t *fp_bytes = reinterpret_cast<uint8_t*>(&block.fullpath);
+            nos::fprint_to(os, "fullpath_hex: ");
+            for (int b = 0; b < 8; b++)
+                nos::fprint_to(os, "{:02x} ", fp_bytes[b]);
+            nos::println_to(os, "");
+            nos::fprintln_to(os, "accel_before_ic: {}", block.acceleration_before_ic);
+            nos::fprintln_to(os, "decel_after_ic: {}", block.deceleration_after_ic);
+            // Print raw bytes of decel_after_ic
+            uint8_t *da_bytes = reinterpret_cast<uint8_t*>(&block.deceleration_after_ic);
+            nos::fprint_to(os, "decel_after_ic_hex: ");
+            for (int b = 0; b < 8; b++)
+                nos::fprint_to(os, "{:02x} ", da_bytes[b]);
+            nos::println_to(os, "");
+            nos::fprintln_to(os, "block_finish_ic: {}", block.block_finish_ic);
+            // Check for suspicious values
+            if (block.deceleration_after_ic > 1e15 ||
+                block.block_finish_ic > 1e15 ||
+                block.fullpath < 0 || block.fullpath > 1e10)
+            {
+                nos::println_to(os, "!!! CORRUPTION DETECTED !!!");
+            }
+        }
+        return 0;
+    }
+
+    int interpreter::cmd_ring_history(const nos::argv &argv, nos::ostream &os)
+    {
+        // Read last N blocks from ring buffer (including "deleted" ones)
+        int count = 5; // default - keep small to avoid output overflow
+        if (argv.size() >= 2)
+            count = std::stoi(argv[1]);
+
+        // Limit to avoid hanging
+        if (count > 20)
+            count = 20;
+
+        int ring_size = blocks->size();
+        int tail = blocks->tail_index();
+        int head = blocks->head_index();
+
+        nos::fprintln_to(os, "Ring: size={} tail={} head={}", ring_size, tail, head);
+
+        if (ring_size == 0)
+        {
+            nos::println_to(os, "Ring buffer not initialized");
+            return 0;
+        }
+
+        // Read backwards from tail (including deleted blocks)
+        for (int i = 0; i < count; i++)
+        {
+            int idx = (tail - 1 - i + ring_size) % ring_size;
+            auto &block = blocks->get(idx);
+
+            // Use safe integer printing to avoid NaN/inf issues
+            nos::fprintln_to(os, "[{}] idx={} blk={}", -i-1, idx, block.blockno);
+
+            // Print raw int64 values (safe)
+            nos::fprintln_to(os, " acc_ic:{} dec_ic:{} fin_ic:{}",
+                block.acceleration_before_ic,
+                block.deceleration_after_ic,
+                block.block_finish_ic);
+
+            // Hex dump of fullpath only (8 bytes)
+            auto *fp = reinterpret_cast<const uint8_t*>(&block.fullpath);
+            nos::fprint_to(os, " fp:");
+            for (int b = 0; b < 8; b++)
+                nos::fprint_to(os, "{:02x}", fp[b]);
+            nos::println_to(os);
+        }
+
+        return 0;
     }
 
     // === G-code methods ===
