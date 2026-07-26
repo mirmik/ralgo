@@ -17,7 +17,9 @@
 #include <ralgo/linalg/vecops.h>
 #include <ralgo/log.h>
 
+#if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC optimize("Ofast")
+#endif
 namespace cnc
 {
     /**
@@ -120,6 +122,8 @@ namespace cnc
         void forward_pass();
     };
 }
+#if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC reset_options
+#endif
 
 #endif

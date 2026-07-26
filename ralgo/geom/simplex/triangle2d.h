@@ -1,4 +1,4 @@
-#ifndef RALGO_GEOM_SIMPLEX_TRIANGLE_32_H
+#ifndef RALGO_GEOM_SIMPLEX_TRIANGLE_2D_H
 #define RALGO_GEOM_SIMPLEX_TRIANGLE_2D_H
 
 #include <ralgo/geom/vector2d.h>

@@ -1,7 +1,9 @@
 #include <ralgo/cnc/planner.h>
 #include <ralgo/cnc/util.h>
 
+#if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC optimize("Ofast")
+#endif
 void cnc::planner::cleanup()
 {
     blocks->clear();
@@ -556,4 +558,6 @@ void cnc::planner::forward_pass()
     }
 }
 
+#if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC reset_options
+#endif

@@ -19,7 +19,6 @@ namespace cnc
     {
         if (!str) return 0.0;
 
-        char* end = nullptr;
         double mantissa = 0.0;
         int exponent = 0;
         int sign = 1;
