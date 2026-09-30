@@ -305,7 +305,8 @@ namespace cnc
             // Check control_scale for active axes
             for (auto idx : task.active_axes)
             {
-                if (idx >= 0 && idx < total_axes && _control_scale[idx] <= 0)
+                if (idx < static_cast<size_t>(total_axes) &&
+                    _control_scale[idx] <= 0)
                 {
                     report_error(error_code::invalid_control_scale, idx);
                     return true;

@@ -572,7 +572,7 @@ namespace cnc
         cleanup();
 
         // 5. Reset positions to zero
-        for (size_t i = 0; i < total_axes; i++)
+        for (int i = 0; i < total_axes; i++)
         {
             _final_position[i] = 0;
             revolver->get_steppers()[i]->set_counter_value(0);

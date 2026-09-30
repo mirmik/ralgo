@@ -433,7 +433,6 @@ TEST_CASE("emulator-like: INTEGRATION ERROR diagnostic")
     MESSAGE("=== Manual integration check ===");
     int64_t pos = 0;
     int64_t vel = 0;
-    int64_t total_ticks = block.block_finish_ic;
 
     // Accel phase
     for (int64_t tick = 0; tick < t; ++tick)

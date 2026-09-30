@@ -1,0 +1,13 @@
+diff --git a/Rx/v2/src/rxcpp/rx-notification.hpp b/Rx/v2/src/rxcpp/rx-notification.hpp
+index 4db642d..9727e95 100644
+--- a/Rx/v2/src/rxcpp/rx-notification.hpp
++++ b/Rx/v2/src/rxcpp/rx-notification.hpp
+@@ -176,7 +176,7 @@ private:
+         void accept(const typename base::observer_type& o) && override{
+             o.on_error(ep);
+         }
+-        const rxu::error_ptr ep;
++        rxu::error_ptr ep;
+     };
+ 
+     struct on_completed_notification : public base {
